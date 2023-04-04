@@ -1,7 +1,10 @@
 <script>
+  import page from 'page';
   import { afterUpdate } from 'svelte';
-  import { router } from '../stores';
-  import { fetchBuild, fetchBuildLog, updateBuild } from '../lib/api';
+  import { notification, router } from '../stores';
+  import {
+    fetchBuild, fetchBuildLog, updateBuild, rebuildBuild,
+  } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
   import {
     Await,
@@ -30,6 +33,17 @@
   }
 
   afterUpdate(() => { submitting = false; });
+
+  async function rebuild() {
+    try {
+      const siteId = await buildPromise.then((resp) => resp.site.id);
+      await rebuildBuild({ buildId: id, siteId });
+      page('/builds');
+      return notification.setSuccess(`Build ${id} restarted successfully!`);
+    } catch (error) {
+      return notification.setError(`Unable to rebuild ${id}: ${error.message}`);
+    }
+  }
 </script>
 
 <GridContainer>
@@ -70,6 +84,7 @@
               Repository
             </ExternalLink>
           </div>
+          <button on:click={rebuild} class="usa-button margin-top-1">Rebuild</button>
         </div>
       </div>
     </div>
