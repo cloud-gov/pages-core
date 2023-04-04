@@ -5,7 +5,6 @@ const path = require('path');
 const {
   app: {
     appEnv,
-    product,
   },
   redis: redisConfig,
 } = require('../../config');
