@@ -19,10 +19,6 @@ import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 import organizationActions from './actions/organizationActions';
 
-import globals from './globals';
-
-const isPages = globals.PRODUCT === 'pages';
-
 const { NODE_ENV } = process.env;
 
 let ErrorElement = null;
@@ -38,10 +34,10 @@ const fetchInitialData = () => {
 
 export default (
   <Route path="/" element={<App onEnter={fetchInitialData} />} errorElement={ErrorElement}>
-    {isPages && <Route path="organizations" element={<Organization.List />} />}
-    {isPages && <Route path="organizations/:id" element={<Organization.Edit />} />}
+    <Route path="organizations" element={<Organization.List />} />
+    <Route path="organizations/:id" element={<Organization.Edit />} />
     <Route path="sites" element={<SiteList />} />
-    {isPages && <Route path="sites/new" element={<AddSite />} /> }
+    <Route path="sites/new" element={<AddSite />} />
     <Route path="sites/:id" element={<SiteContainer />}>
       <Route path="" loader={() => redirect('builds')} />
       <Route path="settings" element={<SiteSettings />} />

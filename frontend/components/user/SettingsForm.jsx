@@ -3,10 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, clearSubmitErrors, reduxForm } from 'redux-form';
 
-import globals from '../../globals';
 import { ORGANIZATION, SITE } from '../../propTypes';
-
-const isPages = globals.PRODUCT === 'pages';
 
 function SettingsForm(props) {
   const {
@@ -30,7 +27,7 @@ function SettingsForm(props) {
           <thead>
             <tr>
               <th scope="col">Repository</th>
-              {isPages && <th scope="col">Organization</th>}
+              <th scope="col">Organization</th>
               <th scope="col">Build Notifications</th>
             </tr>
           </thead>
@@ -42,11 +39,9 @@ function SettingsForm(props) {
                   /
                   {site.repository}
                 </th>
-                {isPages && (
-                  <td data-title="Organization">
-                    {organizations.find(org => org.id === site.organizationId)?.name || '-'}
-                  </td>
-                )}
+                <td data-title="Organization">
+                  {organizations.find(org => org.id === site.organizationId)?.name || '-'}
+                </td>
                 <td>
                   <div className="flex justify-between">
                     <div>

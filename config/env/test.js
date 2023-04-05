@@ -41,11 +41,6 @@ module.exports = {
     bucket: 'cg-123456789',
     serviceName: 'federalist-dev-s3',
   },
-  dynamoDB: {
-    accessKeyId: '123abc',
-    secretAccessKey: '456def',
-    region: 'us-gov-west-1',
-  },
   passport: {
     github: {
       options: {

@@ -185,11 +185,6 @@ class CloudFoundryAPIClient {
       .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
   }
 
-  createSiteProxyRoute(bucketName, domainGuid, spaceGuid, appGuid) {
-    return this.createRoute(bucketName, domainGuid, spaceGuid)
-      .then(route => this.mapRoute(route.metadata.guid, appGuid));
-  }
-
   deleteRoute(host) {
     return this.accessToken()
       .then(token => this.request(
@@ -271,20 +266,6 @@ class CloudFoundryAPIClient {
       token
     )).then(res => findS3ServicePlan(res, serviceName, s3ServicePlanId))
       .then(service => service.metadata.guid);
-  }
-
-  mapRoute(routeGuid, appGuid) {
-    const body = {
-      app_guid: appGuid,
-      route_guid: routeGuid,
-    };
-
-    return this.accessToken().then(token => this.request(
-      'POST',
-      '/v2/route_mappings',
-      token,
-      body
-    ));
   }
 
   // Private methods

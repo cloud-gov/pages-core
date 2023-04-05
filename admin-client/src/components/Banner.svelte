@@ -26,14 +26,14 @@
           on:click|preventDefault={toggleBanner}
           class="usa-accordion__button usa-banner__button"
           aria-expanded={bannerOpen}
-          aria-controls="gov-banner-federalist">
+          aria-controls="gov-banner-pages">
           <span class="usa-banner__button-text">Here’s how you know</span>
         </button>
       </div>
     </header>
     <div
       class="usa-banner__content usa-accordion__content"
-      id="gov-banner-federalist"
+      id="gov-banner-pages"
       hidden={!bannerOpen}>
       <div class="grid-row grid-gap-lg">
         <div class="usa-banner__guidance tablet:grid-col-6">

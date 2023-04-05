@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-  <title>Federalist Admin</title>
+  <title>Pages Admin</title>
 </svelte:head>
 
 <Hero />
@@ -20,7 +20,7 @@
           This is a U.S. government service. Your use indicates your consent
           to monitoring, recording, and no expectation of privacy. Misuse is
           subject to criminal and civil penalties.
-          <a href="https://federalistapp.18f.gov/system-use">
+          <a href="https://pages.cloud.gov/system-use">
             Read more details.
           </a>
           <br />
