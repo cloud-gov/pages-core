@@ -3,8 +3,6 @@ const { Strategy } = require('passport-oauth2');
 const config = require('./config');
 const UAAClient = require('./uaaClient');
 
-let uaaLogoutRedirectURL;
-
 passport.serializeUser(({ id }, next) => {
   next(null, id);
 });
@@ -50,7 +48,6 @@ const createUAAStrategy = (options, verify) => {
   return strategy;
 };
 
-
 const uaaOptions = config.uaa;
 
 const verifyUAAUser = async (profile, uaaGroups) => {
@@ -81,10 +78,8 @@ const uaaStrategy = createUAAStrategy(uaaOptions, verify);
 
 passport.use('uaa', uaaStrategy);
 
-uaaLogoutRedirectURL = uaaStrategy.logoutRedirectURL;
-
-passport.logout = (idp) => {
-  const redirectURL = idp === 'uaa' ? uaaLogoutRedirectURL : '/';
+passport.logout = () => {
+  const redirectURL = uaaStrategy.logoutRedirectURL;
   return (req, res) => {
     req.logout();
     res.redirect(redirectURL);
