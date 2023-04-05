@@ -16,6 +16,7 @@ apiRouter.use(parseJson);
 apiRouter.get('/builds', AdminControllers.Build.list);
 apiRouter.get('/builds/:id', AdminControllers.Build.findById);
 apiRouter.get('/builds/:id/log', AdminControllers.Build.findBuildLog);
+apiRouter.post('/builds', AdminControllers.Build.rebuild);
 apiRouter.put('/builds/:id', AdminControllers.Build.update);
 apiRouter.get('/domains', AdminControllers.Domain.list);
 apiRouter.get('/domains/:id', AdminControllers.Domain.findById);
