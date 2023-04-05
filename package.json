@@ -37,7 +37,7 @@
     "js-file-download": "^0.4.11",
     "js-yaml": "^4.1.0",
     "json-to-csv": "^1.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.2",
     "newrelic": "^8.13.2",
     "node-schedule": "^2.0.0",
