@@ -51,7 +51,7 @@
     "react-router": "6",
     "react-router-dom": "^6.6.2",
     "redis": "^3.0.0",
-    "sequelize": "^6.3.5",
+    "sequelize": "^6.29.0",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2",
     "underscore": "^1.12.1",
