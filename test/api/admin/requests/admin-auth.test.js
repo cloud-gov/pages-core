@@ -108,7 +108,7 @@ describe('Admin authentication request', () => {
             .expect((res) => {
               expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
             });
-          const session = await sessionForCookie(cookie, 'federalist-admin.sid');
+          const session = await sessionForCookie(cookie, 'pages-admin.sid');
           expect(session.passport.user).to.exist;
           expect(session.role).to.exist;
         });

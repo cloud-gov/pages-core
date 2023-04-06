@@ -104,6 +104,10 @@ async function fetchBuild(id) {
   return get(`/builds/${id}`).catch(() => null);
 }
 
+async function rebuildBuild(body) {
+  return post('/builds', body);
+}
+
 async function updateBuild(id, params) {
   return put(`/builds/${id}`, params);
 }
@@ -233,6 +237,7 @@ export {
   fetchMe,
   fetchBuildLogEventSource,
   fetchBuild,
+  rebuildBuild,
   updateBuild,
   fetchBuilds,
   fetchBuildLog,

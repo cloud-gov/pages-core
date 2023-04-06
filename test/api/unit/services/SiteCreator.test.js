@@ -771,7 +771,6 @@ describe('SiteCreator', () => {
             space_guid: config.env.cfSpaceGuid,
             host: bucket,
           });
-          apiNocks.mockMapRoute(mapResponse);
 
           factory.user().then((model) => {
             user = model;

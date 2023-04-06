@@ -29,7 +29,7 @@ body {
   @include hr;
 }
 
-.federalist-hero {
+.pages-hero {
   padding-bottom: 60px;
   padding-top: 60px;
 
@@ -162,7 +162,7 @@ p {
     font-size: $body-font-size-med;
     line-height: 2em;
   }
- 
+
   &.small {
     font-size: $body-font-size-sm;
     line-height: 1em;

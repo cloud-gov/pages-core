@@ -51,7 +51,7 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
   });
 }
 
-const sessionForCookie = (cookie, sid = 'federalist-bull-board.sid') => {
+const sessionForCookie = (cookie, sid = 'pages-bull-board.sid') => {
   const sessionID = cookie.replace(`${sid}=s%3A`, '').split('.')[0];
   return new Promise((resolve, reject) => {
     sessionConfig.store.get(sessionID, (err, sessionBody) => {
@@ -162,7 +162,7 @@ if (config.product === 'pages') {
             .expect('Location', '/')
             .expect(302);
 
-          const authSession = await sessionForCookie(cookie, 'federalist-bull-board.sid');
+          const authSession = await sessionForCookie(cookie, 'pages-bull-board.sid');
 
           expect(authSession.passport.user).to.exist;
           expect(authSession.authenticated).to.equal(true);

@@ -1,13 +1,11 @@
-const config = require('../config');
-
 const dataType = {
   type: 'string',
 };
 
 const data = {
-  serviceName: config.s3.serviceName || 'federalist-dev-s3',
-  bucket: config.s3.bucket || 'cg-123456789',
-  region: config.s3.region || 'us-gov-west-1',
+  serviceName: 'cf-s3-site-service-name',
+  bucket: 's3-bucket-name',
+  region: 'us-gov-west-1',
 };
 
 const cmdCountRecords = 'SELECT count(*) from site;';

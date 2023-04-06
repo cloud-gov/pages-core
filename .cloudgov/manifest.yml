@@ -18,7 +18,6 @@ applications:
     services:
       - app-((env))-uaa-client
       - federalist-((env))-rds
-      - federalist-((env))-s3
       - ((product))-((env))-env
       - pages-((env))-redis
       - ((product))-((env))-proxy

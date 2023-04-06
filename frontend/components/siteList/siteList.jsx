@@ -17,10 +17,6 @@ import { IconPlus } from '../icons';
 import alertActions from '../../actions/alertActions';
 import userActions from '../../actions/userActions';
 
-import globals from '../../globals';
-
-const isPages = globals.PRODUCT === 'pages';
-
 const onGithubAuthSuccess = () => {
   userActions.fetchUser();
   alertActions.alertSuccess('Github authorization successful');
@@ -78,29 +74,28 @@ export const SiteList = ({
   const groupedSites = groupSitesByOrg(sites, orgFilterValue);
 
   let topButton = '';
-  if (isPages) {
-    if (user.hasGithubAuth && hasOrgs(organizations)) {
-      topButton = (
-        <Link
-          to="/sites/new"
-          role="button"
-          className="usa-button button-add-website"
-          alt="Add a new site"
-        >
-          <IconPlus />
-          {' '}
-          Add site
-        </Link>
-      );
-    } else {
-      topButton = (
-        <GithubAuthButton
-          onSuccess={onGithubAuthSuccess}
-          onFailure={onGithubAuthFailure}
-          text="Sign in to your Github account to add sites to the platform."
-        />
-      );
-    }
+
+  if (user.hasGithubAuth && hasOrgs(organizations)) {
+    topButton = (
+      <Link
+        to="/sites/new"
+        role="button"
+        className="usa-button button-add-website"
+        alt="Add a new site"
+      >
+        <IconPlus />
+        {' '}
+        Add site
+      </Link>
+    );
+  } else {
+    topButton = (
+      <GithubAuthButton
+        onSuccess={onGithubAuthSuccess}
+        onFailure={onGithubAuthFailure}
+        text="Sign in to your Github account to add sites to the platform."
+      />
+    );
   }
 
   return (

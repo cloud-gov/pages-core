@@ -16,8 +16,6 @@ import globals from '../../../globals';
 import EnvironmentVariableForm from './EnvironmentVariableForm';
 import EnvironmentVariableTable from './EnvironmentVariableTable';
 
-const isPages = globals.PRODUCT === 'pages';
-
 const infoContent = (
   <>
     Certain environment variable names are reserved for
@@ -45,10 +43,7 @@ const warningContent = (
     is a
     {' '}
     <b>
-      FISMA
-      {' '}
-      {isPages ? 'Moderate' : 'Low'}
-      {' '}
+      FISMA Moderate
     </b>
     system, do NOT store variables for systems that are High, and
     only expose variables if it is safe to do so. You assume the risk if the

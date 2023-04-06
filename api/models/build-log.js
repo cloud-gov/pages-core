@@ -14,8 +14,6 @@ const sanitizeBuildSecrets = (buildLog) => {
     include: [models.User],
   }).then((build) => {
     const secrets = [
-      config.s3.accessKeyId,
-      config.s3.secretAccessKey,
       config.build.token,
       build ? build.User.githubAccessToken : undefined,
     ];
