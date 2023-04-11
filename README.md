@@ -199,7 +199,7 @@ __*&#8595; NOTICE &#8595;*__
 
 #### Core deployment
 ##### Pipeline instance variables
-Two instances of the pipeline are set for the `pages staging` and `pages production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
+Three instances of the pipeline are set for the `pages dev`, `pages staging` and `pages production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
 
 |Instance Variable|Pages Dev|Pages Staging|Pages Production|
 --- | --- | ---| ---|
