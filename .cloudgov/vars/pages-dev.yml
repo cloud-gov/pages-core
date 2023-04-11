@@ -1,0 +1,16 @@
+product: pages
+name: pages-dev
+domain: pages-dev.cloud.gov
+memory: 256MB
+instances: 2
+env: dev
+env_postfix: -dev
+log_level: verbose
+feature_auth_github: 'false'
+feature_auth_uaa: 'true'
+feature_bull_site_build_queue: 'true'
+uaa_host: https://uaa.dev.us-gov-west-1.aws-us-gov.cloud.gov
+uaa_login_host: https://login.dev.us-gov-west-1.aws-us-gov.cloud.gov
+new_relic_app_name: web-pages-dev
+proxy_domain: sites.pages-dev.cloud.gov
+cf_cdn_space_name: sites-dev
