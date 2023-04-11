@@ -135,7 +135,6 @@ jobs:
         resource: pr-((deploy-env))
         passed: [set-pipeline]
         trigger: true
-        params: {depth: 1}
       - put: gh-status
         inputs: [src-api]
         params: {state: pending}
@@ -237,7 +236,6 @@ jobs:
         resource: pr-((deploy-env))
         passed: [set-pipeline]
         trigger: true
-        params: {depth: 1}
       - put: gh-status
         inputs: [src-admin-client]
         params: {state: pending}
@@ -315,7 +313,6 @@ jobs:
         resource: pr-((deploy-env))
         passed: [set-pipeline]
         trigger: true
-        params: {depth: 1}
       - put: gh-status
         inputs: [src-queues-ui]
         params: {state: pending}
@@ -374,7 +371,6 @@ jobs:
       - get: src
         resource: pr-((deploy-env))
         passed: [set-pipeline]
-        params: {depth: 1}
       - get: nightly
         trigger: true
       - in_parallel:
@@ -401,7 +397,6 @@ jobs:
     plan:
     - get: src
       resource: pr-((deploy-env))
-      params: {depth: 1}
       trigger: true
     - set_pipeline: core
       file: src/ci/pipeline-dev.yml
