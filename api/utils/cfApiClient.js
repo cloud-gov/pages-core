@@ -262,7 +262,7 @@ class CloudFoundryAPIClient {
   fetchS3ServicePlanGUID(serviceName, s3ServicePlanId) {
     return this.accessToken().then(token => this.request(
       'GET',
-      '/v2/service_plans',
+      '/v2/service_plans?results-per-page=100',
       token
     )).then(res => findS3ServicePlan(res, serviceName, s3ServicePlanId))
       .then(service => service.metadata.guid);
