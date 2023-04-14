@@ -39,7 +39,7 @@ _Note: some terminal commands may take a while to process, without offering feed
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
 
-2. Assuming you have been added to the `FederalistLocal` Github organization, navigate to the [developer settings for the `FederalistLocal` OAuth application](https://github.com/organizations/FederalistLocal/settings/applications/968257) and create a new Client secret.
+2. Navigate to the [developer settings for the `Pages-Local` OAuth application](https://github.com/organizations/cloud-gov/settings/applications/1994573) and create a new Client secret.
 
 3. Once you have the new Client secret, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with the Client ID and Client secret from the `FederalistLocal` OAuth application:
     ```js
