@@ -565,6 +565,7 @@ resources:
     source:
       uri: ((git-base-url))/((pages-repository-path))
       branch: ((git-branch))
+      commit_verification_keys: ((cloud-gov-pages-gpg-keys))
 
   - name: nightly
     type: time
