@@ -76,7 +76,7 @@ const mockFetchServiceInstanceCredentialsRequest = (guid, resources) => nock(url
   .reply(200, resources);
 
 const mockFetchS3ServicePlanGUID = resources => nock(url, reqheaders)
-  .get('/v2/service_plans')
+  .get('/v2/service_plans?results-per-page=100')
   .reply(200, resources);
 
 const mockFetchSpacesRequest = (name, resources) => nock(url, reqheaders)
