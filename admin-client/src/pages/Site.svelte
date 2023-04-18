@@ -166,9 +166,9 @@
       </AccordionContent>
       <Await on={siteWebhookPromise} let:response={hooks}>
         <AccordionContent title="Webhooks">
-          {hooks}
           <SiteFormWebhook
             {site}
+            {hooks}
             onSubmit={handleWebhookSubmit}
             onSuccess={handleWebhookSuccess}
             onFailure={handleWebhookFailure}
