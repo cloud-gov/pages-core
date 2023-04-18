@@ -1,5 +1,6 @@
 const { Organization, Site, Event } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
+const GithubBuildHelper = require('../../services/GithubBuildHelper');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, pick, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
@@ -54,6 +55,28 @@ module.exports = wrapHandlers({
     };
 
     return res.json(json);
+  },
+
+  createWebhook: async (req, res) => {
+    const {
+      params: { id },
+    } = req;
+
+    const site = await Site.withUsers(id);
+    const hook = await GithubBuildHelper.createSiteWebhook(site, site.Users);
+
+    return res.json(hook);
+  },
+
+  listWebhooks: async (req, res) => {
+    const {
+      params: { id },
+    } = req;
+
+    const site = await Site.withUsers(id);
+    const hooks = await GithubBuildHelper.listSiteWebhooks(site, site.Users);
+
+    return res.json(hooks);
   },
 
   findById: async (req, res) => {

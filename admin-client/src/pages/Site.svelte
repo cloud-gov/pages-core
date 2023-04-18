@@ -1,9 +1,11 @@
 <script>
   import { notification, router } from '../stores';
   import {
+    createSiteWebhook,
     fetchBuilds,
     fetchOrganizations,
     fetchSite,
+    fetchSiteWebhooks,
     fetchUserEnvironmentVariables,
     fetchUsers,
     updateSite,
@@ -19,6 +21,7 @@
     SiteDeleteForm,
     SiteForm,
     SiteFormOrganization,
+    SiteFormWebhook,
     SiteMetadata,
     UserTable,
   } from '../components';
@@ -26,6 +29,7 @@
 
   const { id } = $router.params;
   $: sitePromise = fetchSite(id);
+  $: siteWebhookPromise = fetchSiteWebhooks(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
   $: orgsPromise = fetchOrganizations({ limit: 100 });
   $: usersPromise = fetchUsers({ site: id });
@@ -51,6 +55,19 @@
   async function handleAdminConfigurationSuccess(site) {
     sitePromise = Promise.resolve(site);
     notification.setSuccess('Site updated successfully');
+  }
+
+  async function handleWebhookSubmit(siteId) {
+    return createSiteWebhook(siteId);
+  }
+
+  async function handleWebhookSuccess(site) {
+    sitePromise = Promise.resolve(site);
+    notification.setSuccess('Site webhook created successfully');
+  }
+
+  async function handleWebhookFailure() {
+    notification.setError('Site webhook create error');
   }
 
   function domains(site) {
@@ -147,6 +164,17 @@
           </a>
         </div>
       </AccordionContent>
+      <Await on={siteWebhookPromise} let:response={hooks}>
+        <AccordionContent title="Webhooks">
+          {hooks}
+          <SiteFormWebhook
+            {site}
+            onSubmit={handleWebhookSubmit}
+            onSuccess={handleWebhookSuccess}
+            onFailure={handleWebhookFailure}
+          />
+        </AccordionContent>
+      </Await>
       <AccordionContent title="Admin Configuration">
         <SiteForm
           {site}
