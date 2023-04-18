@@ -61,13 +61,12 @@
     return createSiteWebhook(siteId);
   }
 
-  async function handleWebhookSuccess(site) {
-    sitePromise = Promise.resolve(site);
+  async function handleWebhookSuccess() {
     notification.setSuccess('Site webhook created successfully');
   }
 
-  async function handleWebhookFailure() {
-    notification.setError('Site webhook create error');
+  async function handleWebhookFailure(error) {
+    notification.setError(`Site webhook create error: ${error.message}`);
   }
 
   function domains(site) {

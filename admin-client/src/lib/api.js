@@ -201,7 +201,7 @@ async function fetchSites(query = {}) {
 }
 
 async function createSiteWebhook(id) {
-  return post(`/sites/${id}/webhooks`).catch(() => null);
+  return post(`/sites/${id}/webhooks`);
 }
 
 async function fetchSiteWebhooks(id) {

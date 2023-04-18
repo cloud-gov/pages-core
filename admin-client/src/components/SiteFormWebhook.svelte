@@ -30,7 +30,7 @@
       </tr>
     </DataTable>
   </div>
-  <div class="grid-col-8 grid-offset-4">
+  <div class="grid-col-12">
     <Form
       action="Add Pages Webhook"
       onSubmit={() => onSubmit(site.id)}
