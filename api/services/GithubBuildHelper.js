@@ -32,6 +32,16 @@ const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
   return getNextToken(users[count]);
 };
 
+const createSiteWebhook = async (site, siteUsers) => {
+  const githubAccessToken = await getAccessTokenWithPushPermissions(site, siteUsers);
+  return GitHub.setWebhook(site, githubAccessToken);
+};
+
+const listSiteWebhooks = async (site, siteUsers) => {
+  const githubAccessToken = await getAccessTokenWithPushPermissions(site, siteUsers);
+  return GitHub.listSiteWebhooks(site, githubAccessToken);
+};
+
 const loadBuildUserAccessToken = async (build) => {
   let githubAccessToken;
   const site = build.Site;
@@ -101,4 +111,10 @@ const fetchContent = async (build, path) => {
   return GitHub.getContent(accessToken, owner, repository, path, build.clonedCommitSha);
 };
 
-module.exports = { reportBuildStatus, fetchContent, loadBuildUserAccessToken };
+module.exports = {
+  createSiteWebhook,
+  listSiteWebhooks,
+  reportBuildStatus,
+  fetchContent,
+  loadBuildUserAccessToken,
+};

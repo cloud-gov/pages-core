@@ -29,7 +29,7 @@
         errors = error.errors;
       }
       if (onFailure) {
-        onFailure();
+        onFailure(error);
       }
     }
   }

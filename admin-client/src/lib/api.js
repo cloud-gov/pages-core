@@ -200,6 +200,14 @@ async function fetchSites(query = {}) {
   return get('/sites', query).catch(() => []);
 }
 
+async function createSiteWebhook(id) {
+  return post(`/sites/${id}/webhooks`);
+}
+
+async function fetchSiteWebhooks(id) {
+  return get(`/sites/${id}/webhooks`).catch(() => null);
+}
+
 async function fetchRawSites() {
   return get('/sites/raw').catch(() => []);
 }
@@ -261,6 +269,8 @@ export {
   fetchRoles,
   fetchSite,
   fetchSites,
+  createSiteWebhook,
+  fetchSiteWebhooks,
   fetchRawSites,
   fetchUserEnvironmentVariables,
   fetchUser,

@@ -39,7 +39,7 @@ _Note: some terminal commands may take a while to process, without offering feed
 1. Make a copy of `config/local.sample.js` and name it `local.js` and place it in the `config` folder. You can do this by running `cp config/local{.sample,}.js`
 This will be the file that holds your S3 and SQS configurations.
 
-2. Assuming you have been added to the `FederalistLocal` Github organization, navigate to the [developer settings for the `FederalistLocal` OAuth application](https://github.com/organizations/FederalistLocal/settings/applications/968257) and create a new Client secret.
+2. Navigate to the [developer settings for the `Pages-Local` OAuth application](https://github.com/organizations/cloud-gov/settings/applications/1994573) and create a new Client secret.
 
 3. Once you have the new Client secret, you'll see a `Client ID` and `Client Secret`. Open the `config/local.js` file in your text or code editor and update it with the Client ID and Client secret from the `FederalistLocal` OAuth application:
     ```js
@@ -188,19 +188,24 @@ We are in the process of migrating from CircleCI to an internal instance of Conc
 #### CI deployments
 This repository contains two distinct deployment pipelines in concourse:
 - [__Core__](./ci/pipeline.yml)
+- [__Core Dev__](./ci/pipeline-dev.yml)
 - [__Metrics__](./apps/metrics/ci/pipeline.yml)
 
 __Core__ deploys the Pages app/api, the admin app, and the queues app. __Metrics__ deploys concourse tasks to check our app/infrastructure health.
 
+__*&#8595; NOTICE &#8595;*__
+
+> __Core Dev__ deploys the Pages app/api, the admin app, and the queues app when a PR is created into the `staging` branch. This uses a unique pipeline file: [./ci/pipeline-dev.yml](./ci/pipeline-dev.yml)
+
 #### Core deployment
 ##### Pipeline instance variables
-Two instances of the pipeline are set for the `pages staging` and `pages production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
+Three instances of the pipeline are set for the `pages dev`, `pages staging` and `pages production` environments. Instance variables are used to fill in Concourse pipeline parameter variables bearing the same name as the instance variable. See more on [Concourse vars](https://concourse-ci.org/vars.html). Each instance of the pipeline has three instance variables associated to it: `deploy-env`, `git-branch`. `product`
 
-|Instance Variable |Pages Staging| Pages Production|
---- | --- | ---|
-|**`deploy-env`**|`staging`|`production`|
-|**`git-branch`**|`staging`|`main`|
-|**`product`**|`pages`|`pages`|
+|Instance Variable|Pages Dev|Pages Staging|Pages Production|
+--- | --- | ---| ---|
+|**`deploy-env`**|`dev`|`staging`|`production`|
+|**`git-branch`**|`staging`|`staging`|`main`|
+|**`product`**|`pages`|`pages`|`pages`|
 
 ##### Pipeline credentials
 Concourse CI integrates directly with [Credhub](https://docs.cloudfoundry.org/credhub/) to provide access to credentials/secrets at job runtime. When a job is started, Concourse will resolve the parameters within the pipeline with the latest credentials using the double parentheses notation (ie. `((<credential-name>))`). See more about the [credentials lookup rules](https://concourse-ci.org/credhub-credential-manager.html#credential-lookup-rules).
@@ -221,14 +226,25 @@ Some credentials in this pipeline are "compound" credentials that use the pipeli
 |**`((pages-repository-path))`**|The url path to the repository|:x:|
 |**`((gh-access-token))`**| The Github access token|:x:|
 
-##### Setting up the pipeline
-The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the respective `git-branch` source will automatically set the pipeline with any updates. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. Run the following command with the fly CLI to set a pipeline instance:
+##### Setting up the pipeline for Core
+The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the respective `git-branch` source will automatically set the pipeline. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. Run the following command with the fly CLI to set a pipeline instance:
 
 ```bash
 $ fly -t <Concourse CI Target Name> set-pipeline -p core \
   -c ci/pipeline.yml \
   -i git-branch=main \
   -i deploy-env=production
+  -i product=pages
+```
+
+##### Setting up the pipeline for Core Dev
+The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates from a source PR will automatically set the pipeline. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. Run the following command with the fly CLI to set a pipeline instance:
+
+```bash
+$ fly -t <Concourse CI Target Name> set-pipeline -p core \
+  -c ci/pipeline-dev.yml \
+  -i git-branch=staging \
+  -i deploy-env=dev
   -i product=pages
 ```
 
