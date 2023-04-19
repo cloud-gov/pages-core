@@ -9,6 +9,7 @@
   export let onFailure;
 
   const hookData = hooks.map((hook) => ({
+    id: hook?.id,
     url: hook?.config?.url,
     status: hook?.last_response?.status,
     message: hook?.last_response?.message,
@@ -19,11 +20,13 @@
   <div class="grid-col-12">
     <DataTable data={hookData} borderless>
       <tr slot="header">
-        <th class="center">URL</th>
+        <th>ID</th>
+        <th>URL</th>
         <th>Status</th>
         <th>Message</th>
       </tr>
       <tr slot="item" let:item={hook}>
+        <td>{hook.id}</td>
         <td>{hook.url}</td>
         <td>{hook.status}</td>
         <td>{hook.message}</td>
