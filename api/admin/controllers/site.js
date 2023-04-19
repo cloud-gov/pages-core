@@ -65,7 +65,7 @@ module.exports = wrapHandlers({
     const site = await Site.withUsers(id);
     const hook = await GithubBuildHelper.createSiteWebhook(site, site.Users);
 
-    return res.json(hook);
+    return res.json(hook || []);
   },
 
   listWebhooks: async (req, res) => {
