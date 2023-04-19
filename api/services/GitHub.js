@@ -289,6 +289,13 @@ module.exports = {
     }))
     .catch(handleWebhookError),
 
+  listSiteWebhooks: async (site, githubAccessToken) => {
+    const github = await githubClient(githubAccessToken);
+    const { owner, repository: repo } = site;
+
+    return (await listWebhooks(github, { owner, repo }).catch(ignore404)) || [];
+  },
+
   deleteWebhook: async (site, githubAccessToken) => {
     const github = await githubClient(githubAccessToken);
 
