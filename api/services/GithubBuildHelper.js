@@ -1,6 +1,8 @@
 const url = require('url');
 const GitHub = require('./GitHub');
 const config = require('../../config');
+const EventCreator = require('./EventCreator');
+const { Event } = require('../models');
 const { buildViewLink } = require('../utils/build');
 
 // Loops through supplied list of users, until it
@@ -19,6 +21,7 @@ const getAccessTokenWithCertainPermissions = async (site, siteUsers, permission)
       const permissions = await GitHub.checkPermissions(user, site.owner, site.repository);
 
       if (permissions[permission]) {
+        EventCreator.audit(Event.labels.TOKEN_ACTION, user, `token action on site ${site.id}`)
         return user.githubAccessToken;
       }
       count += 1;
