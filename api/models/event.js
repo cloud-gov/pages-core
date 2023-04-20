@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     REQUEST_HANDLER: 'request-handler',
     USER_ACTION: 'user-action',
     ADMIN_ACTION: 'admin-action',
+    TOKEN_ACTION: 'token-action',
   };
 
   function isValidType(value) {

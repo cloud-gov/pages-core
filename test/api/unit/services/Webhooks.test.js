@@ -51,7 +51,7 @@ describe('Webhooks Service', () => {
     beforeEach(() => {
       nock.cleanAll();
       githubAPINocks.status();
-      githubAPINocks.repo({ response: [201, { permissions: { admin: false, push: true } }] });
+      githubAPINocks.repo({ response: [201, { permissions: { admin: true, push: true } }] });
       sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
     });
 
