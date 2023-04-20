@@ -5,7 +5,7 @@ const { buildViewLink } = require('../utils/build');
 
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
-const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
+const getAccessTokenWithCertainPermissions = async (site, siteUsers, permission) => {
   let count = 0;
   const users = siteUsers.filter(u => u.githubAccessToken && u.signedInAt)
     .sort((a, b) => b.signedInAt - a.signedInAt);
@@ -18,7 +18,7 @@ const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
 
       const permissions = await GitHub.checkPermissions(user, site.owner, site.repository);
 
-      if (permissions.push) {
+      if (permissions[permission]) {
         return user.githubAccessToken;
       }
       count += 1;
@@ -30,15 +30,19 @@ const getAccessTokenWithPushPermissions = async (site, siteUsers) => {
   };
 
   return getNextToken(users[count]);
-};
+}
+
+const getAccessTokenWithPushPermissions = async (site, siteUsers) => getAccessTokenWithCertainPermissions(site, siteUsers, 'push');
+
+const getAccessTokenWithAdminPermissions = async (site, siteUsers) => getAccessTokenWithCertainPermissions(site, siteUsers, 'admin');
 
 const createSiteWebhook = async (site, siteUsers) => {
-  const githubAccessToken = await getAccessTokenWithPushPermissions(site, siteUsers);
+  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, siteUsers);
   return GitHub.setWebhook(site, githubAccessToken);
 };
 
 const listSiteWebhooks = async (site, siteUsers) => {
-  const githubAccessToken = await getAccessTokenWithPushPermissions(site, siteUsers);
+  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, siteUsers);
   return GitHub.listSiteWebhooks(site, githubAccessToken);
 };
 
