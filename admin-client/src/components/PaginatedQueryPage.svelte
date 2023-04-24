@@ -1,5 +1,6 @@
 <script>
   import page from 'page';
+  import Svelecte from 'svelecte';
   import { formToObj, objToQueryString } from '../lib/utils';
   import { router } from '../stores';
   import Await from './Await.svelte';
@@ -37,6 +38,7 @@
 
   function handleSubmit(event) {
     const obj = formToObj(event.target);
+    console.log(event, obj)
     const queryString = objToQueryString({ ...params, ...obj });
     expanded = false;
     page(`/${path}?${queryString}`);
@@ -100,6 +102,12 @@
                                 </option>
                               {/each}
                             </select>
+                          </fieldset>
+                        {/if}
+                        {#if field.type === 'select-auto'}
+                          <fieldset class="usa-fieldset">
+                            <label class="usa-label" for={field.name}>{field.label || field.name}</label>
+                            <Svelecte style="min-width: 400px;" clearable={true} valueAsObject={true} labelField="name" name={field.name} options={field.options(payload.meta)}/>
                           </fieldset>
                         {/if}
                       {/each}
