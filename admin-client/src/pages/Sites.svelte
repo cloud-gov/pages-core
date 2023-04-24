@@ -4,7 +4,7 @@
 
   const fields = {
     organization: {
-      type: 'select',
+      type: 'select-auto',
       options: (meta) => meta.orgs.map((org) => ({
         name: org.name,
         value: org.id,
