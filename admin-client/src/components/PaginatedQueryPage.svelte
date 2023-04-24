@@ -38,7 +38,6 @@
 
   function handleSubmit(event) {
     const obj = formToObj(event.target);
-    console.log(event, obj)
     const queryString = objToQueryString({ ...params, ...obj });
     expanded = false;
     page(`/${path}?${queryString}`);
