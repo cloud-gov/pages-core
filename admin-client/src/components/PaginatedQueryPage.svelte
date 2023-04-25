@@ -106,7 +106,7 @@
                         {#if field.type === 'select-auto'}
                           <fieldset class="usa-fieldset">
                             <label class="usa-label" for={field.name}>{field.label || field.name}</label>
-                            <Svelecte style="min-width: 400px;" clearable={true} valueAsObject={true} labelField="name" name={field.name} options={field.options(payload.meta)}/>
+                            <Svelecte clearable={true} valueAsObject={true} labelField="name" name={field.name} options={field.options(payload.meta)}/>
                           </fieldset>
                         {/if}
                       {/each}
@@ -238,5 +238,11 @@
   }
   .usa-navbar.controls > *{
     margin-right: 2rem;
+  }
+  :global(.svelecte-control) {
+    min-width: 400px;
+  }
+  :global(.inputBox) {
+    width: 100% !important;
   }
 </style>
