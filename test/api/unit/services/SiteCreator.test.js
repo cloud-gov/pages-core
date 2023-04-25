@@ -342,7 +342,7 @@ describe('SiteCreator', () => {
     });
 
     context('when the site is created from a template', () => {
-      const template = 'uswds-jekyll';
+      const template = 'uswds-11ty';
       let user;
       let siteParams, name;
 
@@ -462,7 +462,7 @@ describe('SiteCreator', () => {
           .catch(done);
       });
 
-      it('should use jekyll as the build engine', (done) => {
+      it('should use node as the build engine', (done) => {
         factory.user()
           .then((model) => {
             user = model;
@@ -470,7 +470,7 @@ describe('SiteCreator', () => {
             githubAPINocks.webhook();
             return SiteCreator.createSite({ siteParams, user });
           }).then((site) => {
-            expect(site.engine).to.equal('jekyll');
+            expect(site.engine).to.equal('node.js');
             done();
           }).catch(done);
       });

@@ -9,16 +9,6 @@ module.exports = {
     description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
     thumb: '/images/pages-uswds-v3-11ty-thumbnail.png',
   },
-  'uswds-jekyll': {
-    owner: 'cloud-gov',
-    repo: 'pages-uswds-jekyll',
-    branch: 'main',
-    engine: 'jekyll',
-    example: 'https://uswds-jekyll.pages.cloud.gov',
-    title: 'Jekyll - U.S. Web Design System v2.0',
-    description: 'A flexible multi-page setup intended to introduce an agency or program. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
-    thumb: '/images/pages-uswds-v2-thumbnail.png',
-  },
   'uswds-gatsby': {
     owner: 'cloud-gov',
     repo: 'pages-uswds-gatsby',

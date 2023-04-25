@@ -450,8 +450,8 @@ describe('Site API', () => {
           owner: siteOwner,
           repository: siteRepository,
           defaultBranch: 'main',
-          engine: 'jekyll',
-          template: 'uswds-jekyll',
+          engine: 'node.js',
+          template: 'uswds-11ty',
         })
         .set('Cookie', cookie)
         .expect(200))
@@ -500,9 +500,9 @@ describe('Site API', () => {
           owner: siteOwner,
           repository: siteRepository,
           defaultBranch: 'main',
-          engine: 'jekyll',
+          engine: 'node.js',
           organizationId: org.id,
-          template: 'uswds-jekyll',
+          template: 'uswds-11ty',
         })
         .set('Cookie', cookie)
         .expect(200))
