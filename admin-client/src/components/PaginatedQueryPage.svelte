@@ -242,4 +242,7 @@
   :global(.svelecte-control) {
     min-width: 400px;
   }
+  :global(.inputBox) {
+    width: 100% !important;
+  }
 </style>
