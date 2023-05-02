@@ -29,7 +29,7 @@ applications:
       - mailer
       - slack
     env:
-      NODE_ENV: production
+      NODE_ENV: ((node_env))
       APP_ENV: ((env))
       ADMIN_HOSTNAME: https://admin.((domain))
       APP_HOSTNAME: https://((domain))
@@ -71,7 +71,7 @@ applications:
     env:
       ADMIN_GITHUB_ORGANIZATION: 18F
       ADMIN_GITHUB_TEAM: federalist-admins
-      NODE_ENV: production
+      NODE_ENV: ((node_env))
       APP_ENV: ((env))
       APP_HOSTNAME: https://queues.((domain))
       LOG_LEVEL: ((log_level))
