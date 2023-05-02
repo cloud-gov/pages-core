@@ -40,7 +40,7 @@
     },
     "engine": {
       "type": "string",
-      "enum": ["jekyll", "hugo", "static"]
+      "enum": ["jekyll", "hugo", "static", "node.js"]
     },
     "owner": {
       "type": "string"
