@@ -149,7 +149,7 @@ jobs:
           run:
             dir: src-api
             path: bash
-            args: [-c, yarn build]
+            args: [-c, yarn build-dev]
 
       - task: deploy-api
         config:
