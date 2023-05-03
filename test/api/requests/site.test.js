@@ -21,7 +21,7 @@ const {
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const siteErrors = require('../../../api/responses/siteErrors');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
-const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
+const UsersHelper = require('../../../api/services/UsersHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 const DomainService = require('../../../api/services/Domain');
 
@@ -1391,7 +1391,7 @@ describe('Site API', () => {
               permissions: { admin: false, push: true },
             }],
           });
-          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves(['org-admin']);
+          sinon.stub(UsersHelper, 'githubUsersAdmins').resolves(['org-admin']);
           return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
@@ -1426,7 +1426,7 @@ describe('Site API', () => {
               permissions: { admin: false, push: true },
             }],
           });
-          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves([site.Users[0].username]);
+          sinon.stub(UsersHelper, 'githubUsersAdmins').resolves([site.Users[0].username]);
           return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)

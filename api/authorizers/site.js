@@ -1,7 +1,7 @@
 const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
 const { Organization, Site } = require('../models');
-const FederalistUsersHelper = require('../services/FederalistUsersHelper');
+const UsersHelper = require('../services/UsersHelper');
 const { fetchModelById } = require('../utils/queryDatabase');
 
 const authorize = async ({ id: userId }, { id: siteId }) => {
@@ -51,7 +51,7 @@ const authorizeRepositoryAdmin = (user, site) => (
 );
 
 function authorizeFederalistUsersAdmin(user) {
-  return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
+  return UsersHelper.githubUsersAdmins(user.githubAccessToken)
     .then((admins) => {
       if (!admins.includes(user.username)) {
         throw 'user is not a system operator';

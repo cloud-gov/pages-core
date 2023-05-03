@@ -7,7 +7,7 @@ const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require('../../../../api/authorizers/site');
 const { Role } = require('../../../../api/models');
 const siteErrors = require('../../../../api/responses/siteErrors');
-const FederalistUsersHelper = require('../../../../api/services/FederalistUsersHelper');
+const UsersHelper = require('../../../../api/services/UsersHelper');
 
 describe('Site authorizer', () => {
   describe('.create(user, params)', () => {
@@ -229,7 +229,7 @@ describe('Site authorizer', () => {
   describe('.destroy(user, site)', () => {
     let stub;
     beforeEach(() => {
-      stub = sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins');
+      stub = sinon.stub(UsersHelper, 'githubUsersAdmins');
       nock.cleanAll();
     });
     afterEach(() => {
