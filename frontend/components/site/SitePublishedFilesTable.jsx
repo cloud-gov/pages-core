@@ -115,6 +115,9 @@ function SitePublishedFilesTable() {
   }, [currentPage]);
 
   useEffect(() => {
+    if (!publishedFiles.data) {
+      return;
+    }
     // either our data wasn't truncated or we need to store the last key for future data fetching
     if (!publishedFiles.data.isTruncated) {
       setLastPage(currentPage);
@@ -128,7 +131,7 @@ function SitePublishedFilesTable() {
     return <LoadingIndicator />;
   }
 
-  if (!publishedFiles.data.files.length) {
+  if (!publishedFiles.data || !publishedFiles.data.files.length) {
     return (
       <AlertBanner
         status="info"
