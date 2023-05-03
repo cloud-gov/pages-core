@@ -127,7 +127,7 @@ function SitePublishedFilesTable() {
     }
   }, [publishedFiles]);
 
-  if (publishedFiles.isLoading) {
+  if (publishedFiles.isLoading || !publishedFiles.data) {
     return <LoadingIndicator />;
   }
 
