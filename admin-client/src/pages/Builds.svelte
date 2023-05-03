@@ -4,7 +4,7 @@
   
   const fields = {
     site: {
-      type: 'select',
+      type: 'select-auto',
       options: (meta) => meta.sites.map((site) => ({
         name: `${site.owner}/${site.repository}`,
         value: site.id,
