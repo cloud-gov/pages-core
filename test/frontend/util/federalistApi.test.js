@@ -119,12 +119,12 @@ describe('federalistApi', () => {
 
   describe('fetchPublishedFiles', () => {
     it('is defined', () => {
-      federalistApi.fetchPublishedFiles(testSite, testBranch);
+      federalistApi.fetchPublishedFiles(testSite.id, testBranch);
       testRouteCalled('getPublishedFiles');
     });
 
     it('works with the startAtKey param', () => {
-      federalistApi.fetchPublishedFiles(testSite, testBranch, 'boop');
+      federalistApi.fetchPublishedFiles(testSite.id, testBranch, 'boop');
       testRouteCalled('getPublishedFilesWithQueryParam');
     });
   });

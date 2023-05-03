@@ -101,8 +101,6 @@ function renderPublishedFilesTable(files, name, currentPage, lastPage, setCurren
 
 function SitePublishedFilesTable() {
   const { id, name } = useParams();
-  console.log(`id : ${id}`);
-  console.log(`name : ${name}`);
   const publishedFiles = useSelector(state => state.publishedFiles);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -129,11 +127,11 @@ function SitePublishedFilesTable() {
     }
   }, [publishedFiles]);
 
-  if (publishedFiles.isLoading || !publishedFiles.data) {
+  if (publishedFiles.isLoading) {
     return <LoadingIndicator />;
   }
 
-  if (!publishedFiles.data.files.length) {
+  if (!publishedFiles.data || !publishedFiles.data.files.length) {
     return (
       <AlertBanner
         status="info"

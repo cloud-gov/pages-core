@@ -87,8 +87,8 @@ export default {
     return request(`site/${site.id}/published-branch`);
   },
 
-  fetchPublishedFiles(site, branch, startAtKey = null) {
-    let path = `site/${site.id}/published-branch/${branch}/published-file`;
+  fetchPublishedFiles(id, branch, startAtKey = null) {
+    let path = `site/${id}/published-branch/${branch}/published-file`;
     if (startAtKey) {
       path += `?startAtKey=${startAtKey}`;
     }
