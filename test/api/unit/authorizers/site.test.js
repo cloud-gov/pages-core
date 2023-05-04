@@ -1,13 +1,11 @@
 const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
-const sinon = require('sinon');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require('../../../../api/authorizers/site');
 const { Role } = require('../../../../api/models');
 const siteErrors = require('../../../../api/responses/siteErrors');
-const FederalistUsersHelper = require('../../../../api/services/FederalistUsersHelper');
 
 describe('Site authorizer', () => {
   describe('.create(user, params)', () => {
@@ -227,13 +225,10 @@ describe('Site authorizer', () => {
   });
 
   describe('.destroy(user, site)', () => {
-    let stub;
     beforeEach(() => {
-      stub = sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins');
       nock.cleanAll();
     });
     afterEach(() => {
-      stub.restore();
       nock.cleanAll();
     });
     it('should resolve if the user is associated with the site', async () => {
@@ -255,44 +250,17 @@ describe('Site authorizer', () => {
     it('should reject if the user is not associated with the site', async () => {
       const [user, site] = await Promise.all([factory.user(), factory.site()]);
 
-      stub.rejects();
-
-      githubAPINocks.repo({
-        owner: site.owner,
-        repository: site.repo,
-        response: [200, {
-          permissions: { admin: true, push: true },
-        }],
-      });
-
       const error = await authorizer.destroy(user, site)
         .catch(err => err);
 
       expect(error).to.be.throw;
-      return expect(error.status).to.equal(403);
-    });
-
-    it('should accept if user is not assoc with the site but is feralist-users admin', async () => {
-      const [user, site] = await Promise.all([factory.user(), factory.site()]);
-
-      stub.resolves([user.username]);
-      githubAPINocks.repo({
-        owner: site.owner,
-        repository: site.repo,
-        response: [200, {
-          permissions: { admin: true, push: true },
-        }],
-      });
-
-      const expected = await authorizer.destroy(user, site);
-      return expect(expected).to.be.undefined;
+      return expect(error).to.equal(403);
     });
 
     it('should reject if the user is associated with the site but not an admin', async () => {
       const user = await factory.user();
       const site = await factory.site({ users: Promise.all([user]) });
 
-      stub.rejects();
       githubAPINocks.repo({
         owner: site.owner,
         repository: site.repo,
@@ -327,7 +295,6 @@ describe('Site authorizer', () => {
       const user = await factory.user();
       const site = await factory.site({ users: Promise.all([user]) });
 
-      stub.resolves([]);
       githubAPINocks.repo({
         owner: site.owner,
         repository: site.repo,

@@ -61,7 +61,6 @@ function pagesWorker(connection) {
 
   const scheduledJobProcessor = Processors.multiJobProcessor({
     nightlyBuilds: Processors.nightlyBuilds,
-    revokeMembershipForUAAUsers: Processors.revokeMembershipForUAAUsers,
     sandboxNotifications: Processors.sandboxNotifications,
     timeoutBuilds: Processors.timeoutBuilds,
     cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
@@ -97,7 +96,6 @@ function pagesWorker(connection) {
       ? archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig)
       : Promise.resolve(),
     scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
-    scheduledQueue.add('revokeMembershipForUAAUsers', {}, nightlyJobConfig),
     scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
     scheduledQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
     scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig),

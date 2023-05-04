@@ -1,7 +1,6 @@
 const GitHub = require('./GitHub');
 const { Site, User } = require('../models');
 const siteErrors = require('../responses/siteErrors');
-const FederalistUsersHelper = require('./FederalistUsersHelper');
 const config = require('../../config');
 
 const checkGithubRepository = ({ user, owner, repository }) => GitHub
@@ -14,21 +13,10 @@ const checkGithubRepository = ({ user, owner, repository }) => GitHub
       };
     }
     if (!repo.permissions || !repo.permissions.push) {
-      return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
-        .then((admins) => {
-          if (!admins.includes(user.username)) {
-            throw {
-              message: siteErrors.WRITE_ACCESS_REQUIRED,
-              status: 400,
-            };
-          }
-        })
-        .catch(() => {
-          throw {
-            message: siteErrors.WRITE_ACCESS_REQUIRED,
-            status: 400,
-          };
-        });
+      throw {
+        message: siteErrors.WRITE_ACCESS_REQUIRED,
+        status: 400,
+      };
     }
     return true;
   });
