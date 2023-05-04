@@ -14,3 +14,4 @@ uaa_login_host: https://login.fr-stage.cloud.gov
 new_relic_app_name: web-pages-dev
 proxy_domain: sites.pages-dev.cloud.gov
 cf_cdn_space_name: sites-dev
+node_env: development

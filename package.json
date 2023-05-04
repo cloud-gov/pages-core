@@ -64,6 +64,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.production.config.js",
+    "build-dev": "webpack --config webpack.development-build.config.js",
     "start": "node index.js",
     "start-workers": "node ./api/workers/index.js",
     "start-bull-board:cg": "node -r ./api/bull-board/cfEnv.js ./api/bull-board/index.js",
