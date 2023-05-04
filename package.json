@@ -41,7 +41,7 @@
     "moment": "^2.29.2",
     "newrelic": "^8.13.2",
     "node-schedule": "^2.0.0",
-    "nunjucks": "^3.2.2",
+    "nunjucks": "^3.2.4",
     "passport": "^0.4.0",
     "passport-github": "^1.0.0",
     "passport-oauth2": "^1.6.1",
