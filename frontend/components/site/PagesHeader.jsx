@@ -14,9 +14,7 @@ const PagesHeader = ({
           {`${owner}/${repository}`}
         </h1>
       </div>
-      {title &&
-        <h2>{title}</h2>
-      }
+      {title && <h2>{title}</h2>}
     </div>
     <div className="usa-width-one-third header-actions">
       <GitHubLink text="View repo" owner={owner} repository={repository} />
