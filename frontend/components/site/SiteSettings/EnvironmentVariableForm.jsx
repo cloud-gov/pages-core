@@ -19,6 +19,7 @@ export const EnvironmentVariableForm = ({
       <legend className="sr-only">Add new environment variable</legend>
       <Field
         name="name"
+        id="nameInput"
         type="text"
         label="Name:"
         component={InputWithErrorField}
@@ -27,6 +28,7 @@ export const EnvironmentVariableForm = ({
       />
       <Field
         name="value"
+        id="valueInput"
         type="text"
         label="Value:"
         component={InputWithErrorField}
