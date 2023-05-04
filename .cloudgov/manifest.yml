@@ -54,6 +54,7 @@ applications:
   - name: ((product))-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
+    instances: 2
     routes:
       - route: admin.((domain))
   - name: ((product))-queues-ui((env_postfix))
