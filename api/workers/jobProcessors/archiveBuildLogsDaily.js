@@ -5,19 +5,7 @@ const BuildLogs = require('../../services/build-logs');
 const { Build } = require('../../models');
 const Mailer = require('../../services/mailer');
 const Slacker = require('../../services/slacker');
-
-function createJobLogger(job) {
-  let logs = [];
-  return {
-    log(msg) {
-      logs.push(job.log(msg));
-    },
-    async flush() {
-      await Promise.all(logs);
-      logs = [];
-    },
-  };
-}
+const { createJobLogger } = require('./utils');
 
 async function archiveBuildLogsDaily(job) {
   const logger = createJobLogger(job);
