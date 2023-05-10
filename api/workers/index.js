@@ -16,11 +16,15 @@ const {
   ArchiveBuildLogsQueue,
   ArchiveBuildLogsQueueName,
   DomainQueueName,
+  FailStuckBuildsQueue,
+  FailStuckBuildsQueueName,
   MailQueueName,
   ScheduledQueue,
   ScheduledQueueName,
   SlackQueueName,
   SiteDeletionQueueName,
+  TimeoutBuildTasksQueue,
+  TimeoutBuildTasksQueueName,
 } = require('../queues');
 
 const Processors = require('./jobProcessors');
@@ -53,6 +57,8 @@ function pagesWorker(connection) {
     }
   };
 
+  const failBuildsProcessor = job => Processors.failStuckBuilds(job);
+
   const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
 
   const mailJobProcessor = appEnv === 'development'
@@ -62,43 +68,56 @@ function pagesWorker(connection) {
   const scheduledJobProcessor = Processors.multiJobProcessor({
     nightlyBuilds: Processors.nightlyBuilds,
     sandboxNotifications: Processors.sandboxNotifications,
-    timeoutBuilds: Processors.timeoutBuilds,
     cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
   });
 
   const slackJobProcessor = job => (new Slack()).send(job.data);
 
+  const timeoutBuildsProcessor = () => Processors.timeoutBuilds();
+
   const workers = [
     new QueueWorker(ArchiveBuildLogsQueueName, connection,
       path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
+    new QueueWorker(FailStuckBuildsQueueName, connection, failBuildsProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
     new QueueWorker(SiteDeletionQueueName, connection, siteDeletionProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
+    new QueueWorker(TimeoutBuildTasksQueueName, connection, timeoutBuildsProcessor),
   ];
 
   const schedulers = [
     new QueueScheduler(ArchiveBuildLogsQueueName, { connection }),
     new QueueScheduler(DomainQueueName, { connection }),
+    new QueueScheduler(FailStuckBuildsQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
     new QueueScheduler(SiteDeletionQueueName, { connection }),
     new QueueScheduler(SlackQueueName, { connection }),
+    new QueueScheduler(TimeoutBuildTasksQueueName, { connection }),
   ];
 
   const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
+  const failStuckBuildsQueue = new FailStuckBuildsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
-  const queues = [archiveBuildLogsQueue, scheduledQueue];
+  const timeoutBuildTasksQueue = new TimeoutBuildTasksQueue(connection);
+  const queues = [
+    archiveBuildLogsQueue,
+    failStuckBuildsQueue,
+    scheduledQueue,
+    timeoutBuildTasksQueue,
+  ];
 
   const jobs = () => Promise.all([
     appEnv === 'production'
       ? archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig)
       : Promise.resolve(),
+    failStuckBuildsQueue.add('failStuckBuilds', {}, everyTenMinutesJobConfig),
     scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
-    scheduledQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
     scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig),
+    timeoutBuildTasksQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
   ]);
 
   return {

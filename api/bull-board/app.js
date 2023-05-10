@@ -12,10 +12,12 @@ const slowDown = require('express-slow-down');
 const {
   ArchiveBuildLogsQueue,
   DomainQueue,
+  FailStuckBuildsQueue,
   MailQueue,
   SiteDeletionQueue,
   ScheduledQueue,
   SlackQueue,
+  TimeoutBuildTasksQueue,
 } = require('../queues');
 
 const passport = require('./passport');
@@ -42,10 +44,12 @@ createBullBoard({
     new BullAdapter(createQueue('site-build-queue')),
     new BullMQAdapter(new ArchiveBuildLogsQueue(connection)),
     new BullMQAdapter(new DomainQueue(connection)),
+    new BullMQAdapter(new FailStuckBuildsQueue(connection)),
     new BullMQAdapter(new MailQueue(connection)),
     new BullMQAdapter(new SiteDeletionQueue(connection)),
     new BullMQAdapter(new SlackQueue(connection)),
     new BullMQAdapter(new ScheduledQueue(connection)),
+    new BullMQAdapter(new TimeoutBuildTasksQueue(connection)),
   ],
   serverAdapter,
 });
