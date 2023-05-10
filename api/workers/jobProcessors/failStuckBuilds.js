@@ -9,11 +9,16 @@ async function failStuckBuilds(job) {
   const results = await runFailStuckBuilds();
 
   if (!results) {
-    logger.log('No builds where stuck');
-  } else {
-    const buildIds = results.map(r => r.id);
-    logger.log(`The following builds were failed: ${buildIds.join(', ')}`);
+    const message = 'No builds where stuck';
+    logger.log(message);
+
+    return message;
   }
+
+  const buildIds = results.map(r => r.id);
+  const message = `The following builds were failed: ${buildIds.join(', ')}`;
+  logger.log(message);
+  return message;
 }
 
 module.exports = failStuckBuilds;
