@@ -36,7 +36,6 @@ function renderPublishedBranchesTable(data, site) {
   return (
     <div>
       <p>
-        { site.id }
         Use this page to see every version of your site&apos;s code published on
         {` ${globals.APP_NAME} `}
         and to audit the specific files that

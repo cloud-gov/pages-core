@@ -1,7 +1,6 @@
 const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
 const { Organization, Site } = require('../models');
-const FederalistUsersHelper = require('../services/FederalistUsersHelper');
 const { fetchModelById } = require('../utils/queryDatabase');
 
 const authorize = async ({ id: userId }, { id: siteId }) => {
@@ -38,9 +37,9 @@ const authorizeRepositoryAdmin = (user, site) => (
     })
     .catch((error) => {
       if (error.status === 404) {
-      // authorize user if the site's repo does not exist:
-      // When a user attempts to delete a site after deleting the repo, Federalist
-      // attempts to fetch the repo but it no longer exists and receives a 404
+        // authorize user if the site's repo does not exist:
+        // When a user attempts to delete a site after deleting the repo, Federalist
+        // attempts to fetch the repo but it no longer exists and receives a 404
         return site.id;
       }
       throw {
@@ -49,21 +48,6 @@ const authorizeRepositoryAdmin = (user, site) => (
       };
     })
 );
-
-function authorizeFederalistUsersAdmin(user) {
-  return FederalistUsersHelper.federalistUsersAdmins(user.githubAccessToken)
-    .then((admins) => {
-      if (!admins.includes(user.username)) {
-        throw 'user is not a system operator';
-      }
-    })
-    .catch(() => {
-      throw {
-        message: siteErrors.ADMIN_ACCESS_REQUIRED,
-        status: 403,
-      };
-    });
-}
 
 const createWithOrgs = (organizations, organizationId) => {
   if (!organizationId) {
@@ -122,8 +106,7 @@ const findOne = (user, site) => authorize(user, site);
 const update = (user, site) => authorize(user, site);
 
 const destroy = (user, site) => authorize(user, site)
-  .then(() => authorizeRepositoryAdmin(user, site))
-  .catch(() => authorizeFederalistUsersAdmin(user));
+  .then(() => authorizeRepositoryAdmin(user, site));
 
 const removeUser = (user, site) => authorize(user, site);
 

@@ -64,6 +64,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.production.config.js",
+    "build-dev": "webpack --config webpack.development-build.config.js",
     "start": "node index.js",
     "start-workers": "node ./api/workers/index.js",
     "start-bull-board:cg": "node -r ./api/bull-board/cfEnv.js ./api/bull-board/index.js",
@@ -92,8 +93,6 @@
     "update-local-config": "node ./scripts/update-local-config.js",
     "create-dev-data": "NODE_ENV=development node ./scripts/create-dev-data.js",
     "update-proxy-db": "node ./scripts/proxy-edge.js",
-    "remove-inactive-federalist-users": "node ./scripts/remove-inactive-federalist-users.js",
-    "deactivate-users-who-are-not-federalist-users-members": "node ./scripts/deactivate-users-who-are-not-federalist-users-members.js",
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js",
     "send-email": "node ./scripts/send-email.js",

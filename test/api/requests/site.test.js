@@ -21,7 +21,6 @@ const {
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const siteErrors = require('../../../api/responses/siteErrors');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
-const FederalistUsersHelper = require('../../../api/services/FederalistUsersHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 const DomainService = require('../../../api/services/Domain');
 
@@ -149,7 +148,7 @@ describe('Site API', () => {
             const responseSite = response.body.find(candidate => candidate.id === site.id);
             expect(responseSite).not.to.be.undefined;
             siteResponseExpectations(responseSite, site);
-            expect(responseSite).to.include.keys('canEditLiveUrl','canEditDemoUrl');
+            expect(responseSite).to.include.keys('canEditLiveUrl', 'canEditDemoUrl');
           });
           done();
         })
@@ -555,9 +554,9 @@ describe('Site API', () => {
         })
         .set('Cookie', cookie)
         .expect(400)).then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 400, response.body);
-        done();
-      }).catch(done);
+          validateAgainstJSONSchema('POST', '/site', 400, response.body);
+          done();
+        }).catch(done);
     });
 
     it('should respond with a 400 if the site already exists', (done) => {
@@ -578,10 +577,10 @@ describe('Site API', () => {
         })
         .set('Cookie', cookie)
         .expect(400)).then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 400, response.body);
-        expect(response.body.message).to.equal(`This site has already been added to ${config.app.appName}.`);
-        done();
-      }).catch(done);
+          validateAgainstJSONSchema('POST', '/site', 400, response.body);
+          expect(response.body.message).to.equal(`This site has already been added to ${config.app.appName}.`);
+          done();
+        }).catch(done);
     });
 
     it('should respond with a 400 if the user does not have admin access to the repository', (done) => {
@@ -609,10 +608,10 @@ describe('Site API', () => {
         })
         .set('Cookie', cookie)
         .expect(400)).then((response) => {
-        validateAgainstJSONSchema('POST', '/site', 400, response.body);
-        expect(response.body.message).to.equal('You do not have admin access to this repository');
-        done();
-      })
+          validateAgainstJSONSchema('POST', '/site', 400, response.body);
+          expect(response.body.message).to.equal('You do not have admin access to this repository');
+          done();
+        })
         .catch(done);
     });
 
@@ -652,10 +651,10 @@ describe('Site API', () => {
           })
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 400, response.body);
-          expect(response.body.message).to.equal('You do not have admin access to this repository');
-          done();
-        })
+            validateAgainstJSONSchema('POST', '/site', 400, response.body);
+            expect(response.body.message).to.equal('You do not have admin access to this repository');
+            done();
+          })
         .catch(done);
     });
   });
@@ -807,10 +806,10 @@ describe('Site API', () => {
           repository: site.repository,
         })
         .expect(400)).then((response) => {
-        validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-        expect(response.body.message).to.eq('You do not have write access to this repository');
-        done();
-      })
+          validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
+          expect(response.body.message).to.eq('You do not have write access to this repository');
+          done();
+        })
         .catch(done);
     });
 
@@ -824,10 +823,10 @@ describe('Site API', () => {
           repository: 'not-real',
         })
         .expect(404)).then((response) => {
-        validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
-        expect(response.body.message).to.eq('The site you are trying to add does not exist');
-        done();
-      })
+          validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
+          expect(response.body.message).to.eq('The site you are trying to add does not exist');
+          done();
+        })
         .catch(done);
     });
   });
@@ -880,10 +879,10 @@ describe('Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', models.cookie)
           .expect(400)).then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal('Bad Request');
-          done();
-        })
+            validateAgainstJSONSchema('DELETE', path, 400, response.body);
+            expect(response.body.message).to.equal('Bad Request');
+            done();
+          })
         .catch(done);
     });
 
@@ -899,10 +898,10 @@ describe('Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', models.cookie)
           .expect(404)).then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 404, response.body);
-          expect(response.body.message).to.equal('Not found');
-          done();
-        })
+            validateAgainstJSONSchema('DELETE', path, 404, response.body);
+            expect(response.body.message).to.equal('Not found');
+            done();
+          })
         .catch(done);
     });
 
@@ -999,10 +998,10 @@ describe('Site API', () => {
           .set('x-csrf-token', csrfToken.getToken())
           .set('Cookie', cookie)
           .expect(400)).then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal(siteErrors.USER_REQUIRED);
-          done();
-        })
+            validateAgainstJSONSchema('DELETE', path, 400, response.body);
+            expect(response.body.message).to.equal(siteErrors.USER_REQUIRED);
+            done();
+          })
         .catch(done);
     });
 
@@ -1391,7 +1390,7 @@ describe('Site API', () => {
               permissions: { admin: false, push: true },
             }],
           });
-          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves(['org-admin']);
+
           return authenticatedSession(site.Users[0]);
         })
         .then(cookie => request(app)
@@ -1406,40 +1405,6 @@ describe('Site API', () => {
         })
         .then((sites) => {
           expect(sites).to.not.be.empty;
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should allow a user to delete a site associated with their account if federalist admin', (done) => {
-      let site;
-
-      factory.site()
-        .then(s => Site.findByPk(s.id, { include: [User] }))
-        .then((model) => {
-          site = model;
-          nock.cleanAll();
-          githubAPINocks.repo({
-            owner: site.owner,
-            repository: site.repo,
-            response: [200, {
-              permissions: { admin: false, push: true },
-            }],
-          });
-          sinon.stub(FederalistUsersHelper, 'federalistUsersAdmins').resolves([site.Users[0].username]);
-          return authenticatedSession(site.Users[0]);
-        })
-        .then(cookie => request(app)
-          .delete(`/v0/site/${site.id}`)
-          .set('x-csrf-token', csrfToken.getToken())
-          .set('Cookie', cookie)
-          .expect(200))
-        .then((response) => {
-          expect(response.body).to.deep.eq({});
-          return Site.findAll({ where: { id: site.id } });
-        })
-        .then((sites) => {
-          expect(sites).to.be.empty;
           done();
         })
         .catch(done);
