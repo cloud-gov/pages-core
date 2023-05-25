@@ -5,7 +5,7 @@ const { isDelimitedFQDN } = require('../utils/validators');
 const States = buildEnum(['pending', 'provisioning', 'failed', 'provisioned', 'deprovisioning']);
 const Contexts = buildEnum(['site', 'demo']);
 
-function associate({ Domain, Site }) {
+function associate({ Domain, Site, Organization }) {
   // Associations
   Domain.belongsTo(Site, {
     foreignKey: 'siteId',
@@ -48,6 +48,32 @@ function associate({ Domain, Site }) {
       state,
     },
   }));
+
+  Domain.addScope('byOrg', id => ({
+    include: [{
+      model: Site,
+      required: true,
+      include: [{
+        model: Organization,
+        required: true,
+        where: { id },
+      }],
+    }],
+  }));
+
+  Domain.addScope('provisionedWithSiteAndOrganization', {
+    where: { state: 'provisioned' },
+    include: [{
+      model: Site,
+      include: [
+        { model: Organization },
+      ],
+    }],
+    order: [
+      [Site, Organization, 'name', 'ASC'],
+      [Site, 'repository', 'ASC'],
+    ],
+  });
 }
 
 function define(sequelize, DataTypes) {
@@ -99,6 +125,7 @@ function define(sequelize, DataTypes) {
   Domain.associate = associate;
   Domain.searchScope = search => ({ method: ['byIdOrText', search] });
   Domain.siteScope = siteId => ({ method: ['bySite', siteId] });
+  Domain.orgScope = orgId => ({ method: ['byOrg', orgId] });
   Domain.stateScope = state => ({ method: ['byState', state] });
   Domain.States = States;
   Domain.Contexts = Contexts;

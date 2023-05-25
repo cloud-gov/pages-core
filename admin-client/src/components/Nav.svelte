@@ -108,6 +108,11 @@
             </a>
           </li>
           <li class="usa-nav__primary-item">
+            <a class="usa-nav__link"  class:usa-current={currentPath === '/reports'} href="/reports">
+              <span>Reports</span>
+            </a>
+          </li>
+          <li class="usa-nav__primary-item">
             <NavButton action={logout}>Logout</NavButton>
           </li>
         {:else}

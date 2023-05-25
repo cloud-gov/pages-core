@@ -118,7 +118,7 @@
             </li>
           </ul>
         {/if}
-        {#if ! noSearch}
+        {#if !noSearch}
         <form
           class="usa-search usa-search--small flex-align-center"
           role="search"

@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@bull-board/express": "4.11.3",
+    "@json2csv/plainjs": "^7.0.1",
     "@octokit/request": "^6.2.2",
     "@octokit/rest": "^18.5.2",
     "@socket.io/redis-adapter": "^7.0.0",
@@ -37,6 +38,7 @@
     "js-file-download": "^0.4.11",
     "js-yaml": "^4.1.0",
     "json-to-csv": "^1.0.0",
+    "json2csv": "juanjoDiaz/json2csv#v7.0.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.2",
     "newrelic": "^8.13.2",
