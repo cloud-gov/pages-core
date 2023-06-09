@@ -17,6 +17,7 @@ apiRouter.use(require('./user'));
 apiRouter.use(require('./published-file'));
 apiRouter.use(require('./role'));
 apiRouter.use(require('./site'));
+apiRouter.use(require('./site-branch-config'));
 apiRouter.use(require('./user-action'));
 apiRouter.use(require('./user-environment-variable'));
 

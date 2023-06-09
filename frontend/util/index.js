@@ -24,3 +24,7 @@ export function sandboxMsg(days, content = null) {
   const str = content ? ` ${content} ` : ' ';
   return `All${str}data for this sandbox organization will be removed in ${timeframe}.`;
 }
+
+export function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

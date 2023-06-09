@@ -79,37 +79,40 @@ class EnvironmentVariables extends Component {
     const showTable = !isLoading && data.length > 0;
 
     return (
-      <div className="well">
-        <AlertBanner
-          status="info"
-          message={infoContent}
-          alertRole={false}
-        />
-        <AlertBanner
-          status="warning"
-          message={warningContent}
-          alertRole={false}
-        />
-        <br />
-        { isLoading
-          ? <LoadingIndicator />
-          : (
-            <>
-              <ExpandableArea
-                bordered
-                title="Add a new environment variable"
-              >
-                <div className="well">
-                  <EnvironmentVariableForm onSubmit={params => addUEV(params)} />
-                </div>
-              </ExpandableArea>
-              { showTable
+      <>
+        <h3>Environment Variables</h3>
+        <div className="well">
+          <AlertBanner
+            status="info"
+            message={infoContent}
+            alertRole={false}
+          />
+          <AlertBanner
+            status="warning"
+            message={warningContent}
+            alertRole={false}
+          />
+          <br />
+          { isLoading
+            ? <LoadingIndicator />
+            : (
+              <>
+                <ExpandableArea
+                  bordered
+                  title="Add a new environment variable"
+                >
+                  <div className="well">
+                    <EnvironmentVariableForm onSubmit={params => addUEV(params)} />
+                  </div>
+                </ExpandableArea>
+                { showTable
                 && (
                 <EnvironmentVariableTable uevs={data} onDelete={deleteUEV} />
                 )}
-            </>
-          )}
-      </div>
+              </>
+            )}
+        </div>
+      </>
     );
   }
 }

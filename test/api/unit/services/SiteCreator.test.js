@@ -10,7 +10,7 @@ const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
-const { Build, Site, User } = require('../../../../api/models');
+const { Build, Site, User, SiteBranchConfig } = require('../../../../api/models');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 
 describe('SiteCreator', () => {
@@ -44,7 +44,7 @@ describe('SiteCreator', () => {
       expect(site.Users[0].id).to.equal(user.id);
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
-      expect(site.defaultBranch).to.equal(defaultBranch);
+      expect(site.SiteBranchConfigs[0].branch).to.equal(defaultBranch);
       expect(site.webhookId).to.not.be.null;
     };
 
@@ -53,7 +53,7 @@ describe('SiteCreator', () => {
         owner,
         repository,
       },
-      include: [User, Build],
+      include: [User, Build, SiteBranchConfig],
     });
 
     context('from a GitHub repo', () => {

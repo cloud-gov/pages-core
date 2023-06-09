@@ -13,7 +13,7 @@ router.post('/site', sessionAuth, SiteController.create);
 router.get('/site/:id', sessionAuth, SiteController.findById);
 router.put('/site/:id', sessionAuth, SiteController.update);
 router.delete('/site/:id', sessionAuth, SiteController.destroy);
-
+router.get('/site/:site_id/domains', sessionAuth, SiteController.getSiteDomains);
 router.post('/site/:site_id/basic-auth', sessionAuth, SiteController.addBasicAuth);
 router.delete('/site/:site_id/basic-auth', sessionAuth, SiteController.removeBasicAuth);
 module.exports = router;
