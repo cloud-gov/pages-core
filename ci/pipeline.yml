@@ -13,7 +13,7 @@ node-image: &node-image
   type: docker-image
   source:
     repository: node
-    tag: 18
+    tag: 18.15
 
 cf-image: &cf-image
   platform: linux
@@ -595,7 +595,7 @@ resources:
     type: docker-image
     source:
       repository: node
-      tag: 18
+      tag: 18.15
 
   - name: slack
     type: slack-notification
