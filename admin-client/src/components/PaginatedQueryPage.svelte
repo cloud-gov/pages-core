@@ -61,7 +61,6 @@
             +
           </a>
         {/if}
-        <button class="usa-menu-btn">Menu</button>
       </div>
       <nav class="usa-nav">
         <button class="usa-nav__close">
