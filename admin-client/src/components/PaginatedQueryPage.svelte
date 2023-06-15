@@ -10,6 +10,7 @@
   export let path;
   export let query;
   export let addAction = false;
+  export let noSearch = false;
   export let fields = {};
   export let title = null;
   export let expanded = false;
@@ -117,6 +118,7 @@
             </li>
           </ul>
         {/if}
+        {#if ! noSearch}
         <form
           class="usa-search usa-search--small flex-align-center"
           role="search"
@@ -147,6 +149,7 @@
             <span class="usa-sr-only">Search</span>
           </button>
         </form>
+        {/if}
       </nav>
     </div>
     <div class="tag-container usa-nav-container margin-top-1 margin-bottom-2">
