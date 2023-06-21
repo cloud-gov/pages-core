@@ -350,6 +350,30 @@ describe('Build model', () => {
     });
   });
 
+  describe('.orgScope()', () => {
+    it('returns builds by organization', async () => {
+      const organizationA = await factory.organization.create({name: 'Org A'});
+      const siteA = await factory.site({organizationId: organizationA.id });
+      const buildA1 = await factory.build({site: siteA.id});
+      const buildA2 = await factory.build({site: siteA.id});
+
+      const siteAA = await factory.site({organizationId: organizationA.id });
+      const buildAA = await factory.build({site: siteAA.id});
+
+      const organizationB = await factory.organization.create({name: 'Org B'});
+      const siteB = await factory.site({organizationId: organizationB.id });
+      const buildB = await factory.build({site: siteB.id});
+
+      const siteD = await factory.site(); // Site without an Organization
+      const buildD = await factory.build({site: siteD.id});
+
+      const result = await Build.scope(Build.orgScope(organizationA.id)).findAll();
+
+      expect(result.map(build => build.id)).to.have.members([buildA1.id, buildA2.id, buildAA.id]);
+      expect(result.map(build => build.id)).to.not.have.members([buildB.id, buildD.id]);
+    });
+  });
+
   describe('forSiteUser scope', () => {
     it('returns the build for the associated user', async () => {
       const user = await factory.user();
