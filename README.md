@@ -3,13 +3,13 @@
 
 ## About Pages
 
-[Cloud.gov Pages](https://cloud.gov/pages/) helps federal government entities publish compliant static websites quickly and seamlessly. Federalist integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
+[Cloud.gov Pages](https://cloud.gov/pages/) helps federal government entities publish compliant static websites quickly and seamlessly. Cloud.gov Pages integrates with GitHub and is built on top of [cloud.gov](https://cloud.gov), which uses Amazon Web Services.
 
 This repository is home to "pages-core" - a Node.js app that allows government users to create and configure Pages sites.
 
 ## Examples
 
-Partner agencies across the federal government use Federalist to host websites. A few examples include:
+Partner agencies across the federal government use cloud.gov Pages to host websites. A few examples include:
 
 - [College Scorecard](https://collegescorecard.ed.gov/)
 - [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
@@ -23,12 +23,17 @@ More examples can be found at [https://cloud.gov/pages/success-stories/](https:/
 
 Before you start, ensure you have the following installed:
 
+- [Node](https://nodejs.org/en) and [Yarn](https://classic.yarnpkg.com/en/docs/install)
 - [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) (choose **cf CLI v7**)
 - [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
+Run these commands to add tools for local development
+- `yarn install`
+- `./scripts/add-pre-commit-hook.sh`
+
 ### Then follow these steps to set up and run your server
 
-In order to provide a simple development user experience, Federalist has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
+In order to provide a simple development user experience, cloud.gov Pages has some complexity on the backend. So as part of your local setup, you will need to emulate some of that complexity through the creation steps below. This shouldn't take longer than 15 minutes.
 
 _Note: some terminal commands may take a while to process, without offering feedback to you. Your patience will be rewarded!_
 

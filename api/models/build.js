@@ -42,8 +42,10 @@ const associate = ({
   Build.addScope('byOrg', id => ({
     include: [{
       model: Site,
+      required: true,
       include: [{
         model: Organization,
+        required: true,
         where: { id },
       }],
     }],
