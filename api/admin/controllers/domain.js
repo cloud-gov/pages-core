@@ -1,4 +1,7 @@
-const { Domain, Site, Event } = require('../../models');
+const json2csv = require('@json2csv/plainjs');
+const {
+  Domain, Site, Event, Organization,
+} = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 const DomainService = require('../../services/Domain');
@@ -44,6 +47,69 @@ module.exports = wrapHandlers({
     };
 
     return res.json(json);
+  },
+
+  async listPublished(req, res) {
+    const {
+      limit, page, organization,
+    } = req.query;
+
+    const scopes = ['provisionedWithSiteAndOrganization'];
+
+    if (organization) {
+      scopes.push(Domain.orgScope(organization));
+    }
+
+    const [pagination, orgs] = await Promise.all([
+      paginate(
+        Domain.scope(scopes),
+        domains => domainSerializer.serializeMany(domains, true),
+        { limit, page },
+        { order: ['names', 'context'] }
+      ),
+      Organization.findAll({ raw: true }),
+    ]);
+
+    const json = {
+      meta: {
+        orgs,
+      },
+      ...pagination,
+    };
+
+    return res.json(json);
+  },
+
+  async listPublishedCSV(req, res) {
+    const domains = await Domain.scope('provisionedWithSiteAndOrganization').findAll();
+
+    const fields = [
+      {
+        label: 'Organization',
+        value: 'Site.Organization.name',
+      },
+      {
+        label: 'Agency',
+        value: 'Site.Organization.agency',
+      },
+      {
+        label: 'Site',
+        value: 'Site.repository',
+      },
+      {
+        label: 'Domain',
+        value: 'names',
+      },
+      {
+        label: 'Engine',
+        value: 'Site.engine',
+      },
+    ];
+
+    const parser = new json2csv.Parser({ fields });
+    const csv = parser.parse(domains);
+    res.attachment('organizations-report.csv');
+    return res.send(csv);
   },
 
   async findById(req, res) {

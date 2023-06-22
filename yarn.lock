@@ -1166,6 +1166,20 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@json2csv/formatters@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@json2csv/formatters/-/formatters-7.0.1.tgz#c025f0795f9bbab480de77e2248ab593987296b9"
+  integrity sha512-eCmYKIIoFDXUB0Fotet2RmcoFTtNLXLmSV7j6aEQH/D2GiO749Uan3ts03PtAhXpE11QghxBjS0toXom8VQNBw==
+
+"@json2csv/plainjs@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@json2csv/plainjs/-/plainjs-7.0.1.tgz#361d849f04a2a5013c7880738f08b6bc193c24eb"
+  integrity sha512-UAdaZwahrUeYhMYYilJwDsRfE7wDRsmGMsszYH67j8FLD5gZitqG38RXpUgHEH0s6YjsY8iKYWeEQ19WILncFA==
+  dependencies:
+    "@json2csv/formatters" "^7.0.1"
+    "@streamparser/json" "^0.0.15"
+    lodash.get "^4.4.2"
+
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
@@ -1503,6 +1517,11 @@
     notepack.io "~2.2.0"
     socket.io-adapter "^2.4.0"
     uid2 "0.0.3"
+
+"@streamparser/json@^0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@streamparser/json/-/json-0.0.15.tgz#405fbe94877ce0cbd3cf650b4d9186a0ec6acd0a"
+  integrity sha512-6oikjkMTYAHGqKmcC9leE4+kY4Ch4eiTImXUN/N4d2bNGBYs0LJ/tfxmpvF5eExSU7iiPlV9jYlADqvj3NWA3Q==
 
 "@supercharge/promise-pool@^1.5.0":
   version "1.9.0"
@@ -6247,6 +6266,10 @@ json2csv@^3.4.2:
     lodash.set "^4.3.0"
     lodash.uniq "^4.5.0"
     path-is-absolute "^1.0.0"
+
+json2csv@juanjoDiaz/json2csv#v7.0.1:
+  version "7.0.1"
+  resolved "https://codeload.github.com/juanjoDiaz/json2csv/tar.gz/b43c7dd556b7afc9728ecc31ccc96c8c76056f09"
 
 json5@^1.0.1:
   version "1.0.1"

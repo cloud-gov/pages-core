@@ -58,6 +58,36 @@ async function _fetch(path, fetchOpts = {}, apiOpts = { handleError: true }) {
   return request;
 }
 
+// eslint-disable-next-line no-underscore-dangle
+async function _fetchAttachedFile(path) {
+  const fetchOptions = { ...defaultOptions };
+  fetchOptions.headers['x-csrf-token'] = session.csrfToken();
+
+  let request = fetch(`${apiUrl}/admin${path}`, fetchOptions)
+    .then(async (r) => {
+      if (r.ok) return r.text();
+      if (r.status === 401) {
+        authLogout();
+        return null;
+      }
+      if (r.status === 422) {
+        const json = await r.json();
+        const error = new Error(json.message || r.statusText);
+        error.errors = json.errors;
+        throw error;
+      }
+      throw new Error(r.statusText);
+    });
+
+  request = request.catch((e) => {
+    notification.setError(`API request failed: ${e.message}`);
+    console.error(e);
+    throw e;
+  });
+
+  return request;
+}
+
 function destroy(path, body) {
   return _fetch(path, { method: 'DELETE', body: JSON.stringify(body) });
 }
@@ -69,6 +99,10 @@ function get(path, query) {
     qs = searchString !== '' ? `?${searchString}` : '';
   }
   return _fetch(path + qs);
+}
+
+function getAttachedFile(path) {
+  return _fetchAttachedFile(path);
 }
 
 function post(path, body = {}, opts = {}) {
@@ -168,6 +202,14 @@ async function fetchOrganizations(query = {}) {
   return get('/organizations', query).catch(() => []);
 }
 
+async function fetchOrganizationsReport(query = {}) {
+  return get('/organizations-report', query).catch(() => []);
+}
+
+async function fetchOrganizationsReportCSV() {
+  return getAttachedFile('/organizations-report.csv').catch(() => []);
+}
+
 async function updateOrganization(id, params) {
   return put(`/organizations/${id}`, params);
 }
@@ -261,6 +303,8 @@ export {
   createOrganization,
   fetchOrganization,
   fetchOrganizations,
+  fetchOrganizationsReport,
+  fetchOrganizationsReportCSV,
   updateOrganization,
   deactivateOrganization,
   activateOrganization,
