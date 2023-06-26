@@ -103,9 +103,11 @@ async function createData() {
    *              Organizations
    */
   console.log('Creating Organizations');
-  const [agency1, agency2, sandbox] = await Promise.all([
+  const [agency1, agency2, agency3, agency4, sandbox] = await Promise.all([
     Organization.create({ name: 'agency1', agency: 'GSA' }),
     Organization.create({ name: 'agency2', agency: 'GSA' }),
+    Organization.create({ name: 'agency3', agency: 'Bureau of Testing' }),
+    Organization.create({ name: 'agency4', agency: 'Demonstration Department' }),
     Organization.create({ name: 'user1@example.com', isSandbox: true }),
   ]);
 
@@ -116,6 +118,8 @@ async function createData() {
   const [
     user1,
     user2,
+    user3,
+    user4,
     userOrgless,
     managerNoGithub,
     managerWithGithub,
@@ -152,6 +156,26 @@ async function createData() {
       })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency1, userRole)),
+
+    User
+      .create({
+        username: 'user3',
+        email: 'user3@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity)
+      .then(user => addUserToOrg(user, agency3, userRole)),
+
+    User
+      .create({
+        username: 'user4',
+        email: 'user4@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+      .then(createUAAIdentity)
+      .then(user => addUserToOrg(user, agency4, userRole)),
 
     User
       .create({
@@ -229,7 +253,7 @@ async function createData() {
    *                 Sites
    */
   console.log('Creating sites...');
-  const [site1, nodeSite, goSite] = await Promise.all([
+  const [site1, nodeSite, goSite, goSite2, nodeSite2, orglessSite] = await Promise.all([
     siteFactory({
       demoBranch: 'demo-branch',
       demoDomain: 'https://demo.example.gov',
@@ -256,6 +280,33 @@ async function createData() {
       users: [user1, user2, managerNoGithub],
     })
       .then(site => addSiteToOrg(site, agency2)),
+
+    siteFactory({
+      engine: 'hugo',
+      owner: user3.username,
+      repository: 'another-example-hugo-site',
+      users: [user3, managerWithGithub],
+      demoBranch: 'demo3',
+    })
+      .then(site => addSiteToOrg(site, agency3)),
+
+    siteFactory({
+      engine: 'node.js',
+      owner: user4.username,
+      repository: 'another-example-node-site',
+      users: [user4, managerWithGithub],
+      demoBranch: 'demo4',
+    })
+      .then(site => addSiteToOrg(site, agency4)),
+
+    siteFactory({
+      engine: 'node.js',
+      owner: userOrgless.username,
+      repository: 'an-orgless-node-site',
+      users: [userOrgless, managerWithGithub],
+      demoBranch: 'demo5',
+    }),
+
   ]);
 
   await site1.createUserEnvironmentVariable({
@@ -464,6 +515,43 @@ async function createData() {
       serviceName: 'foo.example.gov-ext',
       state: 'provisioned',
     }),
+    Domain.create({
+      context: 'site',
+      names: 'bar.example.gov',
+      siteId: goSite2.id,
+      origin: 'bar-foo-baz.app.cloud.gov',
+      path: `/site/${nodeSite.owner}/${nodeSite.repository}`,
+      serviceName: 'bar.example.gov-ext',
+      state: 'provisioned',
+    }),
+    Domain.create({
+      context: 'site',
+      names: 'qux.example.gov',
+      siteId: nodeSite2.id,
+      origin: 'quz-baz-bar.app.cloud.gov',
+      path: `/site/${nodeSite2.owner}/${nodeSite2.repository}`,
+      serviceName: 'qux.example.gov-ext',
+      state: 'provisioned',
+    }),
+    Domain.create({
+      context: 'site',
+      names: 'vanity.qux.example.gov',
+      siteId: nodeSite2.id,
+      origin: 'quz-baz-bar.app.cloud.gov',
+      path: `/site/${nodeSite2.owner}/${nodeSite2.repository}`,
+      serviceName: 'vanity.qux.example.gov-ext',
+      state: 'provisioned',
+    }),
+    Domain.create({
+      context: 'site',
+      names: 'orgless.example.gov',
+      siteId: orglessSite.id,
+      origin: 'orgless.app.cloud.gov',
+      path: `/site/${orglessSite.owner}/${orglessSite.repository}`,
+      serviceName: 'orgless.example.gov-ext',
+      state: 'provisioned',
+    }),
+
   ]);
 }
 

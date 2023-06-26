@@ -1,11 +1,12 @@
 const { expect } = require('chai');
-const { Domain, Site } = require('../../../../api/models');
+const { Domain, Site, Organization } = require('../../../../api/models');
 const Factory = require('../../support/factory');
 
 function clean() {
   return Promise.all([
     Domain.truncate({ force: true, cascade: true }),
     Site.truncate({ force: true, cascade: true }),
+    Organization.truncate({ force: true, cascade: true }),
   ]);
 }
 
@@ -97,6 +98,30 @@ describe('Domain model', () => {
     });
   });
 
+  describe('.orgScope()', () => {
+    it('returns domains by organization', async () => {
+      const organizationA = await Factory.organization.create({name: 'Org A'});
+      const siteA = await Factory.site({organizationId: organizationA.id });
+      const domainA1 = await Factory.domain.create({siteId: siteA.id, state: Domain.States.Provisioned});
+      const domainA2 = await Factory.domain.create({siteId: siteA.id, state: Domain.States.Provisioned});
+
+      const siteAA = await Factory.site({organizationId: organizationA.id });
+      const domainAA = await Factory.domain.create({siteId: siteAA.id, state: Domain.States.Provisioned});
+
+      const organizationB = await Factory.organization.create({name: 'Org B'});
+      const siteB = await Factory.site({organizationId: organizationB.id });
+      const domainB = await Factory.domain.create({siteId: siteB.id, state: Domain.States.Provisioned});
+
+      const siteD = await Factory.site(); // Site without an Organization
+      const domainD = await Factory.domain.create({siteId: siteD.id, state: Domain.States.Provisioned});
+
+      const result = await Domain.scope(Domain.orgScope(organizationA.id)).findAll();
+
+      expect(result.map(domain => domain.id)).to.have.members([domainA1.id, domainA2.id, domainAA.id]);
+      expect(result.map(domain => domain.id)).to.not.have.members([domainB.id, domainD.id]);
+    });
+  });
+
   describe('.withSite()', () => {
     it('includes the site', async () => {
       const site = await Factory.site();
@@ -127,5 +152,61 @@ describe('Domain model', () => {
 
       expect(result.map(domain => domain.id)).to.have.members([domain1.id, domain3.id]);
     });
+  });
+
+  describe('.provisionedWithSiteAndOrganization()', () => {
+    it('only includes provisioned domains', async () => {
+      const organization = await Factory.organization.create();
+      const site = await Factory.site({organizationId: organization.id });
+      const [domain1, domain2] = await Promise
+        .all([
+          Domain.States.Provisioned,
+          Domain.States.Pending,
+        ]
+          .map(state => Factory.domain.create({
+            siteId: site.id, names: 'www.example.gov', context: Domain.Contexts.Site, state,
+          })));
+
+      const result = await Domain.scope('provisionedWithSiteAndOrganization').findAll();
+      expect(result.map(domain => domain.id)).to.have.members([domain1.id]);
+      expect(result.map(domain => domain.id)).to.not.have.members([domain2.id]);
+    });
+
+    it('includes the site', async () => {
+      const organization = await Factory.organization.create();
+      const site = await Factory.site({organizationId: organization.id });
+      const domain = await Factory.domain.create({siteId: site.id, state: Domain.States.Provisioned});
+      const result = await Domain.scope('provisionedWithSiteAndOrganization').findByPk(domain.id);
+      expect(result.Site.id).to.eq(site.id);
+    });
+
+    it('includes the organization', async () => {
+      const organization = await Factory.organization.create();
+      const site = await Factory.site({organizationId: organization.id });
+      const domain = await Factory.domain.create({siteId: site.id, state: Domain.States.Provisioned});
+      const result = await Domain.scope('provisionedWithSiteAndOrganization').findByPk(domain.id);
+      expect(result.Site.Organization.id).to.eq(organization.id);
+    });
+
+    it('returns domains ordered by organization', async () => {
+      const organizationB = await Factory.organization.create({name: 'Org B'});
+      const siteB = await Factory.site({organizationId: organizationB.id });
+      const domainB = await Factory.domain.create({siteId: siteB.id, state: Domain.States.Provisioned});
+
+      const organizationA = await Factory.organization.create({name: 'Org A'});
+      const siteA = await Factory.site({organizationId: organizationA.id });
+      const domainA = await Factory.domain.create({siteId: siteA.id, state: Domain.States.Provisioned});
+
+      const siteD = await Factory.site(); // Site without an Organization
+      const domainD = await Factory.domain.create({siteId: siteD.id, state: Domain.States.Provisioned});
+
+      const organizationC = await Factory.organization.create({name: 'Org C'});
+      const siteC = await Factory.site({organizationId: organizationC.id });
+      const domainC = await Factory.domain.create({siteId: siteC.id, state: Domain.States.Provisioned});
+
+      const result = await Domain.scope('provisionedWithSiteAndOrganization').findAll();
+      expect(result.map(domain => domain.id)).to.include.ordered.members([domainA.id, domainB.id, domainC.id, domainD.id]);
+    });
+
   });
 });
