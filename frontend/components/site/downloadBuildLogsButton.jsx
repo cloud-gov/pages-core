@@ -2,13 +2,19 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import fileDownload from 'js-file-download';
 
 function DownloadBuildLogsButton(props) {
   function downloadBuildLogs() {
     const { buildLogsData = [], buildId } = props;
     const text = buildLogsData.map(source => `${source}\n`);
-    fileDownload(text, `build-log-${buildId}.txt`);
+    const blob = new Blob([text], { type: 'text/plain' });
+    const aElement = document.createElement('a');
+    aElement.setAttribute('download', `build-log-${buildId}.txt`);
+    const href = URL.createObjectURL(blob);
+    aElement.href = href;
+    aElement.setAttribute('target', '_blank');
+    aElement.click();
+    URL.revokeObjectURL(href);
   }
 
   return (

@@ -30,7 +30,18 @@ const finalRules = {
   'sonarjs/no-identical-functions': [0],
 };
 
+const overrides = [
+  {
+    files: ["frontend/components/site/downloadBuildLogsButton.jsx"],
+    env: {
+      'browser': true,
+      'node': true
+    },
+  },
+];
+
 module.exports = {
+  overrides,
   extends: ['airbnb', 'plugin:sonarjs/recommended', 'plugin:no-unsanitized/DOM'],
   rules: finalRules,
   parserOptions: {
