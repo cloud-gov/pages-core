@@ -1,5 +1,3 @@
-/* global document:true */
-
 import '@babel/polyfill';
 import { createRoot } from 'react-dom/client';
 import React from 'react';

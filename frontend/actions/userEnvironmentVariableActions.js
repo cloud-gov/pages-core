@@ -1,4 +1,3 @@
-/* global window:true */
 import federalist from '../util/federalistApi';
 import { httpError } from './actionCreators/alertActions';
 import {

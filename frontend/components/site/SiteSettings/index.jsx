@@ -1,4 +1,3 @@
-/* global window:true */
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
