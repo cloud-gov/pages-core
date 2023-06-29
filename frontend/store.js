@@ -1,4 +1,3 @@
-/* global window */
 import {
   combineReducers, compose, createStore, applyMiddleware,
 } from 'redux';

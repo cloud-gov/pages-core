@@ -1,4 +1,3 @@
-/* global window */
 import React, { useEffect, useReducer } from 'react';
 import { useParams } from 'react-router-dom';
 import { success } from 'react-notification-system-redux';

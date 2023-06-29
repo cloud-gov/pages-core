@@ -32,7 +32,7 @@ const finalRules = {
 
 const overrides = [
   {
-    files: ["frontend/components/site/downloadBuildLogsButton.jsx"],
+    files: ["frontend/**/*"],
     env: {
       'browser': true,
       'node': true
