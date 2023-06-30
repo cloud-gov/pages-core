@@ -1,8 +1,9 @@
 /* eslint no-console: 0 */
 const path = require('path');
+const fs = require('fs');
 
 const _ = require('underscore');
-const jsonToCSV = require('json-to-csv');
+const json2csv = require('@json2csv/plainjs');
 
 const { User, Site } = require('../api/models');
 
@@ -40,6 +41,20 @@ function consolidateOnSiteId(sites) {
   });
 }
 
+function writeCSV(sites, fileName) {
+  return new Promise((resolve, reject) => {
+    let csv;
+    try {
+      const fields = Object.keys(sites[0]);
+      const parser = new json2csv.Parser({ fields });
+      csv = parser.parse(sites);
+    } catch (err) {
+      reject(err);
+    }
+    fs.writeFile(fileName, csv, err => (!err ? resolve() : reject(err)));
+  });
+}
+
 const args = Array.prototype.slice.call(process.argv);
 const destination = resolveDestination(args[2] || './current-sites.csv');
 console.log('Final output can be found at', destination);
@@ -53,7 +68,7 @@ User.findAll({ include: [Site] })
     console.log(`Found ${sites.length} unique sites`);
     return sites;
   })
-  .then(sites => jsonToCSV(sites, destination))
+  .then(sites => writeCSV(sites, destination))
   .then(() => {
     console.log('Current sites written to file', destination);
     process.exit(0);
