@@ -36,14 +36,18 @@
   }
 
   .usa-logo a {
-    background-image: url("/images/logo.svg");
-    background-position: center;
+    background-image: url("/images/pages-logo.svg");
+    background-position: left;
     background-repeat: no-repeat;
-    background-size: contain;
-    color: transparent;
+    background-size: 20px;
+    color: white;
     display: inline-block;
     height: auto;
     text-decoration: none;
+    padding-left: 26px;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 47px;
   }
 </style>
 
@@ -61,7 +65,7 @@
             href="/"
             title="Home"
             aria-label="Home">
-            Pages
+            Pages Admin
           </a>
         </em>
       </div>
