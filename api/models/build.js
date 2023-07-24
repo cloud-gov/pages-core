@@ -40,21 +40,27 @@ const associate = ({
 
   // Scopes
   Build.addScope('byOrg', id => ({
-    include: [{
-      model: Site,
-      required: true,
-      include: [{
-        model: Organization,
+    include: [
+      {
+        model: Site,
         required: true,
-        where: { id },
-      }],
-    }],
+        include: [
+          {
+            model: Organization,
+            required: true,
+            where: { id },
+          },
+        ],
+      },
+    ],
   }));
   Build.addScope('bySite', id => ({
-    include: [{
-      model: Site,
-      where: { id },
-    }],
+    include: [
+      {
+        model: Site,
+        where: { id },
+      },
+    ],
   }));
   Build.addScope('forSiteUser', user => ({
     where: {
@@ -73,23 +79,27 @@ const associate = ({
         },
       ],
     },
-    include: [{
-      model: Site,
-      required: true,
-      include: [
-        {
-          model: User,
-          required: false,
-        },
-        {
-          model: Organization,
-          required: false,
-          include: [{
-            model: OrganizationRole,
-          }],
-        },
-      ],
-    }],
+    include: [
+      {
+        model: Site,
+        required: true,
+        include: [
+          {
+            model: User,
+            required: false,
+          },
+          {
+            model: Organization,
+            required: false,
+            include: [
+              {
+                model: OrganizationRole,
+              },
+            ],
+          },
+        ],
+      },
+    ],
   }));
 };
 
@@ -110,7 +120,10 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
     state: buildStatus.status,
   };
 
-  if (buildStatus.commitSha && buildStatus.commitSha !== build.clonedCommitSha) {
+  if (
+    buildStatus.commitSha
+    && buildStatus.commitSha !== build.clonedCommitSha
+  ) {
     atts.clonedCommitSha = buildStatus.commitSha;
   }
 
@@ -137,16 +150,19 @@ async function enqueue() {
   const build = this;
 
   const {
-    Site, User, Build, UserEnvironmentVariable,
+    Site, User, Build, UserEnvironmentVariable, SiteBranchConfig,
   } = build.sequelize.models;
 
   const foundBuild = await Build.findOne({
     where: { id: build.id },
-    include: [User, {
-      model: Site,
-      required: true,
-      include: [UserEnvironmentVariable, User],
-    }],
+    include: [
+      User,
+      {
+        model: Site,
+        required: true,
+        include: [UserEnvironmentVariable, User, SiteBranchConfig],
+      },
+    ],
   });
 
   const count = await Build.count({
@@ -169,7 +185,8 @@ async function enqueue() {
 
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
-  const site = await this.getSite();
+  const { SiteBranchConfig } = this.sequelize.models;
+  const site = await this.getSite({ include: [SiteBranchConfig] });
   const build = await jobStateUpdate(buildStatus, this, site, timestamp);
   if (build.state === States.Success) {
     await site.update({ publishedAt: timestamp });
@@ -186,84 +203,95 @@ function isComplete() {
 }
 
 function isInProgress() {
-  return [States.Created, States.Queued, States.Tasked, States.Processing].includes(this.state);
+  return [
+    States.Created,
+    States.Queued,
+    States.Tasked,
+    States.Processing,
+  ].includes(this.state);
 }
 
 function canStart(state) {
-  return [States.Created, States.Queued, States.Tasked].includes(this.state)
-    && state === States.Processing;
+  return (
+    [States.Created, States.Queued, States.Tasked].includes(this.state)
+    && state === States.Processing
+  );
 }
 
 module.exports = (sequelize, DataTypes) => {
-  const Build = sequelize.define('Build', {
-    branch: {
-      type: DataTypes.STRING,
-      validate: {
-        is: branchRegex,
+  const Build = sequelize.define(
+    'Build',
+    {
+      branch: {
+        type: DataTypes.STRING,
+        validate: {
+          is: branchRegex,
+        },
+        allowNull: false,
       },
-      allowNull: false,
-    },
-    requestedCommitSha: {
-      type: DataTypes.STRING,
-      validate: {
-        is: shaRegex,
+      requestedCommitSha: {
+        type: DataTypes.STRING,
+        validate: {
+          is: shaRegex,
+        },
+      },
+      completedAt: {
+        type: DataTypes.DATE,
+      },
+      error: {
+        type: DataTypes.STRING,
+      },
+      source: {
+        type: DataTypes.JSON,
+      },
+      state: {
+        type: DataTypes.ENUM,
+        values: States.values,
+        defaultValue: States.Created,
+        allowNull: false,
+        validate: {
+          isIn: [States.values],
+        },
+      },
+      token: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      site: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      user: {
+        type: DataTypes.INTEGER,
+      },
+      startedAt: {
+        type: DataTypes.DATE,
+      },
+      url: {
+        type: DataTypes.STRING,
+        validate: isEmptyOrUrl,
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      logsS3Key: {
+        type: DataTypes.STRING,
+      },
+      clonedCommitSha: {
+        type: DataTypes.STRING,
+        validate: {
+          is: shaRegex,
+        },
       },
     },
-    completedAt: {
-      type: DataTypes.DATE,
-    },
-    error: {
-      type: DataTypes.STRING,
-    },
-    source: {
-      type: DataTypes.JSON,
-    },
-    state: {
-      type: DataTypes.ENUM,
-      values: States.values,
-      defaultValue: States.Created,
-      allowNull: false,
-      validate: {
-        isIn: [States.values],
+    {
+      tableName: 'build',
+      hooks: {
+        beforeValidate,
       },
-    },
-    token: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    site: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    user: {
-      type: DataTypes.INTEGER,
-    },
-    startedAt: {
-      type: DataTypes.DATE,
-    },
-    url: {
-      type: DataTypes.STRING,
-      validate: isEmptyOrUrl,
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    logsS3Key: {
-      type: DataTypes.STRING,
-    },
-    clonedCommitSha: {
-      type: DataTypes.STRING,
-      validate: {
-        is: shaRegex,
-      },
-    },
-  }, {
-    tableName: 'build',
-    hooks: {
-      beforeValidate,
-    },
-  });
+    }
+  );
 
   Build.generateToken = generateToken;
   Build.associate = associate;

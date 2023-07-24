@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Federalist API
   description: API for interacting with Federalist
-  version: "0.0.0"
+  version: '0.0.0'
 host: federalistapp-staging.18f.gov
 schemes:
   - https
@@ -31,19 +31,19 @@ paths:
         200:
           description: The newly created build
           schema:
-            $ref: "Build.json"
+            $ref: 'Build.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           descriptions: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/build:
     get:
       summary: Fetch all of the user's builds for a given site
@@ -53,148 +53,148 @@ paths:
           schema:
             type: array
             items:
-              $ref: "Build.json"
+              $ref: 'Build.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           descriptions: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /build/{id}:
     parameters:
-    - name: id
-      in: path
-      description: The id of the build
-      type: integer
-      required: true
+      - name: id
+        in: path
+        description: The id of the build
+        type: integer
+        required: true
     get:
       summary: Fetch a build by its ID
       responses:
         200:
           description: The build object specified by the ID
           schema:
-            $ref: "Build.json"
+            $ref: 'Build.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     put:
       summary: Update the build state
       responses:
         200:
           description: The build object specified by the ID
           schema:
-            $ref: "Build.json"
+            $ref: 'Build.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /build/{id}/status/{token}:
     parameters:
-    - name: id
-      in: path
-      description: The id of the build
-      type: integer
-      required: true
-    - name: token
-      in: path
-      description: Federalist's secret build token.
-      type: string
-      required: true
+      - name: id
+        in: path
+        description: The id of the build
+        type: integer
+        required: true
+      - name: token
+        in: path
+        description: Federalist's secret build token.
+        type: string
+        required: true
     post:
       summary: |
         Update a build's status. This endpoint is designed to be used by the
         build container to update the build's status when the build is done with
         its work.
       parameters:
-      - name: status
-        in: body
-        description: The build container's status
-        required: true
-        schema:
-          type: object
-          properties:
-            status:
-              description: The build container's exit code
-              type: string
-            message:
-              description: The error message associated with the build. Empty if status is "0"
-              type: string
+        - name: status
+          in: body
+          description: The build container's status
+          required: true
+          schema:
+            type: object
+            properties:
+              status:
+                description: The build container's exit code
+                type: string
+              message:
+                description: The error message associated with the build. Empty if status is "0"
+                type: string
       responses:
         200:
           description: Acknowledgement that the build has been updated
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /build/{build_id}/log/{token}:
     parameters:
-    - name: build_id
-      in: path
-      description: The id of the build
-      type: integer
-      required: true
-    - name: token
-      in: path
-      description: Federalist's secret build token.
-      type: string
-      required: true
+      - name: build_id
+        in: path
+        description: The id of the build
+        type: integer
+        required: true
+      - name: token
+        in: path
+        description: Federalist's secret build token.
+        type: string
+        required: true
     post:
       summary: Add build container output to a build by creating a build log record
       responses:
         200:
           description: Acknowledgement that the build log was created
           schema:
-            $ref: "BuildLog.json"
+            $ref: 'BuildLog.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /build/{build_id}/log:
     parameters:
-    - name: build_id
-      in: path
-      description: The id of the build
-      type: integer
-      required: true
+      - name: build_id
+        in: path
+        description: The id of the build
+        type: integer
+        required: true
     get:
       summary: Fetch all build logs associated with a build
       responses:
@@ -203,19 +203,19 @@ paths:
           schema:
             type: object
             items:
-              $ref: "BuildLog.json"
+              $ref: 'BuildLog.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /organization:
     get:
       summary: Fetch all of the current user's organizations
@@ -225,37 +225,37 @@ paths:
           schema:
             type: array
             items:
-              $ref: "Organization.json"
+              $ref: 'Organization.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /organization/{id}:
     parameters:
-    - name: id
-      in: path
-      description: The id of the organization
-      type: integer
-      required: true
+      - name: id
+        in: path
+        description: The id of the organization
+        type: integer
+        required: true
     get:
       summary: Fetch an organization by its ID
       responses:
         200:
           description: The organization specified by the ID
           schema:
-            $ref: "Organization.json"
+            $ref: 'Organization.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /organization/{org_id}/user/{user_id}:
     parameters:
       - name: org_id
@@ -278,22 +278,22 @@ paths:
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /organization/{id}/invite:
     parameters:
-    - name: id
-      in: path
-      description: The id of the organization
-      type: integer
-      required: true
+      - name: id
+        in: path
+        description: The id of the organization
+        type: integer
+        required: true
     post:
       summary: Invite a user to a Federalist organization and maybe the platform.
       parameters:
@@ -321,7 +321,7 @@ paths:
                 description: The organization role for the invited user
                 required: true
                 schema:
-                  $ref: "OrganizationRole.json"
+                  $ref: 'OrganizationRole.json'
               invite:
                 description: The invite details
                 required: true
@@ -337,22 +337,22 @@ paths:
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /organization/{id}/members:
     parameters:
-    - name: id
-      in: path
-      description: The id of the organization
-      type: integer
-      required: true
+      - name: id
+        in: path
+        description: The id of the organization
+        type: integer
+        required: true
     get:
       summary: Fetch members for an organization by its ID
       responses:
@@ -361,15 +361,15 @@ paths:
           schema:
             type: array
             items:
-              $ref: "OrganizationRole.json"
+              $ref: 'OrganizationRole.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /organization-role:
     get:
       summary: Fetch all of the organization roles for the current user
@@ -379,11 +379,11 @@ paths:
           schema:
             type: array
             items:
-              $ref: "OrganizationRole.json"
+              $ref: 'OrganizationRole.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     put:
       summary: Update the organization role type if the current user has permissions
       parameters:
@@ -406,19 +406,19 @@ paths:
         200:
           description: The updated organization role object
           schema:
-            $ref: "OrganizationRole.json"
+            $ref: 'OrganizationRole.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /role:
     get:
       summary: Fetch all of the roles
@@ -428,11 +428,11 @@ paths:
           schema:
             type: array
             items:
-              $ref: "Role.json"
+              $ref: 'Role.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site:
     get:
       summary: Fetch all of the current user's sites
@@ -442,15 +442,15 @@ paths:
           schema:
             type: array
             items:
-              $ref: "Site.json"
+              $ref: 'Site.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     post:
       summary: Create a site
       parameters:
@@ -498,41 +498,41 @@ paths:
         200:
           description: The newly created site
           schema:
-            $ref: "Site.json"
+            $ref: 'Site.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{id}:
     parameters:
-    - name: id
-      in: path
-      description: The id of the site
-      type: integer
-      required: true
+      - name: id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
     get:
       summary: Fetch the data for a Federalist site
       responses:
         200:
           description: The site object for the given ID
           schema:
-            $ref: "Site.json"
+            $ref: 'Site.json'
         401:
           description: Unauthorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     put:
       summary: Update the data for a Federalist site. This action will trigger a rebuild of the site.
       parameters:
@@ -575,19 +575,19 @@ paths:
         200:
           description: The updated site object
           schema:
-            $ref: "Site.json"
+            $ref: 'Site.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     delete:
       summary: Delete a site from Federalist
       responses:
@@ -598,18 +598,18 @@ paths:
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/published-branch:
     parameters:
-    - name: site_id
-      in: path
-      description: The id of the site
-      type: integer
-      required: true
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
     get:
       summary: Fetch all of the branches published to S3 for the given site
       responses:
@@ -618,63 +618,63 @@ paths:
           schema:
             type: array
             items:
-              $ref: "PublishedBranch.json"
+              $ref: 'PublishedBranch.json'
         400:
           description: Bad Request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/published-branch/{branch}:
     parameters:
-    - name: site_id
-      in: path
-      description: The id of the site
-      type: integer
-      required: true
-    - name: branch
-      in: path
-      description: The name of the branch
-      type: string
-      required: true
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
+      - name: branch
+        in: path
+        description: The name of the branch
+        type: string
+        required: true
     get:
       summary: Fetch metadata about what's published for the site at the given branch
       responses:
         200:
           description: A published branch object representing the branch published to S3
           schema:
-            $ref: "PublishedBranch.json"
+            $ref: 'PublishedBranch.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/published-branch/{branch}/published-file:
     parameters:
-    - name: site_id
-      in: path
-      description: The id of the site
-      type: integer
-      required: true
-    - name: branch
-      in: path
-      description: The name of the branch
-      type: string
-      required: true
-    - name: startAtKey
-      in: query
-      description: The S3 key to start after when retrieving the page of files
-      type: string
-      required: false
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
+      - name: branch
+        in: path
+        description: The name of the branch
+        type: string
+        required: true
+      - name: startAtKey
+        in: query
+        description: The S3 key to start after when retrieving the page of files
+        type: string
+        required: false
     get:
       summary: Fetch the list of files that are published to the given branch for the given site
       responses:
@@ -689,15 +689,15 @@ paths:
               files:
                 type: array
                 items:
-                  $ref: "PublishedFile.json"
+                  $ref: 'PublishedFile.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/user:
     post:
       summary: Add the current user to a site based on the owner and repository name
@@ -717,19 +717,19 @@ paths:
         200:
           description: A site object representing the site the user was added to
           schema:
-            $ref: "Site.json"
+            $ref: 'Site.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: The site the user is to be added to cannot be found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/user/{user_id}:
     delete:
       summary: Remove a user from a site
@@ -745,19 +745,19 @@ paths:
       responses:
         200:
           schema:
-            $ref: "Site.json"
+            $ref: 'Site.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/user-action:
     parameters:
       - name: site_id
@@ -771,19 +771,19 @@ paths:
         200:
           description: An array of UserAction records
           schema:
-            $ref: "UserAction.json"
+            $ref: 'UserAction.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/basic-auth:
     parameters:
       - name: site_id
@@ -806,19 +806,19 @@ paths:
         200:
           description: An object representing the user environment variable
           schema:
-            $ref: "Site.json"
+            $ref: 'Site.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: The site of the user environment variable is to be added to cannot be found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     delete:
       summary: Remove basic auth from a site based on the site id
       responses:
@@ -827,15 +827,170 @@ paths:
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
+  /site/{site_id}/branch-config/{site-branch-config_id}:
+    parameters:
+      - name: site_id
+        in: path
+        description: the id of the site
+        type: integer
+        required: true
+      - name: site-branch-config_id
+        in: path
+        description: the id of the site branch config from the site
+        type: integer
+        required: true
+    delete:
+      summary: Remove a site branch config from a site
+      responses:
+        200:
+          description: Delete successful
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+    put:
+      summary: Update site branch config
+      parameters:
+        - name: site-branch-config
+          in: body
+          schema:
+            type: object
+            properties:
+              branch:
+                type: string
+                description: The name of the branch
+                required: false
+              config:
+                type: json
+                description: The json value of the config
+                required: false
+              context:
+                type: string
+                description: The string value of the site branch config context. ie preview, demo, site, etc.
+                required: false
+      responses:
+        200:
+          description: A site branch config object representing the update config
+          schema:
+            $ref: 'SiteBranchConfig.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          descriptions: Not found
+          schema:
+            $ref: 'Error.json'
+  /site/{site_id}/branch-config:
+    parameters:
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
+    get:
+      summary: Fetch the list of site branch configs for the given site
+      responses:
+        200:
+          description: A list of site branch configs for the given site
+          schema:
+            type: array
+            items:
+              $ref: 'SiteBranchConfig.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+    post:
+      summary: Create a site branch config for a site based on the site id
+      parameters:
+        - name: site-branch-config
+          in: body
+          schema:
+            type: object
+            properties:
+              branch:
+                type: string
+                description: The name of the branch
+                required: false
+              config:
+                type: json
+                description: The json value of the config
+                required: false
+              context:
+                type: string
+                description: The string value of the site branch config context. ie preview, demo, site, etc.
+                required: false
+      responses:
+        200:
+          description: An object representing the user environment variable
+          schema:
+            $ref: 'SiteBranchConfig.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: The site of the user environment variable is to be added to cannot be found
+          schema:
+            $ref: 'Error.json'
+  /site/{site_id}/domains:
+    parameters:
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
+    get:
+      summary: Get a list of domains associated to a site
+      responses:
+        200:
+          description: An array of domains
+          schema:
+            type: array
+            items:
+              $ref: 'Domain.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: The site of the domains requested cannot be found
+          schema:
+            $ref: 'Error.json'
   /site/{site_id}/user-environment-variable/{user-environment-variable_id}:
     parameters:
       - name: site_id
@@ -856,22 +1011,22 @@ paths:
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /site/{site_id}/user-environment-variable:
     parameters:
-    - name: site_id
-      in: path
-      description: The id of the site
-      type: integer
-      required: true
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
     get:
       summary: Fetch the list of user environment variables for the given site
       responses:
@@ -880,15 +1035,15 @@ paths:
           schema:
             type: array
             items:
-              $ref: "UserEnvironmentVariable.json"
+              $ref: 'UserEnvironmentVariable.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: Not found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
     post:
       summary: Add the user environment variable to a site based on the site id
       parameters:
@@ -906,19 +1061,19 @@ paths:
         200:
           description: An object representing the user environment variable
           schema:
-            $ref: "UserEnvironmentVariable.json"
+            $ref: 'UserEnvironmentVariable.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         404:
           description: The site of the user environment variable is to be added to cannot be found
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /me:
     get:
       summary: Fetch data for the current user
@@ -926,11 +1081,11 @@ paths:
         200:
           description: A user object representing the current Federalist user
           schema:
-            $ref: "User.json"
+            $ref: 'User.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /me/settings:
     put:
       summary: Update user settings
@@ -938,15 +1093,15 @@ paths:
         200:
           description: A user object representing the current Federalist user
           schema:
-            $ref: "User.json"
+            $ref: 'User.json'
         400:
           description: Bad request
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
         403:
           description: Not authorized
           schema:
-            $ref: "Error.json"
+            $ref: 'Error.json'
   /me/githubtoken:
     delete:
       summary: Revoke OAuth token access for this user

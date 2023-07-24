@@ -54,15 +54,15 @@ exports.up = (db, callback) => {
 const convertSiteConfigsToYAML = (db, site) => {
   const atts = [];
   if (site.defaultConfig) {
-    atts.push(`config = '${yaml.safeDump(site.defaultConfig)}'`);
+    atts.push(`config = '${yaml.dump(site.defaultConfig)}'`);
   }
 
   if (site.demoConfig) {
-    atts.push(`"tempDemoConfig" = '${yaml.safeDump(site.demoConfig)}'`);
+    atts.push(`"tempDemoConfig" = '${yaml.dump(site.demoConfig)}'`);
   }
 
   if (site.previewConfig) {
-    atts.push(`"tempPreviewConfig" = '${yaml.safeDump(site.previewConfig)}'`);
+    atts.push(`"tempPreviewConfig" = '${yaml.dump(site.previewConfig)}'`);
   }
 
   const cmdUpdateSiteRecord = `

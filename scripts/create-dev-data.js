@@ -270,6 +270,7 @@ async function createData() {
       repository: 'example-node-site',
       users: [user1, managerWithGithub],
       demoBranch: 'demo1',
+      previewConfig: { hello: 'preview' },
     })
       .then(site => addSiteToOrg(site, agency1)),
 
@@ -508,7 +509,7 @@ async function createData() {
     }),
     Domain.create({
       context: 'site',
-      names: 'foo.example.gov',
+      names: 'foo.example.gov,www.example.gov',
       siteId: nodeSite.id,
       origin: 'foo-bar-baz.app.cloud.gov',
       path: `/site/${nodeSite.owner}/${nodeSite.repository}`,

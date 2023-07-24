@@ -33,7 +33,7 @@ export const EnvironmentVariableForm = ({
         label="Value:"
         component={InputWithErrorField}
         required
-        minlength={4}
+        minLength={4}
         validate={[validateValue]}
       />
     </fieldset>

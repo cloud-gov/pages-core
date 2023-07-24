@@ -6,9 +6,14 @@ const SiteMembershipCreator = require('../services/SiteMembershipCreator');
 const UserActionCreator = require('../services/UserActionCreator');
 const EventCreator = require('../services/EventCreator');
 const siteSerializer = require('../serializers/site');
-const DomainService = require('../services/Domain');
+const domainSerializer = require('../serializers/domain');
 const {
-  Build, Organization, Site, User, Event, Domain,
+  Organization,
+  Site,
+  User,
+  Event,
+  Domain,
+  SiteBranchConfig,
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const {
@@ -31,7 +36,9 @@ module.exports = wrapHandlers({
   async findAllForUser(req, res) {
     const { user } = req;
 
-    const sites = await Site.forUser(user).findAll({ include: [Domain] });
+    const sites = await Site.forUser(user).findAll({
+      include: [Domain, SiteBranchConfig],
+    });
 
     if (!sites) {
       return res.notFound();
@@ -43,7 +50,10 @@ module.exports = wrapHandlers({
   },
 
   async findById(req, res) {
-    const { user, params: { id: siteid } } = req;
+    const {
+      user,
+      params: { id: siteid },
+    } = req;
 
     const site = await fetchModelById(siteid, Site.forUser(user));
 
@@ -58,7 +68,10 @@ module.exports = wrapHandlers({
   },
 
   async destroy(req, res) {
-    const { user, params: { id: siteId } } = req;
+    const {
+      user,
+      params: { id: siteId },
+    } = req;
 
     const site = await fetchModelById(siteId, Site.forUser(user));
 
@@ -73,7 +86,9 @@ module.exports = wrapHandlers({
       return res.unprocessableEntity({ message });
     }
 
-    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Destroyed', { site });
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Destroyed', {
+      site,
+    });
     return res.json({});
   },
 
@@ -113,7 +128,11 @@ module.exports = wrapHandlers({
     }
 
     await authorizer.removeUser(req.user, site);
-    await SiteMembershipCreator.revokeSiteMembership({ user: req.user, site, userId });
+    await SiteMembershipCreator.revokeSiteMembership({
+      user: req.user,
+      site,
+      userId,
+    });
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteUser Removed', {
       siteUser: { siteId: site.id, userId },
     });
@@ -149,16 +168,24 @@ module.exports = wrapHandlers({
       user,
       siteParams,
     });
-    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Created', { site });
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Created', {
+      site,
+    });
     await site.reload({ include: [Organization, User] });
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
 
   async update(req, res) {
-    const { user, params: { id: siteId }, body } = req;
+    const {
+      user,
+      params: { id: siteId },
+      body,
+    } = req;
 
-    const site = await fetchModelById(siteId, Site.forUser(user), { include: [Domain] });
+    const site = await fetchModelById(siteId, Site.forUser(user), {
+      include: [Domain, SiteBranchConfig],
+    });
 
     if (!site) {
       return res.notFound();
@@ -168,53 +195,13 @@ module.exports = wrapHandlers({
 
     const params = Object.assign(site, body);
     const updateParams = {
-      demoBranch: params.demoBranch,
-      defaultConfig: params.defaultConfig,
-      previewConfig: params.previewConfig,
-      demoConfig: params.demoConfig,
-      defaultBranch: params.defaultBranch,
       engine: params.engine,
     };
-
-    // Include domain URL(s) in update only if they're managed by an associated Domain
-    const canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(
-      site,
-      site.Domains,
-      Domain.Contexts.Site
-    );
-    const canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(
-      site,
-      site.Domains,
-      Domain.Contexts.Demo
-    );
-    if (canEditLiveUrl) {
-      updateParams.domain = params.domain;
-    }
-    if (canEditDemoUrl) {
-      updateParams.demoDomain = params.demoDomain;
-    }
 
     await site.update(updateParams);
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Updated', {
       site: { ...updateParams, id: site.id },
     });
-    await Build.create({
-      user: req.user.id,
-      site: site.id,
-      branch: site.defaultBranch,
-      username: req.user.username,
-    })
-      .then(b => b.enqueue());
-
-    if (site.demoBranch) {
-      await Build.create({
-        user: req.user.id,
-        site: site.id,
-        branch: site.demoBranch,
-        username: req.user.username,
-      })
-        .then(b => b.enqueue());
-    }
 
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
@@ -252,6 +239,24 @@ module.exports = wrapHandlers({
     await site.update({ basicAuth: {} });
 
     const siteJSON = siteSerializer.serializeNew(site);
+    return res.json(siteJSON);
+  },
+
+  async getSiteDomains(req, res) {
+    const {
+      user,
+      params: { site_id: siteId },
+    } = req;
+
+    const site = await Site.findByPk(siteId, { include: [Domain] });
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    await authorizer.findOne(user, site);
+
+    const siteJSON = domainSerializer.serializeMany(site.Domains);
     return res.json(siteJSON);
   },
 });

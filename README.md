@@ -9,12 +9,6 @@ This repository is home to "pages-core" - a Node.js app that allows government u
 
 ## Examples
 
-Partner agencies across the federal government use cloud.gov Pages to host websites. A few examples include:
-
-- [College Scorecard](https://collegescorecard.ed.gov/)
-- [Natural Resources Revenue Data](https://revenuedata.doi.gov/)
-- [NSF Small Business Innovation Research program](https://seedfund.nsf.gov)
-
 More examples can be found at [https://cloud.gov/pages/success-stories/](https://cloud.gov/pages/success-stories/).
 
 ## Development

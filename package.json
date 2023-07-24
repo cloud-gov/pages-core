@@ -72,6 +72,7 @@
     "debug": "node --inspect index.js",
     "watch": "NODE_ENV=development nodemon index.js --config nodemon.json",
     "test": "yarn test:prepare && yarn test:server && yarn test:client",
+    "test:cleandb": "NODE_ENV=test node migrate.js reset",
     "test:cover": "yarn test:prepare && yarn test:server:cover && yarn test:client:cover",
     "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build",
     "test:server": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor mocha --exit --timeout 2500 --recursive ./test/api",

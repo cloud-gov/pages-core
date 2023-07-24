@@ -4,8 +4,7 @@ import alertActions from '../actions/alertActions';
 export const API = '/v0';
 
 function request(endpoint, params = {}, { handleHttpError = true } = {}) {
-  const csrfToken = typeof window !== 'undefined'
-    ? window.CSRF_TOKEN : global.CSRF_TOKEN;
+  const csrfToken = typeof window !== 'undefined' ? window.CSRF_TOKEN : global.CSRF_TOKEN;
 
   const defaultHeaders = {
     'x-csrf-token': csrfToken,
@@ -13,17 +12,16 @@ function request(endpoint, params = {}, { handleHttpError = true } = {}) {
 
   const url = `${API}/${endpoint}`;
 
-  const headers = { ...defaultHeaders, ...params.headers || {} };
+  const headers = { ...defaultHeaders, ...(params.headers || {}) };
   const finalParams = { ...params, headers };
 
-  return fetch(url, finalParams)
-    .catch((error) => {
-      if (handleHttpError) {
-        alertActions.httpError(error.message);
-      } else {
-        throw error;
-      }
-    });
+  return fetch(url, finalParams).catch((error) => {
+    if (handleHttpError) {
+      alertActions.httpError(error.message);
+    } else {
+      throw error;
+    }
+  });
 }
 
 export default {
@@ -97,6 +95,10 @@ export default {
     return request('site');
   },
 
+  fetchSiteDomains(siteId) {
+    return request(`site/${siteId}/domains`);
+  },
+
   fetchUser() {
     return request('me');
   },
@@ -106,17 +108,21 @@ export default {
   },
 
   addUserToSite({ owner, repository }) {
-    return request('site/user', {
-      method: 'POST',
-      data: {
-        owner,
-        repository,
+    return request(
+      'site/user',
+      {
+        method: 'POST',
+        data: {
+          owner,
+          repository,
+        },
       },
-    }, {
-      // we want to handle the error elsewhere in order
-      // to show the additional AddSite fields
-      handleHttpError: false,
-    });
+      {
+        // we want to handle the error elsewhere in order
+        // to show the additional AddSite fields
+        handleHttpError: false,
+      }
+    );
   },
 
   removeUserFromSite(siteId, userId) {
@@ -128,27 +134,37 @@ export default {
   },
 
   addSite(site) {
-    return request('site', {
-      method: 'POST',
-      data: site,
-    }, {
-      handleHttpError: false,
-    });
+    return request(
+      'site',
+      {
+        method: 'POST',
+        data: site,
+      },
+      {
+        handleHttpError: false,
+      }
+    );
   },
 
   updateSite(site, data) {
-    return request(`site/${site.id}`, {
-      method: 'PUT',
-      data,
-    }, {
-      handleHttpError: false,
-    });
+    return request(
+      `site/${site.id}`,
+      {
+        method: 'PUT',
+        data,
+      },
+      {
+        handleHttpError: false,
+      }
+    );
   },
 
   deleteSite(siteId) {
-    return request(`site/${siteId}`,
+    return request(
+      `site/${siteId}`,
       { method: 'DELETE' },
-      { handleHttpError: false });
+      { handleHttpError: false }
+    );
   },
 
   restartBuild(buildId, siteId) {
@@ -173,11 +189,53 @@ export default {
   },
 
   updateUserSettings(userSettings) {
-    return request('me/settings', {
+    return request(
+      'me/settings',
+      {
+        method: 'PUT',
+        data: userSettings,
+      },
+      {
+        handleHttpError: false,
+      }
+    );
+  },
+
+  deleteSiteBranchConfig(siteId, siteBranchConfigId) {
+    return request(`site/${siteId}/branch-config/${siteBranchConfigId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  createSiteBranchConfig(siteId, branch, config = {}, context) {
+    return request(`site/${siteId}/branch-config`, {
+      method: 'POST',
+      data: {
+        branch,
+        config,
+        context,
+      },
+    });
+  },
+
+  fetchSiteBranchConfigs(siteId) {
+    return request(`site/${siteId}/branch-config`);
+  },
+
+  updateSiteBranchConfig(
+    siteId,
+    siteBranchConfigId,
+    branch,
+    config = {},
+    context
+  ) {
+    return request(`site/${siteId}/branch-config/${siteBranchConfigId}`, {
       method: 'PUT',
-      data: userSettings,
-    }, {
-      handleHttpError: false,
+      data: {
+        branch,
+        config,
+        context,
+      },
     });
   },
 
@@ -186,50 +244,70 @@ export default {
   },
 
   deleteUserEnvironmentVariable(siteId, uevId) {
-    return request(`site/${siteId}/user-environment-variable/${uevId}`, {
-      method: 'DELETE',
-    }, {
-      handleHttpError: false,
-    });
+    return request(
+      `site/${siteId}/user-environment-variable/${uevId}`,
+      {
+        method: 'DELETE',
+      },
+      {
+        handleHttpError: false,
+      }
+    );
   },
 
   createUserEnvironmentVariable(siteId, uev) {
-    return request(`site/${siteId}/user-environment-variable`, {
-      method: 'POST',
-      data: {
-        name: uev.name,
-        value: uev.value,
+    return request(
+      `site/${siteId}/user-environment-variable`,
+      {
+        method: 'POST',
+        data: {
+          name: uev.name,
+          value: uev.value,
+        },
       },
-    }, {
-      handleHttpError: false,
-    });
+      {
+        handleHttpError: false,
+      }
+    );
   },
 
   removeBasicAuthFromSite(siteId) {
-    return request(`site/${siteId}/basic-auth`, {
-      method: 'DELETE',
-    }, {
-      handleHttpError: false,
-    });
+    return request(
+      `site/${siteId}/basic-auth`,
+      {
+        method: 'DELETE',
+      },
+      {
+        handleHttpError: false,
+      }
+    );
   },
 
   saveBasicAuthToSite(siteId, credentials) {
-    return request(`site/${siteId}/basic-auth`, {
-      method: 'POST',
-      data: {
-        username: credentials.username,
-        password: credentials.password,
+    return request(
+      `site/${siteId}/basic-auth`,
+      {
+        method: 'POST',
+        data: {
+          username: credentials.username,
+          password: credentials.password,
+        },
       },
-    }, {
-      handleHttpError: false,
-    });
+      {
+        handleHttpError: false,
+      }
+    );
   },
 
   revokeApplicationGrant() {
-    return request('me/githubtoken', {
-      method: 'DELETE',
-    }, {
-      handleHttpError: false,
-    });
+    return request(
+      'me/githubtoken',
+      {
+        method: 'DELETE',
+      },
+      {
+        handleHttpError: false,
+      }
+    );
   },
 };

@@ -7,6 +7,7 @@ import IconEnvelope from '../../public/images/icons/icon-envelope.svg';
 import IconExclamationCircle from '../../public/images/icons/icon-exclamation-circle-solid.svg';
 import IconGear from '../../public/images/icons/icon-gear.svg';
 import IconGitHub from '../../public/images/icons/icon-github.svg';
+import IconLink from '../../public/images/icons/icon-link.svg';
 import IconPeople from '../../public/images/icons/icon-people.svg';
 import IconPlus from '../../public/images/icons/icon-plus.svg';
 import IconSpinner from '../../public/images/icons/icon-spinner-solid.svg';
@@ -22,6 +23,7 @@ export {
   IconExclamationCircle,
   IconGear,
   IconGitHub,
+  IconLink,
   IconPeople,
   IconPlus,
   IconSpinner,

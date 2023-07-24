@@ -3,18 +3,20 @@ import PropTypes from 'prop-types';
 
 import AdvancedSiteSettingsForm from './AdvancedSiteSettingsForm';
 import DeleteSiteForm from './DeleteSiteForm';
+import ExpandableArea from '../../ExpandableArea';
 
-export const AdvancedSiteSettings = ({
-  initialValues,
-  onDelete,
-  onSubmit,
-}) => (
+export const AdvancedSiteSettings = ({ initialValues, onDelete, onSubmit }) => (
   <div>
-    <AdvancedSiteSettingsForm
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-    />
-    <DeleteSiteForm onSubmit={onDelete} />
+    <h3>Advanced Settings</h3>
+    <ExpandableArea bordered title="Site engine">
+      <AdvancedSiteSettingsForm
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+      />
+    </ExpandableArea>
+    <ExpandableArea bordered title="Delete site">
+      <DeleteSiteForm onSubmit={onDelete} />
+    </ExpandableArea>
   </div>
 );
 
@@ -24,9 +26,6 @@ AdvancedSiteSettings.propTypes = {
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
-    defaultConfig: PropTypes.string,
-    demoConfig: PropTypes.string,
-    previewConfig: PropTypes.string,
   }).isRequired,
 };
 

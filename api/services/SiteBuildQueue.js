@@ -8,19 +8,12 @@ const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
 
-const defaultBranch = build => build.branch === build.Site.defaultBranch;
-const demoBranch = build => build.branch === build.Site.demoBranch;
+const siteConfig = (build, siteBranchConfigs = []) => {
+  const configRecord = siteBranchConfigs.find(c => c.branch === build.branch)
+    || siteBranchConfigs.find(c => c.context === 'preview')
+    || null;
 
-const siteConfig = (build) => {
-  let siteBuildConfig;
-  if (defaultBranch(build)) {
-    siteBuildConfig = build.Site.defaultConfig;
-  } else if (demoBranch(build)) {
-    siteBuildConfig = build.Site.demoConfig;
-  } else {
-    siteBuildConfig = build.Site.previewConfig;
-  }
-  return siteBuildConfig || {};
+  return configRecord?.config || {};
 };
 
 const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
@@ -43,22 +36,28 @@ const buildUEVs = uevs => (uevs
   }))
   : []);
 
-const generateDefaultCredentials = build => ({
-  STATUS_CALLBACK: statusCallbackURL(build),
-  BASEURL: baseURLForBuild(build),
-  BRANCH: build.branch,
-  CONFIG: JSON.stringify(siteConfig(build)),
-  REPOSITORY: build.Site.repository,
-  OWNER: build.Site.owner,
-  SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
-  GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
-  GENERATOR: build.Site.engine,
-  BUILD_ID: build.id,
-  USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(build.Site.UserEnvironmentVariables)),
-});
+const generateDefaultCredentials = async (build) => {
+  const {
+    engine, owner, repository, UserEnvironmentVariables, SiteBranchConfigs,
+  } = build.Site;
+
+  return ({
+    STATUS_CALLBACK: statusCallbackURL(build),
+    BASEURL: baseURLForBuild(build),
+    BRANCH: build.branch,
+    CONFIG: JSON.stringify(siteConfig(build, SiteBranchConfigs)),
+    REPOSITORY: repository,
+    OWNER: owner,
+    SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
+    GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
+    GENERATOR: engine,
+    BUILD_ID: build.id,
+    USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(UserEnvironmentVariables)),
+  });
+};
 
 const buildContainerEnvironment = async (build) => {
-  const defaultCredentials = generateDefaultCredentials(build);
+  const defaultCredentials = await generateDefaultCredentials(build);
 
   if (!defaultCredentials.GITHUB_TOKEN) {
     defaultCredentials.GITHUB_TOKEN = await GithubBuildHelper.loadBuildUserAccessToken(build);

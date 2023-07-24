@@ -1,5 +1,5 @@
 const userFactory = require('./user');
-const { Site } = require('../../../../api/models');
+const { Site, SiteBranchConfig } = require('../../../../api/models');
 const { generateSubdomain } = require('../../../../api/utils');
 
 let siteAttsStep = 1;
@@ -36,7 +36,46 @@ function makeAttributes(overrides = {}) {
   };
 }
 
-function site(overrides) {
+async function addSiteBranchConfigs(site) {
+  const {
+    id: siteId,
+    defaultBranch,
+    demoBranch,
+    defaultConfig,
+    demoConfig,
+    previewConfig,
+  } = site;
+
+  if (defaultBranch) {
+    await SiteBranchConfig.create({
+      siteId,
+      branch: defaultBranch,
+      s3Key: `/site/${site.owner}/${site.repository}`,
+      config: defaultConfig,
+      context: 'site',
+    });
+  }
+
+  if (demoBranch) {
+    await SiteBranchConfig.create({
+      siteId,
+      s3Key: `/demo/${site.owner}/${site.repository}`,
+      branch: demoBranch,
+      config: demoConfig,
+      context: 'demo',
+    });
+  }
+
+  if (previewConfig) {
+    await SiteBranchConfig.create({
+      siteId,
+      config: previewConfig,
+      context: 'preview',
+    });
+  }
+}
+
+function site(overrides, options = {}) {
   let site; // eslint-disable-line no-shadow
   let users;
 
@@ -47,9 +86,12 @@ function site(overrides) {
 
       return Site.create(attributes);
     })
-    .then((siteModel) => {
+    .then(async (siteModel) => {
       site = siteModel;
-      const userPromises = users.map(user => site.addUser(user));
+      const userPromises = users.map((user) => site.addUser(user));
+      if (!options.noSiteBranchConfig) {
+        await addSiteBranchConfigs(site);
+      }
       return Promise.all(userPromises);
     })
     .then(() => Site.findByPk(site.id));
