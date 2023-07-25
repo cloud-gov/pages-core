@@ -1,8 +1,8 @@
-const ScheduledBuildHelper = require('../../services/ScheduledBuildHelper');
+const NightlyBuildsHelper = require('../../services/NightlyBuildsHelper');
 const { logger } = require('../../../winston');
 
 async function nightlyBuilds() {
-  const results = await ScheduledBuildHelper.nightlyBuilds();
+  const results = await NightlyBuildsHelper.nightlyBuilds();
 
   const successes = results
     .filter(result => result.status === 'fulfilled')
