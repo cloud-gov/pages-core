@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const moment = require('moment');
 const BuildLogs = require('../../../api/services/build-logs');
 const TimeoutBuilds = require('../../../api/services/TimeoutBuilds');
-const ScheduledBuildHelper = require('../../../api/services/ScheduledBuildHelper');
+const NightlyBuildsHelper = require('../../../api/services/NightlyBuildsHelper');
 const SandboxHelper = require('../../../api/services/SandboxHelper');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const factory = require('../support/factory');
@@ -18,7 +18,7 @@ describe('job processors', () => {
 
   context('nightlyBuilds', () => {
     it('with failed builds', async () => {
-      sinon.stub(ScheduledBuildHelper, 'nightlyBuilds').resolves([
+      sinon.stub(NightlyBuildsHelper, 'nightlyBuilds').resolves([
         { status: 'fulfilled', value: '1' },
         { status: 'fulfilled', value: '2' },
         { status: 'rejected', reason: 'because' },
@@ -29,7 +29,7 @@ describe('job processors', () => {
     });
 
     it('all successful builds', async () => {
-      sinon.stub(ScheduledBuildHelper, 'nightlyBuilds').resolves([
+      sinon.stub(NightlyBuildsHelper, 'nightlyBuilds').resolves([
         { status: 'fulfilled', value: '1' },
         { status: 'fulfilled', value: '2' },
       ]);

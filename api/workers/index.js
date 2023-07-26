@@ -19,6 +19,8 @@ const {
   FailStuckBuildsQueue,
   FailStuckBuildsQueueName,
   MailQueueName,
+  NightlyBuildsQueue,
+  NightlyBuildsQueueName,
   ScheduledQueue,
   ScheduledQueueName,
   SlackQueueName,
@@ -65,8 +67,9 @@ function pagesWorker(connection) {
     ? job => logger.info(job.data)
     : job => (new Mailer()).send(job.data);
 
+  const nightlyBuildsProcessor = () => Processors.nightlyBuilds();
+
   const scheduledJobProcessor = Processors.multiJobProcessor({
-    nightlyBuilds: Processors.nightlyBuilds,
     sandboxNotifications: Processors.sandboxNotifications,
     cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
   });
@@ -81,6 +84,7 @@ function pagesWorker(connection) {
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(FailStuckBuildsQueueName, connection, failBuildsProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
+    new QueueWorker(NightlyBuildsQueueName, connection, nightlyBuildsProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
     new QueueWorker(SiteDeletionQueueName, connection, siteDeletionProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
@@ -92,6 +96,7 @@ function pagesWorker(connection) {
     new QueueScheduler(DomainQueueName, { connection }),
     new QueueScheduler(FailStuckBuildsQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
+    new QueueScheduler(NightlyBuildsQueueName, { connection }),
     new QueueScheduler(ScheduledQueueName, { connection }),
     new QueueScheduler(SiteDeletionQueueName, { connection }),
     new QueueScheduler(SlackQueueName, { connection }),
@@ -100,11 +105,13 @@ function pagesWorker(connection) {
 
   const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
   const failStuckBuildsQueue = new FailStuckBuildsQueue(connection);
+  const nightlyBuildsQueue = new NightlyBuildsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
   const timeoutBuildTasksQueue = new TimeoutBuildTasksQueue(connection);
   const queues = [
     archiveBuildLogsQueue,
     failStuckBuildsQueue,
+    nightlyBuildsQueue,
     scheduledQueue,
     timeoutBuildTasksQueue,
   ];
@@ -114,7 +121,7 @@ function pagesWorker(connection) {
       ? archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig)
       : Promise.resolve(),
     failStuckBuildsQueue.add('failStuckBuilds', {}, everyTenMinutesJobConfig),
-    scheduledQueue.add('nightlyBuilds', {}, nightlyJobConfig),
+    nightlyBuildsQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
     scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig),
     timeoutBuildTasksQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
