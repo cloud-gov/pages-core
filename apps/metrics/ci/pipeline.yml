@@ -232,7 +232,6 @@ jobs:
         file: src-metrics/apps/metrics/ci/pipeline.yml
         instance_vars:
           deploy-env: ((deploy-env))
-          git-branch: ((git-branch))
 
 ############################
 #  RESOURCES
@@ -245,7 +244,7 @@ resources:
     source:
       repository: ((pages-repository-path))
       access_token: ((gh-access-token))
-      base_branch: ((git-branch))
+      base_branch: main
       disable_forks: true
       ignore_drafts: false
 
@@ -254,7 +253,7 @@ resources:
     icon: github
     source:
       uri: ((git-base-url))/((pages-repository-path))
-      branch: ((git-branch))
+      branch: main
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
 
   - name: slack

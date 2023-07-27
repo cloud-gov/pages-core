@@ -18,10 +18,10 @@ applications:
     services:
       - app-((env))-uaa-client
       - federalist-((env))-rds
-      - ((product))-((env))-env
+      - pages-((env))-env
       - pages-((env))-redis
-      - ((product))-((env))-proxy
-      - ((product))-((env))-domain
+      - pages-((env))-proxy
+      - pages-((env))-domain
       - federalist-((env))-uev-key
       - federalist-deploy-user
       - federalist-site-wide-error
@@ -47,17 +47,17 @@ applications:
       UAA_HOST: ((uaa_host))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))
       PROXY_DOMAIN: ((proxy_domain))
-      PRODUCT: ((product))
+      PRODUCT: pages
       CF_CDN_SPACE_NAME: ((cf_cdn_space_name))
       CF_DOMAIN_WITH_CDN_PLAN_GUID: 440cce96-8989-428b-a60e-91c1393bf3f2
       NEW_RELIC_ERROR_COLLECTOR_ENABLED: false
-  - name: ((product))-admin((env_postfix))
+  - name: pages-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
     instances: 2
     routes:
       - route: admin.((domain))
-  - name: ((product))-queues-ui((env_postfix))
+  - name: pages-queues-ui((env_postfix))
     buildpack: nodejs_buildpack
     command: yarn start-bull-board:cg
     disk_quota: 2G
@@ -67,8 +67,8 @@ applications:
       - route: queues.((domain))
     services:
       - app-((env))-uaa-client
-      - ((product))-((env))-redis
-      - ((product))-((env))-env
+      - pages-((env))-redis
+      - pages-((env))-env
     env:
       ADMIN_GITHUB_ORGANIZATION: 18F
       ADMIN_GITHUB_TEAM: federalist-admins
@@ -79,4 +79,4 @@ applications:
       NPM_CONFIG_PRODUCTION: true
       NODE_MODULES_CACHE: false
       UAA_LOGIN_HOST: ((uaa_login_host))
-      PRODUCT: ((product))
+      PRODUCT: pages

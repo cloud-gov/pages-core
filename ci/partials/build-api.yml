@@ -1,0 +1,9 @@
+platform: linux
+inputs: [name: src]
+outputs: [name: src]
+params:
+  PRODUCT: pages
+run:
+  dir: src
+  path: bash
+  args: [-c, yarn build]
