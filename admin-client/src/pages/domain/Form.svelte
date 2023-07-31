@@ -1,6 +1,7 @@
 <script>
+  import Svelecte from 'svelecte';
   import { siteName } from '../../lib/utils';
-  import { Form, SelectInput, TextInput } from '../../components';
+  import { Form, TextInput } from '../../components';
 
   export let sites;
   export let siteId;
@@ -10,24 +11,38 @@
 
   const domain = {
     names: '',
-    context: '',
+    siteBranchConfigId: null,
     siteId: siteId || '',
   };
 
-  $: siteOptions = sites.map((site) => ({ label: siteName(site), value: site.id }));
+  $: siteOptions = sites.map((site) => ({
+    label: siteName(site),
+    value: site.id,
+  }));
 
-  let contextOptions = [];
+  $: contextOptions = !domain.siteId
+    ? []
+    : sites
+      .find((site) => site.id === domain.siteId)
+      .SiteBranchConfigs.filter((sbc) => sbc.context !== 'preview')
+      .map((sbc) => ({
+        label: `Branch: ${sbc.branch} | Context: ${sbc.context}`,
+        value: sbc.id,
+      }));
+
   $: {
-    const options = [];
-    const selectedSite = sites.find((site) => site.id === domain.siteId);
+    if (domain.siteId && domain.siteBranchConfigId) {
+      const selected = sites.find((site) => site.id === domain.siteId);
 
-    if (selectedSite) {
-      options.push('site');
-      if (selectedSite.demoBranch) {
-        options.push('demo');
+      if (selected) {
+        const configs = selected.SiteBranchConfigs;
+        const configMatch = configs.find((sbc) => sbc.id === domain.siteBranchConfigId);
+
+        if (!configMatch) {
+          domain.siteBranchConfigId = null;
+        }
       }
     }
-    contextOptions = options;
   }
 </script>
 
@@ -38,26 +53,36 @@
   {onSuccess}
   title="Create Domain"
   large={true}
-  let:errors={errors}>
+  let:errors
+>
+  <fieldset class="usa-fieldset">
+    <label class="usa-label" for="site">
+      Site<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+    </label>
+    <Svelecte
+      clearable={true}
+      labelField="label"
+      name="site"
+      options={siteOptions}
+      placeholder="Select site"
+      bind:value={domain.siteId}
+    />
+  </fieldset>
 
-  <SelectInput
-    label="Site"
-    name="site"
-    options={siteOptions}
-    required
-    error={errors.siteId}
-    bind:value={domain.siteId}
-  />
-
-  <SelectInput
-    hint="'site' or 'demo'"
-    label="Context"
-    name="context"
-    options={contextOptions}
-    required
-    error={errors.context}
-    bind:value={domain.context}
-  />
+  <fieldset class="usa-fieldset">
+    <label class="usa-label" for="context">
+      Branch Context
+      <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+    </label>
+    <Svelecte
+      clearable={true}
+      labelField="label"
+      name="context"
+      options={contextOptions}
+      placeholder="Select site context and branch"
+      bind:value={domain.siteBranchConfigId}
+    />
+  </fieldset>
 
   <TextInput
     hint="Comma separated list of valid domains"

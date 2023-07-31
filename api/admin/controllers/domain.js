@@ -1,9 +1,14 @@
 const json2csv = require('@json2csv/plainjs');
 const {
-  Domain, Site, Event, Organization,
+  Domain,
+  Event,
+  Organization,
+  Site,
+  SiteBranchConfig,
 } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
+const { siteViewOrigin } = require('../../utils/site');
 const DomainService = require('../../services/Domain');
 const EventCreator = require('../../services/EventCreator');
 const domainSerializer = require('../../serializers/domain');
@@ -35,7 +40,10 @@ module.exports = wrapHandlers({
         { limit, page },
         { order: ['names', 'context'] }
       ),
-      Site.findAll({ attributes: ['id', 'owner', 'repository', 'demoBranch'], raw: true }),
+      Site.findAll({
+        attributes: ['id', 'owner', 'repository', 'demoBranch'],
+        raw: true,
+      }),
     ]);
 
     const json = {
@@ -50,9 +58,7 @@ module.exports = wrapHandlers({
   },
 
   async listPublished(req, res) {
-    const {
-      limit, page, organization,
-    } = req.query;
+    const { limit, page, organization } = req.query;
 
     const scopes = ['provisionedWithSiteAndOrganization'];
 
@@ -81,7 +87,9 @@ module.exports = wrapHandlers({
   },
 
   async listPublishedCSV(req, res) {
-    const domains = await Domain.scope('provisionedWithSiteAndOrganization').findAll();
+    const domains = await Domain.scope(
+      'provisionedWithSiteAndOrganization'
+    ).findAll();
 
     const fields = [
       {
@@ -132,11 +140,7 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: {
-        context,
-        names,
-        siteId,
-      },
+      body: { names, siteBranchConfigId, siteId },
     } = req;
 
     const site = await fetchModelById(siteId, Site);
@@ -144,19 +148,58 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
+    const sbc = await fetchModelById(siteBranchConfigId, SiteBranchConfig);
+    if (!sbc) {
+      return res.notFound();
+    }
+
+    if (sbc.siteId !== siteId) {
+      return res
+        .status(400)
+        .send({ message: 'The site and site branch config are not related.' });
+    }
+
+    if (sbc.context === 'preview') {
+      return res.status(400).send({
+        message: 'The site branch config cannot have the context of "preview".',
+      });
+    }
+
     try {
-      const domain = await Domain.create({ siteId, context, names });
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Created', { domain });
+      const origin = siteViewOrigin(site);
+      const firstDomainName = names.split(',')[0];
+      const serviceName = `${firstDomainName}-ext`;
+      const domain = await Domain.create({
+        siteId,
+        siteBranchConfigId,
+        names,
+        origin,
+        path: sbc.s3Key,
+        serviceName,
+      });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'Domain Created',
+        { domain }
+      );
       return res.json(domainSerializer.serialize(domain, true));
     } catch (err) {
       if (!err.errors) {
         throw err;
       }
-      const errors = err.errors.reduce((obj, error) => ({
-        ...obj, [error.path]: error.message,
-      }), {});
+      const errors = err.errors.reduce(
+        (obj, error) => ({
+          ...obj,
+          [error.path]: error.message,
+        }),
+        {}
+      );
 
-      return res.unprocessableEntity({ errors, message: 'Could not create Domain' });
+      return res.unprocessableEntity({
+        errors,
+        message: 'Could not create Domain',
+      });
     }
   },
 
@@ -172,7 +215,12 @@ module.exports = wrapHandlers({
 
     try {
       await DomainService.destroy(domain);
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Destroyed', { domain });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'Domain Destroyed',
+        { domain }
+      );
       return res.json({});
     } catch (error) {
       return res.unprocessableEntity(error);
@@ -232,7 +280,12 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.deprovision(domain);
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Deprovisioned', { domain: updatedDomain });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'Domain Deprovisioned',
+        { domain: updatedDomain }
+      );
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),
@@ -256,7 +309,12 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Provisioned', { domain: updatedDomain });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'Domain Provisioned',
+        { domain: updatedDomain }
+      );
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),

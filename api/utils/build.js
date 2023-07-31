@@ -19,17 +19,37 @@ function buildUrl(build, site) {
 }
 
 function buildViewLink(build, site) {
-  let link;
+  const { SiteBranchConfigs, Domains } = site;
 
-  // Todo Update site domain and demo domain to look at Domain table based on context
-  if (build.branch === site.defaultBranch && site.domain) {
-    link = site.domain;
-  } else if (build.branch === site.demoBranch && site.demoDomain) {
-    link = site.demoDomain;
-  } else {
-    link = build.url || buildUrl(build, site);
+  if (build.url) {
+    const regex = /(http|https):\/\/+/;
+
+    if (regex.test(build.url)) {
+      return `${build.url.replace(regex, 'https://')}/`;
+    }
+
+    return `https://${build.url}/`;
   }
-  return `${link.replace(/\/+$/, '')}/`;
+
+  const siteBranchConfig = SiteBranchConfigs.find(
+    sbc => sbc.branch === build.branch
+  );
+
+  if (!siteBranchConfig) {
+    return `${buildUrl(build, site)}/`;
+  }
+
+  const domain = Domains.find(
+    d => d.siteBranchConfigId === siteBranchConfig.id && d.state === 'provisioned'
+  );
+
+  if (!domain) {
+    return `${buildUrl(build, site)}/`;
+  }
+
+  const domainName = domain.names.split(',')[0];
+
+  return `https://${domainName.replace(/\/+$/, '')}/`;
 }
 
 module.exports = { buildViewLink, buildUrl };

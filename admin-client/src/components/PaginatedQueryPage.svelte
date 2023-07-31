@@ -20,9 +20,7 @@
   }
   $: hidden = expanded ? null : 'hidden';
 
-  const limits = [
-    '10', '25', '50', '100',
-  ];
+  const limits = ['10', '25', '50', '100'];
 
   const defaultParams = {
     limit: '25',
@@ -58,14 +56,12 @@
           <em class="usa-logo__text">{title || path}</em>
         </div>
         {#if addAction}
-          <a class="usa-button usa-button--outline" href={`${path}/new`}>
-            +
-          </a>
+          <a class="usa-button usa-button--outline" href={`${path}/new`}> + </a>
         {/if}
       </div>
       <nav class="usa-nav">
         <button class="usa-nav__close">
-          <img src="/img/usa-icons/close.svg" alt="close">
+          <img src="/img/usa-icons/close.svg" alt="close" />
         </button>
         {#if hasFilters}
           <ul class="usa-nav__primary usa-accordion">
@@ -92,11 +88,20 @@
                       {#each fieldArray as field}
                         {#if field.type === 'select'}
                           <fieldset class="usa-fieldset">
-                            <label class="usa-label" for={field.name}>{field.label || field.name}</label>
-                            <select class="usa-select" name={field.name} id={field.name}>
+                            <label class="usa-label" for={field.name}
+                              >{field.label || field.name}</label
+                            >
+                            <select
+                              class="usa-select"
+                              name={field.name}
+                              id={field.name}
+                            >
                               <option value="">-</option>
                               {#each field.options(payload.meta) as opt}
-                                <option value={opt.value ?? opt} selected={`${opt.value ?? opt}` === params[field.name]}>
+                                <option
+                                  value={opt.value ?? opt}
+                                  selected={`${opt.value ?? opt}` === params[field.name]}
+                                >
                                   {opt.name ?? opt}
                                 </option>
                               {/each}
@@ -105,13 +110,21 @@
                         {/if}
                         {#if field.type === 'select-auto'}
                           <fieldset class="usa-fieldset">
-                            <label class="usa-label" for={field.name}>{field.label || field.name}</label>
-                            <Svelecte clearable={true} valueAsObject={true} labelField="name" name={field.name} options={field.options(payload.meta)}/>
+                            <label class="usa-label" for={field.name}
+                              >{field.label || field.name}</label
+                            >
+                            <Svelecte
+                              clearable={true}
+                              valueAsObject={true}
+                              labelField="name"
+                              name={field.name}
+                              options={field.options(payload.meta)}
+                            />
                           </fieldset>
                         {/if}
                       {/each}
                     </div>
-                    <input class="usa-button" type="submit" value="Search">
+                    <input class="usa-button" type="submit" value="Search" />
                   </form>
                 </div>
               </div>
@@ -119,46 +132,55 @@
           </ul>
         {/if}
         {#if !noSearch}
-        <form
-          class="usa-search usa-search--small flex-align-center"
-          role="search"
-          on:submit|preventDefault={handleSubmit}
-        >
-          <label class="usa-label margin-top-0 margin-right-1" for="limit">Limit:</label>
-          <select
-            class="usa-select height-4 line-height-sans-1 margin-right-2"
-            name="limit"
-            id="limit"
-            value={params.limit}
+          <form
+            class="usa-search usa-search--small flex-align-center"
+            role="search"
+            on:submit|preventDefault={handleSubmit}
           >
-            {#each limits as limit}
-              <option value={limit}>{limit}</option>
-            {/each}
-          </select>
-          <label class="usa-sr-only" for="basic-mega-search-field-small">
-            Search
-          </label>
-          <input
-            class="usa-input"
-            id="basic-mega-search-field-small"
-            type="search"
-            name="search"
-            value={params.search}
-          >
-          <button class="usa-button" type="submit">
-            <span class="usa-sr-only">Search</span>
-          </button>
-        </form>
+            <label class="usa-label margin-top-0 margin-right-1" for="limit"
+              >Limit:</label
+            >
+            <select
+              class="usa-select height-4 line-height-sans-1 margin-right-2"
+              name="limit"
+              id="limit"
+              value={params.limit}
+            >
+              {#each limits as limit}
+                <option value={limit}>{limit}</option>
+              {/each}
+            </select>
+            <label class="usa-sr-only" for="basic-mega-search-field-small">
+              Search
+            </label>
+            <input
+              class="usa-input"
+              id="basic-mega-search-field-small"
+              type="search"
+              name="search"
+              value={params.search}
+            />
+            <button class="usa-button" type="submit">
+              <span class="usa-sr-only">Search</span>
+            </button>
+          </form>
         {/if}
       </nav>
     </div>
     <div class="tag-container usa-nav-container margin-top-1 margin-bottom-2">
       {#each filtersWithValues as key}
         <span class="usa-tag">
-          <button class="usa-button usa-button--unstyled"
-                  on:click={() => handleTagClick({ [key]: '' })}>
-            <svg class="usa-icon margin-right-1" aria-hidden="true" focusable="false" role="img">
-              <use xlink:href="/img/sprite.svg#close"></use>
+          <button
+            class="usa-button usa-button--unstyled"
+            on:click={() => handleTagClick({ [key]: '' })}
+          >
+            <svg
+              class="usa-icon margin-right-1"
+              aria-hidden="true"
+              focusable="false"
+              role="img"
+            >
+              <use xlink:href="/img/sprite.svg#close" />
             </svg>
           </button>
           {key}: <b>{params[key]}</b>
@@ -167,9 +189,9 @@
     </div>
   </header>
   <GridContainer>
-    <PaginationBanner pagination={payload} extraParams={params}/>
-      <slot data={payload.data}>Found {payload.data.length} items.</slot>
-    <PaginationBanner pagination={payload} extraParams={params}/>
+    <PaginationBanner pagination={payload} extraParams={params} />
+    <slot data={payload.data}>Found {payload.data.length} items.</slot>
+    <PaginationBanner pagination={payload} extraParams={params} />
   </GridContainer>
 </Await>
 
@@ -185,10 +207,11 @@
     padding-top: 0;
   }
 
-  .usa-accordion__button.usa-nav__link[aria-expanded="true"] {
+  .usa-accordion__button.usa-nav__link[aria-expanded='true'] {
     color: #005ea2;
     background-color: #f0f0f0;
-    background-image: url(../img/angle-arrow-up-primary.svg),linear-gradient(transparent,transparent);
+    background-image: url(../img/angle-arrow-up-primary.svg),
+      linear-gradient(transparent, transparent);
   }
 
   .usa-form .controls > fieldset {
@@ -213,7 +236,7 @@
     background-color: #d9e8f6;
     color: #005ea2;
     display: flex;
-    padding-left: .25rem;
+    padding-left: 0.25rem;
     align-items: center;
     text-transform: lowercase;
   }
@@ -238,7 +261,7 @@
     display: flex;
     align-items: center;
   }
-  .usa-navbar.controls > *{
+  .usa-navbar.controls > * {
     margin-right: 2rem;
   }
   :global(.svelecte-control) {

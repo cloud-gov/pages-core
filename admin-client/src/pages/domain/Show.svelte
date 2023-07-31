@@ -9,14 +9,15 @@
     destroyDomain,
   } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
-  import { siteName } from '../../lib/utils';
+  import {
+    siteName, domainBranch, domainContext, stateColor,
+  } from '../../lib/utils';
   import {
     Await,
     GridContainer,
     PageTitle,
     LabeledItem,
   } from '../../components';
-  import { domainBranch, stateColor } from './domain';
   import DnsTable from './DnsTable.svelte';
 
   $: id = $router.params.id;
@@ -72,7 +73,7 @@
         <LabeledItem label="site">
           <a href="/sites/{domain.Site.id}">{siteName(domain.Site)}</a>
         </LabeledItem>
-        <LabeledItem label="context" value={domain.context} />
+        <LabeledItem label="context" value={domainContext(domain)} />
         <LabeledItem label="branch" value={domainBranch(domain)} />
         {#if domain.state !== 'pending'}
           <LabeledItem label="origin" value={domain.origin} />

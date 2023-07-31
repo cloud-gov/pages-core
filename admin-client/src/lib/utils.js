@@ -1,3 +1,14 @@
+const domainBranch = (domain) => domain.SiteBranchConfig.branch;
+const domainContext = (domain) => domain.SiteBranchConfig.context;
+
+const stateColor = (state) => ({
+  pending: 'bg-gray-30',
+  provisioning: 'bg-gold',
+  failed: 'bg-red',
+  provisioned: 'bg-mint',
+  deprovisioning: 'bg-gold',
+}[state] || 'bg-gray-30');
+
 function formToObj(form) {
   return [...form.elements]
     .filter((e) => e.name)
@@ -17,7 +28,10 @@ function siteName(site) {
 }
 
 export {
+  domainBranch,
+  domainContext,
   formToObj,
   objToQueryString,
   siteName,
+  stateColor,
 };

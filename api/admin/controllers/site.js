@@ -1,4 +1,6 @@
-const { Organization, Site, Event } = require('../../models');
+const {
+  Organization, Site, SiteBranchConfig, Event,
+} = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const GithubBuildHelper = require('../../services/GithubBuildHelper');
 const { fetchModelById } = require('../../utils/queryDatabase');
@@ -6,11 +8,7 @@ const { paginate, pick, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
 const EventCreator = require('../../services/EventCreator');
 
-const updateableAttrs = [
-  'containerConfig',
-  'isActive',
-  'organizationId',
-];
+const updateableAttrs = ['containerConfig', 'isActive', 'organizationId'];
 
 module.exports = wrapHandlers({
   listRaw: async (req, res) => {
@@ -20,7 +18,7 @@ module.exports = wrapHandlers({
         ['owner', 'ASC'],
         ['repository', 'ASC'],
       ],
-      raw: true,
+      include: [SiteBranchConfig],
     });
     return res.json(sites);
   },
@@ -101,9 +99,19 @@ module.exports = wrapHandlers({
     await site.update(pick(updateableAttrs, body));
 
     if (site.isActive && body.isActive === false) {
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Deactivated', { site });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'Site Deactivated',
+        { site }
+      );
     } else if (!site.isActive && body.isActive === true) {
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Activated', { site });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'Site Activated',
+        { site }
+      );
     }
 
     return res.json(serializeNew(site, true));
@@ -120,7 +128,9 @@ module.exports = wrapHandlers({
       return res.unprocessableEntity({ message });
     }
 
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Destroyed', { site });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Destroyed', {
+      site,
+    });
 
     return res.json({});
   },

@@ -4,7 +4,12 @@ const BuildLogs = require('../../services/build-logs');
 const GithubBuildHelper = require('../../services/GithubBuildHelper');
 
 const {
-  Build, Site, User, Event,
+  Build,
+  Domain,
+  Event,
+  Site,
+  SiteBranchConfig,
+  User,
 } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
@@ -40,7 +45,9 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const build = await fetchModelById(id, Build, { include: [Site, User] });
+    const build = await fetchModelById(id, Build, {
+      include: [{ model: Site, include: [Domain, SiteBranchConfig] }, User],
+    });
     if (!build) return res.notFound();
 
     return res.json(buildSerializer.serializeObject(build));
@@ -67,7 +74,9 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const build = await fetchModelById(id, Build, { include: [Site, User] });
+    const build = await fetchModelById(id, Build, {
+      include: [{ model: Site, include: [Domain, SiteBranchConfig] }, User],
+    });
     if (!build) return res.notFound();
 
     await build.update({ state });
@@ -82,7 +91,7 @@ module.exports = wrapHandlers({
         id: req.body.buildId,
         site: req.body.siteId,
       },
-      include: [{ model: Site, include: [{ model: User }] }],
+      include: [{ model: Site, include: [User, Domain, SiteBranchConfig] }],
     });
 
     if (!requestBuild) {

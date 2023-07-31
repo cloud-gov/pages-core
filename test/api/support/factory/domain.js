@@ -1,4 +1,4 @@
-const { Domain } = require('../../../../api/models');
+const { SiteBranchConfig, Domain } = require('../../../../api/models');
 const siteFactory = require('./site');
 
 const counters = {};
@@ -15,14 +15,37 @@ function build(params = {}) {
   } = params;
 
   return Domain.build({
-    ...params, context, names,
+    ...params,
+    context,
+    names,
   });
 }
 
 async function create(params = {}) {
+  let siteId = params.siteId;
+  let siteBranchConfigId = params.siteBranchConfigId;
+
+  if (siteId && !siteBranchConfigId) {
+    const where = {
+      siteId: params.siteId,
+      context: params.context || Domain.Contexts.Site,
+    };
+
+    const sbc = await SiteBranchConfig.findOne({ where });
+
+    siteBranchConfigId = sbc.id;
+  }
+
+  if (!params.siteId) {
+    const site = await siteFactory({ include: SiteBranchConfig });
+    siteId = site.id;
+    siteBranchConfigId = site.SiteBranchConfigs[0].id;
+  }
+
   return build({
     ...params,
-    siteId: params.siteId || (await siteFactory()).id,
+    siteId,
+    siteBranchConfigId,
   }).save();
 }
 

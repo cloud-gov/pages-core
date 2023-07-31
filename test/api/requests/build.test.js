@@ -2,7 +2,6 @@ const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
-const { Sequelize } = require('sequelize');
 const app = require('../../../app');
 const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
 const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');

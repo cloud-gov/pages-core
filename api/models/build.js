@@ -150,7 +150,12 @@ async function enqueue() {
   const build = this;
 
   const {
-    Site, User, Build, UserEnvironmentVariable, SiteBranchConfig,
+    Domain,
+    Site,
+    User,
+    Build,
+    UserEnvironmentVariable,
+    SiteBranchConfig,
   } = build.sequelize.models;
 
   const foundBuild = await Build.findOne({
@@ -160,7 +165,7 @@ async function enqueue() {
       {
         model: Site,
         required: true,
-        include: [UserEnvironmentVariable, User, SiteBranchConfig],
+        include: [UserEnvironmentVariable, User, SiteBranchConfig, Domain],
       },
     ],
   });
