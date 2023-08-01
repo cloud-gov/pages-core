@@ -27,6 +27,7 @@ curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo 
 && sudo apt update \
 && sudo apt install gh -y
 gh config set prompt disabled
+gh config set git_protocol ssh
 
 # install and run commitizen: https://commitizen-tools.github.io/commitizen/
 export PATH="/root/.local/bin:$PATH"

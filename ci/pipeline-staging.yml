@@ -469,7 +469,6 @@ resources:
       uri: ((git-base-url))/((pages-repository-path))
       branch: main
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
-      private_key: ((pages-gpg-operations-github-sshkey.private_key))
 
   - name: nightly
     type: time
