@@ -7,13 +7,33 @@ const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
 const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 
-class ValidationError extends Error {}
+class ValidationError extends Error { }
 
 class CustomError extends Error {
   constructor(message, status = 400) {
     super(message);
     this.status = status;
   }
+}
+
+function isValidJSON(json) {
+  if (typeof json === 'number') {
+    return false;
+  }
+
+  try {
+    if (typeof json === 'string') {
+      const parsed = JSON.parse(json);
+
+      if (typeof parsed !== 'object') {
+        throw new Error('Invalid json type');
+      }
+    }
+  } catch {
+    return false;
+  }
+  // if no error, then the string was valid
+  return true;
 }
 
 function isValidYaml(yamlString) {
@@ -109,7 +129,9 @@ module.exports = {
   CustomError,
   shaRegex,
   githubUsernameRegex,
+  isValidJSON,
   isValidYaml,
+  parseSiteConfig,
   parseSiteConfigs,
   isEmptyOrUrl,
   ValidationError,

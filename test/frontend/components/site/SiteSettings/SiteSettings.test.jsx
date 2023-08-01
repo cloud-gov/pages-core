@@ -17,6 +17,8 @@ const { SiteSettings } = proxyquire(
   {
     '../../../actions/siteActions': siteActionsMock,
     './EnvironmentVariables': () => <div />,
+    './BranchConfigs': () => <div />,
+    './Domains': () => <div />,
   }
 );
 
@@ -65,7 +67,8 @@ describe('<SiteSettings/>', () => {
 
   it('should render', () => {
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('[title="Advanced settings"]')).to.have.length(1);
+    expect(wrapper.find('[title="Site engine"]')).to.have.length(1);
+    expect(wrapper.find('[title="Delete site"]')).to.have.length(1);
     expect(wrapper.find('ExpandableArea')).to.have.length(2);
   });
 });

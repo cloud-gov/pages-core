@@ -1,0 +1,47 @@
+{
+  "commitizen": {
+    "name": "cz_customize",
+    "version_scheme": "semver",
+    "version_provider": "npm",
+    "update_changelog_on_bump": true,
+    "major_version_zero": false,
+    "bump_message": "chore: release $new_version",
+    "gpg_sign": true,
+    "changelog_incremental": true,
+    "customize": {
+      "message_template": "{{change_type}}:{% if show_message %} {{message}}{% endif %}",
+      "example": "feat: this feature enable customize through config file",
+      "schema": "<type>: <body>",
+      "schema_pattern": "^((build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w \\-'])+([\\s\\S]*))|Merge.*",
+      "bump_pattern": "^(.+!|BREAKING CHANGE|chore|docs|feat|fix|perf|refactor|revert|style|test):",
+      "bump_map": {
+          ".+!": "MAJOR",
+          "BREAKING CHANGE": "MAJOR",
+          "feat": "MINOR",
+          "fix": "PATCH",
+          "chore": "PATCH",
+          "docs": "PATCH",
+          "perf": "PATCH",
+          "refactor": "PATCH",
+          "revert": "MINOR",
+          "style": "PATCH",
+          "test": "PATCH"
+      },
+      "change_type_order": ["Breaking Changes", "Added", "Fixed", "Performance", "Reverted", "Maintenance", "Documentation"],
+      "commit_parser": "^((?P<change_type>chore|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?",
+      "changelog_pattern": "^(.+!|BREAKING CHANGE|chore|docs|feat|fix|perf|refactor|revert|style|test):",
+      "change_type_map": {
+        "BREAKING CHANGE": "Breaking Changes",
+        "chore": "Maintenance",
+        "docs": "Documentation",
+        "feat": "Added",
+        "fix": "Fixed",
+        "perf": "Performance",
+        "refactor": "Maintenance",
+        "revert": "Reverted",
+        "style": "Maintenance",
+        "test": "Maintenance"
+      }
+    }
+  }
+}

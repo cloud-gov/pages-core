@@ -13,7 +13,9 @@ function paramsForNewSite(params) {
   const owner = params.owner ? params.owner.toLowerCase() : null;
   const repository = params.repository ? params.repository.toLowerCase() : null;
   const subdomain = generateSubdomain(owner, repository);
-  const organizationId = params.organizationId ? parseInt(params.organizationId, 10) : null;
+  const organizationId = params.organizationId
+    ? parseInt(params.organizationId, 10)
+    : null;
   return {
     owner,
     repository,
@@ -45,7 +47,9 @@ function checkSiteExists({ owner, repository }) {
     where: { owner, repository },
   }).then((existingSite) => {
     if (existingSite) {
-      const error = new Error(`This site has already been added to ${config.app.appName}.`);
+      const error = new Error(
+        `This site has already been added to ${config.app.appName}.`
+      );
       error.status = 400;
       throw error;
     }
@@ -53,44 +57,46 @@ function checkSiteExists({ owner, repository }) {
 }
 
 function checkGithubOrg({ user, owner }) {
-  return ownerIsFederalistUser(owner).then((model) => {
-    if (model) {
-      // Owner of the repo is a user with a DB record, and not an org.
-      // Drop down to the next promise and bypass the org check
-      return Promise.resolve(true);
-    }
+  return ownerIsFederalistUser(owner)
+    .then((model) => {
+      if (model) {
+        // Owner of the repo is a user with a DB record, and not an org.
+        // Drop down to the next promise and bypass the org check
+        return Promise.resolve(true);
+      }
 
-    return GitHub.checkOrganizations(user, owner);
-  }).then((federalistAuthorizedOrg) => {
-    // Has this org authorized federalist as an oauth app?
-    if (!federalistAuthorizedOrg) {
-      throw {
-        message: `${config.app.appName} can't confirm org permissions for '${owner}'.`
-          + `Either '${owner}' hasn't approved access for ${config.app.appName} or you aren't an org member.`
-          + `Ensure you are an org member and ask an org owner to authorize ${config.app.appName} for the organization.`,
-        status: 403,
-      };
-    }
-  });
+      return GitHub.checkOrganizations(user, owner);
+    })
+    .then((federalistAuthorizedOrg) => {
+      // Has this org authorized federalist as an oauth app?
+      if (!federalistAuthorizedOrg) {
+        throw {
+          message:
+            `${config.app.appName} can't confirm org permissions for '${owner}'.`
+            + `Either '${owner}' hasn't approved access for ${config.app.appName} or you aren't an org member.`
+            + `Ensure you are an org member and ask an org owner to authorize ${config.app.appName} for the organization.`,
+          status: 403,
+        };
+      }
+    });
 }
 
 function checkGithubRepository({ user, owner, repository }) {
-  return GitHub.getRepository(user, owner, repository)
-    .then((repo) => {
-      if (!repo) {
-        throw {
-          message: `The repository ${owner}/${repository} does not exist.`,
-          status: 400,
-        };
-      }
-      if (!repo.permissions.admin) {
-        throw {
-          message: 'You do not have admin access to this repository',
-          status: 400,
-        };
-      }
-      return repo;
-    });
+  return GitHub.getRepository(user, owner, repository).then((repo) => {
+    if (!repo) {
+      throw {
+        message: `The repository ${owner}/${repository} does not exist.`,
+        status: 400,
+      };
+    }
+    if (!repo.permissions.admin) {
+      throw {
+        message: 'You do not have admin access to this repository',
+        status: 400,
+      };
+    }
+    return repo;
+  });
 }
 
 function buildSite(params, s3) {
@@ -103,16 +109,16 @@ function buildSite(params, s3) {
 
   const site = Site.build(siteParams);
 
-  return site.validate()
-    .then(() => site);
+  return site.validate().then(() => site);
 }
 
 function buildInfrastructure(params, s3ServiceName) {
-  return apiClient.createSiteBucket(
-    s3ServiceName,
-    config.env.cfSpaceGuid,
-    config.app.s3ServicePlanId
-  )
+  return apiClient
+    .createSiteBucket(
+      s3ServiceName,
+      config.env.cfSpaceGuid,
+      config.app.s3ServicePlanId
+    )
     .then((response) => {
       const { credentials } = response.entity;
 
@@ -134,8 +140,7 @@ function validateSite(params) {
     // Used to throw the invalid model error and messaging
     const site = Site.build(params);
 
-    return site.validate()
-      .then(() => site);
+    return site.validate().then(() => site);
   }
 
   return buildInfrastructure(params, s3ServiceName);
@@ -157,12 +162,19 @@ async function saveAndBuildSite({ site, user }) {
 
   await site.save();
 
+  // Currently uses site.defaultBranch to create site branch config via validateSite function
+  // will need to change in the future once the defaultBranch column is dropped from site
+  await site.createSiteBranchConfig({
+    branch: site.defaultBranch,
+    context: 'site',
+    s3Key: `/site/${site.owner}/${site.repository}`,
+  });
+
   const buildParams = paramsForNewBuild({ site, user });
 
   await Promise.all([
     site.addUser(user.id),
-    Build.create(buildParams)
-      .then(build => build.enqueue()),
+    Build.create(buildParams).then(build => build.enqueue()),
   ]);
 
   return site;
@@ -174,7 +186,10 @@ async function createSiteFromExistingRepo({ siteParams, user }) {
   await checkSiteExists({ owner, repository });
   const repo = await checkGithubRepository({ user, owner, repository });
   await checkGithubOrg({ user, owner });
-  const site = await validateSite({ ...siteParams, defaultBranch: repo.default_branch });
+  const site = await validateSite({
+    ...siteParams,
+    defaultBranch: repo.default_branch,
+  });
   return saveAndBuildSite({ site, user });
 }
 
@@ -198,7 +213,11 @@ function createSite({ user, siteParams }) {
   const newSiteParams = paramsForNewSite(siteParams);
 
   if (template) {
-    return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
+    return createSiteFromTemplate({
+      siteParams: newSiteParams,
+      template,
+      user,
+    });
   }
 
   return createSiteFromExistingRepo({ siteParams: newSiteParams, user });

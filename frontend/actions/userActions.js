@@ -1,5 +1,3 @@
-/* global window:true */
-
 import federalist from '../util/federalistApi';
 import alertActions from './alertActions';
 import { dispatch } from '../store';

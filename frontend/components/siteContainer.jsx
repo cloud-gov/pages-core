@@ -14,19 +14,24 @@ import LoadingIndicator from './LoadingIndicator';
 
 export const SITE_NAVIGATION_CONFIG = [
   {
+    display: 'Custom Domains',
+    route: 'custom-domains',
+    icon: 'IconLink',
+  },
+  {
     display: 'Build history',
     route: 'builds',
     icon: 'IconBook',
   },
   {
-    display: 'Uploaded files',
-    route: 'published',
-    icon: 'IconCloudUpload',
-  },
-  {
     display: 'Site settings',
     route: 'settings',
     icon: 'IconGear',
+  },
+  {
+    display: 'Uploaded files',
+    route: 'published',
+    icon: 'IconCloudUpload',
   },
 ];
 

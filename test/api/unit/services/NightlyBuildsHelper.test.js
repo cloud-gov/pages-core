@@ -1,11 +1,16 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const factory = require('../../support/factory');
-const { Build, Site, User } = require('../../../../api/models');
-const ScheduledBuildHelper = require('../../../../api/services/ScheduledBuildHelper');
+const {
+  Build,
+  Site,
+  SiteBranchConfig,
+  User,
+} = require('../../../../api/models');
+const NightlyBuildsHelper = require('../../../../api/services/NightlyBuildsHelper');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 
-describe('ScheduledBuildHelper', () => {
+describe('NightlyBuildsHelper', () => {
   const nightlyConfig = { schedule: 'nightly' };
 
   before(async () => {
@@ -13,13 +18,25 @@ describe('ScheduledBuildHelper', () => {
     await factory.user({ username: process.env.USER_AUDITOR });
   });
 
+  beforeEach(async () => {
+    await Promise.all([
+      Build.truncate(),
+      Site.truncate(),
+      SiteBranchConfig.truncate(),
+    ]);
+  });
+
   afterEach(async () => {
     sinon.restore();
     await Promise.all([
       Build.truncate(),
       Site.truncate(),
-      User.truncate({ force: true, cascade: true }),
+      SiteBranchConfig.truncate(),
     ]);
+  });
+
+  after(async () => {
+    await User.truncate({ force: true, cascade: true });
   });
 
   describe('when there is an error', () => {
@@ -35,7 +52,7 @@ describe('ScheduledBuildHelper', () => {
         defaultBranch: 'main',
       });
 
-      const result = await ScheduledBuildHelper.nightlyBuilds();
+      const result = await NightlyBuildsHelper.nightlyBuilds();
 
       expect(result.length).to.eq(1);
       expect(result[0].status).to.eq('rejected');
@@ -70,18 +87,30 @@ describe('ScheduledBuildHelper', () => {
       }),
     ]);
 
-    const result = await ScheduledBuildHelper.nightlyBuilds();
+    const results = await NightlyBuildsHelper.nightlyBuilds();
 
-    expect(result).to.have.deep.members([
-      { status: 'fulfilled', value: 'scheduled/test1@main' },
-      { status: 'fulfilled', value: 'scheduled/test1@staging' },
-      { status: 'fulfilled', value: 'scheduled/test2@staging' },
-    ]);
+    expect(results.length).to.eql(3);
+    expect(results).to.deep.include({
+      status: 'fulfilled',
+      value: `site:${sites[0].id}@main`,
+    });
+    expect(results).to.deep.include({
+      status: 'fulfilled',
+      value: `site:${sites[0].id}@staging`,
+    });
+    expect(results).to.deep.include({
+      status: 'fulfilled',
+      value: `site:${sites[1].id}@staging`,
+    });
 
-    const builds = await Build.findAll({ where: { site: sites.map(site => site.id) } });
+    const builds = await Build.findAll({
+      where: { site: sites.map((site) => site.id) },
+    });
 
     expect(builds.length).to.eql(3);
-    expect(builds.filter(build => build.branch === 'main').length).to.eql(1);
-    expect(builds.filter(build => build.branch === 'staging').length).to.eql(2);
+    expect(builds.filter((build) => build.branch === 'main').length).to.eql(1);
+    expect(builds.filter((build) => build.branch === 'staging').length).to.eql(
+      2
+    );
   });
 });

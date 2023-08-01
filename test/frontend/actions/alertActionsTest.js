@@ -59,7 +59,7 @@ describe('alertActions', () => {
 
       fixture.httpError(message);
 
-      expect(dispatch.calledOnce).to.be.true;
+      expect(dispatch.calledTwice).to.be.true;
       expect(dispatch.calledWith(httpErrorAction)).to.be.true;
     });
 
@@ -72,7 +72,7 @@ describe('alertActions', () => {
 
       fixture.alertError(message);
 
-      expect(dispatch.calledOnce).to.be.true;
+      expect(dispatch.calledTwice).to.be.true;
       expect(dispatch.calledWith(httpErrorAction)).to.be.true;
     });
   });

@@ -1,3 +1,5 @@
+import { error as errorNotification } from 'react-notification-system-redux';
+
 import { dispatch } from '../store';
 
 import {
@@ -15,6 +17,14 @@ export default {
 
   httpError(message) {
     dispatch(createHttpErrorAction(message));
+    dispatch(
+      errorNotification({
+        title: 'Error',
+        message,
+        position: 'tr',
+        autoDismiss: 0,
+      })
+    );
   },
 
   alertError(message) {

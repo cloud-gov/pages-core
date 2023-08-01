@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { toInt } = require('../utils');
 const {
-  branchRegex, parseSiteConfigs, isEmptyOrUrl, isValidSubdomain,
+  branchRegex, isEmptyOrUrl, isValidSubdomain,
 } = require('../utils/validators');
 
 const afterValidate = (site) => {
@@ -31,6 +31,7 @@ const associate = ({
   Organization,
   OrganizationRole,
   Site,
+  SiteBranchConfig,
   SiteUser,
   User,
   UserAction,
@@ -41,6 +42,9 @@ const associate = ({
     foreignKey: 'site',
   });
   Site.hasMany(Domain, {
+    foreignKey: 'siteId',
+  });
+  Site.hasMany(SiteBranchConfig, {
     foreignKey: 'siteId',
   });
   Site.belongsToMany(User, {
@@ -122,14 +126,6 @@ const beforeValidate = (site) => {
   if (site.owner) {
     site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
   }
-
-  const siteConfigs = {
-    defaultConfig: { value: site.defaultConfig, label: 'Site configuration' },
-    demoConfig: { value: site.demoConfig, label: 'Demo configuration' },
-    previewConfig: { value: site.previewConfig, label: 'Preview configuration' },
-  };
-
-  Object.assign(site, parseSiteConfigs(siteConfigs));
 };
 
 function isEmptyOrBranch(value) {

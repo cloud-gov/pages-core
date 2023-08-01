@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "branch",
+    "config",
+    "context"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "branch": {
+      "type": ["string", "null"]
+    },
+    "config": {
+      "type": ["json", "null"]
+    },
+    "context": {
+      "type": ["string", "null"]
+    }
+  }
+}

@@ -13,7 +13,10 @@ export const AdvancedSiteSettingsForm = ({
   pristine,
   handleSubmit,
 }) => (
-  <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
+  <form
+    className="settings-form settings-form-advanced"
+    onSubmit={handleSubmit}
+  >
     <div className="well">
       {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
       <label htmlFor="engine">Site engine</label>
@@ -29,86 +32,23 @@ export const AdvancedSiteSettingsForm = ({
           />
         )}
       />
-    </div>
-    <div className="well">
-      {/* CUSTOM CONFIG */}
-      <fieldset>
-        <legend>Live site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code>
-          {' '}
-          file when we build your site&apos;s primary branch.
-        </p>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label htmlFor="defaultConfig">Site configuration</label>
-        <Field
-          component="textarea"
-          name="defaultConfig"
-          id="defaultConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <div className="well">
-      {/* DEMO CONFIG */}
-      <fieldset>
-        <legend>Demo site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code>
-          {' '}
-          file when we build your site&apos;s demo branch.
-        </p>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label htmlFor="demoConfig">Demo configuration</label>
-        <Field
-          component="textarea"
-          name="demoConfig"
-          id="demoConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <div className="well">
-      {/* PREVIEW CONFIG */}
-      <fieldset>
-        <legend>Preview site</legend>
-        <p className="well-text">
-          Add additional configuration in yaml to be added to your
-          {' '}
-          <code>_config.yml</code>
-          {' '}
-          file when we build a preview branch for your site.
-        </p>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label htmlFor="previewConfig">Preview configuration</label>
-        <Field
-          component="textarea"
-          name="previewConfig"
-          id="previewConfig"
-          className="form-control-mono"
-        />
-      </fieldset>
-    </div>
-    <button
-      type="button"
-      className="usa-button usa-button-secondary"
-      disabled={pristine}
-      onClick={reset}
-    >
-      Reset
-    </button>
+      <button
+        type="button"
+        className="usa-button usa-button-secondary"
+        disabled={pristine}
+        onClick={reset}
+      >
+        Reset
+      </button>
 
-    <button
-      type="submit"
-      className="usa-button usa-button-primary"
-      disabled={pristine}
-    >
-      Save advanced settings
-    </button>
+      <button
+        type="submit"
+        className="usa-button usa-button-primary"
+        disabled={pristine}
+      >
+        Save advanced settings
+      </button>
+    </div>
   </form>
 );
 
@@ -116,9 +56,6 @@ AdvancedSiteSettingsForm.propTypes = {
   // initialValues is what the initial form values are based on
   initialValues: PropTypes.shape({
     engine: PropTypes.string.isRequired,
-    defaultConfig: PropTypes.string,
-    demoConfig: PropTypes.string,
-    previewConfig: PropTypes.string,
   }).isRequired,
 
   // the following props are from reduxForm:
@@ -128,4 +65,6 @@ AdvancedSiteSettingsForm.propTypes = {
 };
 
 // create a higher-order component with reduxForm and export that
-export default reduxForm({ form: 'advancedSiteSettings' })(AdvancedSiteSettingsForm);
+export default reduxForm({ form: 'advancedSiteSettings' })(
+  AdvancedSiteSettingsForm
+);
