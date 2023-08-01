@@ -1,0 +1,6 @@
+platform: linux
+inputs: [name: src]
+run:
+  dir: src
+  path: bash
+  args: [-c, yarn lint]

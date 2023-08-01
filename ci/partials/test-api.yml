@@ -1,0 +1,22 @@
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: karlkfi/concourse-dcind
+inputs:
+  - name: src
+  - name: redis
+  - name: postgres
+  - name: node
+run:
+  dir: src
+  path: ci/docker/entrypoint.sh
+  args:
+    - bash
+    - -ceux
+    - |
+      docker network prune -f
+      docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
+      docker-compose -f ci/docker/docker-compose.yml down
+      docker volume rm $(docker volume ls -q)
+      docker network prune -f

@@ -9,23 +9,6 @@ env-cf: &env-cf
   CF_SPACE: ((deploy-env))
   CF_STACK: cflinuxfs4
 
-node-image: &node-image
-  type: docker-image
-  source:
-    repository: node
-    tag: 18.15
-
-cf-image: &cf-image
-  platform: linux
-  image_resource:
-    type: registry-image
-    source:
-      aws_access_key_id: ((ecr-aws-key))
-      aws_secret_access_key: ((ecr-aws-secret))
-      repository: harden-concourse-task
-      aws_region: us-gov-west-1
-      tag: ((harden-concourse-task-tag))
-
 test-api: &test-api
   - in_parallel:
     - get: redis
@@ -36,258 +19,182 @@ test-api: &test-api
       params: {save: true}
 
   - task: install-deps-api
-    config:
-      platform: linux
-      image_resource:
-        <<: *node-image
-      inputs: [name: src-api]
-      outputs: [name: src-api]
-      run:
-        dir: src-api
-        path: bash
-        args: [-c, yarn --pure-lockfile]
+    file: src/ci/partials/install-deps-api.yml
+    image: node
 
   - in_parallel:
     - task: lint-api
-      config:
-        platform: linux
-        image_resource:
-          <<: *node-image
-        inputs: [name: src-api]
-        run:
-          dir: src-api
-          path: bash
-          args: [-c, yarn lint]
+      file: src/ci/partials/lint-api.yml
+      image: node
 
     - task: test-api
       privileged: true
-      config:
-        platform: linux
-        image_resource:
-          type: docker-image
-          source:
-            repository: karlkfi/concourse-dcind
-        inputs:
-          - name: src-api
-          - name: redis
-          - name: postgres
-          - name: node
-        run:
-          dir: src-api
-          path: ci/docker/entrypoint.sh
-          args:
-            - bash
-            - -ceux
-            - |
-              docker network prune -f
-              docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
-              docker-compose -f ci/docker/docker-compose.yml down
-              docker volume rm $(docker volume ls -q)
-              docker network prune -f
+      file: src/ci/partials/test-api.yml
 
 test-admin-client: &test-admin-client
   - task: install-deps-admin-client
-    config:
-      platform: linux
-      image_resource:
-        <<: *node-image
-      inputs: [name: src-admin-client]
-      outputs: [name: src-admin-client]
-      run:
-        dir:  src-admin-client/admin-client
-        path: bash
-        args: [-c, yarn --pure-lockfile]
+    file: src/ci/partials/install-deps-admin-client.yml
+    image: node
 
   - task: lint-admin-client
-    config:
-      platform: linux
-      image_resource:
-        <<: *node-image
-      inputs: [name: src-admin-client]
-      run:
-        dir: src-admin-client/admin-client
-        path: bash
-        args: [-c, yarn lint]
+    file: src/ci/partials/lint-admin-client.yml
+    image: node
 
   - task: build-admin-client
-    config:
-      platform: linux
-      image_resource:
-        <<: *node-image
-      inputs: [name: src-admin-client]
-      outputs: [name: src-admin-client]
-      params:
-        API_URL: https://((((deploy-env))-((product))-domain))
-        NODE_ENV: production
-      run:
-        dir: src-admin-client/admin-client
-        path: bash
-        args: [-c, yarn build]
+    file: src/ci/partials/build-admin-client.yml
+    image: node
+    params:
+      API_URL: https://((((deploy-env))-pages-domain))
+      NODE_ENV: production
 
 ############################
 #  JOBS
 
 jobs:
 
-  - name: test-api-((deploy-env))
+  - name: test-api
     plan:
-      - get: src-api
-        resource: pr-((deploy-env))
+      - get: src
+        resource: pr
         trigger: true
         version: every
-      - put: src-api
-        resource: pr-((deploy-env))
+      - put: src
+        resource: pr
         params:
-          path: src-api
+          path: src
           status: pending
           base_context: concourse
-          context: test-api-((deploy-env))
+          context: test-api
       - do: *test-api
 
     on_failure:
       in_parallel:
-        - put: src-api
-          resource: pr-((deploy-env))
+        - put: src
+          resource: pr
           params:
-            path: src-api
+            path: src
             status: failure
             base_context: concourse
-            context: test-api-((deploy-env))
+            context: test-api
         - put: slack
           params:
             text: |
               :x: FAILED: pages api tests on ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
     on_success:
       in_parallel:
-        - put: src-api
-          resource: pr-((deploy-env))
+        - put: src
+          resource: pr
           params:
-            path: src-api
+            path: src
             status: success
             base_context: concourse
-            context: test-api-((deploy-env))
+            context: test-api
         - put: slack
           params:
             text: |
               :white_check_mark: SUCCESS: Successfully tested pages api on ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-admin-client-((deploy-env))
+  - name: test-admin-client
     plan:
-      - get: src-admin-client
-        resource: pr-((deploy-env))
+      - get: src
+        resource: pr
         trigger: true
         version: every
-      - put: src-admin-client
-        resource: pr-((deploy-env))
+      - get: node
+      - put: src
+        resource: pr
         params:
-          path: src-admin-client
+          path: src
           status: pending
           base_context: concourse
-          context: test-admin-client-((deploy-env))
+          context: test-admin-client
 
       - do: *test-admin-client
 
     on_failure:
       in_parallel:
-        - put: src-admin-client
-          resource: pr-((deploy-env))
+        - put: src
+          resource: pr
           params:
-            path: src-admin-client
+            path: src
             status: failure
             base_context: concourse
-            context: test-admin-client-((deploy-env))
+            context: test-admin-client
         - put: slack
           params:
             text: |
-              :x: FAILED: pages admin client tests on ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              :x: FAILED: pages admin client tests
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
     on_success:
       in_parallel:
-        - put: src-admin-client
-          resource: pr-((deploy-env))
+        - put: src
+          resource: pr
           params:
-            path: src-admin-client
+            path: src
             status: success
             base_context: concourse
-            context: test-admin-client-((deploy-env))
+            context: test-admin-client
         - put: slack
           params:
             text: |
-              :white_check_mark: SUCCESS: Successfully tested pages admin client on ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              :white_check_mark: SUCCESS: Successfully tested pages admin client
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
   - name: test-and-deploy-api-pages-((deploy-env))
     plan:
-      - get: src-api
+      - get: src
         resource: src-((deploy-env))
         passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
       - put: gh-status
-        inputs: [src-api]
+        inputs: [src]
         params: {state: pending}
+      - get: cf-image
       - do: *test-api
       - task: build-api
-        config:
-          platform: linux
-          image_resource:
-            <<: *node-image
-          inputs: [name: src-api]
-          outputs: [name: src-api]
-          params:
-            APP_HOSTNAME: https://((((deploy-env))-((product))-domain))
-            PRODUCT: pages
-          run:
-            dir: src-api
-            path: bash
-            args: [-c, yarn build]
+        file: src/ci/partials/build-api.yml
+        image: node
+        params:
+          APP_HOSTNAME: https://((((deploy-env))-pages-domain))
 
       - task: deploy-api
-        config:
-          <<: *cf-image
-          inputs: [name: src-api]
-          run:
-            path: src-api/ci/tasks/deploy.sh
+        file: src/ci/partials/deploy.yml
+        image: cf-image
         params:
           <<: *env-cf
           CF_APP_NAME: pages-((deploy-env))
-          CF_MANIFEST: src-api/.cloudgov/manifest.yml
-          CF_VARS_FILE: src-api/.cloudgov/vars/pages-((deploy-env)).yml
-          CF_PATH: src-api
+          CF_MANIFEST: src/.cloudgov/manifest.yml
+          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src
         on_failure:
           try:
             task: cancel-api-deployment
-            config:
-              <<: *cf-image
-              inputs: [name: src-api]
-              run:
-                path: src-api/ci/tasks/cancel-deployment.sh
+            file: src/ci/partials/cancel-deployment.yml
+            image: cf-image
             params:
               <<: *env-cf
               CF_APP_NAME: pages-((deploy-env))
 
       - task: run-database-migrations
-        config:
-          <<: *cf-image
-          inputs: [name: src-api]
-          run:
-            path: src-api/ci/tasks/run-task.sh
+        file: src/ci/partials/run-task.yml
+        image: cf-image
         params:
           <<: *env-cf
           CF_APP_NAME: pages-((deploy-env))
@@ -296,13 +203,13 @@ jobs:
         on_failure:
           in_parallel:
             - put: gh-status
-              inputs: [src-api]
+              inputs: [src]
               params: {state: failure}
             - put: slack
               params:
                 text: |
                   :x: FAILED: to migrate database for pages ((deploy-env))
-                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
                 channel: ((slack-channel))
                 username: ((slack-username))
                 icon_url: ((slack-icon-url))
@@ -310,76 +217,63 @@ jobs:
     on_failure:
       in_parallel:
         - put: gh-status
-          inputs: [src-api]
+          inputs: [src]
           params: {state: failure}
         - put: slack
           params:
             text: |
               :x: FAILED: api deployment on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
         - put: gh-status
-          inputs: [src-api]
+          inputs: [src]
           params: {state: success}
         - put: slack
           params:
             text: |
               :white_check_mark: SUCCESS: Successfully deployed api on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
   - name: test-and-deploy-admin-client-pages-((deploy-env))
     plan:
-      - get: src-admin-client
+      - get: src
         resource: src-((deploy-env))
         passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
       - put: gh-status
-        inputs: [src-admin-client]
+        inputs: [src]
         params: {state: pending}
 
       - do: *test-admin-client
-
+      - get: cf-image
       - task: configure-nginx
-        config:
-          <<: *cf-image
-          inputs: [name: src-admin-client]
-          outputs: [name: src-admin-client]
-          run:
-            dir: src-admin-client
-            path: ci/tasks/configure-admin-client-nginx.sh
+        file: src/ci/partials/configure-nginx.yml
+        image: cf-image
         params:
-          API_DOMAIN: ((((deploy-env))-((product))-domain))
+          API_DOMAIN: ((((deploy-env))-pages-domain))
 
       - task: deploy-admin-client
-        config:
-          <<: *cf-image
-          inputs: [name: src-admin-client]
-          run:
-            dir: src-admin-client
-            path: ci/tasks/deploy.sh
+        file: src/ci/partials/deploy.yml
+        image: cf-image
         params:
           <<: *env-cf
           CF_APP_NAME: pages-admin-((deploy-env))
-          CF_MANIFEST: .cloudgov/manifest.yml
-          CF_VARS_FILE: .cloudgov/vars/pages-((deploy-env)).yml
-          CF_PATH: admin-client
+          CF_MANIFEST: src/.cloudgov/manifest.yml
+          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src/admin-client
         on_failure:
           try:
             task: cancel-admin-client-deployment
-            config:
-              <<: *cf-image
-              inputs: [name: src-admin-client]
-              run:
-                dir: src-admin-client
-                path: ci/tasks/cancel-deployment.sh
+            file: src/ci/partials/cancel-deployment.yml
+            image: cf-image
             params:
               <<: *env-cf
               CF_APP_NAME: pages-admin-((deploy-env))
@@ -387,13 +281,13 @@ jobs:
     on_failure:
       in_parallel:
         - put: gh-status
-          inputs: [src-admin-client]
+          inputs: [src]
           params: {state: failure}
         - put: slack
           params:
             text: |
               :x: FAILED: admin client deployment on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -401,73 +295,68 @@ jobs:
     on_success:
       in_parallel:
         - put: gh-status
-          inputs: [src-admin-client]
+          inputs: [src]
           params: {state: success}
         - put: slack
           params:
             text: |
               :white_check_mark: SUCCESS: Successfully deployed admin client on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
   - name: deploy-queues-ui-pages-((deploy-env))
     plan:
-      - get: src-queues-ui
+      - get: src
         resource: src-((deploy-env))
         passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
       - put: gh-status
-        inputs: [src-queues-ui]
+        inputs: [src]
         params: {state: pending}
+      - get: cf-image
       - task: deploy-queues-ui
-        config:
-          <<: *cf-image
-          inputs: [name: src-queues-ui]
-          run:
-            path: src-queues-ui/ci/tasks/deploy.sh
+        file: src/ci/partials/deploy.yml
+        image: cf-image
         params:
           <<: *env-cf
           CF_APP_NAME: pages-queues-ui-((deploy-env))
-          CF_MANIFEST: src-queues-ui/.cloudgov/manifest.yml
-          CF_VARS_FILE: src-queues-ui/.cloudgov/vars/pages-((deploy-env)).yml
-          CF_PATH: src-queues-ui
+          CF_MANIFEST: src/.cloudgov/manifest.yml
+          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src
         on_failure:
           try:
             task: cancel-queues-ui-deployment
-            config:
-              <<: *cf-image
-              inputs: [name: src-queues-ui]
-              run:
-                path: src-queues-ui/ci/tasks/cancel-deployment.sh
+            file: src/ci/partials/cancel-deployment.yml
+            image: cf-image
             params:
               <<: *env-cf
               CF_APP_NAME: pages-queues-ui-((deploy-env))
     on_failure:
       in_parallel:
         - put: gh-status
-          inputs: [src-queues-ui]
+          inputs: [src]
           params: {state: failure}
         - put: slack
           params:
             text: |
               :x: FAILED: pages queues UI deployment on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
         - put: gh-status
-          inputs: [src-queues-ui]
+          inputs: [src]
           params: {state: success}
         - put: slack
           params:
             text: |
               :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
@@ -478,24 +367,19 @@ jobs:
         resource: src-((deploy-env))
         passed: [set-pipeline]
         params: {depth: 1}
+      - get: cf-image
       - get: nightly
         trigger: true
       - in_parallel:
         - task: restage-api
-          config:
-            inputs: [name: src]
-            <<: *cf-image
-            run:
-              path: src/ci/tasks/restage.sh
+          file: src/ci/partials/restage.yml
+          image: cf-image
           params:
             <<: *env-cf
             CF_APP_NAME: pages-((deploy-env))
         # - task: restage-queues-ui
-        #   config:
-        #     inputs: [name: src]
-        #     <<: *cf-image
-        #     run:
-        #       path: src/ci/tasks/restage.sh
+        #   file: src/ci/partials/restage.yml
+        #   image: cf-image
         #   params:
         #     <<: *env-cf
         #     CF_APP_NAME: pages-queues-ui-((deploy-env))
@@ -506,15 +390,13 @@ jobs:
         resource: src-((deploy-env))
         passed: [set-pipeline]
         params: {depth: 1}
+      - get: cf-image
       - get: five-minutes
         trigger: true
       - in_parallel:
         - task: queued-builds-check
-          config:
-            inputs: [name: src]
-            <<: *cf-image
-            run:
-              path: src/ci/tasks/run-task.sh
+          file: src/ci/partials/run-task.yml
+          image: cf-image
           params:
             <<: *env-cf
             CF_APP_NAME: pages-((deploy-env))
@@ -526,7 +408,7 @@ jobs:
               params:
                 text: |
                   :x: FAILED: sites builds checks on pages ((deploy-env))
-                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"&vars.git-branch="((git-branch))"&vars.product="((product))"|View build details>
+                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
                 channel: ((slack-channel))
                 username: ((slack-username))
                 icon_url: ((slack-icon-url))
@@ -541,21 +423,42 @@ jobs:
       file: src/ci/pipeline.yml
       instance_vars:
         deploy-env: ((deploy-env))
-        git-branch: ((git-branch))
-        product: ((product))
+
+  - name: update-release-branch
+    plan:
+    - get: src
+      resource: src-((deploy-env))
+      trigger: true
+    - get: cf-image
+    - task: update-release-branch
+      image: cf-image
+      config:
+        platform: linux
+        inputs:
+          - name: src
+        params:
+          GH_EMAIL: ((pages-operations-github-user-info.email))
+          GH_USERNAME: ((pages-operations-github-user-info.username))
+          GH_BOT_GPG_KEY: ((pages-operations-github-user-gpg.private_key))
+          GH_BOT_SSH_KEY: ((pages-gpg-operations-github-sshkey.private_key))
+          GH_BOT_GPG_TRUST: ((pages-operations-github-user-gpg-trust))
+          GH_TOKEN: ((pages-operations-ci-github-token))
+        run:
+          dir: src
+          path: ci/tasks/update-release-branch.sh
 
 ############################
 #  RESOURCES
 
 resources:
 
-  - name: pr-((deploy-env))
+  - name: pr
     type: pull-request
     check_every: 1m
     source:
       repository: ((pages-repository-path))
       access_token: ((gh-access-token))
-      base_branch: ((git-branch))
+      base_branch: main
       disable_forks: true
       ignore_drafts: false
 
@@ -564,8 +467,9 @@ resources:
     icon: github
     source:
       uri: ((git-base-url))/((pages-repository-path))
-      branch: ((git-branch))
+      branch: main
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
+      private_key: ((pages-gpg-operations-github-sshkey.private_key))
 
   - name: nightly
     type: time
@@ -610,6 +514,15 @@ resources:
       repo: pages-core
       access_token: ((gh-access-token))
       context_prefix: concourse
+
+  - name: cf-image
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: harden-concourse-task
+      aws_region: us-gov-west-1
+      tag: ((harden-concourse-task-tag))
 
 
 ############################

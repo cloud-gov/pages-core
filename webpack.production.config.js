@@ -10,11 +10,11 @@ const RESOURCE_GENERATOR = {
   publicPath: '/',
 };
 
-module.exports = {
-  mode: 'production',
+const config = {
+  mode: process.env.NODE_ENV,
   entry: './frontend/main.jsx',
   output: {
-    filename: 'js/bundle.[contenthash].js',
+    filename: `js/bundle${process.env.NODE_ENV === 'production' ? '.[contenthash]' : ''}.js`,
     path: path.resolve(__dirname, 'public'),
   },
   resolve: {
@@ -40,6 +40,7 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
+              sourceMap: process.env.NODE_ENV === 'development',
               postcssOptions: {
                 plugins: [autoprefixer],
               },
@@ -90,11 +91,12 @@ module.exports = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({ filename: 'styles/styles.[contenthash].css' }),
+    // Make sure this is the first plugin!!!
+    new MiniCssExtractPlugin({ filename: `styles/styles${process.env.NODE_ENV === 'production' ? '.[contenthash]' : ''}.css` }),
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
-    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/}),
+    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
     new WebpackManifestPlugin({
       fileName: '../webpack-manifest.json',
       publicPath: '',
@@ -106,3 +108,10 @@ module.exports = {
     ]),
   ],
 };
+
+if (process.env.NODE_ENV === 'development') {
+  config.devtool = 'inline-source-map';
+  config.stats = 'minimal';
+}
+
+module.exports = config;
