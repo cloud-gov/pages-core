@@ -420,7 +420,7 @@ jobs:
       params: {depth: 1}
       trigger: true
     - set_pipeline: core
-      file: src/ci/pipeline.yml
+      file: src/ci/pipeline-staging.yml
       instance_vars:
         deploy-env: ((deploy-env))
 
