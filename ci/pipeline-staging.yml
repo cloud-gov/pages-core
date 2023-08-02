@@ -156,7 +156,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-and-deploy-api-pages-((deploy-env))
+  - name: test-and-deploy-api-pages
     plan:
       - get: src
         resource: src-((deploy-env))
@@ -241,7 +241,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-and-deploy-admin-client-pages-((deploy-env))
+  - name: test-and-deploy-admin-client-pages
     plan:
       - get: src
         resource: src-((deploy-env))
@@ -306,7 +306,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: deploy-queues-ui-pages-((deploy-env))
+  - name: deploy-queues-ui-pages
     plan:
       - get: src
         resource: src-((deploy-env))
@@ -361,7 +361,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: nightly-tasks-pages-((deploy-env))
+  - name: nightly-tasks-pages
     plan:
       - get: src
         resource: src-((deploy-env))
@@ -384,7 +384,7 @@ jobs:
         #     <<: *env-cf
         #     CF_APP_NAME: pages-queues-ui-((deploy-env))
 
-  - name: sites-builds-checks-((deploy-env))
+  - name: sites-builds-checks
     plan:
       - get: src
         resource: src-((deploy-env))
