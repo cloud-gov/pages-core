@@ -466,9 +466,10 @@ resources:
     type: git
     icon: github
     source:
-      uri: ((git-base-url))/((pages-repository-path))
-      branch: main
+      uri: git@github.com:((pages-repository-path))
+      branch: chore-release-fixes
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
+      private_key: ((pages-gpg-operations-github-sshkey.private_key))
 
   - name: nightly
     type: time
