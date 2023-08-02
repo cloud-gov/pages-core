@@ -248,6 +248,7 @@ jobs:
         passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
+      - get: node
       - put: gh-status
         inputs: [src]
         params: {state: pending}

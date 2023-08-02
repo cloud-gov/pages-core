@@ -38,11 +38,10 @@ bump_status=$?
 # if we have a bump, commit, update/create PR
 if [[ $bump_status -eq 0 ]]
 then
-  commit_msg=`git log -1 --pretty=%B`
+  commit_msg=`git log -1 --pretty=%B | sed 's/chore: r/R/g'`
   git push origin release --force --tags
-  gh pr view release
-  pr_status=$?
-  if [[ $pr_status -eq 0 ]]
+  pr_exists=`gh pr view release --json 'state' --jq '.state == "OPEN"'`
+  if [[ $pr_exists == 'true' ]]
   then
     gh pr edit \
     --title "$commit_msg" \

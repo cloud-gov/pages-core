@@ -273,6 +273,7 @@ jobs:
             CF_APP_NAME: pages-((deploy-env))
         - task: restage-queues-ui
           file: src/ci/partials/restage.yml
+          image: cf-image
           params:
             <<: *env-cf
             CF_APP_NAME: pages-queues-ui-((deploy-env))
