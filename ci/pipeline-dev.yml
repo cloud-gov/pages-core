@@ -53,12 +53,15 @@ test-admin-client: &test-admin-client
 
 jobs:
 
-  - name: test-and-deploy-api-pages-((deploy-env))
+  - name: test-and-deploy-api-pages
     plan:
       - get: src
         resource: pr-((deploy-env))
         passed: [set-pipeline]
         trigger: true
+      - put: gh-status
+        inputs: [src]
+        params: {state: pending}
       - get: cf-image
       - do: *test-api
       - task: build-api
@@ -96,6 +99,9 @@ jobs:
           CF_TASK_COMMAND: 'yarn run migrate:up'
         on_failure:
           in_parallel:
+            - put: gh-status
+              inputs: [src]
+              params: {state: failure}
             - put: slack
               params:
                 text: |
@@ -107,6 +113,9 @@ jobs:
 
     on_failure:
       in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: failure}
         - put: slack
           params:
             text: |
@@ -117,6 +126,9 @@ jobs:
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: success}
         - put: slack
           params:
             text: |
@@ -126,12 +138,15 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: test-and-deploy-admin-client-pages-((deploy-env))
+  - name: test-and-deploy-admin-client-pages
     plan:
       - get: src
         resource: pr-((deploy-env))
         passed: [set-pipeline]
         trigger: true
+      - put: gh-status
+        inputs: [src]
+        params: {state: pending}
 
       - do: *test-admin-client
       - get: cf-image
@@ -161,6 +176,9 @@ jobs:
 
     on_failure:
       in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: failure}
         - put: slack
           params:
             text: |
@@ -172,6 +190,9 @@ jobs:
 
     on_success:
       in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: success}
         - put: slack
           params:
             text: |
@@ -181,12 +202,15 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: deploy-queues-ui-pages-((deploy-env))
+  - name: deploy-queues-ui-pages
     plan:
       - get: src
         resource: pr-((deploy-env))
         passed: [set-pipeline]
         trigger: true
+      - put: gh-status
+        inputs: [src]
+        params: {state: pending}
       - get: cf-image
       - task: deploy-queues-ui
         file: src/ci/partials/deploy.yml
@@ -207,6 +231,9 @@ jobs:
               CF_APP_NAME: pages-queues-ui-((deploy-env))
     on_failure:
       in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: failure}
         - put: slack
           params:
             text: |
@@ -217,6 +244,9 @@ jobs:
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: success}
         - put: slack
           params:
             text: |
@@ -226,7 +256,7 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-  - name: nightly-tasks-pages-((deploy-env))
+  - name: nightly-tasks-pages
     plan:
       - get: src
         resource: pr-((deploy-env))
@@ -302,6 +332,15 @@ resources:
     source:
       url: ((slack-webhook-url))
 
+  - name: gh-status
+    type: cogito
+    check_every: 1h
+    source:
+      owner: cloud-gov
+      repo: pages-core
+      access_token: ((gh-access-token))
+      context_prefix: concourse
+
   - name: cf-image
     type: registry-image
     source:
@@ -315,6 +354,12 @@ resources:
 #  RESOURCE TYPES
 
 resource_types:
+
+  - name: cogito
+    type: docker-image
+    check_every: 24h
+    source:
+      repository: pix4d/cogito
 
   - name: pull-request
     type: docker-image
