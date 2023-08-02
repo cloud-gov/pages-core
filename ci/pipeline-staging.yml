@@ -467,7 +467,7 @@ resources:
     icon: github
     source:
       uri: git@github.com:((pages-repository-path))
-      branch: chore-release-fixes
+      branch: main
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
       private_key: ((pages-gpg-operations-github-sshkey.private_key))
 
