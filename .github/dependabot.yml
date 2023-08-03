@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    # Disable version updates for npm dependencies
+    # This still allows for security updates but is pretty sloppy configuration from Github
+    # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#open-pull-requests-limit
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: '[ci skip] '
