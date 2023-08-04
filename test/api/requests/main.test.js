@@ -128,10 +128,10 @@ describe('Main Site', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          const stylesBundleRe = /<link rel="stylesheet" href="\/styles\/styles\.[a-z0-9]*\.css">/;
+          const stylesBundleRe = /<link rel="stylesheet" href="\/\/dist\/styles\/styles\.css">/;
           expect(response.text.search(stylesBundleRe)).to.be.above(-1);
 
-          const jsBundleRe = /<script src="\/js\/bundle\.[a-z0-9]*\.js"><\/script>/;
+          const jsBundleRe = /<script src="\/\/dist\/js\/bundle\.js"><\/script>/;
           expect(response.text.search(jsBundleRe)).to.be.above(-1);
           done();
         })
