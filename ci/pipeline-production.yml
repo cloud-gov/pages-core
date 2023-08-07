@@ -47,8 +47,8 @@ test-admin-client: &test-admin-client
       API_URL: https://((((deploy-env))-pages-domain))
       NODE_ENV: production
 
-############################
-#  JOBS
+# ############################
+# #  JOBS
 
 jobs:
   - name: test-and-deploy-api-pages-((deploy-env))
@@ -309,6 +309,31 @@ jobs:
                 username: ((slack-username))
                 icon_url: ((slack-icon-url))
 
+  - name: release
+    plan:
+    - get: src
+      resource: src-((deploy-env))-tagged
+      params: {depth: 1}
+      trigger: true
+      passed: [set-pipeline]
+    - get: cf-image
+    - task: get-changelog-version
+      image: cf-image
+      config:
+        platform: linux
+        inputs:
+          - name: src
+        outputs:
+          - name: src
+        run:
+          dir: src
+          path: ci/tasks/get-changelog-version.sh
+    - put: pages-release
+      params:
+        name: src/.git/ref
+        tag: src/.git/ref
+        body: src/releaselog.md
+
   - name: set-pipeline
     plan:
     - get: src
@@ -387,11 +412,23 @@ resources:
       aws_region: us-gov-west-1
       tag: ((harden-concourse-task-tag))
 
+  - name: pages-release
+    type: github-release
+    source:
+      owner: cloud-gov
+      repository: pages-core
+      access_token: ((gh-access-token))
+
 
 ############################
 #  RESOURCE TYPES
 
 resource_types:
+
+  - name: github-release
+    type: registry-image
+    source:
+      repository: concourse/github-release-resource
 
   - name: cogito
     type: docker-image
