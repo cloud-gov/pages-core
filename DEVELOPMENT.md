@@ -182,9 +182,9 @@ __Core [Env]__ deploys the Pages app/api, the admin app, and the queues app for 
 
 __*&#8595; NOTICE &#8595;*__
 
-> __Core Production__ deploys the Pages app/api, the admin app, and the queues app when a new tag is added to the `main` branch. This uses a unique pipeline file: [./ci/pipeline-production.yml](./ci/pipeline-production.yml). This pipeline is also responsible for creating and updating our release PRs.
+> __Core Production__ deploys the Pages app/api, the admin app, and the queues app when a new tag is added to the `main` branch. This uses a unique pipeline file: [./ci/pipeline-production.yml](./ci/pipeline-production.yml).
 
-> __Core Staging__ deploys the Pages app/api, the admin app, and the queues app when a new commit is added to the `main` branch. This also tests PRs against `main`. This uses a unique pipeline file: [./ci/pipeline-staging.yml](./ci/pipeline-staging.yml)
+> __Core Staging__ deploys the Pages app/api, the admin app, and the queues app when a new commit is added to the `main` branch. This also tests PRs against `main` and is responsible for creating and updating our release PRs. This uses a unique pipeline file: [./ci/pipeline-staging.yml](./ci/pipeline-staging.yml)
 
 > __Core Dev__ deploys the Pages app/api, the admin app, and the queues app when a PR is created into the `main` branch. This uses a unique pipeline file: [./ci/pipeline-dev.yml](./ci/pipeline-dev.yml)
 
@@ -225,7 +225,7 @@ $ fly -t <Concourse CI Target Name> set-pipeline -p core \
 ```
 
 ##### Getting or deleting a pipeline instance from the CLI
-To get a pipeline instance's config or destroy a pipeline instance, Run the following command with the fly CLI to set a pipeline:
+To get a pipeline instance's config or destroy a pipeline instance, run the following command with the fly CLI to set a pipeline:
 
 ```bash
 ## Get a pipeline instance config
@@ -236,6 +236,9 @@ $ fly -t <Concourse CI Target Name> get-pipeline \
 $ fly -t <Concourse CI Target Name> destroy-pipeline \
   -p core/deploy-env:production
 ```
+
+#### Pinned Versions
+Because our production deployments are triggered by git tags, they can be [pinned to specific version](https://concourse-ci.org/resource-versions.html#version-pinning) in the Concourse UI. The best practice is to navigate to the [`src-production-tagged` resource](https://ci.fr.cloud.gov/teams/pages/pipelines/core/resources/src-production-tagged?vars.deploy-env=%22production%22), pin the desired version, and restart any downstream Concourse jobs.
 
 #### Metrics deployment
 ##### Pipeline instance variables
@@ -457,8 +460,6 @@ Related issue: https://github.com/cloud-gov/product/issues/2486
 
 This convention is enforced via [this ruleset](https://github.com/cloud-gov/pages-core/settings/rules/26912), which checks the commit message against a regex rule before it can be merged to the default branch.
 
-The benefit of adhering to this convention is that we can more easily reason about our commit history and also generate nice changelogs via [Release Please](https://github.com/googleapis/release-please).
+The benefit of adhering to this convention is that we can more easily reason about our commit history and also generate nice changelogs via [Commitizen](https://commitizen-tools.github.io/commitizen/).
 
 If you didn't follow this convention while making your commits locally or on a development branch, you'll still have an opportunity to edit the commit history to match the Convention Commits specification. While the code is on a non-default branch, you can perform an [interactive rebase](https://git-scm.com/docs/git-rebase) to rewrite the history.
-
-\[releases and deployment TBD\]
