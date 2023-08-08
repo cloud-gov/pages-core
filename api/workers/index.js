@@ -1,6 +1,6 @@
+const path = require('path');
 const { QueueScheduler } = require('bullmq');
 const IORedis = require('ioredis');
-const path = require('path');
 
 const {
   app: {

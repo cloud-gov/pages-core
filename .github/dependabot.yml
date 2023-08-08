@@ -2,6 +2,8 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: /
+    schedule:
+      interval: weekly
     # Disable version updates for npm dependencies
     # This still allows for security updates but is pretty sloppy configuration from Github
     # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#open-pull-requests-limit

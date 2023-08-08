@@ -68,20 +68,10 @@ module.exports = {
         test: /\.svg$/i,
         oneOf: [
           {
-            // For .svg files in public/images/icons/, use the react-svg loader
+            // For .svg files in public/images/icons/, use the @svgr/webpack loader
             // so that they can be loaded as React components
             include: path.resolve(__dirname, 'public/images/icons'),
-            use: [
-              'babel-loader',
-              {
-                loader: 'react-svg-loader',
-                options: {
-                  svgo: {
-                    plugins: [{ removeViewBox: false }],
-                  },
-                },
-              },
-            ],
+            use: ['@svgr/webpack'],
           },
           {
             // For all other .svg files, fallback to asset/resource

@@ -1,6 +1,6 @@
-const deepExtend = require('deep-extend');
 const fs = require('fs');
 const path = require('path');
+const deepExtend = require('deep-extend');
 
 const config = {};
 
