@@ -1,3 +1,14 @@
+## 0.1.1 (2023-08-08)
+
+### Maintenance
+
+- update dependencies
+- run dev tests in parallel with build, update dependabot (#4196)
+- Build test webpack assets in non-version-controlled directory (#4191)
+- add github release to production deploy (#4216)
+- update deployment documentation
+- correct release PR behavior (#4162)
+
 ## 0.1.0 (2023-08-02)
 
 ### Added
