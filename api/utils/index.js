@@ -1,6 +1,6 @@
 const fs = require('fs');
-const inflection = require('inflection');
 const path = require('path');
+const inflection = require('inflection');
 const moment = require('moment');
 
 const config = require('../../config');

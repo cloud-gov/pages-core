@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
@@ -5,7 +6,6 @@ const session = require('express-session');
 const nunjucks = require('nunjucks');
 const flash = require('connect-flash');
 const helmet = require('helmet');
-const crypto = require('crypto');
 
 const { logger, expressLogger, expressErrorLogger } = require('../../winston');
 const config = require('../../config');
