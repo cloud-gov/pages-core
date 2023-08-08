@@ -9,28 +9,6 @@ env-cf: &env-cf
   CF_SPACE: ((deploy-env))
   CF_STACK: cflinuxfs4
 
-test-api: &test-api
-  - in_parallel:
-    - get: redis
-      params: {save: true}
-    - get: postgres
-      params: {save: true}
-    - get: node
-      params: {save: true}
-
-  - task: install-deps-api
-    file: src/ci/partials/install-deps-api.yml
-    image: node
-
-  - in_parallel:
-    - task: lint-api
-      file: src/ci/partials/lint-api.yml
-      image: node
-
-    - task: test-api
-      privileged: true
-      file: src/ci/partials/test-api.yml
-
 test-admin-client: &test-admin-client
   - get: node
   - task: install-deps-admin-client
@@ -62,54 +40,73 @@ jobs:
       - put: gh-status
         inputs: [src]
         params: {state: pending}
-      - get: cf-image
-      - do: *test-api
-      - task: build-api
-        file: src/ci/partials/build-api.yml
+      - in_parallel:
+        - get: cf-image
+        - get: redis
+          params: {save: true}
+        - get: postgres
+          params: {save: true}
+        - get: node
+          params: {save: true}
+      - task: install-deps-api
+        file: src/ci/partials/install-deps-api.yml
         image: node
-        params:
-          APP_HOSTNAME: https://((((deploy-env))-pages-domain))
-          NODE_ENV: development
 
-      - task: deploy-api
-        file: src/ci/partials/deploy.yml
-        image: cf-image
-        params:
-          <<: *env-cf
-          CF_APP_NAME: pages-((deploy-env))
-          CF_MANIFEST: src/.cloudgov/manifest.yml
-          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
-          CF_PATH: src
-        on_failure:
-          try:
-            task: cancel-api-deployment
-            file: src/ci/partials/cancel-deployment.yml
+      - in_parallel:
+        - task: lint-api
+          file: src/ci/partials/lint-api.yml
+          image: node
+
+        - task: test-api
+          privileged: true
+          file: src/ci/partials/test-api.yml
+        - do:
+          - task: build-api
+            file: src/ci/partials/build-api.yml
+            image: node
+            params:
+              APP_HOSTNAME: https://((((deploy-env))-pages-domain))
+              NODE_ENV: development
+
+          - task: deploy-api
+            file: src/ci/partials/deploy.yml
             image: cf-image
             params:
               <<: *env-cf
               CF_APP_NAME: pages-((deploy-env))
+              CF_MANIFEST: src/.cloudgov/manifest.yml
+              CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+              CF_PATH: src
+            on_failure:
+              try:
+                task: cancel-api-deployment
+                file: src/ci/partials/cancel-deployment.yml
+                image: cf-image
+                params:
+                  <<: *env-cf
+                  CF_APP_NAME: pages-((deploy-env))
 
-      - task: run-database-migrations
-        file: src/ci/partials/run-task.yml
-        image: cf-image
-        params:
-          <<: *env-cf
-          CF_APP_NAME: pages-((deploy-env))
-          CF_TASK_NAME: run-migrations
-          CF_TASK_COMMAND: 'yarn run migrate:up'
-        on_failure:
-          in_parallel:
-            - put: gh-status
-              inputs: [src]
-              params: {state: failure}
-            - put: slack
-              params:
-                text: |
-                  :x: FAILED: to migrate database for pages ((deploy-env))
-                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-                channel: ((slack-channel))
-                username: ((slack-username))
-                icon_url: ((slack-icon-url))
+          - task: run-database-migrations
+            file: src/ci/partials/run-task.yml
+            image: cf-image
+            params:
+              <<: *env-cf
+              CF_APP_NAME: pages-((deploy-env))
+              CF_TASK_NAME: run-migrations
+              CF_TASK_COMMAND: 'yarn run migrate:up'
+            on_failure:
+              in_parallel:
+                - put: gh-status
+                  inputs: [src]
+                  params: {state: failure}
+                - put: slack
+                  params:
+                    text: |
+                      :x: FAILED: to migrate database for pages ((deploy-env))
+                      <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+                    channel: ((slack-channel))
+                    username: ((slack-username))
+                    icon_url: ((slack-icon-url))
 
     on_failure:
       in_parallel:
