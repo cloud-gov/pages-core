@@ -1,5 +1,5 @@
 const { Readable } = require('stream');
-const { sdkStreamMixin } = require('@aws-sdk/util-stream-node');
+const { sdkStreamMixin } = require('@smithy/util-stream');
 const request = require('supertest');
 const { expect } = require('chai');
 

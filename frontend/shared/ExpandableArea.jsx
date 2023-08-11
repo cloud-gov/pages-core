@@ -5,9 +5,13 @@ import shortid from 'shortid';
 // Based on the USWDS Accordion, but only ever has a single
 // item that can be expanded or collapsed
 
-function ExpandableArea(props) {
+function ExpandableArea({
+  title,
+  bordered = false,
+  children = null,
+  isExpanded = false,
+}) {
   const id = `expandable-area-${shortid.generate()}`;
-  const { bordered, children, isExpanded, title } = props;
   return (
     <div
       className={`usa-accordion ${bordered ? 'usa-accordion--bordered' : ''} width-full`}
@@ -34,12 +38,6 @@ ExpandableArea.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.node,
   isExpanded: PropTypes.bool,
-};
-
-ExpandableArea.defaultProps = {
-  bordered: false,
-  children: null,
-  isExpanded: false,
 };
 
 export default ExpandableArea;

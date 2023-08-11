@@ -1,7 +1,7 @@
 const { Readable } = require('stream');
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { sdkStreamMixin } = require('@aws-sdk/util-stream-node');
+const { sdkStreamMixin } = require('@smithy/util-stream');
 
 const factory = require('../../support/factory');
 

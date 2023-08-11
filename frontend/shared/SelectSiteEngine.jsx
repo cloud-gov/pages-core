@@ -28,7 +28,7 @@ function makeOptions(opts) {
   ));
 }
 
-const SelectSiteEngine = ({ value, onChange, name, id, className }) => (
+const SelectSiteEngine = ({ value, onChange, name, id, className = '' }) => (
   <select
     className={`usa-select ${className}`}
     {...{ name, id }}
@@ -45,11 +45,6 @@ SelectSiteEngine.propTypes = {
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   className: PropTypes.string,
-};
-
-SelectSiteEngine.defaultProps = {
-  className: '',
-  onChange: () => {},
 };
 
 export default SelectSiteEngine;
