@@ -10,6 +10,19 @@ const RESOURCE_GENERATOR = {
   publicPath: '/',
 };
 
+const svgoConfig = {
+  plugins: [
+    {
+      name: 'preset-default',
+      params: {
+        overrides: {
+          removeViewBox: false,
+        },
+      },
+    },
+  ],
+};
+
 module.exports = {
   mode: 'development',
   entry: './frontend/main.jsx',
@@ -71,7 +84,7 @@ module.exports = {
             // For .svg files in public/images/icons/, use the @svgr/webpack loader
             // so that they can be loaded as React components
             include: path.resolve(__dirname, 'public/images/icons'),
-            use: ['@svgr/webpack'],
+            use: [{ loader: '@svgr/webpack', options: { svgoConfig } }],
           },
           {
             // For all other .svg files, fallback to asset/resource
