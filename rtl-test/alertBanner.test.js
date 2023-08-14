@@ -1,4 +1,3 @@
-/* global describe test expect */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -16,20 +15,20 @@ describe('<AlertBanner/>', () => {
   statusTypes.forEach((status) => {
     test(`it has the correct status when the status is ${status}`, () => {
       render(<AlertBanner message="hello" status={status} />);
-      expect(screen.queryByRole('alert')).toHaveClass(`usa-alert-${status}`);
+      expect(screen.getByRole('alert')).toHaveClass(`usa-alert-${status}`);
     });
   });
 
   test('it falls back to an info banner when status is not provided', () => {
     render(<AlertBanner message="hello" />);
-    expect(screen.queryByRole('alert')).toHaveClass('usa-alert-info');
+    expect(screen.getByRole('alert')).toHaveClass('usa-alert-info');
   });
 
   test('it can render a component as a message', () => {
     const componentText = 'Hey there';
     const child = <button type="button">{componentText}</button>;
     render(<AlertBanner message={child} />);
-    expect(screen.queryByRole('button')).toHaveTextContent(componentText);
+    expect(screen.getByRole('button')).toHaveTextContent(componentText);
   });
 
   test('it can opt out of displaying `role="alert"`', () => {

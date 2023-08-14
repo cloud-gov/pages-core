@@ -1,4 +1,3 @@
-/* global describe test expect beforeEach */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -31,7 +30,7 @@ describe('<BranchViewLink/>', () => {
     props.viewLink = 'https://some-domain.gov/';
     render(<BranchViewLink {...props} />);
 
-    const link = screen.queryByRole('link');
+    const link = screen.getByRole('link');
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', 'https://some-domain.gov/');
     expect(link).toHaveTextContent('View site');
@@ -42,7 +41,7 @@ describe('<BranchViewLink/>', () => {
     props.viewLink = 'https://some-other-domain.gov/';
     render(<BranchViewLink {...props} />);
 
-    const link = screen.queryByRole('link');
+    const link = screen.getByRole('link');
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', 'https://some-other-domain.gov/');
     expect(link).toHaveTextContent('View demo');
@@ -53,7 +52,7 @@ describe('<BranchViewLink/>', () => {
     props.viewLink = 'https://random-url.com/';
     render(<BranchViewLink {...props} />);
 
-    const link = screen.queryByRole('link');
+    const link = screen.getByRole('link');
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', 'https://random-url.com/');
     expect(link).toHaveTextContent('Preview site');
@@ -64,7 +63,7 @@ describe('<BranchViewLink/>', () => {
     props.viewLink = 'https://release_1.2.3.gov/';
     render(<BranchViewLink {...props} />);
 
-    const link = screen.queryByRole('link');
+    const link = screen.getByRole('link');
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', 'https://release_1.2.3.gov/');
     expect(link).toHaveTextContent('Preview site');

@@ -57,13 +57,14 @@ const overrides = [
   },
   {
     files: [
-      "**/*.test.js"
+      '**/*.test.js', '**/*.test.jsx',
     ],
     env: {
-      jest: true,
+      "jest/globals": true,
     },
-    plugins: ["jest"],
-  }
+    plugins: ['jest'],
+    extends: ['airbnb', 'plugin:sonarjs/recommended']
+  },
 ];
 
 module.exports = {
