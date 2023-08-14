@@ -333,6 +333,12 @@ jobs:
         name: src/.git/ref
         tag: src/.git/ref
         body: src/releaselog.md
+    - put: slack-cg-pages
+      params:
+        text_file: slackrelease.md
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
   - name: set-pipeline
     plan:
@@ -393,6 +399,11 @@ resources:
     type: slack-notification
     source:
       url: ((slack-webhook-url))
+
+  - name: slack-cg-pages
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url-cg-pages))
 
   - name: gh-status
     type: cogito
