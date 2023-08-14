@@ -6,7 +6,12 @@ const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const { wrapHandlers } = require('../utils');
 const {
-  Build, Site, User, Event,
+  Build,
+  Domain,
+  User,
+  Event,
+  Site,
+  SiteBranchConfig,
 } = require('../models');
 const { getSocket } = require('../socketIO');
 
@@ -106,7 +111,9 @@ module.exports = wrapHandlers({
     const { params, body } = req;
 
     const build = await fetchModelById(params.id, Build, {
-      include: [{ model: Site, include: [{ model: User }] }],
+      include: [
+        { model: Site, include: [{ model: User }, Domain, SiteBranchConfig] },
+      ],
     });
 
     if (!build) {

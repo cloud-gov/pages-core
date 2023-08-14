@@ -2117,7 +2117,7 @@ describe('Site API', () => {
 
       it('should render a list of domains associated with a site', async () => {
         const user = await factory.user();
-        const site = await factory.site({ users: [user.id] });
+        const site = await factory.site({ users: [user.id], demoBranch: 'demo' });
         const domain1 = await factory.domain.create({
           siteId: site.id,
           context: 'site',

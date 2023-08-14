@@ -26,32 +26,87 @@ const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
   Aenean laoreet nulla ut porta semper.
 `.replace(/\s\s+/g, ' ');
 
-const log = msg => `${(new Date()).toUTCString()} INFO [main] - ${msg}`;
+const log = msg => `${new Date().toUTCString()} INFO [main] - ${msg}`;
 
 function memberAddedPayload() {
   return {
     action: 'member_added',
     sender: {
-      id: 693815, url: 'https://api.github.com/users/apburnes', type: 'User', login: 'apburnes', node_id: 'MDQ6VXNlcjY5MzgxNQ==', html_url: 'https://github.com/apburnes', gists_url: 'https://api.github.com/users/apburnes/gists{/gist_id}', repos_url: 'https://api.github.com/users/apburnes/repos', avatar_url: 'https://avatars.githubusercontent.com/u/693815?v=4', events_url: 'https://api.github.com/users/apburnes/events{/privacy}', site_admin: false, gravatar_id: '', starred_url: 'https://api.github.com/users/apburnes/starred{/owner}{/repo}', followers_url: 'https://api.github.com/users/apburnes/followers', following_url: 'https://api.github.com/users/apburnes/following{/other_user}', organizations_url: 'https://api.github.com/users/apburnes/orgs', subscriptions_url: 'https://api.github.com/users/apburnes/subscriptions', received_events_url: 'https://api.github.com/users/apburnes/received_events',
+      id: 693815,
+      url: 'https://api.github.com/users/apburnes',
+      type: 'User',
+      login: 'apburnes',
+      node_id: 'MDQ6VXNlcjY5MzgxNQ==',
+      html_url: 'https://github.com/apburnes',
+      gists_url: 'https://api.github.com/users/apburnes/gists{/gist_id}',
+      repos_url: 'https://api.github.com/users/apburnes/repos',
+      avatar_url: 'https://avatars.githubusercontent.com/u/693815?v=4',
+      events_url: 'https://api.github.com/users/apburnes/events{/privacy}',
+      site_admin: false,
+      gravatar_id: '',
+      starred_url:
+        'https://api.github.com/users/apburnes/starred{/owner}{/repo}',
+      followers_url: 'https://api.github.com/users/apburnes/followers',
+      following_url:
+        'https://api.github.com/users/apburnes/following{/other_user}',
+      organizations_url: 'https://api.github.com/users/apburnes/orgs',
+      subscriptions_url: 'https://api.github.com/users/apburnes/subscriptions',
+      received_events_url:
+        'https://api.github.com/users/apburnes/received_events',
     },
     membership: {
       url: 'https://api.github.com/orgs/federalist-users/memberships/maryclair',
       role: 'member',
       user: {
-        id: 32960241, url: 'https://api.github.com/users/maryclair', type: 'User', login: 'maryclair', node_id: 'MDQ6VXNlcjMyOTYwMjQx', html_url: 'https://github.com/maryclair', gists_url: 'https://api.github.com/users/maryclair/gists{/gist_id}', repos_url: 'https://api.github.com/users/maryclair/repos', avatar_url: 'https://avatars.githubusercontent.com/u/32960241?v=4', events_url: 'https://api.github.com/users/maryclair/events{/privacy}', site_admin: false, gravatar_id: '', starred_url: 'https://api.github.com/users/maryclair/starred{/owner}{/repo}', followers_url: 'https://api.github.com/users/maryclair/followers', following_url: 'https://api.github.com/users/maryclair/following{/other_user}', organizations_url: 'https://api.github.com/users/maryclair/orgs', subscriptions_url: 'https://api.github.com/users/maryclair/subscriptions', received_events_url: 'https://api.github.com/users/maryclair/received_events',
+        id: 32960241,
+        url: 'https://api.github.com/users/maryclair',
+        type: 'User',
+        login: 'maryclair',
+        node_id: 'MDQ6VXNlcjMyOTYwMjQx',
+        html_url: 'https://github.com/maryclair',
+        gists_url: 'https://api.github.com/users/maryclair/gists{/gist_id}',
+        repos_url: 'https://api.github.com/users/maryclair/repos',
+        avatar_url: 'https://avatars.githubusercontent.com/u/32960241?v=4',
+        events_url: 'https://api.github.com/users/maryclair/events{/privacy}',
+        site_admin: false,
+        gravatar_id: '',
+        starred_url:
+          'https://api.github.com/users/maryclair/starred{/owner}{/repo}',
+        followers_url: 'https://api.github.com/users/maryclair/followers',
+        following_url:
+          'https://api.github.com/users/maryclair/following{/other_user}',
+        organizations_url: 'https://api.github.com/users/maryclair/orgs',
+        subscriptions_url:
+          'https://api.github.com/users/maryclair/subscriptions',
+        received_events_url:
+          'https://api.github.com/users/maryclair/received_events',
       },
       state: 'pending',
       organization_url: 'https://api.github.com/orgs/federalist-users',
     },
     organization: {
-      id: 14109682, url: 'https://api.github.com/orgs/federalist-users', login: 'federalist-users', node_id: 'MDEyOk9yZ2FuaXphdGlvbjE0MTA5Njgy', hooks_url: 'https://api.github.com/orgs/federalist-users/hooks', repos_url: 'https://api.github.com/orgs/federalist-users/repos', avatar_url: 'https://avatars.githubusercontent.com/u/14109682?v=4', events_url: 'https://api.github.com/orgs/federalist-users/events', issues_url: 'https://api.github.com/orgs/federalist-users/issues', description: 'federalist.18f.gov Users', members_url: 'https://api.github.com/orgs/federalist-users/members{/member}', public_members_url: 'https://api.github.com/orgs/federalist-users/public_members{/member}',
+      id: 14109682,
+      url: 'https://api.github.com/orgs/federalist-users',
+      login: 'federalist-users',
+      node_id: 'MDEyOk9yZ2FuaXphdGlvbjE0MTA5Njgy',
+      hooks_url: 'https://api.github.com/orgs/federalist-users/hooks',
+      repos_url: 'https://api.github.com/orgs/federalist-users/repos',
+      avatar_url: 'https://avatars.githubusercontent.com/u/14109682?v=4',
+      events_url: 'https://api.github.com/orgs/federalist-users/events',
+      issues_url: 'https://api.github.com/orgs/federalist-users/issues',
+      description: 'federalist.18f.gov Users',
+      members_url:
+        'https://api.github.com/orgs/federalist-users/members{/member}',
+      public_members_url:
+        'https://api.github.com/orgs/federalist-users/public_members{/member}',
     },
   };
 }
 
 function socketIOError() {
   return {
-    error: "AbortError: PUBLISH can't be processed. The connection is already closed.\n at handle_offline_command (/home/vcap/app/node_modules/redis/index.js:779:15)\n at RedisClient.internal_send_command (/home/vcap/app/node_modules/redis/index.js:813:9)\n at RedisClient.publish (/home/vcap/app/node_modules/redis/lib/commands.js:46:25)\n at RedisAdapter.broadcast (/home/vcap/app/node_modules/socket.io-redis/dist/index.js:265:28)\n at Namespace.emit (/home/vcap/app/node_modules/socket.io/dist/namespace.js:175:22)\n at Server.<computed> [as emit] (/home/vcap/app/node_modules/socket.io/dist/index.js:445:33)\n at emitBuildStatus (/home/vcap/app/api/controllers/build.js:32:30)\n at runMicrotasks (<anonymous>)\n at processTicksAndRejections (internal/process/task_queues.js:93:5)",
+    error:
+      "AbortError: PUBLISH can't be processed. The connection is already closed.\n at handle_offline_command (/home/vcap/app/node_modules/redis/index.js:779:15)\n at RedisClient.internal_send_command (/home/vcap/app/node_modules/redis/index.js:813:9)\n at RedisClient.publish (/home/vcap/app/node_modules/redis/lib/commands.js:46:25)\n at RedisAdapter.broadcast (/home/vcap/app/node_modules/socket.io-redis/dist/index.js:265:28)\n at Namespace.emit (/home/vcap/app/node_modules/socket.io/dist/namespace.js:175:22)\n at Server.<computed> [as emit] (/home/vcap/app/node_modules/socket.io/dist/index.js:445:33)\n at emitBuildStatus (/home/vcap/app/api/controllers/build.js:32:30)\n at runMicrotasks (<anonymous>)\n at processTicksAndRejections (internal/process/task_queues.js:93:5)",
     message: 'redisAdapter pubClient error',
   };
 }
@@ -107,7 +162,10 @@ async function createData() {
     Organization.create({ name: 'agency1', agency: 'GSA' }),
     Organization.create({ name: 'agency2', agency: 'GSA' }),
     Organization.create({ name: 'agency3', agency: 'Bureau of Testing' }),
-    Organization.create({ name: 'agency4', agency: 'Demonstration Department' }),
+    Organization.create({
+      name: 'agency4',
+      agency: 'Demonstration Department',
+    }),
     Organization.create({ name: 'user1@example.com', isSandbox: true }),
   ]);
 
@@ -124,115 +182,106 @@ async function createData() {
     managerNoGithub,
     managerWithGithub,
   ] = await Promise.all([
-
     /**
      * Fake users
      */
 
     // Users with Github credentials
-    User
-      .create({
-        username: 'user1',
-        email: 'user1@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
-      .then(async (user) => {
-        await Promise.all([
-          createUAAIdentity(user),
-          addUserToOrg(user, agency1, userRole),
-          addUserToOrg(user, agency2, userRole),
-          addUserToOrg(user, sandbox, managerRole),
-        ]);
-        return user;
-      }),
+    User.create({
+      username: 'user1',
+      email: 'user1@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    }).then(async (user) => {
+      await Promise.all([
+        createUAAIdentity(user),
+        addUserToOrg(user, agency1, userRole),
+        addUserToOrg(user, agency2, userRole),
+        addUserToOrg(user, sandbox, managerRole),
+      ]);
+      return user;
+    }),
 
-    User
-      .create({
-        username: 'user2',
-        email: 'user2@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
+    User.create({
+      username: 'user2',
+      email: 'user2@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency1, userRole)),
 
-    User
-      .create({
-        username: 'user3',
-        email: 'user3@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
+    User.create({
+      username: 'user3',
+      email: 'user3@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency3, userRole)),
 
-    User
-      .create({
-        username: 'user4',
-        email: 'user4@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
+    User.create({
+      username: 'user4',
+      email: 'user4@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency4, userRole)),
 
-    User
-      .create({
-        username: 'userorgless',
-        email: 'userorgless@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
-      .then(createUAAIdentity),
+    User.create({
+      username: 'userorgless',
+      email: 'userorgless@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    }).then(createUAAIdentity),
 
     // Manager without Github credentials
-    User
-      .create({ username: 'manager_no_github' })
+    User.create({ username: 'manager_no_github' })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency1, managerRole)),
 
     // Manager with Github credentials
-    User
-      .create({
-        username: 'manager_with_github',
-        email: 'manager_with_github@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
+    User.create({
+      username: 'manager_with_github',
+      email: 'manager_with_github@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    })
       .then(createUAAIdentity)
       .then(user => addUserToOrg(user, agency1, userRole))
       .then(user => addUserToOrg(user, agency2, managerRole)),
 
-    User
-      .create({
-        username: 'support_role',
-        email: 'support_role@example.com',
-        githubAccessToken: 'access-token',
-        githubUserId: 123456,
-      })
-      .then(createUAAIdentity),
+    User.create({
+      username: 'support_role',
+      email: 'support_role@example.com',
+      githubAccessToken: 'access-token',
+      githubUserId: 123456,
+    }).then(createUAAIdentity),
 
     /**
      * Actual Github users
      *
      * Initialized without Github credentials so we can test the process
      */
-    User
-      .create({ username: 'hursey013', adminEmail: 'brian.hurst@gsa.gov' })
-      .then(createUAAIdentity),
+    User.create({
+      username: 'hursey013',
+      adminEmail: 'brian.hurst@gsa.gov',
+    }).then(createUAAIdentity),
 
-    User
-      .create({ username: 'svenaas', adminEmail: 'sven.aas@gsa.gov' })
-      .then(createUAAIdentity),
+    User.create({ username: 'svenaas', adminEmail: 'sven.aas@gsa.gov' }).then(
+      createUAAIdentity
+    ),
 
-    User
-      .create({ username: 'apburnes', adminEmail: 'andrew.burnes@gsa.gov' })
-      .then(createUAAIdentity),
+    User.create({
+      username: 'apburnes',
+      adminEmail: 'andrew.burnes@gsa.gov',
+    }).then(createUAAIdentity),
 
-    User
-      .create({ username: 'davemcorwin', adminEmail: 'david.corwin@gsa.gov' })
-      .then(createUAAIdentity),
+    User.create({
+      username: 'davemcorwin',
+      adminEmail: 'david.corwin@gsa.gov',
+    }).then(createUAAIdentity),
 
     // User without UAA
     User.create({
@@ -271,16 +320,14 @@ async function createData() {
       users: [user1, managerWithGithub],
       demoBranch: 'demo1',
       previewConfig: { hello: 'preview' },
-    })
-      .then(site => addSiteToOrg(site, agency1)),
+    }).then(site => addSiteToOrg(site, agency1)),
 
     siteFactory({
       engine: 'hugo',
       owner: user1.username,
       repository: 'example-go-site',
       users: [user1, user2, managerNoGithub],
-    })
-      .then(site => addSiteToOrg(site, agency2)),
+    }).then(site => addSiteToOrg(site, agency2)),
 
     siteFactory({
       engine: 'hugo',
@@ -288,8 +335,7 @@ async function createData() {
       repository: 'another-example-hugo-site',
       users: [user3, managerWithGithub],
       demoBranch: 'demo3',
-    })
-      .then(site => addSiteToOrg(site, agency3)),
+    }).then(site => addSiteToOrg(site, agency3)),
 
     siteFactory({
       engine: 'node.js',
@@ -297,8 +343,7 @@ async function createData() {
       repository: 'another-example-node-site',
       users: [user4, managerWithGithub],
       demoBranch: 'demo4',
-    })
-      .then(site => addSiteToOrg(site, agency4)),
+    }).then(site => addSiteToOrg(site, agency4)),
 
     siteFactory({
       engine: 'node.js',
@@ -307,7 +352,6 @@ async function createData() {
       users: [userOrgless, managerWithGithub],
       demoBranch: 'demo5',
     }),
-
   ]);
 
   await site1.createUserEnvironmentVariable({
@@ -436,33 +480,43 @@ async function createData() {
   ]);
 
   await BuildLog.bulkCreate(
-    Array(20).fill(0).map(() => ({
-      output: log('This log has a source of ALL'),
-      source: 'ALL',
-      build: nodeSiteBuilds[0].id,
-    }))
+    Array(20)
+      .fill(0)
+      .map(() => ({
+        output: log('This log has a source of ALL'),
+        source: 'ALL',
+        build: nodeSiteBuilds[0].id,
+      }))
   );
 
   await BuildLog.bulkCreate(
-    Array(5000).fill(0).map((_v, idx) => ({
-      output: log(`Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`),
-      source: 'ALL',
-      build: goSiteBuilds[0].id,
-    }))
+    Array(5000)
+      .fill(0)
+      .map((_v, idx) => ({
+        output: log(
+          `Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`
+        ),
+        source: 'ALL',
+        build: goSiteBuilds[0].id,
+      }))
   );
 
   console.log('Uploading logs to S3');
   try {
     await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
   } catch (error) {
-    console.error('Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.');
+    console.error(
+      'Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.'
+    );
   }
 
   /** *****************************************
    *              User Actions
    */
   console.log('Creating user actions...');
-  const removeAction = await ActionType.findOne({ where: { action: 'remove' } });
+  const removeAction = await ActionType.findOne({
+    where: { action: 'remove' },
+  });
   await UserAction.create({
     userId: user1.id,
     targetId: user2.id,
@@ -478,13 +532,24 @@ async function createData() {
   await Promise.all([
     EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'UAA login'),
     EventCreator.audit(Event.labels.AUTHENTICATION, user2, 'UAA login'),
-    EventCreator.audit(Event.labels.AUTHENTICATION, user1, 'member_added', memberAddedPayload()),
+    EventCreator.audit(
+      Event.labels.AUTHENTICATION,
+      user1,
+      'member_added',
+      memberAddedPayload()
+    ),
   ]);
 
   console.log('Creating Error Events');
   await Promise.all([
-    EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
-    EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
+    EventCreator.error(
+      Event.labels.REQUEST_HANDLER,
+      new Error('A sample error'),
+      { some: 'info' }
+    ),
+    EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, {
+      some: 'info',
+    }),
   ]);
 
   /** *****************************************
@@ -493,22 +558,22 @@ async function createData() {
   console.log('Creating Domains');
   await Promise.all([
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: site1.SiteBranchConfigs[0].id,
       names: 'www.agency.gov',
       siteId: site1.id,
     }),
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: nodeSite.SiteBranchConfigs[0].id,
       names: 'www.example.gov',
       siteId: nodeSite.id,
     }),
     Domain.create({
-      context: 'demo',
+      siteBranchConfigId: nodeSite.SiteBranchConfigs[1].id,
       names: 'demo.example.gov',
       siteId: nodeSite.id,
     }),
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: nodeSite.SiteBranchConfigs[1].id,
       names: 'foo.example.gov,www.example.gov',
       siteId: nodeSite.id,
       origin: 'foo-bar-baz.app.cloud.gov',
@@ -517,7 +582,7 @@ async function createData() {
       state: 'provisioned',
     }),
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: goSite2.SiteBranchConfigs[0].id,
       names: 'bar.example.gov',
       siteId: goSite2.id,
       origin: 'bar-foo-baz.app.cloud.gov',
@@ -526,7 +591,7 @@ async function createData() {
       state: 'provisioned',
     }),
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: nodeSite2.SiteBranchConfigs[0].id,
       names: 'qux.example.gov',
       siteId: nodeSite2.id,
       origin: 'quz-baz-bar.app.cloud.gov',
@@ -535,7 +600,7 @@ async function createData() {
       state: 'provisioned',
     }),
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: nodeSite2.SiteBranchConfigs[1].id,
       names: 'vanity.qux.example.gov',
       siteId: nodeSite2.id,
       origin: 'quz-baz-bar.app.cloud.gov',
@@ -544,7 +609,7 @@ async function createData() {
       state: 'provisioned',
     }),
     Domain.create({
-      context: 'site',
+      siteBranchConfigId: orglessSite.SiteBranchConfigs[0].id,
       names: 'orgless.example.gov',
       siteId: orglessSite.id,
       origin: 'orgless.app.cloud.gov',
@@ -552,7 +617,6 @@ async function createData() {
       serviceName: 'orgless.example.gov-ext',
       state: 'provisioned',
     }),
-
   ]);
 }
 
@@ -560,7 +624,9 @@ console.log('This will DELETE all data in your development database.');
 createData()
   .then(() => {
     console.log('Done!');
-    console.log('You may have to log out and then back in to your local development instance of Federalist.');
+    console.log(
+      'You may have to log out and then back in to your local development instance of Federalist.'
+    );
     process.exit();
   })
   .catch((error) => {

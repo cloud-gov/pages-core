@@ -1,7 +1,8 @@
 const IORedis = require('ioredis');
 
-const { Domain, Build, Site } = require('../models');
-const { path: sitePath, siteViewOrigin } = require('../utils/site');
+const {
+  Domain, Build, Site, SiteBranchConfig,
+} = require('../models');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
 const config = require('../../config');
@@ -86,10 +87,7 @@ function queueProvisionStatusCheck(id) {
  * @returns {DnsService.DnsRecord[]}
  */
 function buildDnsRecords(domain) {
-  return domain.names
-    .split(',')
-    .map(DnsService.buildDnsRecords)
-    .flat();
+  return domain.names.split(',').map(DnsService.buildDnsRecords).flat();
 }
 
 /**
@@ -125,12 +123,15 @@ function checkAcmeChallengeDnsRecord(domain) {
  */
 function isSiteUrlManagedByDomain(site, domains, context) {
   const siteDomain = Site.domainFromContext(context);
-  if (site[siteDomain] === null) { return true; }
-  if (domains.length === 0) { return false; }
+  if (site[siteDomain] === null) {
+    return true;
+  }
+  if (domains.length === 0) {
+    return false;
+  }
   return domains
     .filter(domain => domain.context === context)
-    .some(domain => domain.namesArray()
-      .some(name => `https://${name}` === site[siteDomain]));
+    .some(domain => domain.namesArray().some(name => `https://${name}` === site[siteDomain]));
 }
 
 /**
@@ -143,34 +144,39 @@ async function rebuildAssociatedSite(domain, site) {
     await Build.create({
       site: site.id,
       branch,
-      username: 'Federalist Operators',
+      username: 'Automated Platfrom Operation',
     }).then(b => b.enqueue());
   }
 }
 
+// TODO Remove with new site branch config relationship
 /**
  * @param {DomainModel} domain
  * @returns {Promise<DomainModel>}
  */
 async function updateSiteForProvisionedDomain(domain) {
   // Populate appropriate site URL if it isn't already set
-  const site = await domain.getSite();
+  const site = await domain.getSite({ include: [SiteBranchConfig] });
   const firstDomain = `https://${domain.firstName()}`;
   const siteDomain = Site.domainFromContext(domain.context);
-  if (isSiteUrlManagedByDomain(site, [domain], domain.context) && site[siteDomain] === null) {
+  if (
+    isSiteUrlManagedByDomain(site, [domain], domain.context)
+    && site[siteDomain] === null
+  ) {
     await site.update({ [siteDomain]: firstDomain });
     await module.exports.rebuildAssociatedSite(domain, site);
   }
   return domain;
 }
 
+// TODO Remove with new site branch config relationship
 /**
  * @param {DomainModel} domain
  * @returns {Promise<DomainModel>}
  */
 async function updateSiteForDeprovisionedDomain(domain) {
   // Clear appropriate site URL if it matches a domain name
-  const site = await domain.getSite();
+  const site = await domain.getSite({ include: [SiteBranchConfig] });
   if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
     const siteDomain = Site.domainFromContext(domain.context);
     await site.update({ [siteDomain]: null });
@@ -185,7 +191,9 @@ async function updateSiteForDeprovisionedDomain(domain) {
  */
 async function deprovision(domain) {
   if (!canDeprovision(domain)) {
-    throw new Error(`Only '${States.Provisioning}', '${States.Provisioned}', or '${States.Failed}' domains can be deprovisioned.`);
+    throw new Error(
+      `Only '${States.Provisioning}', '${States.Provisioned}', or '${States.Failed}' domains can be deprovisioned.`
+    );
   }
 
   await cfApi().deleteServiceInstance(domain.serviceName);
@@ -207,26 +215,25 @@ async function provision(domain, dnsResults) {
     throw new Error(`Only '${States.Pending}' domains can be provisioned.`);
   }
 
-  if (!dnsResults.some(dnsResult => DnsService.isAcmeChallengeDnsRecord(dnsResult.record))) {
-    throw new Error('There must be at least one Acme Challenge DNS record provided');
+  if (
+    !dnsResults.some(dnsResult => DnsService.isAcmeChallengeDnsRecord(dnsResult.record))
+  ) {
+    throw new Error(
+      'There must be at least one Acme Challenge DNS record provided'
+    );
   }
 
   if (!DnsService.canProvision(dnsResults)) {
-    throw new Error('The Acme Challenge DNS records must be set correctly before the domain can be provisioned.');
+    throw new Error(
+      'The Acme Challenge DNS records must be set correctly before the domain can be provisioned.'
+    );
   }
 
-  const site = await domain.getSite();
+  const { serviceName } = domain;
+  const { origin } = domain;
+  const { path } = domain;
 
-  const firstDomainName = domain.firstName();
-
-  const serviceName = `${firstDomainName}-ext`;
-  const origin = siteViewOrigin(site);
-  const path = sitePath(site, domain.context);
-
-  const {
-    cfCdnSpaceName,
-    cfDomainWithCdnPlanGuid,
-  } = config.env;
+  const { cfCdnSpaceName, cfDomainWithCdnPlanGuid } = config.env;
 
   await cfApi().createExternalDomain({
     domains: domain.names,
@@ -238,9 +245,6 @@ async function provision(domain, dnsResults) {
   });
 
   await domain.update({
-    origin,
-    path,
-    serviceName,
     state: States.Provisioning,
   });
 
@@ -263,9 +267,6 @@ async function checkDeprovisionStatus(id) {
 
   if (resources.length === 0) {
     await domain.update({
-      origin: null,
-      path: null,
-      serviceName: null,
       state: States.Pending,
     });
     await module.exports.updateSiteForDeprovisionedDomain(domain);
@@ -287,7 +288,9 @@ async function checkProvisionStatus(id) {
   }
 
   const service = await cfApi().fetchServiceInstance(domain.serviceName);
-  const { last_operation: { state: lastOperation } } = service.entity;
+  const {
+    last_operation: { state: lastOperation },
+  } = service.entity;
 
   switch (lastOperation) {
     case 'succeeded':

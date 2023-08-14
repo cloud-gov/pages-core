@@ -13,47 +13,104 @@ const initialValues = {
 
 const infoContent = (
   <>
-    <p>
-      Interested in adding a custom domain to this site? Email
-      {' '}
-      <a
-        title="Email support to launch a custom domain."
-        href="mailto:pages-support@cloud.gov"
-      >
-        pages-support@cloud.gov
-      </a>
-      {' '}
-      so we can start the domain launch process for this site.
-    </p>
-    <p>
-      <strong>NOTE: </strong>
-      {' '}
-      Use
-      {' '}
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        title="Our documentation on setting up your DNS for your custom domain."
-        href="https://cloud.gov/pages/documentation/custom-domains/"
-      >
-        our documentation
-      </a>
-      {' '}
-      to prepare your DNS settings before the launch.
-    </p>
+    Interested in adding a custom domain to this site? Email
+    {' '}
+    <a
+      title="Email support to launch a custom domain."
+      href="mailto:pages-support@cloud.gov"
+    >
+      pages-support@cloud.gov
+    </a>
+    {' '}
+    so we can start the domain launch process for this site.
+    <br />
+    <br />
+    <strong>NOTE: </strong>
+    {' '}
+    Use
+    {' '}
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Our documentation on setting up your DNS for your custom domain."
+      href="https://cloud.gov/pages/documentation/custom-domains/"
+    >
+      our documentation
+    </a>
+    {' '}
+    to prepare your DNS settings before the launch.
   </>
 );
 
+function ListRow({ children }) {
+  return (
+    <div
+      style={{
+        alignItems: 'center',
+        display: 'flex',
+        gap: '10px',
+        width: '100%',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+ListRow.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
+};
+
 function ContextTitle({ context }) {
   return (
-    <span style={{ fontWeight: 'bold' }}>
-      {context === 'site' ? 'Live site: ' : `${capitalize(context)} site: `}
-    </span>
+    <div style={{ display: 'inline-block' }}>
+      <h4 style={{ fontWeight: 'bold' }}>
+        {context === 'site' ? 'Live Site' : `${capitalize(context)} Site`}
+      </h4>
+    </div>
   );
 }
 
 ContextTitle.propTypes = {
   context: PropTypes.string.isRequired,
+};
+
+const getStateColor = (state) => {
+  switch (state) {
+    case 'provisioned':
+      return 'rgb(12, 175, 0)';
+    case 'failed':
+      return '#d83731';
+    case 'pending':
+      return '#112e51';
+    default:
+      return '#e27600';
+  }
+};
+
+function StateIndicator({ state }) {
+  return (
+    <div
+      style={{
+        backgroundColor: getStateColor(state),
+        borderRadius: '100px',
+        color: 'white',
+        display: 'inline-block',
+        fontSize: '12px',
+        padding: '5px 10px',
+        height: '30px',
+      }}
+    >
+      {state}
+    </div>
+  );
+}
+
+StateIndicator.propTypes = {
+  state: PropTypes.string.isRequired,
 };
 
 function DomainLink({ domain }) {
@@ -92,9 +149,9 @@ function Domains({ siteId }) {
     <div>
       {domains.error && (
         <div className="well">
-          <h4>
+          <h3>
             An error occurred while loading your site branch configurations.
-          </h4>
+          </h3>
           <p>{domains.error}</p>
         </div>
       )}
@@ -105,17 +162,47 @@ function Domains({ siteId }) {
       )}
       {!domains.isLoading && !domains.error && domains.data && (
         <ul>
-          {domains.data.map((domain) => {
+          {domains.data.map((domain, index) => {
+            const sbc = domain.SiteBranchConfig;
             const names = domain.names.split(',');
+
             return (
-              <li key={`domain-${domain.id}`}>
-                <ContextTitle context={domain.context} />
-                {names.map((name, index) => (
-                  <>
-                    <DomainLink key={`domain-name-${name}`} domain={name} />
-                    {names.length > index + 1 && ' '}
-                  </>
-                ))}
+              <li style={{ listStyle: 'none' }} key={`domain-${domain.id}`}>
+                {index > 0 && (
+                  <div
+                    style={{
+                      backgroundColor: 'rgb(240, 240, 240)',
+                      height: '3px',
+                      marginBottom: '10px',
+                      marginTop: '40px',
+                      width: '100%',
+                    }}
+                  />
+                )}
+                <ListRow>
+                  <ContextTitle context={sbc.context} branch={sbc.branch} />
+                  <StateIndicator state={domain.state} />
+                </ListRow>
+                <ListRow>
+                  <span style={{ fontWeight: 'bold' }}>Branch:</span>
+                  {sbc.branch}
+                </ListRow>
+                <ListRow>
+                  <span style={{ fontWeight: 'bold' }}>
+                    {names.length > 1 ? 'Domains' : 'Domain'}
+                    :
+                  </span>
+                  {names.map((name, idx) => (
+                    <span key={`domain-name-${name}`}>
+                      {domain.state === 'provisioned' ? (
+                        <DomainLink domain={name} />
+                      ) : (
+                        name
+                      )}
+                      {names.length > idx + 1 && ' '}
+                    </span>
+                  ))}
+                </ListRow>
               </li>
             );
           })}

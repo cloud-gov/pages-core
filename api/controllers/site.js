@@ -254,9 +254,14 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
+    const domains = await Domain.findAll({
+      where: { siteId },
+      include: [SiteBranchConfig],
+    });
+
     await authorizer.findOne(user, site);
 
-    const siteJSON = domainSerializer.serializeMany(site.Domains);
+    const siteJSON = domainSerializer.serializeMany(domains);
     return res.json(siteJSON);
   },
 });

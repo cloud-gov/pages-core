@@ -3,6 +3,7 @@ name: Security Considerations
 on:
   pull_request:
     types: [opened, edited, reopened]
+    branches: [main]
 
 jobs:
   security-considerations:

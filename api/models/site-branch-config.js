@@ -1,11 +1,14 @@
 const { Op } = require('sequelize');
 const { branchRegex } = require('../utils/validators');
 
-function associate({ SiteBranchConfig, Site }) {
+function associate({ Domain, SiteBranchConfig, Site }) {
   // Associations
   SiteBranchConfig.belongsTo(Site, {
     foreignKey: 'siteId',
     allowNull: false,
+  });
+  SiteBranchConfig.hasMany(Domain, {
+    foreignKey: 'siteBranchConfigId',
   });
 
   // Scopes
@@ -69,9 +72,7 @@ function define(sequelize, DataTypes) {
             );
           }
         },
-        isValidConfig() {
-
-        },
+        isValidConfig() {},
       },
     }
   );

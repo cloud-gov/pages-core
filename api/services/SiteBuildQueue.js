@@ -20,7 +20,11 @@ const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/
 
 const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
 
-const baseURLForBuild = build => baseURLForDomain(buildViewLink(build, build.Site));
+const baseURLForBuild = (build) => {
+  const link = buildViewLink(build, build.Site);
+  const urlObject = new URL(link);
+  return urlObject.pathname.replace(/(\/)+$/, '');
+};
 
 const statusCallbackURL = build => [
   url.resolve(config.app.hostname, '/v0/build'),
@@ -41,9 +45,11 @@ const generateDefaultCredentials = async (build) => {
     engine, owner, repository, UserEnvironmentVariables, SiteBranchConfigs,
   } = build.Site;
 
+  const baseUrl = baseURLForBuild(build);
+
   return ({
     STATUS_CALLBACK: statusCallbackURL(build),
-    BASEURL: baseURLForBuild(build),
+    BASEURL: baseUrl,
     BRANCH: build.branch,
     CONFIG: JSON.stringify(siteConfig(build, SiteBranchConfigs)),
     REPOSITORY: repository,

@@ -1,4 +1,6 @@
-const { Build, User, Site } = require('../models');
+const {
+  Build, Domain, Site, SiteBranchConfig, User,
+} = require('../models');
 const { buildViewLink } = require('../utils/build');
 const siteSerializer = require('./site');
 const userSerializer = require('./user');
@@ -47,20 +49,35 @@ function serializeObject(build) {
   return json;
 }
 
-const serialize = (serializable) => {
+const serialize = async (serializable) => {
   if (serializable.length !== undefined) {
     const buildIds = serializable.map(build => build.id);
     const query = Build.findAll({
       where: { id: buildIds },
       order: [['createdAt', 'DESC']],
-      include: [User, Site],
+      include: [
+        User,
+        {
+          model: Site,
+          required: true,
+          include: [SiteBranchConfig, Domain],
+        },
+      ],
     });
 
     return query.then(builds => builds.map(serializeObject));
   }
-  const query = Build.findByPk(serializable.id, { include: [User, Site] });
 
-  return query.then(serializeObject);
+  return Build.findByPk(serializable.id, {
+    include: [
+      User,
+      {
+        model: Site,
+        required: true,
+        include: [SiteBranchConfig, Domain],
+      },
+    ],
+  }).then(serializeObject);
 };
 
 module.exports = { serialize, serializeObject, toJSON };

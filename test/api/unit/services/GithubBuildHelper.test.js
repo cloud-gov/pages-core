@@ -1,10 +1,9 @@
-const crypto = require('crypto');
 const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
 const config = require('../../../../config');
 const { logger } = require('../../../../winston');
-const { Build, Site, User } = require('../../../../api/models');
+const { Domain, Site, SiteBranchConfig, User } = require('../../../../api/models');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const { buildViewLink } = require('../../../../api/utils/build');
@@ -467,7 +466,7 @@ describe('GithubBuildHelper', () => {
           state: 'success',
         });
 
-        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await build.reload({ include: [{ model: Site, include: [User, Domain, SiteBranchConfig] }]});
         await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
@@ -505,7 +504,7 @@ describe('GithubBuildHelper', () => {
           state: 'success',
         });
 
-        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await build.reload({ include: [{ model: Site, include: [User, Domain, SiteBranchConfig] }]});
         await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
@@ -526,7 +525,7 @@ describe('GithubBuildHelper', () => {
           targetURL: buildViewLink(build, site),
         });
 
-        await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
+        await build.reload({ include: [{ model: Site, include: [User, Domain, SiteBranchConfig] }]});
         await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;

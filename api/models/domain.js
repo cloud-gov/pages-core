@@ -2,13 +2,26 @@ const { Op } = require('sequelize');
 const { buildEnum, toInt } = require('../utils');
 const { isDelimitedFQDN } = require('../utils/validators');
 
-const States = buildEnum(['pending', 'provisioning', 'failed', 'provisioned', 'deprovisioning']);
+const States = buildEnum([
+  'pending',
+  'provisioning',
+  'failed',
+  'provisioned',
+  'deprovisioning',
+]);
 const Contexts = buildEnum(['site', 'demo']);
 
-function associate({ Domain, Site, Organization }) {
+function associate({
+  Domain, Site, SiteBranchConfig, Organization,
+}) {
   // Associations
   Domain.belongsTo(Site, {
     foreignKey: 'siteId',
+  });
+
+  Domain.belongsTo(SiteBranchConfig, {
+    foreignKey: 'siteBranchConfigId',
+    allowNull: false,
   });
 
   // Scopes
@@ -30,17 +43,25 @@ function associate({ Domain, Site, Organization }) {
   });
 
   Domain.addScope('bySite', id => ({
-    include: [{
-      model: Site,
-      where: { id },
-    }],
+    include: [
+      {
+        model: Site,
+        where: { id },
+      },
+    ],
   }));
 
   Domain.addScope('withSite', {
-    include: [{
-      model: Site,
-      required: true,
-    }],
+    include: [
+      {
+        model: Site,
+        required: true,
+      },
+      {
+        model: SiteBranchConfig,
+        required: true,
+      },
+    ],
   });
 
   Domain.addScope('byState', state => ({
@@ -50,25 +71,29 @@ function associate({ Domain, Site, Organization }) {
   }));
 
   Domain.addScope('byOrg', id => ({
-    include: [{
-      model: Site,
-      required: true,
-      include: [{
-        model: Organization,
+    include: [
+      {
+        model: Site,
         required: true,
-        where: { id },
-      }],
-    }],
+        include: [
+          {
+            model: Organization,
+            required: true,
+            where: { id },
+          },
+        ],
+      },
+    ],
   }));
 
   Domain.addScope('provisionedWithSiteAndOrganization', {
     where: { state: 'provisioned' },
-    include: [{
-      model: Site,
-      include: [
-        { model: Organization },
-      ],
-    }],
+    include: [
+      {
+        model: Site,
+        include: [{ model: Organization }],
+      },
+    ],
     order: [
       [Site, Organization, 'name', 'ASC'],
       [Site, 'repository', 'ASC'],
@@ -77,50 +102,52 @@ function associate({ Domain, Site, Organization }) {
 }
 
 function define(sequelize, DataTypes) {
-  const Domain = sequelize.define('Domain', {
-    names: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isDelimitedFQDN,
+  const Domain = sequelize.define(
+    'Domain',
+    {
+      names: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isDelimitedFQDN,
+        },
+      },
+      // TODO: Remove context column post migration
+      context: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'column-to-be-removed',
+      },
+      origin: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isUrl: true,
+        },
+      },
+      path: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      serviceName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      state: {
+        type: DataTypes.ENUM,
+        values: States.values,
+        defaultValue: States.Pending,
+        allowNull: false,
+        validate: {
+          isIn: [States.values],
+        },
       },
     },
-    context: {
-      type: DataTypes.ENUM,
-      values: Contexts.values,
-      allowNull: false,
-      validate: {
-        isIn: [Contexts.values],
-      },
-    },
-    origin: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        isUrl: true,
-      },
-    },
-    path: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    serviceName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    state: {
-      type: DataTypes.ENUM,
-      values: States.values,
-      defaultValue: States.Pending,
-      allowNull: false,
-      validate: {
-        isIn: [States.values],
-      },
-    },
-  }, {
-    tableName: 'domain',
-    paranoid: true,
-  });
+    {
+      tableName: 'domain',
+      paranoid: true,
+    }
+  );
 
   Domain.associate = associate;
   Domain.searchScope = search => ({ method: ['byIdOrText', search] });

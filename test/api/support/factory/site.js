@@ -44,6 +44,7 @@ async function addSiteBranchConfigs(site) {
     defaultConfig,
     demoConfig,
     previewConfig,
+    demoDomain
   } = site;
 
   if (defaultBranch) {
@@ -56,12 +57,12 @@ async function addSiteBranchConfigs(site) {
     });
   }
 
-  if (demoBranch) {
+  if (demoBranch || demoDomain) {
     await SiteBranchConfig.create({
       siteId,
       s3Key: `/demo/${site.owner}/${site.repository}`,
-      branch: demoBranch,
-      config: demoConfig,
+      branch: demoBranch || 'demo',
+      config: demoConfig || {},
       context: 'demo',
     });
   }
@@ -94,7 +95,7 @@ function site(overrides, options = {}) {
       }
       return Promise.all(userPromises);
     })
-    .then(() => Site.findByPk(site.id));
+    .then(() => Site.findByPk(site.id, { include: SiteBranchConfig }));
 }
 
 module.exports = site;
