@@ -37,33 +37,36 @@ describe('<BranchViewLink/>', () => {
     expect(link).toHaveTextContent('View site');
   });
 
-  // it('renders a link to the demo branch\'s site', () => {
-  //   props.branchName = 'demo-branch';
-  //   props.viewLink = 'https://some-other-domain.gov/';
-  //   const wrapper = shallow(<BranchViewLink {...props} />);
-  //   const anchor = wrapper.find('a');
-  //   expect(anchor.length).to.equal(1);
-  //   expect(anchor.prop('href')).to.equal('https://some-other-domain.gov/');
-  //   expect(anchor.text()).equal('View demo');
-  // });
+  test('it renders a link to the demo branch\'s site', () => {
+    props.branchName = 'demo-branch';
+    props.viewLink = 'https://some-other-domain.gov/';
+    render(<BranchViewLink {...props} />);
 
-  // it('renders a preview link to the other branches', () => {
-  //   props.branchName = 'some-other-branch';
-  //   props.viewLink = 'https://random-url.com/';
-  //   const wrapper = shallow(<BranchViewLink {...props} />);
-  //   const anchor = wrapper.find('a');
-  //   expect(anchor.length).to.equal(1);
-  //   expect(anchor.prop('href')).to.equal('https://random-url.com/');
-  //   expect(anchor.text()).equal('Preview site');
-  // });
+    const link = screen.queryByRole('link');
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://some-other-domain.gov/');
+    expect(link).toHaveTextContent('View demo');
+  });
 
-  // it('allows some special characters', () => {
-  //   props.branchName = 'release_1.2.3';
-  //   props.viewLink = 'https://release_1.2.3.gov/';
-  //   const wrapper = shallow(<BranchViewLink {...props} />);
-  //   const anchor = wrapper.find('a');
-  //   expect(anchor.length).to.equal(1);
-  //   expect(anchor.prop('href')).to.equal('https://release_1.2.3.gov/');
-  //   expect(anchor.text()).equal('Preview site');
-  // });
+  test('it renders a preview link to the other branches', () => {
+    props.branchName = 'some-other-branch';
+    props.viewLink = 'https://random-url.com/';
+    render(<BranchViewLink {...props} />);
+
+    const link = screen.queryByRole('link');
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://random-url.com/');
+    expect(link).toHaveTextContent('Preview site');
+  });
+
+  test('it allows some special characters', () => {
+    props.branchName = 'release_1.2.3';
+    props.viewLink = 'https://release_1.2.3.gov/';
+    render(<BranchViewLink {...props} />);
+
+    const link = screen.queryByRole('link');
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://release_1.2.3.gov/');
+    expect(link).toHaveTextContent('Preview site');
+  });
 });
