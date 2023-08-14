@@ -1,27 +1,36 @@
 const { expect } = require('chai');
 
-const AWSMocks = require('../../support/aws-mocks');
+const {
+  S3Client,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectsCommand,
+} = require('@aws-sdk/client-s3');
+const { mockClient } = require('aws-sdk-client-mock');
 const config = require('../../../../config');
 
 const S3Helper = require('../../../../api/services/S3Helper');
 
-describe('S3Helper', () => {
-  describe('.listObjects(prefix)', () => {
-    afterEach(() => {
-      AWSMocks.resetMocks();
-    });
+const s3Mock = mockClient(S3Client);
 
+describe('S3Helper', () => {
+  after(() => s3Mock.restore());
+  beforeEach(() => s3Mock.reset());
+
+  describe('.listObjects(prefix)', () => {
     it('can get objects', (done) => {
       const prefix = 'some-prefix/';
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
-        expect(params.Bucket).to.equal(config.s3.bucket);
-        expect(params.Prefix).to.equal(prefix);
-
-        callback(null, {
-          Contents: ['a', 'b', 'c'],
-        });
-      };
+      s3Mock.on(ListObjectsV2Command, {
+        Bucket: config.s3.bucket,
+        Prefix: prefix,
+      }).resolvesOnce({
+        IsTruncated: false,
+        Contents: ['a', 'b', 'c'],
+        ContinuationToken: null,
+        NextContinuationToken: null,
+      });
 
       const client = new S3Helper.S3Client(config.s3);
       client.listObjects(prefix)
@@ -35,30 +44,25 @@ describe('S3Helper', () => {
     it('can get all objects when initial response is truncated', (done) => {
       const prefix = 'abc/123/';
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
-        expect(params.Bucket).to.equal(config.s3.bucket);
-        expect(params.Prefix).to.equal(prefix);
-
-        // Simulate conditions that require calling recursively
-        if (!params.ContinuationToken) { // first-call
-          callback(null, {
-            Contents: [1, 2, 3],
-            IsTruncated: true,
-            NextContinuationToken: 'next-token',
-          });
-        } else if (params.ContinuationToken === 'next-token') {
-          callback(null, {
-            Contents: [4, 5, 6],
-            IsTruncated: true,
-            NextContinuationToken: 'last-token',
-          });
-        } else if (params.ContinuationToken === 'last-token') {
-          callback(null, {
-            Contents: [7, 8, 9],
-            IsTruncated: false,
-          });
-        }
-      };
+      s3Mock.on(ListObjectsV2Command, {
+        Bucket: config.s3.bucket,
+        Prefix: prefix,
+      }).resolvesOnce({
+        IsTruncated: true,
+        Contents: [1, 2, 3],
+        ContinuationToken: 'first-token',
+        NextContinuationToken: 'next-token',
+      }).resolvesOnce({
+        IsTruncated: true,
+        Contents: [4, 5, 6],
+        ContinuationToken: 'next-token',
+        NextContinuationToken: 'last-token',
+      }).resolvesOnce({
+        IsTruncated: true,
+        Contents: [7, 8, 9],
+        ContinuationToken: 'last-token',
+        NextContinuationToken: null,
+      });
 
       const client = new S3Helper.S3Client(config.s3);
       client.listObjects(prefix)
@@ -70,11 +74,45 @@ describe('S3Helper', () => {
     });
   });
 
-  describe('.putObject', () => {
-    after(() => {
-      AWSMocks.resetMocks();
-    });
+  describe('.deleteAllBucketObjects()', () => {
+    it('should delete all objects in the S3 bucket', async () => {
+      const objectsToDelete = [
+        'site/owner/repo/index.html',
+        'demo/owner/repo/redirect',
+        '_cache/asdfhjkl',
+        'site/owner/repo',
+        'demo/owner/repo',
+        '_cache',
+        'robots.txt',
+      ];
 
+      let deletionBucket;
+      let deletedObjects;
+
+      s3Mock
+        .on(ListObjectsV2Command).resolves({
+          IsTruncated: false,
+          Contents: objectsToDelete.map(object => ({ Key: object })),
+          ContinuationToken: 'A',
+          NextContinuationToken: null,
+        })
+        .on(DeleteObjectsCommand).callsFake((input) => {
+          deletionBucket = input.Bucket;
+          deletedObjects = input.Delete.Objects;
+          return {};
+        });
+
+      const client = new S3Helper.S3Client(config.s3);
+
+      await client.deleteAllBucketObjects();
+      expect(deletionBucket).to.equal(config.s3.bucket);
+      expect(deletedObjects.length).to.equal(objectsToDelete.length);
+      expect(deletedObjects).to.have.deep
+        .members(objectsToDelete.map(object => ({ Key: object })));
+    });
+  });
+
+  describe('.putObject', () => {
     it('should successfully put object in bucket', async () => {
       const body = 'Hello World';
       const key = 'hello.html';
@@ -87,10 +125,7 @@ describe('S3Helper', () => {
         ...extras,
       };
 
-      AWSMocks.mocks.S3.putObject = (params) => {
-        expect(params).to.deep.equal(expected);
-        return { promise: () => Promise.resolve() };
-      };
+      s3Mock.on(PutObjectCommand, expected).resolves();
 
       const client = new S3Helper.S3Client(config.s3);
       await client.putObject(body, key, extras);
@@ -100,7 +135,7 @@ describe('S3Helper', () => {
       const body = 'Hello World';
       const key = 'hello.html';
 
-      AWSMocks.mocks.S3.putObject = () => ({ promise: () => Promise.reject(new Error()) });
+      s3Mock.on(PutObjectCommand).rejects();
 
       const client = new S3Helper.S3Client(config.s3);
       const err = await client.putObject(body, key).catch(error => error);
@@ -108,15 +143,82 @@ describe('S3Helper', () => {
     });
   });
 
+  describe('.getObject', () => {
+    it('should successfully get object from bucket', async () => {
+      const body = 'Hello World';
+      const key = 'hello.html';
+      const extras = { ContentType: 'text/html' };
+
+      const expected = {
+        Bucket: config.s3.bucket,
+        Key: key,
+        ...extras,
+      };
+
+      s3Mock.on(GetObjectCommand, expected).resolves({ Body: body });
+
+      const client = new S3Helper.S3Client(config.s3);
+      const result = await client.getObject(key, extras);
+      expect(result.Body).to.equal(body);
+    });
+  });
+
   describe('.listCommonPrefixes(prefix)', () => {
-    after(() => {
-      AWSMocks.resetMocks();
+    it('can get common prefixes', (done) => {
+      const prefix = 'some-prefix/';
+
+      s3Mock.on(ListObjectsV2Command, {
+        Bucket: config.s3.bucket,
+        Prefix: prefix,
+      }).resolvesOnce({
+        IsTruncated: false,
+        CommonPrefixes: ['a', 'b', 'c'],
+        ContinuationToken: null,
+        NextContinuationToken: null,
+      });
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.listCommonPrefixes(prefix)
+        .then((objects) => {
+          expect(objects).to.deep.equal(['a', 'b', 'c']);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('can get all common prefixes when initial response is truncated', (done) => {
+      const prefix = 'abc/123/';
+
+      s3Mock.on(ListObjectsV2Command, {
+        Bucket: config.s3.bucket,
+        Prefix: prefix,
+      }).resolvesOnce({
+        IsTruncated: true,
+        CommonPrefixes: [1, 2, 3],
+        ContinuationToken: 'first-token',
+        NextContinuationToken: 'next-token',
+      }).resolvesOnce({
+        IsTruncated: true,
+        CommonPrefixes: [4, 5, 6],
+        ContinuationToken: 'next-token',
+        NextContinuationToken: 'last-token',
+      }).resolvesOnce({
+        IsTruncated: true,
+        CommonPrefixes: [7, 8, 9],
+        ContinuationToken: 'last-token',
+        NextContinuationToken: null,
+      });
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.listCommonPrefixes(prefix)
+        .then((objects) => {
+          expect(objects).to.deep.equal([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+          done();
+        })
+        .catch(done);
     });
   });
 
   describe('.listObjectsPaged(prefix, maxObjects, startAfter)', () => {
-    after(() => {
-      AWSMocks.resetMocks();
-    });
   });
 });

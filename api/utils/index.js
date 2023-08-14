@@ -188,25 +188,6 @@ function wait(time = 500) {
   return new Promise((r => setTimeout(r, time)));
 }
 
-// Retry an async function with exponential backoff
-async function retry(fn, { maxAttempts = 5, waitTime = 100 } = {}) {
-  let attempts = 0;
-  while (attempts < maxAttempts) {
-    attempts += 1;
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      return await fn();
-    } catch (err) {
-      if (attempts >= maxAttempts) {
-        throw err;
-      }
-      // eslint-disable-next-line no-await-in-loop
-      await wait(waitTime * (2 ** (attempts - 1)));
-    }
-  }
-  throw new Error('Exited retry loop without returning...');
-}
-
 function omitBy(fn, obj) {
   const pickedKeys = Object
     .keys(obj)
@@ -282,7 +263,6 @@ module.exports = {
   omit,
   paginate,
   pick,
-  retry,
   shouldIncludeTracking,
   toInt,
   toSubdomainPart,

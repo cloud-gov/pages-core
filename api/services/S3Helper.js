@@ -1,81 +1,69 @@
-const AWS = require('aws-sdk');
-const { retry } = require('../utils');
+const {
+  S3,
+  paginateListObjectsV2,
+  PutObjectCommand,
+  GetObjectCommand,
+  waitUntilBucketExists,
+  DeleteObjectsCommand,
+} = require('@aws-sdk/client-s3');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
-
-function shouldPageResults(totalMaxObjects, isTruncated, objects) {
-  // We're ready to exit if the totalMaxObjects is defined, and
-  // if either the response data are not truncated
-  // or the current objects length is >= to the desired totalMaxObjects
-  return totalMaxObjects && (!isTruncated || objects.length >= totalMaxObjects);
-}
-
-function createPagedResults(totalMaxObjects, isTruncated, objects) {
-  // First, truncate the objects to the maximum total objects
-  // or its length (slice will only go as far as the array's length)
-  const truncatedObjects = objects.slice(0, totalMaxObjects);
-
-  return {
-    isTruncated,
-    objects: truncatedObjects,
-  };
-}
-
-function resolveCallback(resolve, reject) {
-  return (err, objects) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(objects);
-    }
-  };
-}
 
 class S3Client {
   constructor(credentials) {
     this.bucket = credentials.bucket;
-    this.client = new AWS.S3({
-      accessKeyId: credentials.accessKeyId,
-      secretAccessKey: credentials.secretAccessKey,
+    this.client = new S3({
       region: credentials.region,
+      credentials: {
+        accessKeyId: credentials.accessKeyId,
+        secretAccessKey: credentials.secretAccessKey,
+      },
     });
   }
 
-  waitForCredentials() {
+  async waitForBucket() {
     const { bucket, client } = this;
-    return retry(() => client.headBucket({ Bucket: bucket }).promise(), { waitTime: 2000 });
+    await waitUntilBucketExists({ client, maxWaitTime: 60 }, { Bucket: bucket });
   }
 
-  listCommonPrefixes(prefix) {
+  async listHelper(prefix, property) {
+    /*
+     * Iterates over pages of S3 Objects starting with the given prefix
+     * in the bucket defined in the application's config.s3 object,
+     * and returns a collection accumulating the specified property
+     * from the results (e.g. `CommonPrefixes` or `Contents`).
+     */
+    const paginationsConfig = { client: this.client };
+    const listCommandInput = { Bucket: this.bucket, Prefix: prefix, Delimiter: '/' };
+    const paginator = paginateListObjectsV2(paginationsConfig, listCommandInput);
+    const results = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const page of paginator) {
+      results.push(...page[property]);
+    }
+    return results;
+  }
+
+  async listCommonPrefixes(prefix) {
     /*
      * Returns a promise that resolves to an array of
      * the "Common Prefixes" of the S3 Objects
      * starting with the given prefix in the bucket
      * defined in the application's config.s3 object.
      */
-    return new Promise((resolve, reject) => {
-      this.listObjectsHelper(null,
-        { Prefix: prefix, Delimiter: '/' },
-        { aggregationKey: 'CommonPrefixes' },
-        resolveCallback(resolve, reject));
-    });
+    return this.listHelper(prefix, 'CommonPrefixes');
   }
 
-  listObjects(prefix) {
+  async listObjects(prefix) {
     /*
      * Returns a promise that resolves to an array of
      * the S3 Objects starting with the given prefix in
      * the bucket defined in the application's config.s3 object.
      */
-    return new Promise((resolve, reject) => {
-      this.listObjectsHelper(null,
-        { Prefix: prefix },
-        {},
-        resolveCallback(resolve, reject));
-    });
+    return this.listHelper(prefix, 'Contents');
   }
 
-  listObjectsPaged(prefix, startAfterKey = null, totalMaxObjects = 200) {
+  async listObjectsPaged(prefix, startAfterKey = null, totalMaxObjects = 200) {
     /*
      * Returns a promise that resolves to a potentially-truncated array of
      * the S3 Objects starting with the given prefix in
@@ -83,71 +71,85 @@ class S3Client {
      * The object resolved by the promise will include an `isTruncated` flag
      * to indicate if the `files` array is truncated.
      */
-    return new Promise((resolve, reject) => {
-      const maxKeys = Math.min(S3_DEFAULT_MAX_KEYS, totalMaxObjects);
+    const maxKeys = Math.min(S3_DEFAULT_MAX_KEYS, totalMaxObjects);
 
-      this.listObjectsHelper(null,
-        { Prefix: prefix, MaxKeys: maxKeys, StartAfter: startAfterKey },
-        { totalMaxObjects },
-        resolveCallback(resolve, reject));
-    });
+    const paginationsConfig = {
+      client: this.client,
+      pageSize: maxKeys,
+    };
+    const listCommandInput = {
+      Bucket: this.bucket,
+      Prefix: prefix,
+      Delimiter: '/',
+      StartAfter: startAfterKey,
+    };
+
+    const paginator = paginateListObjectsV2(paginationsConfig, listCommandInput);
+    const objects = [];
+
+    let wereS3ResultsTruncated = false;
+    // Concatenate S3 pages until there are enough for OUR page size
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const page of paginator) {
+      objects.push(...page.Contents);
+      if (objects.length >= totalMaxObjects) {
+        break;
+      }
+      wereS3ResultsTruncated = page.isTruncated;
+    }
+
+    // Truncate results before returning if there are more than our page size
+    const truncatedObjects = objects.slice(0, totalMaxObjects);
+    const isTruncated = (wereS3ResultsTruncated || truncatedObjects.length < objects.length);
+
+    return {
+      isTruncated,
+      objects: truncatedObjects,
+    };
   }
 
-  putObject(body, key, extras = {}) {
+  async deleteAllBucketObjects() {
     const { bucket, client } = this;
-    const params = {
+    const paginationsConfig = { client };
+    const listCommandInput = { Bucket: bucket };
+
+    // Iterate by page over all of the objects in the bucket
+    const paginator = paginateListObjectsV2(paginationsConfig, listCommandInput);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const page of paginator) {
+      // Delete all of the objects in the current page
+      const commandInput = {
+        Bucket: this.bucket,
+        Delete: {
+          Objects: page.Contents.map(object => ({ Key: object.Key })),
+        },
+      };
+      const command = new DeleteObjectsCommand(commandInput);
+
+      await client.send(command);
+    }
+  }
+
+  async putObject(body, key, extras = {}) {
+    const { bucket, client } = this;
+    const command = new PutObjectCommand({
       Body: body,
       Bucket: bucket,
       Key: key,
       ...extras,
-    };
-
-    return client.putObject(params).promise();
+    });
+    return client.send(command);
   }
 
-  getObject(key, extras = {}) {
+  async getObject(key, extras = {}) {
     const { bucket, client } = this;
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: bucket,
       Key: key,
       ...extras,
-    };
-    return client.getObject(params).promise();
-  }
-
-  // Private Methods
-  listObjectsHelper(currObjects, extraS3Params = {}, opts = {}, callback) {
-    const listObjectArgs = { Bucket: this.bucket, ...extraS3Params };
-
-    this.client.listObjectsV2(listObjectArgs, (err, data) => {
-      if (err) {
-        return callback(err);
-      }
-
-      const aggregationKey = opts.aggregationKey || 'Contents';
-      const { totalMaxObjects } = opts;
-
-      const objects = currObjects ? currObjects.concat(data[aggregationKey])
-        : data[aggregationKey];
-
-      // if the number of results should be limited
-      if (shouldPageResults(totalMaxObjects, data.IsTruncated, objects)) {
-        // then callback with the paged results
-        return callback(null, createPagedResults(totalMaxObjects, data.IsTruncated, objects));
-      }
-      // otherwise continue as normal (ie, not paged)
-
-      if (data.IsTruncated) {
-        const newExtraParams = {
-          ...extraS3Params,
-          ContinuationToken: data.NextContinuationToken,
-        };
-        // call recursively
-        return this.listObjectsHelper(objects, newExtraParams, opts, callback);
-      }
-      // else done !
-      return callback(null, objects);
     });
+    return client.send(command);
   }
 }
 
