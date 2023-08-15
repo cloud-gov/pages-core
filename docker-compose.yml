@@ -38,6 +38,7 @@ services:
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
       CF_API_USERNAME: deploy_user
       CF_API_PASSWORD: deploy_pass
+      PROXY_DOMAIN: localhost:1337
   bull-board:
     build:
       dockerfile: Dockerfile-app

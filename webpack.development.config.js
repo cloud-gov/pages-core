@@ -111,6 +111,7 @@ module.exports = {
       ...getFeatureFlags(process.env),
       'APP_HOSTNAME',
       'PRODUCT',
+      'PROXY_DOMAIN',
     ]),
     new BundleAnalyzerPlugin({
       analyzerHost: '0.0.0.0',

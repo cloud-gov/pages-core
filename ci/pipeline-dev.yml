@@ -67,6 +67,7 @@ jobs:
             params:
               APP_HOSTNAME: https://((((deploy-env))-pages-domain))
               NODE_ENV: development
+              PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
 
           - task: deploy-api
             file: src/ci/partials/deploy.yml

@@ -26,10 +26,31 @@ export const SITE = PropTypes.shape({
   s3ServiceName: PropTypes.string,
   awsBucketName: PropTypes.string,
   awsBucketRegion: PropTypes.string,
-  organizationId: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]),
+  organizationId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  Domains: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      names: PropTypes.string,
+      context: PropTypes.string,
+      origin: PropTypes.string,
+      path: PropTypes.string,
+      state: PropTypes.string,
+      createdAt: PropTypes.string,
+      updatedAt: PropTypes.string,
+      siteBranchConfigId: PropTypes.number,
+    })
+  ),
+  SiteBranchConfigs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      branch: PropTypes.string,
+      s3Key: PropTypes.string,
+      config: PropTypes.string,
+      context: PropTypes.string,
+      createdAt: PropTypes.string,
+      updatedAt: PropTypes.string,
+    })
+  ),
   users: PropTypes.arrayOf(USER),
 });
 
@@ -61,10 +82,7 @@ export const BUILD_LOG_DATA = PropTypes.objectOf(PropTypes.arrayOf(BUILD_LOG));
 
 export const ORGANIZATION = PropTypes.shape({
   createdAt: PropTypes.string,
-  id: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.string,
-  ]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   name: PropTypes.string.isRequired,
   updatedAt: PropTypes.string,
 });
@@ -76,10 +94,7 @@ export const ORGANIZATIONS = PropTypes.shape({
 
 export const ROLE = PropTypes.shape({
   createdAt: PropTypes.string,
-  id: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.string,
-  ]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   name: PropTypes.string.isRequired,
   updatedAt: PropTypes.string,
 });

@@ -138,51 +138,15 @@ function isSiteUrlManagedByDomain(site, domains, context) {
  * @param {DomainModel} domain
  * @param {SiteModel} site
  */
-async function rebuildAssociatedSite(domain, site) {
-  const branch = site[Site.branchFromContext(domain.context)];
+async function rebuildAssociatedSite(domain) {
+  const { branch } = domain.SiteBranchConfig;
   if (branch) {
     await Build.create({
-      site: site.id,
+      site: domain.siteId,
       branch,
       username: 'Automated Platfrom Operation',
     }).then(b => b.enqueue());
   }
-}
-
-// TODO Remove with new site branch config relationship
-/**
- * @param {DomainModel} domain
- * @returns {Promise<DomainModel>}
- */
-async function updateSiteForProvisionedDomain(domain) {
-  // Populate appropriate site URL if it isn't already set
-  const site = await domain.getSite({ include: [SiteBranchConfig] });
-  const firstDomain = `https://${domain.firstName()}`;
-  const siteDomain = Site.domainFromContext(domain.context);
-  if (
-    isSiteUrlManagedByDomain(site, [domain], domain.context)
-    && site[siteDomain] === null
-  ) {
-    await site.update({ [siteDomain]: firstDomain });
-    await module.exports.rebuildAssociatedSite(domain, site);
-  }
-  return domain;
-}
-
-// TODO Remove with new site branch config relationship
-/**
- * @param {DomainModel} domain
- * @returns {Promise<DomainModel>}
- */
-async function updateSiteForDeprovisionedDomain(domain) {
-  // Clear appropriate site URL if it matches a domain name
-  const site = await domain.getSite({ include: [SiteBranchConfig] });
-  if (isSiteUrlManagedByDomain(site, [domain], domain.context)) {
-    const siteDomain = Site.domainFromContext(domain.context);
-    await site.update({ [siteDomain]: null });
-    await module.exports.rebuildAssociatedSite(domain, site);
-  }
-  return domain;
 }
 
 /**
@@ -257,7 +221,7 @@ async function provision(domain, dnsResults) {
  * @param {number} id The domain id
  */
 async function checkDeprovisionStatus(id) {
-  const domain = await Domain.findByPk(id);
+  const domain = await Domain.findByPk(id, { include: [SiteBranchConfig] });
 
   if (domain.state !== Domain.States.Deprovisioning) {
     return `Domain ${id}|${domain.names} must be ${Domain.States.Deprovisioning} to be deprovisioned, but is ${domain.state}.`;
@@ -269,7 +233,7 @@ async function checkDeprovisionStatus(id) {
     await domain.update({
       state: States.Pending,
     });
-    await module.exports.updateSiteForDeprovisionedDomain(domain);
+    await module.exports.rebuildAssociatedSite(domain);
     return `Domain ${id}|${domain.names} successfully deprovisioned.`;
   }
   // TODO - this does not handle the case where deprovisioning fails
@@ -281,7 +245,7 @@ async function checkDeprovisionStatus(id) {
  * @param {number} id The domain id
  */
 async function checkProvisionStatus(id) {
-  const domain = await Domain.findByPk(id);
+  const domain = await Domain.findByPk(id, { include: [SiteBranchConfig] });
 
   if (domain.state !== Domain.States.Provisioning) {
     return `Domain ${id}|${domain.names} must be ${Domain.States.Provisioning} to be provisioned, but is ${domain.state}.`;
@@ -295,7 +259,7 @@ async function checkProvisionStatus(id) {
   switch (lastOperation) {
     case 'succeeded':
       await domain.update({ state: States.Provisioned });
-      await module.exports.updateSiteForProvisionedDomain(domain);
+      await module.exports.rebuildAssociatedSite(domain);
       return `Domain ${id}|${domain.names} successfully provisioned.`;
     case 'failed':
       await domain.update({ state: States.Failed });
@@ -309,8 +273,6 @@ async function checkProvisionStatus(id) {
 module.exports.buildDnsRecords = buildDnsRecords;
 module.exports.isSiteUrlManagedByDomain = isSiteUrlManagedByDomain;
 module.exports.rebuildAssociatedSite = rebuildAssociatedSite;
-module.exports.updateSiteForProvisionedDomain = updateSiteForProvisionedDomain;
-module.exports.updateSiteForDeprovisionedDomain = updateSiteForDeprovisionedDomain;
 module.exports.canProvision = canProvision;
 module.exports.canDeprovision = canDeprovision;
 module.exports.canDestroy = canDestroy;

@@ -4,16 +4,56 @@ import { expect } from 'chai';
 
 import { BranchViewLink } from '../../../frontend/components/branchViewLink';
 
+const proxyDomain = process.env.PROXY_DOMAIN;
+
 describe('<BranchViewLink/>', () => {
+  const awsBucketName = 'test-bucket';
+  const siteDomain = 'prod-url.com';
+  const demoDomain = 'demo-url.com';
+  const proxyOrigin = `https://${awsBucketName}.${proxyDomain}`;
+  const unprovisionedS3Key = '/this/is/unprovisoned/branch';
+
   const testSite = {
     defaultBranch: 'default-branch',
     demoBranch: 'demo-branch',
-    domain: 'https://prod-url.com',
-    demoDomain: 'https://demo-url.com',
+    domain: `https://${siteDomain}`,
+    demoDomain: `https://${demoDomain}`,
     owner: 'test-owner',
     repository: 'test-repo',
-    awsBucketName: 'test-bucket',
+    awsBucketName,
     s3ServiceName: 'federalist-production-s3',
+    domains: [
+      {
+        names: siteDomain,
+        siteBranchConfigId: 123,
+        state: 'provisioned',
+      },
+      {
+        names: demoDomain,
+        siteBranchConfigId: 256,
+        state: 'provisioned',
+      },
+      {
+        names: 'unprovisioned.gov',
+        siteBranchConfigId: 411,
+        state: 'pending',
+      },
+    ],
+    siteBranchConfigs: [
+      {
+        branch: 'default-branch',
+        id: 123,
+      },
+      {
+        branch: 'demo-branch',
+        id: 256,
+      },
+      {
+        s3Key: unprovisionedS3Key,
+        branch: 'unprovisioned-branch',
+        id: 411,
+      },
+    ],
   };
 
   let props;
@@ -25,43 +65,42 @@ describe('<BranchViewLink/>', () => {
     };
   });
 
-  it('renders a link to the default branch\'s site', () => {
+  it("renders a link to the default branch's site", () => {
     props.branchName = 'default-branch';
-    props.viewLink = 'https://some-domain.gov/';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://some-domain.gov/');
-    expect(anchor.text()).equal('View site');
+    expect(anchor.prop('href')).to.equal(`https://${siteDomain}`);
+    expect(anchor.text()).equal('View Build Link');
   });
 
-  it('renders a link to the demo branch\'s site', () => {
+  it("renders a link to the demo branch's site", () => {
     props.branchName = 'demo-branch';
-    props.viewLink = 'https://some-other-domain.gov/';
     const wrapper = shallow(<BranchViewLink {...props} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://some-other-domain.gov/');
-    expect(anchor.text()).equal('View demo');
+    expect(anchor.prop('href')).to.equal(`https://${demoDomain}`);
+    expect(anchor.text()).equal('View Build Link');
+  });
+
+  it('renders the preview link to site branch when the domain is not provisioned', () => {
+    props.branchName = 'unprovisioned-branch';
+    const wrapper = shallow(<BranchViewLink {...props} />);
+    const anchor = wrapper.find('a');
+    expect(anchor.length).to.equal(1);
+    expect(anchor.prop('href')).to.equal(`${proxyOrigin}${unprovisionedS3Key}`);
+    expect(anchor.text()).equal('View Build Link');
   });
 
   it('renders a preview link to the other branches', () => {
-    props.branchName = 'some-other-branch';
-    props.viewLink = 'https://random-url.com/';
-    const wrapper = shallow(<BranchViewLink {...props} />);
+    const branchName = 'some-other-branch';
+    const updatedProps = { ...props, branchName };
+    const wrapper = shallow(<BranchViewLink {...updatedProps} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://random-url.com/');
-    expect(anchor.text()).equal('Preview site');
-  });
-
-  it('allows some special characters', () => {
-    props.branchName = 'release_1.2.3';
-    props.viewLink = 'https://release_1.2.3.gov/';
-    const wrapper = shallow(<BranchViewLink {...props} />);
-    const anchor = wrapper.find('a');
-    expect(anchor.length).to.equal(1);
-    expect(anchor.prop('href')).to.equal('https://release_1.2.3.gov/');
-    expect(anchor.text()).equal('Preview site');
+    expect(anchor.prop('href')).to.equal(
+      `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchName}`
+    );
+    expect(anchor.text()).equal('View Build Link');
   });
 });
