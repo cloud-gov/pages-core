@@ -10,3 +10,17 @@ updates:
     open-pull-requests-limit: 0
     commit-message:
       prefix: '[ci skip] '
+  - package-ecosystem: npm
+    directory: /admin-client # admin client
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: '[ci skip] '
+  - package-ecosystem: npm
+    directory: /apps/metrics # metrics app
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: '[ci skip] '
