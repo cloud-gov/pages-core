@@ -92,12 +92,16 @@ const serializeObject = (site, isSystemAdmin) => {
   const json = serializeNew(site, isSystemAdmin);
 
   if (json.Domains) {
-    json.domains = site.Domains.map(d => pick(allowedDomainAttributes, d));
+    json.domains = site.Domains.map(
+      d => pick(allowedDomainAttributes, d.get({ plain: true }))
+    );
     delete json.Domains;
   }
 
   if (json.SiteBranchConfigs) {
-    json.siteBranchConfigs = site.SiteBranchConfigs.map(sbc => pick(allowedSBCAttributes, sbc));
+    json.siteBranchConfigs = site.SiteBranchConfigs.map(
+      sbc => pick(allowedSBCAttributes, sbc.get({ plain: true }))
+    );
     delete json.SiteBranchConfigs;
   }
 

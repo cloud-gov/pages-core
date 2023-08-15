@@ -3,7 +3,7 @@ const validateJSONSchema = require('jsonschema').validate;
 
 const siteSchema = require('../../../../public/swagger/Site.json');
 const factory = require('../../support/factory');
-const { Domain } = require('../../../../api/models');
+const { Domain, SiteBranchConfig } = require('../../../../api/models');
 
 const SiteSerializer = require('../../../../api/serializers/site');
 
@@ -77,6 +77,49 @@ describe('SiteSerializer', () => {
 
       expect(object.canEditLiveUrl).to.equal(false); // Because there is an associated site domain with a non-conflicting URL
       expect(object.canEditDemoUrl).to.equal(false); // Because the demo domain is null
+    });
+  });
+
+  describe('.serializeObject', () => {
+    it('includes domains array when associated to site', async () => {
+      const site = await factory.site();
+      const domains = await Promise.all([
+        factory.domain.create({ siteId: site.id }),
+        factory.domain.create({ siteId: site.id }),
+      ]);
+      await site.reload({ include: [Domain] });
+      const object = await SiteSerializer.serializeObject(site);
+      const result = validateJSONSchema(object, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(object.domains).to.have.length(2);
+      domains.map((domain) => {
+        expect(object.domains.find((d) => d.id === domain.id)).to.not.be.null;
+      });
+    });
+
+    it('includes site branch config array when associated to site', async () => {
+      const site = await factory.site({}, { noSiteBranchConfig: true });
+      const sbcs = await Promise.all([
+        factory.siteBranchConfig.create({
+          site,
+          branch: 'main',
+          context: 'site',
+        }),
+        factory.siteBranchConfig.create({
+          site,
+          branch: 'demo',
+          context: 'demo',
+        }),
+      ]);
+      await site.reload({ include: [SiteBranchConfig] });
+      const object = await SiteSerializer.serializeObject(site);
+      const result = validateJSONSchema(object, siteSchema);
+      expect(result.errors).to.be.empty;
+      expect(object.siteBranchConfigs).to.have.length(2);
+      sbcs.map((sbc) => {
+        expect(object.siteBranchConfigs.find((c) => c.id === sbc.id)).to.not.be
+          .null;
+      });
     });
   });
 
