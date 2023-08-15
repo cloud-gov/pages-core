@@ -156,25 +156,6 @@ describe('<SiteListItem />', () => {
     expect(wrapper.find('h5')).to.have.length(0);
   });
 
-  it('outputs a link tag to view the site', () => {
-    const siteWithBuilds = {
-      ...testSite,
-      builds: [{}],
-    };
-
-    wrapper = mountRouter(<SiteListItem site={siteWithBuilds} user={testUser} />);
-    const viewLink = wrapper.find('.sites-list-item-actions a');
-    expect(viewLink).to.have.length(1);
-    expect(viewLink.props()).to.contain({
-      href: testSite.viewLink,
-      alt: `View the ${testSite.repository} site`,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      className: 'view-site-link',
-    });
-    expect(viewLink.text()).to.equal('View site ');
-  });
-
   it('outputs a link to the GitHub repo', () => {
     const ghLink = wrapper.find('GitHubLink');
 

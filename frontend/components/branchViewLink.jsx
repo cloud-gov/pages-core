@@ -3,44 +3,55 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { SITE } from '../propTypes';
 import { IconView } from './icons';
+import globals from '../globals';
 
-const isDefaultBranch = (branchName, site) => branchName === site.defaultBranch;
-const isDemoBranch = (branchName, site) => branchName === site.demoBranch;
+// Based on the site's related site branch configs and domains
+// This function determines the link for a built branch
+const getViewLink = (branch, site) => {
+  const {
+    awsBucketName, owner, repository, domains, siteBranchConfigs,
+  } = site;
+  const origin = `https://${awsBucketName}.${globals.PROXY_DOMAIN}`;
+  const branchConfig = siteBranchConfigs.find(s => s.branch === branch);
 
-const getViewText = (branchName, site) => {
-  let viewText = 'Preview site';
-  if (isDefaultBranch(branchName, site)) {
-    viewText = 'View site';
-  } else if (isDemoBranch(branchName, site)) {
-    viewText = 'View demo';
+  // Checks to see if there is a site branch config
+  // If not it returns the preview url
+  if (!branchConfig) {
+    return `${origin}/preview/${owner}/${repository}/${branch}`;
   }
-  return viewText;
+
+  const domain = domains.find(d => d.siteBranchConfigId === branchConfig.id);
+
+  // Checks to see if there is a provisioned domain associated to the site branch config
+  // If not it returns the preview url based on the S3 Key saved in the site branch config
+  if (!domain || domain.state !== 'provisioned') {
+    return `${origin}${branchConfig.s3Key}`;
+  }
+
+  // Returns the provisioned domain from the names attribute
+  // Uses the first name if more then one name is associated to the Domain
+  // ie. www.agency.gov,agency.gov
+  return `https://${domain.names.split(',')[0]}`;
 };
 
-export const BranchViewLink = ({
-  branchName, viewLink, site, showIcon,
-}) => {
-  const viewText = getViewText(branchName, site);
+export const BranchViewLink = ({ branchName, site, showIcon }) => {
+  const domain = getViewLink(branchName, site);
 
-  if (showIcon) {
-    return (
-      <a
-        href={viewLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="view-site-link"
-      >
-        { viewText }
-        <IconView />
-      </a>
-    );
-  }
-  return (<a href={viewLink} target="_blank" rel="noopener noreferrer">{ viewText }</a>);
+  return (
+    <a
+      href={domain}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={showIcon ? 'view-site-link' : ''}
+    >
+      View Build Link
+      {showIcon && <IconView />}
+    </a>
+  );
 };
 
 BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
-  viewLink: PropTypes.string.isRequired,
   site: SITE.isRequired,
   showIcon: PropTypes.bool,
 };

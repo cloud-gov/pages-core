@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { IconView } from '../icons';
 import PublishedState from './publishedState';
 import RepoLastVerified from './repoLastVerified';
 import GitHubLink from '../GitHubLink';
@@ -10,22 +9,6 @@ import ButtonLink from '../ButtonLink';
 import siteActions from '../../actions/siteActions';
 import { ORGANIZATION, USER } from '../../propTypes';
 import { sandboxMsg } from '../../util';
-
-function getViewLink(viewLink, repo) {
-  return (
-    <a
-      href={viewLink}
-      alt={`View the ${repo} site`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="view-site-link"
-    >
-      View site
-      {' '}
-      <IconView />
-    </a>
-  );
-}
 
 function getSiteName(site) {
   return `${site.owner}/${site.repository}`;
@@ -73,7 +56,6 @@ function SiteListItem({ organization, site, user }) {
       </div>
       <div className="sites-list-item-actions">
         <GitHubLink text="View repo" owner={site.owner} repository={site.repository} />
-        { getViewLink(site.viewLink, site.repository) }
         {
           !organization
           && <ButtonLink clickHandler={handleRemoveSite(site, user, navigate)}>Remove</ButtonLink>

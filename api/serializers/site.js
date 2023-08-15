@@ -19,21 +19,37 @@ const allowedAttributes = [
   'awsBucketName',
   'isActive',
   'organizationId',
+  'Domains',
   'Organization',
+  'SiteBranchConfigs',
   'Users',
 ];
 
-const dateFields = [
+const allowedDomainAttributes = [
+  'id',
+  'names',
+  'context',
+  'origin',
+  'path',
+  'state',
   'createdAt',
   'updatedAt',
-  'repoLastVerified',
+  'siteBranchConfigId',
 ];
 
-const yamlFields = [
-  'defaultConfig',
-  'demoConfig',
-  'previewConfig',
+const allowedSBCAttributes = [
+  'id',
+  'branch',
+  's3Key',
+  'config',
+  'context',
+  'createdAt',
+  'updatedAt',
 ];
+
+const dateFields = ['createdAt', 'updatedAt', 'repoLastVerified'];
+
+const yamlFields = ['defaultConfig', 'demoConfig', 'previewConfig'];
 
 const viewLinks = {
   demoViewLink: 'demo',
@@ -49,15 +65,19 @@ function serializeNew(site, isSystemAdmin = false) {
 
   dateFields
     .filter(dateField => object[dateField])
-    .forEach((dateField) => { filtered[dateField] = object[dateField].toISOString(); });
+    .forEach((dateField) => {
+      filtered[dateField] = object[dateField].toISOString();
+    });
 
   yamlFields
     .filter(yamlField => object[yamlField])
-    .forEach((yamlField) => { filtered[yamlField] = yaml.dump(object[yamlField]); });
+    .forEach((yamlField) => {
+      filtered[yamlField] = yaml.dump(object[yamlField]);
+    });
 
-  Object
-    .keys(viewLinks)
-    .forEach((key) => { filtered[key] = siteViewLink(object, viewLinks[key]); });
+  Object.keys(viewLinks).forEach((key) => {
+    filtered[key] = siteViewLink(object, viewLinks[key]);
+  });
 
   filtered.basicAuth = hideBasicAuthPassword(site.basicAuth);
 
@@ -65,11 +85,21 @@ function serializeNew(site, isSystemAdmin = false) {
     filtered.containerConfig = site.containerConfig;
   }
 
-  return omitBy((v => v === null), filtered);
+  return omitBy(v => v === null, filtered);
 }
 
 const serializeObject = (site, isSystemAdmin) => {
   const json = serializeNew(site, isSystemAdmin);
+
+  if (json.Domains) {
+    json.domains = site.Domains.map(d => pick(allowedDomainAttributes, d));
+    delete json.Domains;
+  }
+
+  if (json.SiteBranchConfigs) {
+    json.siteBranchConfigs = site.SiteBranchConfigs.map(sbc => pick(allowedSBCAttributes, sbc));
+    delete json.SiteBranchConfigs;
+  }
 
   if (json.Users) {
     json.users = site.Users.map(u => userSerializer.toJSON(u));
@@ -82,8 +112,16 @@ const serializeObject = (site, isSystemAdmin) => {
   }
 
   if (site.Domains) {
-    json.canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'site');
-    json.canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(site, site.Domains, 'demo');
+    json.canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(
+      site,
+      site.Domains,
+      'site'
+    );
+    json.canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(
+      site,
+      site.Domains,
+      'demo'
+    );
   }
 
   return json;
@@ -108,5 +146,9 @@ const serialize = (serializable) => {
 };
 
 module.exports = {
-  serialize, serializeObject, toJSON: serializeNew, serializeNew, serializeMany,
+  serialize,
+  serializeObject,
+  toJSON: serializeNew,
+  serializeNew,
+  serializeMany,
 };

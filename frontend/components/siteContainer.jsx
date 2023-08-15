@@ -130,7 +130,6 @@ export function SiteContainer(props) {
           siteId={site.id}
           branch={params.branch || site.defaultBranch}
           fileName={params.fileName}
-          viewLink={site.viewLink}
         />
 
         <Outlet />

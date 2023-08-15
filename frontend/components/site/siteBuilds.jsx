@@ -169,7 +169,6 @@ function SiteBuilds() {
                           && (
                           <BranchViewLink
                             branchName={build.branch}
-                            viewLink={build.viewLink}
                             site={site}
                             showIcon
                             completedAt={build.completedAt}

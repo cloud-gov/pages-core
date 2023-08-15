@@ -8,15 +8,15 @@ const allowedAttributes = [
   's3Key',
 ];
 
-function serialize(userEnvVar) {
-  const object = userEnvVar.get({
+function serialize(sbc) {
+  const object = sbc.get({
     plain: true,
   });
   return pick(allowedAttributes, object);
 }
 
-function serializeMany(userEnvVars) {
-  return userEnvVars.map(serialize);
+function serializeMany(sbc) {
+  return sbc.map(serialize);
 }
 
 module.exports = { serialize, serializeMany };

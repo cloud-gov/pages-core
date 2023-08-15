@@ -7,6 +7,8 @@ const attributes = {
   context: '',
   names: '',
   state: '',
+  siteId: '',
+  siteBranchConfigId: '',
   SiteBranchConfig: sbc => sbc && sbcSerializer.serialize(sbc),
   Site: (site, _, isSystemAdmin) => site && siteSerializer.serializeNew(site, isSystemAdmin),
   createdAt: 'date',

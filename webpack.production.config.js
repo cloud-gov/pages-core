@@ -108,6 +108,7 @@ const config = {
       ...getFeatureFlags(process.env),
       'APP_HOSTNAME',
       'PRODUCT',
+      'PROXY_DOMAIN',
     ]),
   ],
 };
