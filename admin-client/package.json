@@ -31,7 +31,7 @@
   "dependencies": {
     "date-fns": "^2.15.0",
     "page": "^1.11.6",
-    "svelecte": "^3.16.0",
+    "svelecte": "^3.16.3",
     "svelte": "^3.0.0",
     "uswds": "^2.10.0"
   }
