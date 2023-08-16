@@ -1,3 +1,26 @@
+## 0.2.0 (2023-08-16)
+
+### Added
+
+- Added site custom domains page | Updated domain model and admin | #4199
+
+### Fixed
+
+- Site serializer domain and branch config pick
+- Fixed branchViewLink to use branch config and domain model #4032
+- restore viewbox to svg icons for proper rendering
+
+### Maintenance
+
+- extend dependabot config to admin and metrics (#4217)
+- add slack notification to release (#4216)
+- update dependencies
+- run dev tests in parallel with build, update dependabot (#4196)
+- Build test webpack assets in non-version-controlled directory (#4191)
+- add github release to production deploy (#4216)
+- update deployment documentation
+- correct release PR behavior (#4162)
+
 ## 0.1.0 (2023-08-02)
 
 ### Added
