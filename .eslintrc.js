@@ -60,10 +60,10 @@ const overrides = [
       '**/*.test.js', '**/*.test.jsx',
     ],
     env: {
-      "jest/globals": true,
+      'jest/globals': true,
     },
     plugins: ['jest'],
-    extends: ['airbnb', 'plugin:sonarjs/recommended']
+    extends: ['airbnb', 'plugin:sonarjs/recommended'],
   },
 ];
 
