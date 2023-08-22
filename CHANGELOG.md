@@ -1,3 +1,9 @@
+## 0.2.1 (2023-08-22)
+
+### Performance
+
+- Update pages production app to 4 instance with 512mb
+
 ## 0.2.0 (2023-08-16)
 
 ### Added
