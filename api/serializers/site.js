@@ -2,7 +2,11 @@ const yaml = require('js-yaml');
 const { omitBy, pick } = require('../utils');
 const { Organization, Site, User } = require('../models');
 const userSerializer = require('./user');
-const { siteViewLink, hideBasicAuthPassword } = require('../utils/site');
+const {
+  siteViewLink,
+  siteViewDomain,
+  hideBasicAuthPassword,
+} = require('../utils/site');
 const DomainService = require('../services/Domain');
 
 const allowedAttributes = [
@@ -79,6 +83,8 @@ function serializeNew(site, isSystemAdmin = false) {
     filtered[key] = siteViewLink(object, viewLinks[key]);
   });
 
+  filtered.siteOrigin = siteViewDomain(site);
+
   filtered.basicAuth = hideBasicAuthPassword(site.basicAuth);
 
   if (isSystemAdmin) {
@@ -92,16 +98,13 @@ const serializeObject = (site, isSystemAdmin) => {
   const json = serializeNew(site, isSystemAdmin);
 
   if (json.Domains) {
-    json.domains = site.Domains.map(
-      d => pick(allowedDomainAttributes, d.get({ plain: true }))
-    );
+    json.domains = site.Domains.map(d => pick(allowedDomainAttributes, d.get({ plain: true })));
     delete json.Domains;
   }
 
   if (json.SiteBranchConfigs) {
-    json.siteBranchConfigs = site.SiteBranchConfigs.map(
-      sbc => pick(allowedSBCAttributes, sbc.get({ plain: true }))
-    );
+    json.siteBranchConfigs = site.SiteBranchConfigs
+      .map(sbc => pick(allowedSBCAttributes, sbc.get({ plain: true })));
     delete json.SiteBranchConfigs;
   }
 
