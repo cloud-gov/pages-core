@@ -26,6 +26,7 @@
     UserTable,
   } from '../components';
   import { destroySite } from '../flows';
+  import { selectSiteDomains, stateColor } from '../lib/utils';
 
   const { id } = $router.params;
   $: sitePromise = fetchSite(id);
@@ -69,25 +70,6 @@
     notification.setError(`Site webhook create error: ${error.message}`);
   }
 
-  function domains(site) {
-    const ary = [];
-    if (site.domain) {
-      ary.push({
-        type: 'default',
-        branch: site.defaultBranch,
-        domain: site.domain,
-      });
-    }
-    if (site.demoDomain) {
-      ary.push({
-        type: 'demo',
-        branch: site.demoBranch,
-        domain: site.demoDomain,
-      });
-    }
-    return ary;
-  }
-
   function configs(site) {
     return ['default', 'demo', 'preview'].reduce((acc, name) => {
       const value = site[`${name}Config`];
@@ -116,6 +98,20 @@
         </AccordionContent>
       </Await>
       <AccordionContent title="User Configuration">
+        <h3>Site Branch Configuration</h3>
+        <DataTable data={site.SiteBranchConfigs} borderless={true}>
+          <tr slot="header">
+            <th>Context</th>
+            <th>Branch</th>
+            <th>Created At</th>
+          </tr>
+          <tr slot="item" let:item={sbc}>
+            <td>{sbc.context}</td>
+            <td>{sbc.branch}</td>
+            <td>{sbc.createdAt}</td>
+          </tr>
+          <p slot="empty">No domains configured</p>
+        </DataTable>
         <h3>Jekyll Configuration</h3>
         {#each configs(site) as config}
           <h5 class="text-uppercase">{config.name}</h5>
@@ -144,16 +140,27 @@
         </Await>
       </AccordionContent>
       <AccordionContent title="Domains">
-        <DataTable data={domains(site)} borderless={true}>
+        <DataTable
+          data={selectSiteDomains(site)}
+          borderless={true}
+        >
           <tr slot="header">
-            <th>Type</th>
+            <th>Domain Names</th>
+            <th>Context</th>
             <th>Branch</th>
-            <th>Domain</th>
+            <th>State</th>
+            <th>Created At</th>
           </tr>
           <tr slot="item" let:item={domain}>
-            <td>{domain.type}</td>
+            <td><a href={`/domains/${domain.id}`}>{domain.names}</a></td>
+            <td>{domain.context}</td>
             <td>{domain.branch}</td>
-            <td>{domain.domain}</td>
+            <td>
+              <span class="usa-tag radius-pill {stateColor(domain.state)}">
+                {domain.state}
+              </span>
+            </td>
+            <td>{domain.createdAt}</td>
           </tr>
           <p slot="empty">No domains configured</p>
         </DataTable>

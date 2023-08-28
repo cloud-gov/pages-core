@@ -1,5 +1,9 @@
 const {
-  Organization, Site, SiteBranchConfig, Event,
+  Domain,
+  Event,
+  Organization,
+  Site,
+  SiteBranchConfig,
 } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const GithubBuildHelper = require('../../services/GithubBuildHelper');
@@ -11,14 +15,14 @@ const EventCreator = require('../../services/EventCreator');
 const updateableAttrs = ['containerConfig', 'isActive', 'organizationId'];
 
 module.exports = wrapHandlers({
-  listRaw: async (req, res) => {
+  listRaw: async (_, res) => {
     const sites = await Site.findAll({
       attributes: ['id', 'owner', 'repository', 'demoBranch'],
       order: [
         ['owner', 'ASC'],
         ['repository', 'ASC'],
       ],
-      include: [SiteBranchConfig],
+      include: [SiteBranchConfig, Domain],
     });
     return res.json(sites);
   },
@@ -82,7 +86,9 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const site = await fetchModelById(id, Site);
+    const site = await fetchModelById(id, Site, {
+      include: [SiteBranchConfig, Domain],
+    });
     if (!site) return res.notFound();
 
     return res.json(serializeNew(site, true));
