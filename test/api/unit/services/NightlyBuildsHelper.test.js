@@ -20,7 +20,7 @@ describe('NightlyBuildsHelper', () => {
 
   beforeEach(async () => {
     await Promise.all([
-      Build.truncate(),
+      Build.truncate({ force: true, cascade: true }),
       Site.truncate(),
       SiteBranchConfig.truncate(),
     ]);
@@ -29,7 +29,7 @@ describe('NightlyBuildsHelper', () => {
   afterEach(async () => {
     sinon.restore();
     await Promise.all([
-      Build.truncate(),
+      Build.truncate({ force: true, cascade: true }),
       Site.truncate(),
       SiteBranchConfig.truncate(),
     ]);
