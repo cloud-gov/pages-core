@@ -1,3 +1,13 @@
+## 0.2.2 (2023-08-29)
+
+### Fixed
+
+- Admin UI for updated site branch configs and domains
+
+### Maintenance
+
+- use correct path for release notes
+
 ## 0.2.1 (2023-08-22)
 
 ### Performance
