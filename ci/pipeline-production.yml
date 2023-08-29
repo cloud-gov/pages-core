@@ -336,7 +336,7 @@ jobs:
         body: src/releaselog.md
     - put: slack-cg-pages
       params:
-        text_file: slackrelease.md
+        text_file: src/slackrelease.md
         channel: ((slack-channel))
         username: ((slack-username))
         icon_url: ((slack-icon-url))
