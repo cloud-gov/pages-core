@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import api from '../../../util/federalistApi';
+import { useSiteBranchConfigs } from '../../../hooks';
 import BranchConfig from './BranchConfig';
 import LoadingIndicator from '../../LoadingIndicator';
-
-const initialValues = {
-  isLoading: true,
-  error: null,
-  data: [],
-};
 
 // Temporary contexts array to mirror the former context values in the site table
 // A future UI will allow users to set configurations for any branch
 const defaultContexts = ['site', 'demo', 'preview'];
+
+function getHashContext(hash) {
+  if (!hash) return null;
+
+  return hash.slice(1, hash.length).split('-')[0];
+}
 
 function handleUpdate(siteId) {
   return ({
@@ -26,15 +27,9 @@ function handleUpdate(siteId) {
   };
 }
 
-function BranchConfigs({ siteId }) {
-  const [configs, setConfigs] = useState(initialValues);
-
-  useEffect(() => {
-    api
-      .fetchSiteBranchConfigs(siteId)
-      .then(results => setConfigs({ ...configs, isLoading: false, data: results }))
-      .catch(error => setConfigs({ ...configs, state: 'error', error: error.message }));
-  }, [siteId]);
+function BranchConfigs({ siteId, hash }) {
+  const { siteBranchConfigs: configs } = useSiteBranchConfigs(siteId);
+  const hashContext = getHashContext(hash);
 
   return (
     <div>
@@ -59,12 +54,15 @@ function BranchConfigs({ siteId }) {
             conf => conf.context === context
           );
 
+          const isExpanded = context === hashContext;
+
           if (branchConfig) {
             return (
               <BranchConfig
                 key={`config-context-${context}`}
                 {...branchConfig}
                 handleUpdate={handleUpdate(siteId)}
+                isExpanded={isExpanded}
               />
             );
           }
@@ -73,6 +71,7 @@ function BranchConfigs({ siteId }) {
               key={`config-context-${context}`}
               context={context}
               handleUpdate={handleUpdate(siteId)}
+              isExpanded={isExpanded}
             />
           );
         })}
@@ -82,6 +81,11 @@ function BranchConfigs({ siteId }) {
 
 BranchConfigs.propTypes = {
   siteId: PropTypes.number.isRequired,
+  hash: PropTypes.string,
+};
+
+BranchConfigs.defaultProps = {
+  hash: null,
 };
 
 export default BranchConfigs;
