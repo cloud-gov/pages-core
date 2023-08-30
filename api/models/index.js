@@ -17,6 +17,8 @@ const sequelize = new Sequelize(database, username, password, {
 
 require('./build')(sequelize, DataTypes);
 require('./build-log')(sequelize, DataTypes);
+require('./build-task-type')(sequelize, DataTypes);
+require('./build-task')(sequelize, DataTypes);
 require('./site')(sequelize, DataTypes);
 require('./site-branch-config')(sequelize, DataTypes);
 require('./site-user')(sequelize, DataTypes);
