@@ -8,6 +8,8 @@ const cleanDatabase = require('../api/utils/cleanDatabase');
 const {
   ActionType,
   Build,
+  BuildTaskType,
+  BuildTask,
   BuildLog,
   Domain,
   Event,
@@ -433,6 +435,20 @@ async function createData() {
       requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
     })),
   ]);
+
+  const taskType = await BuildTaskType.create({
+    name: 'test',
+    description: 'test',
+    metadata: {
+      foo: 'bar',
+    },
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[0].id,
+    buildTaskTypeId: taskType.id,
+    name: 'type',
+    status: 'processing',
+  });
 
   const goSiteBuilds = await Promise.all([
     Build.create({

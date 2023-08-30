@@ -39,7 +39,7 @@ const associate = ({
     allowNull: false,
   });
   Build.hasMany(BuildTask, {
-    foreignKey: 'build_task',
+    foreignKey: 'buildId',
   });
 
   // Scopes

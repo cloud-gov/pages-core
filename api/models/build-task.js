@@ -31,6 +31,16 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [Statuses.values],
         },
       },
+    }, {
+      tableName: 'build_task',
+      paranoid: true,
+      indexes: [
+        {
+          name: 'build_task_build_id_type_index',
+          unique: true,
+          fields: ['buildId'],
+        },
+      ],
     }
   );
 

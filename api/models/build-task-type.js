@@ -4,7 +4,7 @@ const associate = ({
 }) => {
   // Associations
   BuildTaskType.hasMany(BuildTask, {
-    foreignKey: 'build_task_type',
+    foreignKey: 'buildTaskTypeId',
   });
 };
 
@@ -23,6 +23,8 @@ module.exports = (sequelize, DataTypes) => {
       metadata: {
         type: DataTypes.JSON,
       },
+    }, {
+      tableName: 'build_task_type',
     }
   );
 

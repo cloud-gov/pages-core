@@ -5,6 +5,8 @@ const TYPE_TABLE_SCHEMA = {
   name: { type: "string", notNull: true },
   description: { type: "string", notNull: true },
   metadata: { type: "jsonb", allowNull: true },
+  createdAt: { type: "timestamp", notNull: true },
+  updatedAt: { type: "timestamp", notNull: true },
 };
 
 const TABLE_NAME = "build_task";
@@ -18,7 +20,7 @@ const TABLE_SCHEMA = {
       name: "build_task_build_id_fk",
       table: "build",
       rules: {
-        onDelete: "RESTRICT",
+        onDelete: "CASCADE",
         onUpdate: "RESTRICT"
       },
       mapping: "id"
@@ -31,7 +33,7 @@ const TABLE_SCHEMA = {
       name: "build_task_build_task_type_id_fk",
       table: "build_task_type",
       rules: {
-        onDelete: "RESTRICT",
+        onDelete: "CASCADE",
         onUpdate: "RESTRICT"
       },
       mapping: "id"
@@ -40,6 +42,9 @@ const TABLE_SCHEMA = {
   name: { type: "string", notNull: true },
   status: { type: "string", notNull: true, default: "created" },
   artifact: { type: "string", allowNull: true },
+  createdAt: { type: "timestamp", notNull: true },
+  updatedAt: { type: "timestamp", notNull: true },
+  deletedAt: { type: "timestamp", allowNull: true },
 };
 
 exports.up = async (db) => {
