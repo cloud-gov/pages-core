@@ -95,8 +95,34 @@ export default {
     return request('site');
   },
 
+  createSiteDomain(siteId, names, siteBranchConfigId) {
+    return request(`site/${siteId}/domain`, {
+      method: 'POST',
+      data: {
+        names,
+        siteBranchConfigId,
+      },
+    });
+  },
+
   fetchSiteDomains(siteId) {
     return request(`site/${siteId}/domains`);
+  },
+
+  deleteSiteDomain(siteId, domainId) {
+    return request(`site/${siteId}/domain/${domainId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  updateSiteDomain(siteId, domainId, { names, siteBranchConfigId } = {}) {
+    return request(`site/${siteId}/domain/${domainId}`, {
+      method: 'PUT',
+      data: {
+        names,
+        siteBranchConfigId,
+      },
+    });
   },
 
   fetchUser() {

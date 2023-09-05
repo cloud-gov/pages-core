@@ -12,6 +12,8 @@ import SitePublishedBranchesTable from './components/site/sitePublishedBranchesT
 import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
 import CustomDomains from './components/site/CustomDomains';
+import NewCustomDomain from './components/site/CustomDomains/New';
+import EditCustomDomain from './components/site/CustomDomains/Edit';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 import Error from './components/Error';
@@ -46,6 +48,8 @@ export default (
       <Route path="published/:name" element={<SitePublishedFilesTable />} />
       <Route path="builds" element={<SiteBuilds />} />
       <Route path="custom-domains" element={<CustomDomains />} />
+      <Route path="custom-domains/new" element={<NewCustomDomain />} />
+      <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
     </Route>
     <Route path="settings" element={<UserSettings />} />

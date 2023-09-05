@@ -603,6 +603,110 @@ paths:
           description: Not found
           schema:
             $ref: 'Error.json'
+  /site/{site_id}/domain:
+    post:
+      summary: Create a site domain if the current user has permissions
+      parameters:
+        - name: site_id
+          in: path
+          description: the id of the site
+          type: integer
+        - name: names
+          in: body
+          type: string
+          description: The names of the domain (comma delimited)
+          required: true
+        - name: siteBranchConfigId
+          in: body
+          type: integer
+          description: The id of the related site branch config
+          required: true
+      responses:
+        200:
+          description: The create site domain
+          schema:
+            $ref: 'Domain.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /site/{site_id}/domain/{domain_id}:
+    delete:
+      summary: Delete a site domain if the current user has permissions
+      parameters:
+        - name: site_id
+          in: path
+          description: the id of the site
+          type: integer
+        - name: domain_id
+          in: path
+          description: the id of the domain
+          type: integer
+      responses:
+        200:
+          description: The create site domain
+          schema:
+            type: object
+            properties:
+              message: string
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+    put:
+      summary: Update a site domain if the current user has permissions
+      parameters:
+        - name: site_id
+          in: path
+          description: the id of the site
+          type: integer
+        - name: domain_id
+          in: path
+          description: the id of the domain
+          type: integer
+        - name: names
+          in: body
+          type: string
+          description: The names of the domain (comma delimited)
+          required: false
+        - name: siteBranchConfigId
+          in: body
+          type: integer
+          description: The id of the related site branch config
+          required: false
+      responses:
+        200:
+          description: The create site domain
+          schema:
+            $ref: 'Domain.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
   /site/{site_id}/published-branch:
     parameters:
       - name: site_id

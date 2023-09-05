@@ -13,7 +13,12 @@ function formatConfig(config) {
 }
 
 function BranchConfig({
-  id, branch, config, context, handleUpdate,
+  id,
+  branch,
+  config,
+  context,
+  handleUpdate,
+  isExpanded,
 }) {
   const formattedConfig = formatConfig(config);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +37,7 @@ function BranchConfig({
     <ExpandableArea
       bordered
       title={`${context === 'site' ? 'Live' : capitalize(context)} site`}
+      isExpanded={isExpanded}
     >
       <form
         onSubmit={(event) => {
@@ -113,18 +119,20 @@ function BranchConfig({
 }
 
 BranchConfig.propTypes = {
-  id: PropTypes.oneOf([PropTypes.number, null]),
-  branch: PropTypes.oneOf([PropTypes.string, null]),
+  id: PropTypes.number,
+  branch: PropTypes.string,
   context: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   config: PropTypes.object,
   handleUpdate: PropTypes.func.isRequired,
+  isExpanded: PropTypes.bool,
 };
 
 BranchConfig.defaultProps = {
   id: null,
   branch: null,
   config: null,
+  isExpanded: false,
 };
 
 export default BranchConfig;

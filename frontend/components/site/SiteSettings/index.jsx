@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import BranchConfigs from './BranchConfigs';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
@@ -11,6 +11,7 @@ import globals from '../../../globals';
 
 function SiteSettings() {
   const { id } = useParams();
+  const { hash } = useLocation();
   const site = useSelector(state => currentSite(state.sites, id));
   const navigate = useNavigate();
 
@@ -68,7 +69,7 @@ function SiteSettings() {
         </a>
         .
       </p>
-      <BranchConfigs siteId={site.id} />
+      <BranchConfigs siteId={site.id} hash={hash} />
       <AdvancedSiteSettings
         initialValues={advancedInitialValues}
         onDelete={handleDelete}
