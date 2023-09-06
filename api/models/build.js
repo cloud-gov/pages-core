@@ -20,6 +20,7 @@ const States = buildEnum([
 const associate = ({
   Build,
   BuildLog,
+  BuildTask,
   Organization,
   Site,
   User,
@@ -36,6 +37,9 @@ const associate = ({
   Build.belongsTo(User, {
     foreignKey: 'user',
     allowNull: false,
+  });
+  Build.hasMany(BuildTask, {
+    foreignKey: 'buildId',
   });
 
   // Scopes

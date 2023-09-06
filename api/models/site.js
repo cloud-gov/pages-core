@@ -32,6 +32,7 @@ const associate = ({
   OrganizationRole,
   Site,
   SiteBranchConfig,
+  SiteBuildTask,
   SiteUser,
   User,
   UserAction,
@@ -61,6 +62,9 @@ const associate = ({
   });
   Site.belongsTo(Organization, {
     foreignKey: 'organizationId',
+  });
+  Site.hasMany(SiteBuildTask, {
+    foreignKey: 'siteId',
   });
 
   // Scopes
