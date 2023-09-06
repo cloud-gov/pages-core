@@ -1,3 +1,6 @@
+const crypto = require('crypto');
+const URLSafeBase64 = require('urlsafe-base64');
+
 const { buildEnum } = require('../utils');
 
 const Statuses = buildEnum([
@@ -15,6 +18,13 @@ const associate = ({ BuildTask, Build }) => {
     foreignKey: 'buildId',
     allowNull: false,
   });
+};
+
+const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
+
+const beforeValidate = (buildTask) => {
+  const { token } = buildTask;
+  buildTask.token = token || generateToken(); // eslint-disable-line no-param-reassign
 };
 
 module.exports = (sequelize, DataTypes) => {
@@ -37,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [Statuses.values],
         },
       },
+      token: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     }, {
       tableName: 'build_task',
       paranoid: true,
@@ -47,9 +61,13 @@ module.exports = (sequelize, DataTypes) => {
           fields: ['buildId', 'buildTaskTypeId'],
         },
       ],
+      hooks: {
+        beforeValidate,
+      },
     }
   );
 
+  BuildTask.generateToken = generateToken;
   BuildTask.associate = associate;
 
   return BuildTask;

@@ -216,6 +216,67 @@ paths:
           description: Not found
           schema:
             $ref: 'Error.json'
+  /build/{build_id}/tasks:
+    parameters:
+      - name: build_id
+        in: path
+        description: The id of the build
+        type: integer
+        required: true
+    get:
+      summary: Fetch all build tasks associated with a build
+      responses:
+        200:
+          description: An array with the build tasks associated with the build
+          schema:
+            type: array
+            items:
+              $ref: 'BuildTask.json'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /build/{build_id}/tasks/{task_id}:
+    parameters:
+      - name: build_id
+        in: path
+        description: The id of the build
+        type: integer
+        required: true
+      - name: task_id
+        in: path
+        description: The id of the build task
+        type: integer
+        required: true
+    get:
+      summary: Fetch one build task associated with a build
+      responses:
+        200:
+          description: An object with a build task matching task_id and associated with the build
+          schema:
+            type: object
+            items:
+              $ref: 'BuildTask.json'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
   /organization:
     get:
       summary: Fetch all of the current user's organizations
@@ -1214,3 +1275,32 @@ paths:
           description: Always an empty object
           schema:
             type: object
+  /tasks/{build_task_id}/{token}:
+    parameters:
+      - name: build_task_id
+        in: path
+        description: The id of the build task
+        type: integer
+        required: true
+      - name: token
+        in: path
+        description: The build tasks secret build task token.
+        type: string
+        required: true
+    put:
+      summary: Update build task information
+      responses:
+        200:
+          description: Acknowledgement that the build task was updated
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'

@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "createdAt",
+    "buildId",
+    "buildTaskTypeId",
+    "status",
+    "updatedAt",
+    "name",
+    "artifact"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "error",
+        "processing",
+        "skipped",
+        "success",
+        "queued",
+        "created"
+      ]
+    },
+    "buildId": {
+      "type": "number"
+    },
+    "buildTaskTypeId": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "artifact": {
+      "type": "string"
+    }
+  }
+}
