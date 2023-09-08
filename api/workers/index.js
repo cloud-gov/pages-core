@@ -15,6 +15,8 @@ const DomainService = require('../services/Domain');
 const {
   ArchiveBuildLogsQueue,
   ArchiveBuildLogsQueueName,
+  BuildTasksQueue,
+  BuildTasksQueueName,
   DomainQueueName,
   FailStuckBuildsQueue,
   FailStuckBuildsQueueName,
@@ -59,6 +61,8 @@ function pagesWorker(connection) {
     }
   };
 
+  const buildTasksProcessor = job => Processors.buildTaskRunner(job);
+
   const failBuildsProcessor = job => Processors.failStuckBuilds(job);
 
   const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
@@ -81,6 +85,7 @@ function pagesWorker(connection) {
   const workers = [
     new QueueWorker(ArchiveBuildLogsQueueName, connection,
       path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
+    new QueueWorker(BuildTasksQueueName, connection, buildTasksProcessor),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(FailStuckBuildsQueueName, connection, failBuildsProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
@@ -93,6 +98,7 @@ function pagesWorker(connection) {
 
   const schedulers = [
     new QueueScheduler(ArchiveBuildLogsQueueName, { connection }),
+    new QueueScheduler(BuildTasksQueueName, { connection }),
     new QueueScheduler(DomainQueueName, { connection }),
     new QueueScheduler(FailStuckBuildsQueueName, { connection }),
     new QueueScheduler(MailQueueName, { connection }),
@@ -104,12 +110,14 @@ function pagesWorker(connection) {
   ];
 
   const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
+  const buildTasksQueue = new BuildTasksQueue(connection);
   const failStuckBuildsQueue = new FailStuckBuildsQueue(connection);
   const nightlyBuildsQueue = new NightlyBuildsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
   const timeoutBuildTasksQueue = new TimeoutBuildTasksQueue(connection);
   const queues = [
     archiveBuildLogsQueue,
+    buildTasksQueue,
     failStuckBuildsQueue,
     nightlyBuildsQueue,
     scheduledQueue,

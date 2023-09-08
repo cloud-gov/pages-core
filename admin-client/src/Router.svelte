@@ -68,6 +68,7 @@
   page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
   page('/organizations-report', queryString, render(Pages.Organization.Report));
   page('/reports', queryString, render(Pages.Reports));
+  page('/tasks', queryString, render(Pages.Tasks));
   page('*', render(Pages.NotFound));
   page();
 </script>

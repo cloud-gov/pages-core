@@ -4,6 +4,7 @@ const {
   Organization,
   Site,
   SiteBranchConfig,
+  SiteBuildTask,
 } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
 const GithubBuildHelper = require('../../services/GithubBuildHelper');
@@ -87,7 +88,7 @@ module.exports = wrapHandlers({
     } = req;
 
     const site = await fetchModelById(id, Site, {
-      include: [SiteBranchConfig, Domain],
+      include: [SiteBranchConfig, Domain, SiteBuildTask],
     });
     if (!site) return res.notFound();
 

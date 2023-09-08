@@ -150,6 +150,28 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   return build.update(atts);
 };
 
+const afterCreate = async (build) => {
+  // create relevant build tasks on build create
+  const { SiteBuildTask } = build.sequelize.models;
+  try {
+    await SiteBuildTask.startBuildTasks({ build, startsWhen: 'build' });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const afterUpdate = async (build) => {
+  // we start certain build tasks on build completion
+  const { SiteBuildTask } = build.sequelize.models;
+  if (build.state === States.Success) {
+    try {
+      await SiteBuildTask.startBuildTasks({ build, startsWhen: 'complete' });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+};
+
 async function enqueue() {
   const build = this;
 
@@ -298,6 +320,8 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'build',
       hooks: {
         beforeValidate,
+        afterCreate,
+        afterUpdate,
       },
     }
   );

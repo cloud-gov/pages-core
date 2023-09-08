@@ -6,6 +6,7 @@
     fetchOrganizations,
     fetchSite,
     fetchSiteWebhooks,
+    fetchTasks,
     fetchUserEnvironmentVariables,
     fetchUsers,
     updateSite,
@@ -23,6 +24,7 @@
     SiteFormOrganization,
     SiteFormWebhook,
     SiteMetadata,
+    TaskTable,
     UserTable,
   } from '../components';
   import { destroySite } from '../flows';
@@ -32,6 +34,7 @@
   $: sitePromise = fetchSite(id);
   $: siteWebhookPromise = fetchSiteWebhooks(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
+  $: buildTasksPromise = fetchTasks({ site: id, limit: 10 });
   $: orgsPromise = fetchOrganizations({ limit: 100 });
   $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
@@ -191,6 +194,27 @@
       <AccordionContent title="Recent Builds">
         <Await on={buildsPromise} let:response={builds}>
           <BuildTable builds={builds.data} borderless={true} />
+        </Await>
+      </AccordionContent>
+      <AccordionContent title="Build Tasks">
+        <h3>Registered Build Tasks</h3>
+        <DataTable data={site.SiteBuildTasks} borderless={true}>
+          <tr slot="header">
+            <th>BuildTaskTypeId</th>
+            <th>Branch</th>
+            <th>Metadata</th>
+            <th>Created At</th>
+          </tr>
+          <tr slot="item" let:item={sbt}>
+            <td>{sbt.buildTaskTypeId}</td>
+            <td>{sbt.branch}</td>
+            <td>{JSON.stringify(sbt.metadata)}</td>
+            <td>{sbt.createdAt}</td>
+          </tr>
+          <p slot="empty">No build tasks registered</p>
+        </DataTable>
+        <Await on={buildTasksPromise} let:response={buildTasks}>
+          <TaskTable tasks={buildTasks.data} borderless={true} />
         </Await>
       </AccordionContent>
       <AccordionContent title="Collaborators">

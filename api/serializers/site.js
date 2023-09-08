@@ -26,6 +26,7 @@ const allowedAttributes = [
   'Domains',
   'Organization',
   'SiteBranchConfigs',
+  'SiteBuildTasks',
   'Users',
 ];
 
