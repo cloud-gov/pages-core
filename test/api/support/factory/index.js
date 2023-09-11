@@ -1,5 +1,7 @@
 const bulkBuild = require('./bulkBuild');
 const { buildLog, bulkBuildLogs } = require('./build-log');
+const buildTaskType = require('./build-task-type');
+const buildTask = require('./build-task');
 const build = require('./build');
 const domain = require('./domain');
 const event = require('./event');
@@ -15,6 +17,8 @@ const userEnvironmentVariable = require('./user-environment-variable');
 module.exports = {
   buildLog,
   bulkBuildLogs,
+  buildTaskType,
+  buildTask,
   build,
   bulkBuild,
   domain,
