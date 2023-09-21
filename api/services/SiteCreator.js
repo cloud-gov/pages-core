@@ -116,12 +116,10 @@ function buildInfrastructure(params, s3ServiceName) {
   return apiClient
     .createSiteBucket(
       s3ServiceName,
-      config.env.cfSpaceGuid,
-      config.app.s3ServicePlanId
+      config.env.cfSpaceGuid
     )
-    .then((response) => {
-      const { credentials } = response.entity;
-
+    .then(() => apiClient.fetchServiceInstanceCredentials(s3ServiceName))
+    .then((credentials) => {
       const s3 = {
         serviceName: s3ServiceName,
         bucket: credentials.bucket,

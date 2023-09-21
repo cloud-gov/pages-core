@@ -94,6 +94,6 @@ exports.up = async (db) => {
 exports.down = async (db) => {
   await db.dropTable(TABLE_NAME);
   await db.dropTable(SITE_TABLE_NAME);
-  return db.dropTable(TYPE_TABLE_NAME);
+  await db.dropTable(TYPE_TABLE_NAME);
 };
 

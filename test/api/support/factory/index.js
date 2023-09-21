@@ -3,6 +3,10 @@ const { buildLog, bulkBuildLogs } = require('./build-log');
 const buildTaskType = require('./build-task-type');
 const buildTask = require('./build-task');
 const build = require('./build');
+const {
+  createCFAPIResource,
+  createCFAPIResourceList,
+} = require('./cf-api-response');
 const domain = require('./domain');
 const event = require('./event');
 const organization = require('./organization');
@@ -21,6 +25,8 @@ module.exports = {
   buildTask,
   build,
   bulkBuild,
+  createCFAPIResource,
+  createCFAPIResourceList,
   domain,
   event,
   organization,

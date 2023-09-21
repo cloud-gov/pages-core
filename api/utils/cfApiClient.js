@@ -1,9 +1,16 @@
+const _ = require('underscore');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const HttpClient = require('./httpClient');
 
+function sleep(ms) {
+  return function runSleep(res) {
+    return new Promise(resolve => setTimeout(() => resolve(res), ms));
+  };
+}
+
 function filterEntity(res, name, field = 'name') {
   const errMsg = `Not found: Entity @${field} = ${name}`;
-  const filtered = res.resources.filter(item => item.entity[field] === name);
+  const filtered = res.resources.filter(item => item[field] === name);
   if (filtered.length === 0) {
     const error = new Error(errMsg);
     error.name = name;
@@ -12,29 +19,21 @@ function filterEntity(res, name, field = 'name') {
   return filtered;
 }
 
-function findEntity(res, name, field) {
-  return filterEntity(res, name, field)[0];
-}
-
-function findS3ServicePlan(res, name, s3ServicePlanId) {
-  const filtered = filterEntity(res, name);
-  // TODO: remove dependency on s3ServicePlanId and remove this block
-  if (name === 'basic-public') {
-    const servicePlan = filtered.find(f => f.entity.unique_id === s3ServicePlanId);
-    if (!servicePlan) {
-      const error = new Error(`Not found: @basic-public service plan = (${s3ServicePlanId})`);
-      error.name = name;
-      throw error;
-    }
-    return servicePlan;
+function findEntity(res, name, field = 'name', { errorMessage } = {}) {
+  const errMsg = errorMessage || `Not found: Entity @${field} = ${name}`;
+  const entity = res.resources.find(item => _.get(item, field) === name);
+  if (!entity) {
+    const error = new Error(errMsg);
+    error.name = name;
+    throw error;
   }
-  return filtered[0];
+  return entity;
 }
 
-function firstEntity(res, name) {
+function firstEntity(res, errorName) {
   if (res.resources.length === 0) {
     const error = new Error('Not found');
-    error.name = name;
+    error.name = errorName;
     throw error;
   }
 
@@ -43,18 +42,48 @@ function firstEntity(res, name) {
 
 function objToQueryParams(obj) {
   const qs = new URLSearchParams();
-  Object
-    .entries(obj)
-    .forEach(([key, value]) => {
-      qs.append(key, value);
-    });
+  Object.entries(obj).forEach(([key, value]) => {
+    qs.append(key, value);
+  });
   return qs;
+}
+
+function buildRequestBody({
+  type = 'managed',
+  name,
+  spaceGuid,
+  servicePlanGuid,
+  serviceInstanceGuid,
+  parameters,
+  ...props
+}) {
+  const createRelationship = (key, value) => ({
+    [key]: { data: { guid: value } },
+  });
+
+  return {
+    type,
+    name,
+    ...((serviceInstanceGuid || spaceGuid || servicePlanGuid) && {
+      relationships: {
+        ...(serviceInstanceGuid
+          && createRelationship('service_instance', serviceInstanceGuid)),
+        ...(spaceGuid && createRelationship('space', spaceGuid)),
+        ...(servicePlanGuid
+          && createRelationship('service_plan', servicePlanGuid)),
+      },
+    }),
+    ...(parameters && { parameters }),
+    ...(props && { ...props }),
+  };
 }
 
 class CloudFoundryAPIClient {
   constructor({ apiUrl, authClient } = {}) {
     this.authClient = authClient ?? new CloudFoundryAuthClient();
-    this.httpClient = new HttpClient(apiUrl ?? process.env.CLOUD_FOUNDRY_API_HOST);
+    this.httpClient = new HttpClient(
+      apiUrl ?? process.env.CLOUD_FOUNDRY_API_HOST
+    );
   }
 
   cancelTask(taskGuid) {
@@ -74,15 +103,15 @@ class CloudFoundryAPIClient {
   }
 
   fetchTaskByName(name) {
-    return this.fetchTasks({ names: name })
-      .then(tasks => tasks.find(task => task.name === name));
+    return this.fetchTasks({ names: name }).then(tasks => tasks.find(task => task.name === name));
   }
 
   fetchTasks(params) {
     const qs = objToQueryParams(params);
 
-    return this.authRequest('GET', `/v3/tasks?${qs.toString()}`)
-      .then(body => body.resources);
+    return this.authRequest('GET', `/v3/tasks?${qs.toString()}`).then(
+      body => body.resources
+    );
   }
 
   /**
@@ -102,170 +131,125 @@ class CloudFoundryAPIClient {
       origin,
       path,
       cfCdnSpaceName,
-      cfDomainWithCdnPlanGuid,
+      cfDomainWithCdnPlanGuid: servicePlanGuid,
     } = params;
 
-    const spaceGuid = await this.authRequest('GET', `/v3/spaces?names=${cfCdnSpaceName}`)
-      .then(res => res.resources[0].guid);
+    const spaceGuid = await this.authRequest(
+      'GET',
+      `/v3/spaces?names=${cfCdnSpaceName}`
+    ).then(res => res.resources[0].guid);
 
-    const body = {
-      type: 'managed',
+    const body = buildRequestBody({
+      spaceGuid,
+      servicePlanGuid,
       name,
-      relationships: {
-        space: {
-          data: {
-            guid: spaceGuid,
-          },
-        },
-        service_plan: {
-          data: {
-            guid: cfDomainWithCdnPlanGuid,
-          },
-        },
-      },
-      parameters: {
-        domains,
-        origin,
-        path,
-      },
-    };
+      parameters: { domains, origin, path },
+    });
 
     return this.authRequest('POST', '/v3/service_instances', body);
   }
 
-  createRoute(name, domainGuid, spaceGuid) {
-    const body = {
-      domain_guid: domainGuid,
-      space_guid: spaceGuid,
-      host: name,
-    };
-
-    return this.accessToken().then(token => this.request(
-      'POST',
-      '/v2/routes',
-      token,
-      body
-    ));
-  }
-
-  createS3ServiceInstance(name, serviceName, spaceGuid, s3ServicePlanId) {
-    return this.fetchS3ServicePlanGUID(serviceName, s3ServicePlanId)
-      .then((servicePlanGuid) => {
-        const body = {
-          name,
-          service_plan_guid: servicePlanGuid,
-          space_guid: spaceGuid,
-        };
-
-        return this.accessToken().then(token => this.request(
-          'POST',
-          '/v2/service_instances?accepts_incomplete=true',
-          token,
-          body
-        ));
+  createS3ServiceInstance(name, serviceName, spaceGuid) {
+    return this.fetchS3ServicePlanGUID(serviceName).then((servicePlanGuid) => {
+      const body = buildRequestBody({
+        name,
+        servicePlanGuid,
+        spaceGuid,
       });
+
+      return this.accessToken().then(token => this.request('POST', '/v3/service_instances', token, body));
+    });
   }
 
-  createServiceKey(serviceInstanceName, serviceInstanceGuid, keyIdentifier = 'key') {
-    const body = {
+  createServiceKey(
+    serviceInstanceName,
+    serviceInstanceGuid,
+    keyIdentifier = 'key'
+  ) {
+    const body = buildRequestBody({
+      type: 'key',
       name: `${serviceInstanceName}-${keyIdentifier}`,
-      service_instance_guid: serviceInstanceGuid,
-    };
+      serviceInstanceGuid,
+    });
 
-    return this.accessToken().then(token => this.request(
-      'POST',
-      '/v2/service_keys',
-      token,
-      body
-    ));
+    return this.accessToken().then(token => this.request('POST', '/v3/service_credential_bindings', token, body));
   }
 
-  createSiteBucket(name, spaceGuid, s3ServicePlanId, keyIdentifier = 'key', serviceName = 'basic-vpc') {
-    return this.createS3ServiceInstance(name, serviceName, spaceGuid, s3ServicePlanId)
-      .then(res => this.createServiceKey(name, res.metadata.guid, keyIdentifier));
+  createSiteBucket(
+    name,
+    spaceGuid,
+    keyIdentifier = 'key',
+    serviceName = 'basic-vpc'
+  ) {
+    return this.createS3ServiceInstance(name, serviceName, spaceGuid)
+      .then(() => this.retry('fetchServiceInstance', name))
+      .then(res => this.createServiceKey(name, res.guid, keyIdentifier))
+      .then(() => this.retry(
+        'fetchCredentialBindingsInstance',
+        `${name}-${keyIdentifier}`
+      ));
   }
 
   deleteRoute(host) {
     return this.accessToken()
-      .then(token => this.request(
-        'GET',
-        `/v2/routes?q=host:${host}`,
-        token
-      ))
+      .then(token => this.request('GET', `/v3/routes?hosts=${host}`, token))
       .then(res => findEntity(res, host, 'host'))
-      .then(entity => this.accessToken()
-        .then(token => this.request(
-          'DELETE',
-          `/v2/routes/${entity.metadata.guid}?recursive=true&async=true`,
-          token
-        )));
+      .then(entity => this.accessToken().then(token => this.request('DELETE', `/v3/routes/${entity.guid}`, token)));
   }
 
   deleteServiceInstance(name) {
     return this.fetchServiceInstance(name)
-      .then(instance => this.accessToken().then(token => this.request(
-        'DELETE',
-        `/v2/service_instances/${instance.metadata.guid}?accepts_incomplete=true&recursive=true&async=true`,
-        token
-      ).then(() => ({
-        metadata: {
-          guid: instance.metadata.guid,
-        },
-      }))));
+      .then(instance => this.accessToken()
+        .then(token => this.request(
+          'DELETE',
+          `/v3/service_instances/${instance.guid}`,
+          token
+        )
+          .then(() => ({
+            guid: instance.guid,
+          }))));
   }
 
   fetchServiceInstance(name) {
-    return this.fetchServiceInstances(name)
+    return this.fetchServiceInstances(name).then(res => findEntity(res, name));
+  }
+
+  fetchCredentialBindingsInstance(name) {
+    const path = `/v3/service_credential_bindings?names=${name}`;
+
+    return this.accessToken()
+      .then(token => this.request('GET', path, token))
       .then(res => findEntity(res, name));
   }
 
   fetchServiceInstanceCredentials(name) {
-    return this.fetchServiceInstance(name)
-      .then(instance => this.accessToken().then(token => this.request(
+    return this.accessToken()
+      .then(token => this.request(
         'GET',
-        `/v2/service_instances/${instance.metadata.guid}/service_keys`,
+        `/v3/service_credential_bindings?service_instance_names=${name}`,
+        token
+      ))
+      .then(resources => firstEntity(resources, `${name} Service Keys`))
+      .then(({ guid }) => this.accessToken().then(token => this.request(
+        'GET',
+        `/v3/service_credential_bindings/${guid}/details`,
         token
       )))
-      .then(keys => firstEntity(keys, `${name} Service Keys`))
-      .then(key => key.entity.credentials);
+      .then(resource => resource.credentials);
   }
 
   fetchServiceInstances(name = null) {
-    const query = name ? `?q=name:${name}` : '';
-    const path = `/v2/service_instances${query}`;
+    const query = name ? `?names=${name}` : '';
+    const path = `/v3/service_instances${query}`;
 
-    return this.accessToken().then(token => this.request(
-      'GET',
-      path,
-      token
-    ));
+    return this.accessToken().then(token => this.request('GET', path, token));
   }
 
-  fetchServiceKey(name) {
-    return this.fetchServiceKeys()
-      .then(res => findEntity(res, name))
-      .then(key => this.accessToken().then(token => this.request(
-        'GET',
-        `/v2/service_keys/${key.metadata.guid}`,
-        token
-      )));
-  }
-
-  fetchServiceKeys() {
-    return this.accessToken().then(token => this.request(
-      'GET',
-      '/v2/service_keys',
-      token
-    ));
-  }
-
-  fetchS3ServicePlanGUID(serviceName, s3ServicePlanId) {
-    return this.accessToken().then(token => this.request(
-      'GET',
-      '/v2/service_plans?results-per-page=100',
-      token
-    )).then(res => findS3ServicePlan(res, serviceName, s3ServicePlanId))
-      .then(service => service.metadata.guid);
+  fetchS3ServicePlanGUID(serviceName) {
+    return this.accessToken()
+      .then(token => this.request('GET', `/v3/service_plans?names=${serviceName}`, token))
+      .then(res => firstEntity(res, `Not found: @${serviceName} service plan.`))
+      .then(service => service.guid);
   }
 
   // Private methods
@@ -273,15 +257,46 @@ class CloudFoundryAPIClient {
     return this.authClient.accessToken();
   }
 
+  retry(
+    methodName,
+    args,
+    {
+      res, retries = 0, totalRetries = 20, sleepInterval = 1000,
+    } = {}
+  ) {
+    const methodArgs = typeof args === 'string' ? [args] : args;
+
+    if (retries >= totalRetries) {
+      return res;
+    }
+
+    if (
+      !res
+      || ['initial', 'in progress'].includes(res?.last_operation?.state)
+    ) {
+      return this[methodName](...methodArgs)
+        .then(sleep(retries * sleepInterval))
+        .then(next => this.retry(methodName, methodArgs, {
+          res: next,
+          retries: retries + 1,
+          totalRetries,
+          sleepInterval,
+        }));
+    }
+
+    return res;
+  }
+
   request(method, path, accessToken, json) {
-    return this.httpClient.request({
-      method,
-      url: path,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      data: json,
-    })
+    return this.httpClient
+      .request({
+        method,
+        url: path,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data: json,
+      })
       .then(response => response.data);
   }
 
@@ -292,8 +307,8 @@ class CloudFoundryAPIClient {
 
 CloudFoundryAPIClient.filterEntity = filterEntity;
 CloudFoundryAPIClient.findEntity = findEntity;
-CloudFoundryAPIClient.findS3ServicePlan = findS3ServicePlan;
 CloudFoundryAPIClient.firstEntity = firstEntity;
 CloudFoundryAPIClient.objToQueryParams = objToQueryParams;
+CloudFoundryAPIClient.buildRequestBody = buildRequestBody;
 
 module.exports = CloudFoundryAPIClient;

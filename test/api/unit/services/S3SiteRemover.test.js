@@ -11,8 +11,8 @@ const s3ServiceName = 'site-service';
 const s3ServiceGuid = 'site-service-guid';
 const awsBucketName = 'site-bucket-name';
 
-const mapSiteContents = objects => ({
-  Contents: objects.map(Key => ({ Key })),
+const mapSiteContents = (objects) => ({
+  Contents: objects.map((Key) => ({ Key })),
 });
 
 const buildCacheObjects = (bucket) => {
@@ -32,23 +32,27 @@ const buildSiteObjects = (qualifier = 'site', site, bucket) => {
 };
 
 function createServiceNocks(serviceName, guid, bucketName) {
-  const serviceInstanceResponse = factory.responses.service({
+  const serviceInstanceResponse = factory.createCFAPIResource({
     guid,
-  }, {
     name: serviceName,
   });
-  apiNocks.mockFetchServiceInstancesRequest({ resources: [serviceInstanceResponse] }, serviceName);
 
-  const credentialsReponse = factory.responses.service({}, {
-    credentials: factory.responses.credentials({
-      access_key_id: '',
-      secret_access_key: '',
-      region: '',
-      bucket: bucketName,
-    }),
-    guid,
+  apiNocks.mockFetchServiceInstancesRequest(
+    factory.createCFAPIResourceList({ resources: [serviceInstanceResponse] }),
+    serviceName
+  );
+
+  const credentialsResponse = factory.responses.credentials({
+    access_key_id: '',
+    secret_access_key: '',
+    region: '',
+    bucket: bucketName,
   });
-  apiNocks.mockFetchServiceInstanceCredentialsRequest(guid, { resources: [credentialsReponse] });
+
+  apiNocks.mockFetchServiceInstanceCredentialsRequest(serviceName, {
+    guid,
+    credentials: credentialsResponse
+  });
 }
 
 describe('S3SiteRemover', () => {
@@ -89,7 +93,9 @@ describe('S3SiteRemover', () => {
         } else if (params.Prefix === `demo/${site.owner}/${site.repository}/`) {
           demoObjectWereListed = true;
           cb(null, mapSiteContents(demoObjectsToDelete));
-        } else if (params.Prefix === `preview/${site.owner}/${site.repository}/`) {
+        } else if (
+          params.Prefix === `preview/${site.owner}/${site.repository}/`
+        ) {
           previewObjectsWereListed = true;
           cb(null, mapSiteContents(previewObjectsToDelete));
         } else if (params.Prefix === '_cache/') {
@@ -126,28 +132,31 @@ describe('S3SiteRemover', () => {
         cb(null, {});
       };
 
-      factory.site({
-        awsBucketName,
-        s3ServiceName,
-      }).then((model) => {
-        site = model;
+      factory
+        .site({
+          awsBucketName,
+          s3ServiceName,
+        })
+        .then((model) => {
+          site = model;
 
-        buildSiteObjects('site', site, siteObjectsToDelete);
-        buildSiteObjects('demo', site, demoObjectsToDelete);
-        buildSiteObjects('preview', site, previewObjectsToDelete);
-        buildCacheObjects(cacheObjectsToDelete);
+          buildSiteObjects('site', site, siteObjectsToDelete);
+          buildSiteObjects('demo', site, demoObjectsToDelete);
+          buildSiteObjects('preview', site, previewObjectsToDelete);
+          buildCacheObjects(cacheObjectsToDelete);
 
-        return S3SiteRemover.removeSite(site);
-      }).then(() => {
-        expect(siteObjectsWereListed).to.equal(true);
-        expect(demoObjectWereListed).to.equal(true);
-        expect(previewObjectsWereListed).to.equal(true);
-        expect(cacheObjectsWereListed).to.equal(true);
-        expect(objectsWereDeleted).to.equal(true);
-        expect(objectsToDelete.length).to.equal(0);
+          return S3SiteRemover.removeSite(site);
+        })
+        .then(() => {
+          expect(siteObjectsWereListed).to.equal(true);
+          expect(demoObjectWereListed).to.equal(true);
+          expect(previewObjectsWereListed).to.equal(true);
+          expect(cacheObjectsWereListed).to.equal(true);
+          expect(objectsWereDeleted).to.equal(true);
+          expect(objectsToDelete.length).to.equal(0);
 
-        done();
-      })
+          done();
+        });
     });
 
     it('should delete objects in batches of 1000 at a time', (done) => {
@@ -156,9 +165,12 @@ describe('S3SiteRemover', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) => cb(null, {
-        Contents: Array(800).fill(0).map(() => ({ Key: 'abc123' })),
-      });
+      AWSMocks.mocks.S3.listObjectsV2 = (params, cb) =>
+        cb(null, {
+          Contents: Array(800)
+            .fill(0)
+            .map(() => ({ Key: 'abc123' })),
+        });
 
       AWSMocks.mocks.S3.deleteObjects = (params, cb) => {
         expect(params.Delete.Objects).to.have.length.at.most(1000);
@@ -166,11 +178,12 @@ describe('S3SiteRemover', () => {
         cb();
       };
 
-      factory.site()
-        .then(site => S3SiteRemover.removeSite(site))
+      factory
+        .site()
+        .then((site) => S3SiteRemover.removeSite(site))
         .then(() => {
-        // 800 site, 800 demo, 800 preview, 800 cache objects, robots.txt = 3201 total
-        // 3201 objects means 4 groups of 1000
+          // 800 site, 800 demo, 800 preview, 800 cache objects, robots.txt = 3201 total
+          // 3201 objects means 4 groups of 1000
           expect(deleteObjectsCallCount).to.equal(4);
           done();
         });
@@ -180,8 +193,9 @@ describe('S3SiteRemover', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials(false);
 
-      factory.site()
-        .then(site => S3SiteRemover.removeSite(site))
+      factory
+        .site()
+        .then((site) => S3SiteRemover.removeSite(site))
         .then(done);
     });
   });
@@ -198,17 +212,20 @@ describe('S3SiteRemover', () => {
       apiNocks.mockDeleteService(s3Service, s3Guid);
       apiNocks.mockDeleteRoute(routeName, routeGuid);
 
-      factory.site({
-        s3ServiceName: s3Service,
-        awsBucketName: routeName,
-      }).then((model) => {
-        site = model;
+      factory
+        .site({
+          s3ServiceName: s3Service,
+          awsBucketName: routeName,
+        })
+        .then((model) => {
+          site = model;
 
-        return S3SiteRemover.removeInfrastructure(site);
-      }).then((res) => {
-        expect(res.metadata.guid).to.equal(s3Guid);
-        done();
-      });
+          return S3SiteRemover.removeInfrastructure(site);
+        })
+        .then((res) => {
+          expect(res.guid).to.equal(s3Guid);
+          done();
+        });
     });
 
     it('should resolve when services do not exist', (done) => {
@@ -222,14 +239,16 @@ describe('S3SiteRemover', () => {
       apiNocks.mockDeleteService(s3Service, s3Guid, false);
       apiNocks.mockDeleteRoute(routeName, routeGuid, false);
 
-      factory.site({
-        s3ServiceName: s3Service,
-        awsBucketName: routeName,
-      }).then((model) => {
-        site = model;
+      factory
+        .site({
+          s3ServiceName: s3Service,
+          awsBucketName: routeName,
+        })
+        .then((model) => {
+          site = model;
 
-        return S3SiteRemover.removeInfrastructure(site);
-      })
+          return S3SiteRemover.removeInfrastructure(site);
+        })
         .then(done);
     });
   });
