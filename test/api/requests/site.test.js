@@ -251,7 +251,7 @@ describe('Site API', () => {
   describe('POST /v0/site', () => {
     function createMockVariables(owner, repository) {
       return {
-        name: `owner-${owner}-repo-${repository}`,
+        name: `o-${owner}-r-${repository}`,
         bucketGuid: 'bucket-guid',
         s3: {
           accessKeyId: crypto.randomBytes(3).toString('hex'),
@@ -262,67 +262,73 @@ describe('Site API', () => {
       };
     }
 
-    function createKeyResponse(name, bucketGuid, s3) {
-      const { accessKeyId, bucket, region, secretAccessKey } = s3;
-
-      return factory.responses.service(
-        {},
-        {
-          name: `${name}-key`,
-          service_instance_guid: bucketGuid,
-          credentials: factory.responses.credentials({
-            access_key_id: accessKeyId,
-            secret_access_key: secretAccessKey,
-            region,
-            bucket,
-          }),
-        }
-      );
-    }
-
-    function mockBuildResponse(name, bucketGuid, s3) {
-      const keyResponse = createKeyResponse(name, bucketGuid, s3);
-      const response = { resources: [keyResponse] };
-
-      apiNocks.mockFetchServiceInstancesRequest(response);
-      apiNocks.mockFetchServiceInstanceCredentialsRequest(
-        'test-guid',
-        response
-      );
-    }
-
-    function mockKeyResponse(name, bucketGuid, s3) {
-      const keyRequestBody = { name, service_instance_guid: bucketGuid };
-      const keyResponse = createKeyResponse(name, bucketGuid, s3);
-
-      apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
-    }
-
-    function mockPlanResponse(name, bucketGuid) {
-      const planName = 'basic-vpc';
-      const planGuid = 'plan-guid';
-      const planResponses = {
-        resources: [
-          factory.responses.service({ guid: planGuid }, { name: planName }),
-        ],
-      };
-      const bucketResponse = factory.responses.service(
-        { guid: bucketGuid },
-        { name }
-      );
-      const instanceRequestBody = { name, service_plan_guid: planGuid };
-
-      apiNocks.mockFetchS3ServicePlanGUID(planResponses);
-      apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
-    }
-
     function cfMockServices(owner, repository) {
       const { bucketGuid, name, s3 } = createMockVariables(owner, repository);
 
+      siteParams = {
+        owner: crypto.randomBytes(10).toString('hex'),
+        repository: crypto.randomBytes(10).toString('hex'),
+      };
+
+      const keyName = `${name}-key`;
+      const planName = 'basic-vpc';
+      const planGuid = 'plan-guid';
+      const instanceRequestBody = { name, service_plan_guid: planGuid };
+      const keyRequestBody = {
+        name: keyName,
+        serviceInstanceGuid: bucketGuid,
+      };
+
+      const planResponses = factory.createCFAPIResourceList({
+        resources: [
+          factory.createCFAPIResource({ guid: planGuid, name: planName }),
+        ],
+      });
+      const bucketResponse = factory.createCFAPIResource({
+        guid: bucketGuid,
+        name,
+      });
+
+      const keyResponse = factory.createCFAPIResource({
+        name: keyName,
+        serviceInstanceGuid: bucketGuid,
+      });
+
+      const keyCredentials = factory.responses.credentials({
+        access_key_id: s3.accessKeyId,
+        secret_access_key: s3.secretAccessKey,
+        region: s3.region,
+        bucket: s3.bucket,
+      });
+
+      const serviceInstanceResponses = factory.createCFAPIResourceList({
+        resources: [
+          factory.createCFAPIResource({
+            name,
+            guid: bucketGuid,
+          }),
+        ],
+      });
+
+      const buildResponses = factory.createCFAPIResourceList({
+        resources: [
+          factory.createCFAPIResource({
+            name,
+            service_instance_guid: bucketGuid,
+          }),
+        ],
+      });
+
       mockTokenRequest();
-      mockPlanResponse(name, bucketGuid);
-      mockKeyResponse(name, bucketGuid, s3);
-      mockBuildResponse(name, bucketGuid, s3);
+      apiNocks.mockFetchS3ServicePlanGUID(planResponses, planName);
+      apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
+      apiNocks.mockFetchServiceInstancesRequest(serviceInstanceResponses, name);
+      apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
+      apiNocks.mockFetchServiceInstancesRequest(buildResponses);
+      apiNocks.mockFetchServiceInstanceCredentialsRequest(name, {
+        guid: keyResponse.guid,
+        credentials: keyCredentials,
+      });
     }
 
     beforeEach(() => {
@@ -2117,7 +2123,10 @@ describe('Site API', () => {
 
       it('should render a list of domains associated with a site', async () => {
         const user = await factory.user();
-        const site = await factory.site({ users: [user.id], demoBranch: 'demo' });
+        const site = await factory.site({
+          users: [user.id],
+          demoBranch: 'demo',
+        });
         const domain1 = await factory.domain.create({
           siteId: site.id,
           context: 'site',

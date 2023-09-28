@@ -19,7 +19,7 @@ describe('CloudFoundryAPIClient Delete', () => {
 
       cfApiClient.deleteRoute(routeName)
         .then((res) => {
-          expect(res.metadata.guid).to.equal(guid);
+          expect(res.guid).to.equal(guid);
           done();
         })
         .catch(done);
@@ -55,7 +55,7 @@ describe('CloudFoundryAPIClient Delete', () => {
 
       cfApiClient.deleteServiceInstance(s3Service)
         .then((res) => {
-          expect(res.metadata.guid).to.equal(guid);
+          expect(res.guid).to.equal(guid);
           done();
         })
         .catch(done);

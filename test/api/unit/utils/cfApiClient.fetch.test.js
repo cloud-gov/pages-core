@@ -5,7 +5,7 @@ const config = require('../../../../config');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
-const responses = require('../../support/factory/responses');
+const factory = require('../../support/factory');
 
 describe('CloudFoundryAPIClient', () => {
   afterEach(() => {
@@ -15,191 +15,103 @@ describe('CloudFoundryAPIClient', () => {
 
   describe('.fetchServiceInstances', () => {
     it('should return the service instances for a space', (done) => {
-      const instanceResponses = {
-        resources: [
-          responses.service(),
-          responses.service(),
-          responses.service(),
-        ],
-      };
+      const instance1 = factory.createCFAPIResource();
+      const instance2 = factory.createCFAPIResource();
+      const instance3 = factory.createCFAPIResource();
+      const instanceResponses = factory.createCFAPIResourceList({
+        resources: [instance1, instance2, instance3],
+      });
 
       mockTokenRequest();
       apiNocks.mockFetchServiceInstancesRequest(instanceResponses);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstances()
+      apiClient
+        .fetchServiceInstances()
         .then((res) => {
           expect(res).to.deep.equal(instanceResponses);
           done();
-        });
+        })
+        .catch(done);
     });
   });
 
   describe('.fetchServiceInstance', () => {
     it('should return the service instance by name', (done) => {
-      const guid = 'testing-guid';
       const name = 'testing-service-name';
 
-      const instanceResponses = {
-        resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
-        ],
-      };
+      const instance1 = factory.createCFAPIResource({ name });
+      const instance2 = factory.createCFAPIResource();
+      const instance3 = factory.createCFAPIResource();
+      const instanceResponses = factory.createCFAPIResourceList({
+        resources: [instance1, instance2, instance3],
+      });
 
       mockTokenRequest();
       apiNocks.mockFetchServiceInstancesRequest(instanceResponses, name);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstance(name)
+      apiClient
+        .fetchServiceInstances(name)
         .then((res) => {
-          expect(res).to.deep.equal(instanceResponses.resources[0]);
+          expect(res).to.deep.equal(instanceResponses);
           done();
-        });
+        })
+        .catch(done);
     });
 
     it('should reject when service instance does not exist', (done) => {
       const name = 'not-an-instance';
-
       const message = `Not found: Entity @name = ${name}`;
-
-      const instancesResponse = {
-        resources: [
-          responses.service(),
-          responses.service(),
-        ],
-      };
+      const instance1 = factory.createCFAPIResource();
+      const instance2 = factory.createCFAPIResource();
+      const instance3 = factory.createCFAPIResource();
+      const instanceResponses = factory.createCFAPIResourceList({
+        resources: [instance1, instance2, instance3],
+      });
 
       mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instancesResponse, name);
+      apiNocks.mockFetchServiceInstancesRequest(instanceResponses, name);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstance(name)
-        .catch((err) => {
-          expect(err.message).to.deep.equal(message);
-          expect(err.name).to.equal(name);
-          done();
-        });
+      apiClient.fetchServiceInstance(name).catch((err) => {
+        expect(err.message).to.deep.equal(message);
+        expect(err.name).to.equal(name);
+        done();
+      });
     });
   });
 
   describe('.fetchServiceInstanceCredentials', () => {
     it('should return the service key credentials instance by name', (done) => {
-      const guid = 'testing-guid';
-      const name = 'testing-service-name';
-      const keyName = `${name}-key`;
-      const credentials = responses.credentials({
+      const serviceInstanceName = 'testing-service-name';
+      const keyGuid = 'testing-guid';
+      const keyCredentials = {
         bucket: 'test-bucket',
         region: 'test-region',
         access_key_id: 'access-key-id',
         secret_access_key: 'secret-access-key',
-      });
-
-      const instanceResponses = {
-        resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
-        ],
       };
 
-      const keyResponses = {
-        resources: [
-          responses.service(
-            {},
-            {
-              name: keyName,
-              credentials,
-            }
-          ),
-          responses.service(),
-          responses.service(),
-        ],
+      const keyResponse = {
+        guid: keyGuid,
+        credentials: keyCredentials,
       };
 
       mockTokenRequest();
-      apiNocks.mockFetchServiceInstancesRequest(instanceResponses, name);
-      apiNocks.mockFetchServiceInstanceCredentialsRequest(guid, keyResponses);
+      apiNocks.mockFetchServiceInstanceCredentialsRequest(
+        serviceInstanceName,
+        keyResponse
+      );
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceInstanceCredentials(name)
+      apiClient
+        .fetchServiceInstanceCredentials(serviceInstanceName)
         .then((res) => {
-          expect(res).to.deep.equal(credentials);
+          expect(res).to.deep.equal(keyCredentials);
           done();
-        });
-    });
-  });
-
-  describe('.fetchServiceKeys', () => {
-    it('should return the service keys for a space', (done) => {
-      const keyResponses = {
-        resources: [
-          responses.service(),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceKeysRequest(keyResponses);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceKeys()
-        .then((res) => {
-          expect(res).to.deep.equal(keyResponses);
-          done();
-        });
-    });
-  });
-
-  describe('.fetchServiceKey', () => {
-    it('should return the service key by name', (done) => {
-      const guid = 'testing-guid';
-      const name = 'testing-service-name';
-
-      const keyResponses = {
-        resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceKeysRequest(keyResponses);
-      apiNocks.mockFetchServiceKeyRequest(guid, keyResponses.resources[0]);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceKey(name)
-        .then((res) => {
-          expect(res).to.deep.equal(keyResponses.resources[0]);
-          done();
-        });
-    });
-
-    it('should reject when service key does not exist', (done) => {
-      const name = 'not-a-key';
-
-      const message = `Not found: Entity @name = ${name}`;
-
-      const keysResponse = {
-        resources: [
-          responses.service(),
-          responses.service(),
-        ],
-      };
-
-      mockTokenRequest();
-      apiNocks.mockFetchServiceKeysRequest(keysResponse);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchServiceKey(name)
-        .catch((err) => {
-          expect(err.message).to.equal(message);
-          expect(err.name).to.equal(name);
-          done();
-        });
+        })
+        .catch(done);
     });
   });
 
@@ -208,19 +120,20 @@ describe('CloudFoundryAPIClient', () => {
       const guid = 'testing-guid';
       const name = 'testing-service-name';
 
-      const response = {
+      const response = factory.createCFAPIResourceList({
         resources: [
-          responses.service({ guid }, { name }),
-          responses.service(),
-          responses.service(),
+          factory.createCFAPIResource({ guid, name }),
+          factory.createCFAPIResource(),
+          factory.createCFAPIResource(),
         ],
-      };
+      });
 
       mockTokenRequest();
-      apiNocks.mockFetchS3ServicePlanGUID(response);
+      apiNocks.mockFetchS3ServicePlanGUID(response, name);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
+      apiClient
+        .fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
         .then((res) => {
           expect(res).to.deep.equal(guid);
           done();
@@ -229,24 +142,19 @@ describe('CloudFoundryAPIClient', () => {
 
     it('should reject when service plan is not found', (done) => {
       const name = 'not-a-service-plan';
-
-      const message = `Not found: Entity @name = ${name}`;
-
-      const response = {
-        resources: [
-          responses.service(),
-          responses.service(),
-        ],
-      };
+      const message = `Not found: @${name} service plan.`;
+      const response = factory.createCFAPIResourceList({
+        resources: [],
+      });
 
       mockTokenRequest();
-      apiNocks.mockFetchS3ServicePlanGUID(response);
+      apiNocks.mockFetchS3ServicePlanGUID(response, name);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient.fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
+      apiClient
+        .fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
         .catch((err) => {
-          expect(err.message).to.equal(message);
-          expect(err.name).to.equal(name);
+          expect(err.name).to.equal(message);
           done();
         });
     });
@@ -264,7 +172,10 @@ describe('CloudFoundryAPIClient', () => {
 
       const result = await apiClient.fetchBuildTask(buildId);
 
-      sinon.assert.calledOnceWithExactly(fetchTaskByNameStub, `build-${buildId}`);
+      sinon.assert.calledOnceWithExactly(
+        fetchTaskByNameStub,
+        `build-${buildId}`
+      );
       expect(result).to.equal(stubResult);
     });
   });
@@ -273,10 +184,7 @@ describe('CloudFoundryAPIClient', () => {
     describe('when the task is found', () => {
       it('returns the only the named task from the results of `fetchTasks`', async () => {
         const name = 'foo';
-        const stubResult = [
-          { name },
-          { name: 'bar' },
-        ];
+        const stubResult = [{ name }, { name: 'bar' }];
 
         const apiClient = new CloudFoundryAPIClient();
 
@@ -293,10 +201,7 @@ describe('CloudFoundryAPIClient', () => {
     describe('when the task is not found', () => {
       it('returns undefined', async () => {
         const name = 'foo';
-        const stubResult = [
-          { name: 'baz' },
-          { name: 'bar' },
-        ];
+        const stubResult = [{ name: 'baz' }, { name: 'bar' }];
 
         const apiClient = new CloudFoundryAPIClient();
 
@@ -313,10 +218,7 @@ describe('CloudFoundryAPIClient', () => {
 
   describe('.fetchTasks', () => {
     it('makes an authenticated request to the GET tasks endpoint with appropriate query parameters', async () => {
-      const tasks = [
-        { name: 'foo' },
-        { name: 'bar' },
-      ];
+      const tasks = [{ name: 'foo' }, { name: 'bar' }];
       const stubResult = { resources: tasks };
 
       const apiClient = new CloudFoundryAPIClient();
@@ -326,7 +228,11 @@ describe('CloudFoundryAPIClient', () => {
 
       const result = await apiClient.fetchTasks({ names: 'foo' });
 
-      sinon.assert.calledOnceWithExactly(authRequestStub, 'GET', '/v3/tasks?names=foo');
+      sinon.assert.calledOnceWithExactly(
+        authRequestStub,
+        'GET',
+        '/v3/tasks?names=foo'
+      );
       expect(result).to.deep.equal(tasks);
     });
   });
@@ -362,7 +268,7 @@ describe('CloudFoundryAPIClient', () => {
         const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
         cancelTaskStub.resolves();
 
-        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
+        const error = await apiClient.cancelBuildTask(buildId).catch((e) => e);
 
         sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
         sinon.assert.notCalled(cancelTaskStub);
@@ -382,7 +288,7 @@ describe('CloudFoundryAPIClient', () => {
         const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
         cancelTaskStub.rejects();
 
-        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
+        const error = await apiClient.cancelBuildTask(buildId).catch((e) => e);
 
         sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
         sinon.assert.calledOnceWithExactly(cancelTaskStub, taskGuid);
@@ -402,7 +308,79 @@ describe('CloudFoundryAPIClient', () => {
 
       await apiClient.cancelTask(taskGuid);
 
-      sinon.assert.calledOnceWithExactly(authRequestStub, 'POST', `/v3/tasks/${taskGuid}/actions/cancel`);
+      sinon.assert.calledOnceWithExactly(
+        authRequestStub,
+        'POST',
+        `/v3/tasks/${taskGuid}/actions/cancel`
+      );
+    });
+  });
+
+  describe('.retry', () => {
+    it('should retry fetching until last operation state is succeeded', async () => {
+      const name = 'instance-name';
+      const method = 'fetchServiceInstances';
+      const resource1stCall = factory.createCFAPIResource({
+        name,
+        last_operation: { state: 'initial' },
+      });
+      const resource2ndCall = factory.createCFAPIResource({
+        name,
+        last_operation: { state: 'in progress' },
+      });
+      const resource3rdCall = factory.createCFAPIResource({
+        name,
+        last_operation: { state: 'succeeded' },
+      });
+      const apiClient = new CloudFoundryAPIClient();
+
+      const authRequestStub = sinon.stub(apiClient, method);
+      authRequestStub
+        .onFirstCall()
+        .resolves(resource1stCall)
+        .onSecondCall()
+        .resolves(resource2ndCall)
+        .onThirdCall()
+        .resolves(resource3rdCall);
+
+      const response = await apiClient.retry(method, name, {
+        sleepInterval: 1,
+      });
+
+      sinon.assert.calledThrice(authRequestStub);
+      expect(response).to.deep.equal(resource3rdCall);
+    });
+
+    it('should retry fetching up to 5 times and returns last fetched result', async () => {
+      const name = 'instance-name';
+      const totalRetries = 5;
+      const method = 'fetchServiceInstances';
+      const resource = factory.createCFAPIResource({
+        name,
+        last_operation: { state: 'initial' },
+      });
+      const apiClient = new CloudFoundryAPIClient();
+
+      const authRequestStub = sinon.stub(apiClient, method);
+      authRequestStub
+        .onCall(0)
+        .resolves(resource)
+        .onCall(1)
+        .resolves(resource)
+        .onCall(2)
+        .resolves(resource)
+        .onCall(3)
+        .resolves(resource)
+        .onCall(4)
+        .resolves(resource)
+
+      const response = await apiClient.retry(method, name, {
+        sleepInterval: 1,
+        totalRetries,
+      });
+
+      sinon.assert.callCount(authRequestStub, 5);
+      expect(response).to.deep.equal(resource);
     });
   });
 });

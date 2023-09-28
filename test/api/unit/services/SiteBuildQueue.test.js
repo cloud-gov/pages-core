@@ -280,7 +280,7 @@ describe('SiteBuildQueue', () => {
       });
 
       /////////////////////////
-      //  Verify if we actually use the path in a domain name 
+      //  Verify if we actually use the path in a domain name
       //  since the Domain table validates names field to ensure
       //  they are fully qualified domains without paths
       ///////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ describe('SiteBuildQueue', () => {
 
     context("building a site's demo branch", () => {
       it('should set an empty string for BASEURL in the message for a site with a demo domain', (done) => {
-        const branch = 'demo'
+        const branch = 'demo';
         const domains = ['https://example.com', 'https://example.com/'];
 
         const baseurlPromises = domains.map((domain) =>
@@ -434,9 +434,8 @@ describe('SiteBuildQueue', () => {
           .catch(done);
       });
 
-
       /////////////////////////
-      //  Verify if we actually use the path in a domain name 
+      //  Verify if we actually use the path in a domain name
       //  since the Domain table validates names field to ensure
       //  they are fully qualified domains without paths
       ///////////////////////////////////////////////////////

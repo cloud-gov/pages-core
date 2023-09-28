@@ -2,7 +2,6 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
 const sinon = require('sinon');
-const config = require('../../../../config/env/test');
 const apiConfig = require('../../../../config');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
@@ -10,7 +9,12 @@ const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
-const { Build, Site, User, SiteBranchConfig } = require('../../../../api/models');
+const {
+  Build,
+  Site,
+  User,
+  SiteBranchConfig,
+} = require('../../../../api/models');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 
 describe('SiteCreator', () => {
@@ -48,241 +52,217 @@ describe('SiteCreator', () => {
       expect(site.webhookId).to.not.be.null;
     };
 
-    const afterCreateSite = (owner, repository) => Site.findOne({
-      where: {
-        owner,
-        repository,
-      },
-      include: [User, Build, SiteBranchConfig],
-    });
+    const afterCreateSite = (owner, repository) =>
+      Site.findOne({
+        where: {
+          owner,
+          repository,
+        },
+        include: [User, Build, SiteBranchConfig],
+      });
 
     context('from a GitHub repo', () => {
       let siteParams, name;
 
       beforeEach(() => {
         siteParams = {
-          owner: crypto.randomBytes(10).toString("hex"),
-          repository: crypto.randomBytes(10).toString("hex"),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
         };
 
         name = `o-${siteParams.owner}-r-${siteParams.repository}`;
 
-        const routeGuid = "route-12345";
         const keyName = `${name}-key`;
-        const planName = "basic-vpc";
-        const planGuid = "plan-guid";
-        const bucketGuid = "bucket-guid";
-        const accessKeyId = crypto.randomBytes(10).toString("hex");
-        const secretAccessKey = crypto.randomBytes(10).toString("hex");
-        const region = "us-gov-other-1";
-        const bucket = "testing-bucket";
+        const planName = 'basic-vpc';
+        const planGuid = 'plan-guid';
+        const bucketGuid = 'bucket-guid';
+        const accessKeyId = crypto.randomBytes(10).toString('hex');
+        const secretAccessKey = crypto.randomBytes(10).toString('hex');
+        const region = 'us-gov-other-1';
+        const bucket = 'testing-bucket';
 
         const instanceRequestBody = { name, service_plan_guid: planGuid };
-        const keyRequestBody = { name, service_instance_guid: bucketGuid };
-
-        const planResponses = {
-          resources: [
-            factory.responses.service({ guid: planGuid }, { name: planName }),
-          ],
+        const keyRequestBody = {
+          name: keyName,
+          serviceInstanceGuid: bucketGuid,
         };
-        const bucketResponse = factory.responses.service(
-          { guid: bucketGuid },
-          { name }
-        );
-        const keyResponse = factory.responses.service(
-          {},
-          {
-            name: keyName,
-            service_instance_guid: bucketGuid,
-            credentials: factory.responses.credentials({
-              access_key_id: accessKeyId,
-              secret_access_key: secretAccessKey,
-              region,
-              bucket,
+
+        const planResponses = factory.createCFAPIResourceList({
+          resources: [
+            factory.createCFAPIResource({ guid: planGuid, name: planName }),
+          ],
+        });
+        const bucketResponse = factory.createCFAPIResource({
+          guid: bucketGuid,
+          name,
+        });
+
+        const keyResponse = factory.createCFAPIResource({
+          name: keyName,
+          serviceInstanceGuid: bucketGuid,
+        });
+
+        const keyCredentials = factory.responses.credentials({
+          access_key_id: accessKeyId,
+          secret_access_key: secretAccessKey,
+          region,
+          bucket,
+        });
+
+        const serviceInstanceResponses = factory.createCFAPIResourceList({
+          resources: [
+            factory.createCFAPIResource({
+              name,
+              guid: bucketGuid,
             }),
-          }
-        );
-
-        const buildResponses = {
-          resources: [
-            factory.responses.service(
-              {},
-              {
-                name,
-                service_instance_guid: bucketGuid,
-                credentials: factory.responses.credentials({
-                  access_key_id: accessKeyId,
-                  secret_access_key: secretAccessKey,
-                  region,
-                  bucket,
-                }),
-              }
-            ),
           ],
-        };
+        });
 
-        const serviceCredentialsResponses = {
-          resources: [keyResponse],
-        };
-
-        const routeResponse = factory.responses.service({ guid: routeGuid });
+        const buildResponses = factory.createCFAPIResourceList({
+          resources: [
+            factory.createCFAPIResource({
+              name,
+              service_instance_guid: bucketGuid,
+            }),
+          ],
+        });
 
         mockTokenRequest();
-        apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+        apiNocks.mockFetchS3ServicePlanGUID(planResponses, planName);
         apiNocks.mockCreateS3ServiceInstance(
           instanceRequestBody,
           bucketResponse
         );
+        apiNocks.mockFetchServiceInstancesRequest(serviceInstanceResponses, name)
         apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
         apiNocks.mockFetchServiceInstancesRequest(buildResponses);
-        apiNocks.mockFetchServiceInstanceCredentialsRequest(
-          "test-guid",
-          serviceCredentialsResponses
-        );
-        apiNocks.mockCreateRoute(routeResponse, {
-          domain_guid: config.env.cfDomainGuid,
-          space_guid: config.env.cfSpaceGuid,
-          host: bucket,
+        apiNocks.mockFetchServiceInstanceCredentialsRequest(name, {
+          guid: keyResponse.guid,
+          credentials: keyCredentials,
         });
       });
 
       let user;
       let webhookNock;
 
-      const setupWebhook = (accessToken, owner, repo) => githubAPINocks.webhook({
-        accessToken,
-        owner,
-        repo,
-      });
-
-      context('when the owner of the repo is an authorized federalist org', () => {
-        it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
-          const defaultBranch = 'myDefaultBranch';
-
-          factory.user().then((model) => {
-            user = model;
-            githubAPINocks.repo({ defaultBranch });
-
-            githubAPINocks.userOrganizations({
-              accessToken: user.githubAccessToken,
-              organizations: [{ login: siteParams.owner }],
-            });
-
-            webhookNock = setupWebhook(
-              user.githubAccessToken,
-              siteParams.owner,
-              siteParams.repository
-            );
-
-            return SiteCreator.createSite({ user, siteParams });
-          })
-            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-            .then((site) => {
-              validateSiteExpectations(
-                site,
-                siteParams.owner,
-                siteParams.repository,
-                user,
-                defaultBranch,
-                name,
-                "testing-bucket",
-                "us-gov-other-1"
-              );
-              expect(webhookNock.isDone()).to.equal(true);
-              done();
-            })
-            .catch(done);
+      const setupWebhook = (accessToken, owner, repo) =>
+        githubAPINocks.webhook({
+          accessToken,
+          owner,
+          repo,
         });
 
-        it('ignores case when comparing org name', (done) => {
-          const defaultBranch = 'myDefaultBranch';
+      context(
+        'when the owner of the repo is an authorized federalist org',
+        () => {
+          it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
+            const defaultBranch = 'myDefaultBranch';
 
-          factory.user().then((model) => {
-            user = model;
-            githubAPINocks.repo({ defaultBranch });
-            githubAPINocks.webhook();
+            factory
+              .user()
+              .then((model) => {
+                user = model;
+                githubAPINocks.repo({ defaultBranch });
 
-            githubAPINocks.userOrganizations({
-              accessToken: user.githubAccessToken,
-              organizations: [{ login: siteParams.owner.toUpperCase() }],
-            });
+                githubAPINocks.userOrganizations({
+                  accessToken: user.githubAccessToken,
+                  organizations: [{ login: siteParams.owner }],
+                });
 
-            return SiteCreator.createSite({ user, siteParams });
-          })
-            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-            .then((site) => {
-              validateSiteExpectations(
-                site,
-                siteParams.owner,
-                siteParams.repository,
-                user,
-                defaultBranch,
-                name,
-                "testing-bucket",
-                "us-gov-other-1"
-              );
-              done();
-            })
-            .catch(done);
-        });
-      });
+                webhookNock = setupWebhook(
+                  user.githubAccessToken,
+                  siteParams.owner,
+                  siteParams.repository
+                );
 
-      context('when the user that owns the repo is a federalist user', () => {
-        it('creates new site record for the given repository, adds the user, webhook, and build', (done) => {
-          factory.user().then((model) => {
-            user = model;
-            siteParams.owner = user.username;
-            name = `o-${siteParams.owner}-r-${siteParams.repository}`;
+                return SiteCreator.createSite({ user, siteParams });
+              })
+              .then(() =>
+                afterCreateSite(siteParams.owner, siteParams.repository)
+              )
+              .then((site) => {
+                validateSiteExpectations(
+                  site,
+                  siteParams.owner,
+                  siteParams.repository,
+                  user,
+                  defaultBranch,
+                  name,
+                  'testing-bucket',
+                  'us-gov-other-1'
+                );
+                expect(webhookNock.isDone()).to.equal(true);
+                done();
+              })
+              .catch(done);
+          });
 
-            githubAPINocks.repo();
-            webhookNock = setupWebhook(
-              user.githubAccessToken,
-              siteParams.owner,
-              siteParams.repository
-            );
+          it('ignores case when comparing org name', (done) => {
+            const defaultBranch = 'myDefaultBranch';
 
-            return SiteCreator.createSite({ user, siteParams });
-          })
-            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-            .then((site) => {
-              validateSiteExpectations(
-                site,
-                siteParams.owner,
-                siteParams.repository,
-                user,
-                undefined,
-                name,
-                "testing-bucket",
-                "us-gov-other-1"
-              );
+            factory
+              .user()
+              .then((model) => {
+                user = model;
+                githubAPINocks.repo({ defaultBranch });
+                githubAPINocks.webhook();
 
-              expect(webhookNock.isDone()).to.equal(true);
-              done();
-            })
-            .catch(done);
-        });
-      });
+                githubAPINocks.userOrganizations({
+                  accessToken: user.githubAccessToken,
+                  organizations: [{ login: siteParams.owner.toUpperCase() }],
+                });
+
+                return SiteCreator.createSite({ user, siteParams });
+              })
+              .then(() =>
+                afterCreateSite(siteParams.owner, siteParams.repository)
+              )
+              .then((site) => {
+                validateSiteExpectations(
+                  site,
+                  siteParams.owner,
+                  siteParams.repository,
+                  user,
+                  defaultBranch,
+                  name,
+                  'testing-bucket',
+                  'us-gov-other-1'
+                );
+                done();
+              })
+              .catch(done);
+          });
+        }
+      );
 
       it('should reject if the user does not have admin access to the site', (done) => {
-        factory.user().then((model) => {
-          user = model;
-          githubAPINocks.repo({
-            accessToken: user.accessToken,
-            owner: siteParams.owner,
-            repo: siteParams.repository,
-            response: [200, {
-              permissions: {
-                admin: false,
-                push: true,
-              },
-            }],
+        factory
+          .user()
+          .then((model) => {
+            user = model;
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
+              owner: siteParams.owner,
+              repo: siteParams.repository,
+              response: [
+                200,
+                {
+                  permissions: {
+                    admin: false,
+                    push: true,
+                  },
+                },
+              ],
+            });
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .catch((err) => {
+            expect(err.status).to.equal(400);
+            expect(err.message).to.equal(
+              'You do not have admin access to this repository'
+            );
+            done();
           });
-          return SiteCreator.createSite({ user, siteParams });
-        }).catch((err) => {
-          expect(err.status).to.equal(400);
-          expect(err.message).to.equal('You do not have admin access to this repository');
-          done();
-        });
       });
 
       it('should reject if the site already exists in Federalist', (done) => {
@@ -293,32 +273,43 @@ describe('SiteCreator', () => {
               repository: values.site.repository,
             };
             return SiteCreator.createSite({ user: values.user, siteParams });
-          }).catch((err) => {
+          })
+          .catch((err) => {
             expect(err.status).to.equal(400);
-            expect(err.message).to.equal(`This site has already been added to ${apiConfig.app.appName}.`);
+            expect(err.message).to.equal(
+              `This site has already been added to ${apiConfig.app.appName}.`
+            );
             done();
-          }).catch(done);
+          })
+          .catch(done);
       });
 
       it('should reject if the GitHub repository does not exist', (done) => {
-        factory.user().then((model) => {
-          user = model;
-          githubAPINocks.repo({
-            accessToken: user.accessToken,
-            org: siteParams.owner,
-            repo: siteParams.repository,
-            response: [404, { message: 'Not Found' }],
-          });
-          return SiteCreator.createSite({ user, siteParams });
-        }).catch((err) => {
-          expect(err.status).to.eq(400);
-          expect(err.message).to.eq(`The repository ${siteParams.owner}/${siteParams.repository} does not exist.`);
-          done();
-        }).catch(done);
+        factory
+          .user()
+          .then((model) => {
+            user = model;
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
+              org: siteParams.owner,
+              repo: siteParams.repository,
+              response: [404, { message: 'Not Found' }],
+            });
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .catch((err) => {
+            expect(err.status).to.eq(400);
+            expect(err.message).to.eq(
+              `The repository ${siteParams.owner}/${siteParams.repository} does not exist.`
+            );
+            done();
+          })
+          .catch(done);
       });
 
       it('rejects if the org that owns the repo has not authorized federalist', (done) => {
-        factory.user()
+        factory
+          .user()
           .then((model) => {
             user = model;
             githubAPINocks.repo();
@@ -330,9 +321,10 @@ describe('SiteCreator', () => {
             return SiteCreator.createSite({ user, siteParams });
           })
           .catch((err) => {
-            const expectedError = `${apiConfig.app.appName} can't confirm org permissions for '${siteParams.owner}'.`
-            + `Either '${siteParams.owner}' hasn't approved access for ${apiConfig.app.appName} or you aren't an org member.`
-            + `Ensure you are an org member and ask an org owner to authorize ${apiConfig.app.appName} for the organization.`;
+            const expectedError =
+              `${apiConfig.app.appName} can't confirm org permissions for '${siteParams.owner}'.` +
+              `Either '${siteParams.owner}' hasn't approved access for ${apiConfig.app.appName} or you aren't an org member.` +
+              `Ensure you are an org member and ask an org owner to authorize ${apiConfig.app.appName} for the organization.`;
 
             expect(err.message).to.equal(expectedError);
             expect(err.status).to.equal(403);
@@ -348,135 +340,136 @@ describe('SiteCreator', () => {
 
       beforeEach(() => {
         siteParams = {
-          owner: crypto.randomBytes(10).toString("hex"),
-          repository: crypto.randomBytes(10).toString("hex"),
+          owner: crypto.randomBytes(10).toString('hex'),
+          repository: crypto.randomBytes(10).toString('hex'),
           template,
         };
 
         name = `o-${siteParams.owner}-r-${siteParams.repository}`;
 
-        const routeGuid = "route-12345";
         const keyName = `${name}-key`;
-        const planName = "basic-vpc";
-        const planGuid = "plan-guid";
-        const bucketGuid = "bucket-guid";
-        const accessKeyId = crypto.randomBytes(10).toString("hex");
-        const secretAccessKey = crypto.randomBytes(10).toString("hex");
-        const region = "us-gov-other-1";
-        const bucket = "testing-bucket";
+        const planName = 'basic-vpc';
+        const planGuid = 'plan-guid';
+        const bucketGuid = 'bucket-guid';
+        const accessKeyId = crypto.randomBytes(10).toString('hex');
+        const secretAccessKey = crypto.randomBytes(10).toString('hex');
+        const region = 'us-gov-other-1';
+        const bucket = 'testing-bucket';
 
         const instanceRequestBody = { name, service_plan_guid: planGuid };
-        const keyRequestBody = { name, service_instance_guid: bucketGuid };
-
-        const planResponses = {
-          resources: [
-            factory.responses.service({ guid: planGuid }, { name: planName }),
-          ],
+        const keyRequestBody = {
+          name: keyName,
+          serviceInstanceGuid: bucketGuid,
         };
-        const bucketResponse = factory.responses.service(
-          { guid: bucketGuid },
-          { name }
-        );
-        const keyResponse = factory.responses.service(
-          {},
-          {
-            name: keyName,
-            service_instance_guid: bucketGuid,
-            credentials: factory.responses.credentials({
-              access_key_id: accessKeyId,
-              secret_access_key: secretAccessKey,
-              region,
-              bucket,
+
+        const planResponses = factory.createCFAPIResourceList({
+          resources: [
+            factory.createCFAPIResource({ guid: planGuid, name: planName }),
+          ],
+        });
+        const bucketResponse = factory.createCFAPIResource({
+          guid: bucketGuid,
+          name,
+        });
+
+        const keyResponse = factory.createCFAPIResource({
+          name: keyName,
+          serviceInstanceGuid: bucketGuid,
+        });
+
+        const keyCredentials = factory.responses.credentials({
+          access_key_id: accessKeyId,
+          secret_access_key: secretAccessKey,
+          region,
+          bucket,
+        });
+
+        const serviceInstanceResponses = factory.createCFAPIResourceList({
+          resources: [
+            factory.createCFAPIResource({
+              name,
+              guid: bucketGuid,
             }),
-          }
-        );
-
-        const buildResponses = {
-          resources: [
-            factory.responses.service(
-              {},
-              {
-                name,
-                service_instance_guid: bucketGuid,
-                credentials: factory.responses.credentials({
-                  access_key_id: accessKeyId,
-                  secret_access_key: secretAccessKey,
-                  region,
-                  bucket,
-                }),
-              }
-            ),
           ],
-        };
+        });
 
-        const serviceCredentialsResponses = {
-          resources: [keyResponse],
-        };
-
-        const routeResponse = factory.responses.service({ guid: routeGuid });
+        const buildResponses = factory.createCFAPIResourceList({
+          resources: [
+            factory.createCFAPIResource({
+              name,
+              service_instance_guid: bucketGuid,
+            }),
+          ],
+        });
 
         mockTokenRequest();
-        apiNocks.mockFetchS3ServicePlanGUID(planResponses);
+        apiNocks.mockFetchS3ServicePlanGUID(planResponses, planName);
         apiNocks.mockCreateS3ServiceInstance(
           instanceRequestBody,
           bucketResponse
         );
+        apiNocks.mockFetchServiceInstancesRequest(serviceInstanceResponses, name)
         apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
         apiNocks.mockFetchServiceInstancesRequest(buildResponses);
-        apiNocks.mockFetchServiceInstanceCredentialsRequest(
-          "test-guid",
-          serviceCredentialsResponses
-        );
-        apiNocks.mockCreateRoute(routeResponse, {
-          domain_guid: config.env.cfDomainGuid,
-          space_guid: config.env.cfSpaceGuid,
-          host: bucket,
+        apiNocks.mockFetchServiceInstanceCredentialsRequest(name, {
+          guid: keyResponse.guid,
+          credentials: keyCredentials,
         });
       });
 
       it('should create a new site record for the given repository and add the user', (done) => {
-        factory.user().then((model) => {
-          user = model;
-          githubAPINocks.createRepoUsingTemplate();
-          githubAPINocks.webhook();
-          return SiteCreator.createSite({ user, siteParams });
-        }).then((site) => {
-          expect(site).to.not.be.undefined;
-          expect(site.owner).to.equal(siteParams.owner);
-          expect(site.repository).to.equal(siteParams.repository);
-          expect(site.defaultBranch).to.equal('main');
+        factory
+          .user()
+          .then((model) => {
+            user = model;
+            githubAPINocks.createRepoUsingTemplate();
+            githubAPINocks.webhook();
+            return SiteCreator.createSite({ user, siteParams });
+          })
+          .then((site) => {
+            expect(site).to.not.be.undefined;
+            expect(site.owner).to.equal(siteParams.owner);
+            expect(site.repository).to.equal(siteParams.repository);
+            expect(site.defaultBranch).to.equal('main');
 
-          return Site.findOne({
-            where: {
-              owner: siteParams.owner,
-              repository: siteParams.repository,
-            },
-            include: [User],
-          });
-        }).then((site) => {
-          expect(site).to.not.be.undefined;
-          expect(site.Users).to.have.length(1);
-          expect(site.Users[0].id).to.equal(user.id);
-          done();
-        })
+            return Site.findOne({
+              where: {
+                owner: siteParams.owner,
+                repository: siteParams.repository,
+              },
+              include: [User],
+            });
+          })
+          .then((site) => {
+            expect(site).to.not.be.undefined;
+            expect(site.Users).to.have.length(1);
+            expect(site.Users[0].id).to.equal(user.id);
+            done();
+          })
           .catch(done);
       });
 
       it('should use node as the build engine', (done) => {
-        factory.user()
+        factory
+          .user()
           .then((model) => {
             user = model;
             githubAPINocks.createRepoUsingTemplate();
             githubAPINocks.webhook();
             return SiteCreator.createSite({ siteParams, user });
-          }).then((site) => {
+          })
+          .then((site) => {
             expect(site.engine).to.equal('node.js');
             done();
-          }).catch(done);
+          })
+          .catch(done);
       });
 
       it('should trigger a build that pushes the source repo to the destiantion repo', (done) => {
-        const templateResolverStub = sinon.stub(TemplateResolver, 'getTemplate');
+        const templateResolverStub = sinon.stub(
+          TemplateResolver,
+          'getTemplate'
+        );
         const fakeTemplate = {
           repo: 'federalist-template',
           owner: '18f',
@@ -485,27 +478,32 @@ describe('SiteCreator', () => {
 
         templateResolverStub.returns(fakeTemplate);
 
-        factory.user().then((model) => {
-          user = model;
-          githubAPINocks.createRepoUsingTemplate();
-          githubAPINocks.webhook();
-          return SiteCreator.createSite({ siteParams, user });
-        }).then(site => Site.findByPk(site.id, { include: [Build] })).then((site) => {
-          expect(site.Builds).to.have.length(1);
-          expect(site.Builds[0].user).to.equal(user.id);
-          expect(site.Builds[0].branch).to.equal(site.defaultBranch);
+        factory
+          .user()
+          .then((model) => {
+            user = model;
+            githubAPINocks.createRepoUsingTemplate();
+            githubAPINocks.webhook();
+            return SiteCreator.createSite({ siteParams, user });
+          })
+          .then((site) => Site.findByPk(site.id, { include: [Build] }))
+          .then((site) => {
+            expect(site.Builds).to.have.length(1);
+            expect(site.Builds[0].user).to.equal(user.id);
+            expect(site.Builds[0].branch).to.equal(site.defaultBranch);
 
-          templateResolverStub.restore();
+            templateResolverStub.restore();
 
-          done();
-        })
+            done();
+          })
           .catch(done);
       });
 
       it('should create a webhook for the new site', (done) => {
         let webhookNock;
 
-        factory.user()
+        factory
+          .user()
           .then((model) => {
             user = model;
             githubAPINocks.createRepoUsingTemplate();
@@ -524,7 +522,8 @@ describe('SiteCreator', () => {
       });
 
       it('should reject if the repo already exists on GitHub', (done) => {
-        factory.user()
+        factory
+          .user()
           .then((model) => {
             user = model;
 
@@ -533,15 +532,20 @@ describe('SiteCreator', () => {
               owner: siteParams.owner,
               repo: siteParams.repository,
               template: TemplateResolver.getTemplate(template),
-              response: [422, {
-                errors: [{ message: 'name already exists on this account' }],
-              }],
+              response: [
+                422,
+                {
+                  errors: [{ message: 'name already exists on this account' }],
+                },
+              ],
             });
             return SiteCreator.createSite({ user, siteParams });
           })
           .catch((err) => {
             expect(err.status).to.equal(400);
-            expect(err.message).to.equal('A repo with that name already exists.');
+            expect(err.message).to.equal(
+              'A repo with that name already exists.'
+            );
             done();
           })
           .catch(done);
@@ -554,11 +558,13 @@ describe('SiteCreator', () => {
           template: 'not-a-template',
         };
 
-        factory.user()
+        factory
+          .user()
           .then((model) => {
             user = model;
             return SiteCreator.createSite({ user, siteParams: badSiteParams });
-          }).catch((err) => {
+          })
+          .catch((err) => {
             expect(err.status).to.eq(400);
             expect(err.message).to.eq('No such template: not-a-template');
             done();
@@ -571,11 +577,12 @@ describe('SiteCreator', () => {
       let user;
       let webhookNock;
 
-      const setupWebhook = (accessToken, owner, repo) => githubAPINocks.webhook({
-        accessToken,
-        owner,
-        repo,
-      });
+      const setupWebhook = (accessToken, owner, repo) =>
+        githubAPINocks.webhook({
+          accessToken,
+          owner,
+          repo,
+        });
 
       describe('for the Pages product', () => {
         it('creates new bucket and site record for the given repository, adds the user, webhook, and build', (done) => {
@@ -586,8 +593,6 @@ describe('SiteCreator', () => {
           };
 
           const name = `o-${siteParams.owner}-r-${siteParams.repository}`;
-          const appGuid = 'app-12345';
-          const routeGuid = 'route-12345';
           const keyName = `${name}-key`;
           const planName = 'basic-vpc';
           const planGuid = 'plan-guid';
@@ -596,200 +601,89 @@ describe('SiteCreator', () => {
           const secretAccessKey = crypto.randomBytes(10).toString('hex');
           const region = 'us-gov-other-1';
           const bucket = 'testing-bucket';
-
+  
           const instanceRequestBody = { name, service_plan_guid: planGuid };
-          const keyRequestBody = { name, service_instance_guid: bucketGuid };
-
-          const planResponses = {
-            resources: [
-              factory.responses.service({ guid: planGuid }, { name: planName }),
-            ],
-          };
-          const bucketResponse = factory.responses.service({ guid: bucketGuid }, { name });
-          const keyResponse = factory.responses.service({}, {
+          const keyRequestBody = {
             name: keyName,
-            service_instance_guid: bucketGuid,
-            credentials: factory.responses.credentials({
-              access_key_id: accessKeyId,
-              secret_access_key: secretAccessKey,
-              region,
-              bucket,
-            }),
+            serviceInstanceGuid: bucketGuid,
+          };
+  
+          const planResponses = factory.createCFAPIResourceList({
+            resources: [
+              factory.createCFAPIResource({ guid: planGuid, name: planName }),
+            ],
+          });
+          const bucketResponse = factory.createCFAPIResource({
+            guid: bucketGuid,
+            name,
+          });
+  
+          const keyResponse = factory.createCFAPIResource({
+            name: keyName,
+            serviceInstanceGuid: bucketGuid,
+          });
+  
+          const keyCredentials = factory.responses.credentials({
+            access_key_id: accessKeyId,
+            secret_access_key: secretAccessKey,
+            region,
+            bucket,
           });
 
-          const buildResponses = {
+          const serviceInstanceResponses = factory.createCFAPIResourceList({
             resources: [
-              factory.responses.service({}, {
+              factory.createCFAPIResource({
                 name,
-                service_instance_guid: bucketGuid,
-                credentials: factory.responses.credentials({
-                  access_key_id: accessKeyId,
-                  secret_access_key: secretAccessKey,
-                  region,
-                  bucket,
-                }),
+                guid: bucketGuid,
               }),
             ],
-          };
-
-          const serviceCredentialsResponses = {
-            resources: [keyResponse],
-          };
-
-          const routeResponse = factory.responses.service({ guid: routeGuid });
-
+          });
+  
+          const buildResponses = factory.createCFAPIResourceList({
+            resources: [
+              factory.createCFAPIResource({
+                name,
+                service_instance_guid: bucketGuid,
+              }),
+            ],
+          });
+  
           mockTokenRequest();
-          apiNocks.mockFetchS3ServicePlanGUID(planResponses);
-          apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
+          apiNocks.mockFetchS3ServicePlanGUID(planResponses, planName);
+          apiNocks.mockCreateS3ServiceInstance(
+            instanceRequestBody,
+            bucketResponse
+          );
+          apiNocks.mockFetchServiceInstancesRequest(serviceInstanceResponses, name)
           apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
           apiNocks.mockFetchServiceInstancesRequest(buildResponses);
-          apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
-          apiNocks.mockCreateRoute(routeResponse, {
-            domain_guid: config.env.cfDomainGuid,
-            space_guid: config.env.cfSpaceGuid,
-            host: bucket,
+          apiNocks.mockFetchServiceInstanceCredentialsRequest(name, {
+            guid: keyResponse.guid,
+            credentials: keyCredentials,
           });
 
-          factory.user().then((model) => {
-            user = model;
-            githubAPINocks.repo();
+          factory
+            .user()
+            .then((model) => {
+              user = model;
+              githubAPINocks.repo();
 
-            githubAPINocks.userOrganizations({
-              accessToken: user.githubAccessToken,
-              organizations: [{ login: siteParams.owner }],
-            });
+              githubAPINocks.userOrganizations({
+                accessToken: user.githubAccessToken,
+                organizations: [{ login: siteParams.owner }],
+              });
 
-            webhookNock = setupWebhook(
-              user.githubAccessToken,
-              siteParams.owner,
-              siteParams.repository
-            );
-
-            return SiteCreator.createSite({ user, siteParams });
-          })
-            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
-            .then((site) => {
-              validateSiteExpectations(
-                site,
+              webhookNock = setupWebhook(
+                user.githubAccessToken,
                 siteParams.owner,
-                siteParams.repository,
-                user,
-                'main',
-                name,
-                bucket,
-                region
+                siteParams.repository
               );
-              expect(webhookNock.isDone()).to.equal(true);
-              done();
+
+              return SiteCreator.createSite({ user, siteParams });
             })
-            .catch(done);
-        });
-      });
-
-      describe('for the Federalist product', () => {
-        before(() => {
-          process.env.PRODUCT = 'federalist'
-        })
-
-        before(() => {
-          process.env.PRODUCT = 'pages'
-        })
-
-        it('creates new bucket and site record for the given repository, adds the user, webhook, and build', (done) => {
-          const siteParams = {
-            owner: crypto.randomBytes(10).toString('hex'),
-            repository: crypto.randomBytes(10).toString('hex'),
-            sharedBucket: false,
-          };
-
-          const name = `o-${siteParams.owner}-r-${siteParams.repository}`;
-          const guid = 'mapped-12345';
-          const appGuid = 'app-12345';
-          const routeGuid = 'route-12345';
-          const keyName = `${name}-key`;
-          const planName = 'basic-vpc';
-          const planGuid = 'plan-guid';
-          const bucketGuid = 'bucket-guid';
-          const accessKeyId = crypto.randomBytes(10).toString('hex');
-          const secretAccessKey = crypto.randomBytes(10).toString('hex');
-          const region = 'us-gov-other-1';
-          const bucket = 'testing-bucket';
-
-          const instanceRequestBody = { name, service_plan_guid: planGuid };
-          const keyRequestBody = { name, service_instance_guid: bucketGuid };
-
-          const planResponses = {
-            resources: [
-              factory.responses.service({ guid: planGuid }, { name: planName }),
-            ],
-          };
-          const bucketResponse = factory.responses.service({ guid: bucketGuid }, { name });
-          const keyResponse = factory.responses.service({}, {
-            name: keyName,
-            service_instance_guid: bucketGuid,
-            credentials: factory.responses.credentials({
-              access_key_id: accessKeyId,
-              secret_access_key: secretAccessKey,
-              region,
-              bucket,
-            }),
-          });
-
-          const buildResponses = {
-            resources: [
-              factory.responses.service({}, {
-                name,
-                service_instance_guid: bucketGuid,
-                credentials: factory.responses.credentials({
-                  access_key_id: accessKeyId,
-                  secret_access_key: secretAccessKey,
-                  region,
-                  bucket,
-                }),
-              }),
-            ],
-          };
-
-          const serviceCredentialsResponses = {
-            resources: [keyResponse],
-          };
-
-          const routeResponse = factory.responses.service({ guid: routeGuid });
-          const mapResponse = factory.responses.service({ guid }, {
-            app_guid: appGuid,
-            route_guid: routeGuid,
-          });
-
-          mockTokenRequest();
-          apiNocks.mockFetchS3ServicePlanGUID(planResponses);
-          apiNocks.mockCreateS3ServiceInstance(instanceRequestBody, bucketResponse);
-          apiNocks.mockCreateServiceKey(keyRequestBody, keyResponse);
-          apiNocks.mockFetchServiceInstancesRequest(buildResponses);
-          apiNocks.mockFetchServiceInstanceCredentialsRequest('test-guid', serviceCredentialsResponses);
-          apiNocks.mockCreateRoute(routeResponse, {
-            domain_guid: config.env.cfDomainGuid,
-            space_guid: config.env.cfSpaceGuid,
-            host: bucket,
-          });
-
-          factory.user().then((model) => {
-            user = model;
-            githubAPINocks.repo();
-
-            githubAPINocks.userOrganizations({
-              accessToken: user.githubAccessToken,
-              organizations: [{ login: siteParams.owner }],
-            });
-
-            webhookNock = setupWebhook(
-              user.githubAccessToken,
-              siteParams.owner,
-              siteParams.repository
-            );
-
-            return SiteCreator.createSite({ user, siteParams });
-          })
-            .then(() => afterCreateSite(siteParams.owner, siteParams.repository))
+            .then(() =>
+              afterCreateSite(siteParams.owner, siteParams.repository)
+            )
             .then((site) => {
               validateSiteExpectations(
                 site,
