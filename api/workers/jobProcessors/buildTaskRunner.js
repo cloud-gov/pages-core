@@ -1,10 +1,9 @@
 const {
   BuildTask, BuildTaskType, Build, Site,
 } = require('../../models');
-const arbitrary = require('./buildTasks/artibrary');
-const gethtml = require('./buildTasks/gethtml');
+
 const { createJobLogger } = require('./utils');
-const { S3Client } = require('../../services/S3Helper');
+const CloudFoundryAPIClient = require('../../utils/cfApiClient');
 
 async function buildTaskRunner(job) {
   const logger = createJobLogger(job);
@@ -12,30 +11,26 @@ async function buildTaskRunner(job) {
 
   logger.log(`Running build task id: ${taskId}`);
   try {
-    const s3Client = new S3Client({
-      accessKeyId: job.data.AWS_ACCESS_KEY_ID,
-      secretAccessKey: job.data.AWS_SECRET_ACCESS_KEY,
-      region: job.data.AWS_DEFAULT_REGION,
-      bucket: job.data.BUCKET,
-    });
-
-    const callbackUrl = job.data.STATUS_CALLBACK;
-
     const task = await BuildTask.findByPk(taskId, {
       include: [
         { model: BuildTaskType, required: true },
         { model: Build, required: true, include: [{ model: Site, required: true }] },
       ],
+      raw: true,
+      nest: true,
     });
 
-    const taskTypeName = task.BuildTaskType.name;
-    switch (taskTypeName) {
-      case 'test':
-        return arbitrary(task, logger, s3Client, callbackUrl);
-      case 'another test':
-        return gethtml(task, logger, s3Client, callbackUrl);
+    const taskTypeRunner = task.BuildTaskType.runner;
+    const apiClient = new CloudFoundryAPIClient();
+    switch (taskTypeRunner) {
+      case BuildTaskType.Runners.Cf_task:
+        await apiClient.startBuildTask(task, job);
+        return true;
+      case BuildTaskType.Runners.Worker:
+        // TODO: temporary switch for JS worker code
+        return true;
       default:
-        logger.log(`Unknown task type: ${taskTypeName}`);
+        logger.log(`Unknown task runner: ${taskTypeRunner}`);
         return true;
     }
   } catch (err) {

@@ -443,6 +443,8 @@ async function createData() {
     metadata: {
       foo: 'bar',
     },
+    runner: 'cf_task',
+    startsWhen: 'build',
   });
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,

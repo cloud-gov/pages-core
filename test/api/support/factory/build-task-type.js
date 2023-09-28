@@ -2,11 +2,13 @@ const { BuildTaskType } = require('../../../../api/models');
 
 // eslint-disable-next-line no-underscore-dangle
 const _attributes = ({
-  name, description, metadata,
+  name, description, metadata, runner, startsWhen,
 } = {}) => ({
   name: name || 'build task type name',
   description: description || 'build task type description',
   metadata: metadata || { some: 'metadata' },
+  runner: runner || 'cf_task',
+  startsWhen: startsWhen || 'build',
 });
 
 const buildTaskType = overrides => Promise.props(_attributes(overrides))

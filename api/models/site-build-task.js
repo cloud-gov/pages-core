@@ -56,7 +56,7 @@ async function findTasksToStart({ build, startsWhen }) {
     },
     include: {
       model: BuildTaskType,
-      where: { metadata: { startsWhen } },
+      where: { startsWhen },
       required: true,
     },
   });
