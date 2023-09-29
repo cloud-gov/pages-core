@@ -49,7 +49,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              url: url => !url.includes('images'),
+              url: { filter: (url) => !url.includes('images') },
             },
           },
           {
@@ -66,7 +66,10 @@ module.exports = {
             options: {
               sassOptions: {
                 quietDeps: true,
-                loadPath: path.resolve(__dirname, 'node_modules/uswds/src/stylesheets/'),
+                loadPath: path.resolve(
+                  __dirname,
+                  'node_modules/uswds/src/stylesheets/'
+                ),
               },
             },
           },
@@ -101,7 +104,10 @@ module.exports = {
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
-    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/}),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
+    }),
     new webpack.EnvironmentPlugin([
       ...getFeatureFlags(process.env),
       'APP_HOSTNAME',
