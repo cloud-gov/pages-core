@@ -4,6 +4,6 @@
 <GridContainer>
   <PageTitle>Reports</PageTitle>
     <ul>
-      <li><a href="/organizations-report">Organizations With Published Sites</a></li>
+      <li><a href="/reports/published-sites">Organizations With Published Sites</a></li>
     </ul>
 </GridContainer>

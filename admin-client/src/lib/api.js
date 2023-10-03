@@ -202,12 +202,12 @@ async function fetchOrganizations(query = {}) {
   return get('/organizations', query).catch(() => []);
 }
 
-async function fetchOrganizationsReport(query = {}) {
-  return get('/organizations-report', query).catch(() => []);
+async function fetchPublishedSitesReport(query = {}) {
+  return get('/reports/published-sites', query).catch(() => []);
 }
 
-async function fetchOrganizationsReportCSV() {
-  return getAttachedFile('/organizations-report.csv').catch(() => []);
+async function fetchPublishedSitesReportCSV() {
+  return getAttachedFile('/reports/published-sites.csv').catch(() => []);
 }
 
 async function updateOrganization(id, params) {
@@ -307,8 +307,8 @@ export {
   createOrganization,
   fetchOrganization,
   fetchOrganizations,
-  fetchOrganizationsReport,
-  fetchOrganizationsReportCSV,
+  fetchPublishedSitesReport,
+  fetchPublishedSitesReportCSV,
   updateOrganization,
   deactivateOrganization,
   activateOrganization,

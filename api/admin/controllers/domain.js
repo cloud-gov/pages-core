@@ -116,7 +116,7 @@ module.exports = wrapHandlers({
 
     const parser = new json2csv.Parser({ fields });
     const csv = parser.parse(domains);
-    res.attachment('organizations-report.csv');
+    res.attachment('published-sites.csv');
     return res.send(csv);
   },
 

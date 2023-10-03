@@ -51,10 +51,10 @@ describe('Admin - Domains API', () => {
     });
   });
 
-  describe('GET /admin/organizations-report', () => {
+  describe('GET /admin/reports/published-sites', () => {
     it('should require admin authentication', async () => {
       const response = await request(app)
-        ['get']('/organizations-report')
+        ['get']('/reports/published-sites')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -81,7 +81,7 @@ describe('Admin - Domains API', () => {
 
       const cookie = await authenticatedSession(user, sessionConfig);
       const { body } = await request(app)
-        .get('/organizations-report')
+        .get('/reports/published-sites')
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
         .expect(200);
@@ -97,10 +97,10 @@ describe('Admin - Domains API', () => {
     });
   });
 
-  describe('GET /admin/organizations-report.csv', () => {
+  describe('GET /admin/reports/published-sites.csv', () => {
     it('should require admin authentication', async () => {
       const response = await request(app)
-        ['get']('/organizations-report.csv')
+        ['get']('/reports/published-sites.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -128,7 +128,7 @@ describe('Admin - Domains API', () => {
 
       const cookie = await authenticatedSession(user, sessionConfig);
       const response = await request(app)
-        .get('/organizations-report.csv')
+        .get('/reports/published-sites.csv')
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
         .expect(200);
@@ -136,7 +136,7 @@ describe('Admin - Domains API', () => {
         'text/csv; charset=utf-8'
       );
       expect(response.headers['content-disposition']).to.equal(
-        'attachment; filename="organizations-report.csv"'
+        'attachment; filename="published-sites.csv"'
       );
       [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
