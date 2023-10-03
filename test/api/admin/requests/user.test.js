@@ -1,0 +1,112 @@
+const request = require('supertest');
+const { expect } = require('chai');
+const app = require('../../../../api/admin');
+const { authenticatedSession } = require('../../support/session');
+const sessionConfig = require('../../../../api/admin/sessionConfig');
+const factory = require('../../support/factory');
+const config = require('../../../../config');
+const {
+  Organization, OrganizationRole, Role, User, UAAIdentity,
+} = require('../../../../api/models');
+const { createUAAIdentity } = require('../../support/factory/uaa-identity');
+
+describe('Admin - Organizations API', () => {
+  let userRole;
+  let managerRole;
+
+  before(async () => {
+    [userRole, managerRole] = await Promise.all([
+      Role.findOne({ where: { name: 'user' } }),
+      Role.findOne({ where: { name: 'manager' } }),
+    ]);
+  });
+
+  afterEach(() =>
+    Promise.all([
+      Organization.truncate({ force: true, cascade: true }),
+      OrganizationRole.truncate({ force: true, cascade: true }),
+      User.truncate({ force: true, cascade: true }),
+    ])
+  );
+
+  describe('GET /admin/reports/users', () => {
+    it('should require admin authentication', async () => {
+      const response = await request(app)
+        ['get']('/reports/users')
+        .expect(401);
+      expect(response.body.message).to.equal('Unauthorized');
+    });
+
+    it('returns all users', async () => {
+      const user1 = await factory.user();
+      const user2 = await factory.user();
+
+      const org1 = await factory.organization.create();
+      const org2 = await factory.organization.create();
+
+      org1.addUser(user1, { through: { roleId: managerRole.id } });
+      org1.addUser(user2, { through: { roleId: userRole.id } });
+      org2.addUser(user1, { through: { roleId: userRole.id } });
+
+      const cookie = await authenticatedSession(user1, sessionConfig);
+      const { body } = await request(app)
+        .get('/reports/users')
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .expect(200);
+
+      expect(body.data.length).to.equal(2);
+      ids = body.data.map(user => user['id']);
+      expect(ids).to.include(user1.id);
+      expect(ids).to.include(user2.id);
+    });
+  });
+
+  describe('GET /admin/reports/users.csv', () => {
+    it('should require admin authentication', async () => {
+      const response = await request(app)
+        ['get']('/reports/users.csv')
+        .expect(401);
+      expect(response.body.message).to.equal('Unauthorized');
+    });
+
+    it('returns all users', async () => {
+      const user1 = await factory.user();
+      createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
+
+      const user2 = await factory.user();
+      createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
+
+      const org1 = await factory.organization.create();
+      const org2 = await factory.organization.create();
+
+      org1.addUser(user1, { through: { roleId: managerRole.id } });
+      org1.addUser(user2, { through: { roleId: userRole.id } });
+      org2.addUser(user1, { through: { roleId: userRole.id } });
+
+      const cookie = await authenticatedSession(user1, sessionConfig);
+      const response = await request(app)
+        .get('/reports/users.csv')
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .expect(200);
+      expect(response.headers['content-type']).to.equal(
+        'text/csv; charset=utf-8'
+      );
+      expect(response.headers['content-disposition']).to.equal(
+        'attachment; filename="users.csv"'
+      );
+      [header, ...data] = response.text.split(/\n/);
+      expect(header).to.equal(
+        '"ID","Email","Organizations","Details","Created","Last Signed In"'
+      );
+      expect(data.length).to.equal(2);
+      expect(data).to.include(
+        `${user1.id},"user1@example.com","${org1.name}|${org2.name}","${org1.name}: manager, ${org2.name}: user","${user1.createdAt.toISOString()}","${user1.signedInAt.toISOString()}"`
+      );
+      expect(data).to.include(
+        `${user2.id},"user2@example.com","${org1.name}","${org1.name}: user","${user2.createdAt.toISOString()}","${user2.signedInAt.toISOString()}"`
+      );
+    });
+  });
+});

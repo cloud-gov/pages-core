@@ -68,6 +68,7 @@
   page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
   page('/reports/organizations', queryString, render(Pages.Organization.OrgsReport));
   page('/reports/published-sites', queryString, render(Pages.Organization.PublishedSitesReport));
+  page('/reports/users', queryString, render(Pages.User.UsersReport));
   page('/reports', queryString, render(Pages.Reports));
   page('/tasks', queryString, render(Pages.Tasks));
   page('*', render(Pages.NotFound));

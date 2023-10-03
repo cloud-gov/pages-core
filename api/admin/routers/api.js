@@ -39,6 +39,8 @@ apiRouter.get('/reports/organizations', AdminControllers.Organization.listOrdere
 apiRouter.get('/reports/organizations.csv', AdminControllers.Organization.listOrderedCSV);
 apiRouter.get('/reports/published-sites', AdminControllers.Domain.listPublished);
 apiRouter.get('/reports/published-sites.csv', AdminControllers.Domain.listPublishedCSV);
+apiRouter.get('/reports/users', AdminControllers.User.listForUsersReport);
+apiRouter.get('/reports/users.csv', AdminControllers.User.listForUsersReportCSV);
 apiRouter.put('/organization-role', AdminControllers.OrganizationRole.update);
 apiRouter.get('/roles', AdminControllers.Role.list);
 apiRouter.get('/sites', AdminControllers.Site.list);

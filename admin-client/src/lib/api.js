@@ -278,6 +278,14 @@ async function fetchUsers(query = {}) {
   return get('/users', query).catch(() => []);
 }
 
+async function fetchUsersReport(query = {}) {
+  return get('/reports/users', query).catch(() => []);
+}
+
+async function fetchUsersReportCSV() {
+  return getAttachedFile('/reports/users.csv').catch(() => []);
+}
+
 async function inviteUser(params) {
   return post('/users/invite', params);
 }
@@ -333,6 +341,8 @@ export {
   fetchUserEnvironmentVariables,
   fetchUser,
   fetchUsers,
+  fetchUsersReport,
+  fetchUsersReportCSV,
   inviteUser,
   resendInvite,
   logout,
