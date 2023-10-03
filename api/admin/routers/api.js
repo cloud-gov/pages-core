@@ -35,6 +35,8 @@ apiRouter.put('/organizations/:id', AdminControllers.Organization.update);
 apiRouter.post('/organizations/:id/deactivate', authorize(['pages.admin']), AdminControllers.Organization.deactivate);
 apiRouter.post('/organizations/:id/activate', AdminControllers.Organization.activate);
 apiRouter.delete('/organization/:org_id/user/:user_id', authorize(['pages.admin']), AdminControllers.OrganizationRole.destroy);
+apiRouter.get('/reports/organizations', AdminControllers.Organization.listOrdered);
+apiRouter.get('/reports/organizations.csv', AdminControllers.Organization.listOrderedCSV);
 apiRouter.get('/reports/published-sites', AdminControllers.Domain.listPublished);
 apiRouter.get('/reports/published-sites.csv', AdminControllers.Domain.listPublishedCSV);
 apiRouter.put('/organization-role', AdminControllers.OrganizationRole.update);

@@ -202,6 +202,14 @@ async function fetchOrganizations(query = {}) {
   return get('/organizations', query).catch(() => []);
 }
 
+async function fetchOrganizationsReport(query = {}) {
+  return get('/reports/organizations', query).catch(() => []);
+}
+
+async function fetchOrganizationsReportCSV() {
+  return getAttachedFile('/reports/organizations.csv').catch(() => []);
+}
+
 async function fetchPublishedSitesReport(query = {}) {
   return get('/reports/published-sites', query).catch(() => []);
 }
@@ -307,6 +315,8 @@ export {
   createOrganization,
   fetchOrganization,
   fetchOrganizations,
+  fetchOrganizationsReport,
+  fetchOrganizationsReportCSV,
   fetchPublishedSitesReport,
   fetchPublishedSitesReportCSV,
   updateOrganization,

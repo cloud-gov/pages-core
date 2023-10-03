@@ -66,6 +66,7 @@
   page('/organizations/new', queryString, render(Pages.Organization.New));
   page('/organizations/:id', queryString, render(Pages.Organization.Show));
   page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
+  page('/reports/organizations', queryString, render(Pages.Organization.OrgsReport));
   page('/reports/published-sites', queryString, render(Pages.Organization.PublishedSitesReport));
   page('/reports', queryString, render(Pages.Reports));
   page('/tasks', queryString, render(Pages.Tasks));

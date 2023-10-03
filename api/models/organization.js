@@ -76,6 +76,12 @@ const associate = ({
       }],
     }],
   }));
+
+  Organization.addScope('byName', {
+    order: [
+      ['name', 'ASC'],
+    ],
+  });
 };
 
 module.exports = (sequelize, DataTypes) => {
