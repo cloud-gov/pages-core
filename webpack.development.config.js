@@ -54,7 +54,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              url: url => !url.includes('images'),
+              url: { filter: (url) => !url.includes('images') },
             },
           },
           {

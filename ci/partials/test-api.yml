@@ -1,8 +1,9 @@
 platform: linux
 image_resource:
-  type: docker-image
+  type: registry-image
   source:
-    repository: karlkfi/concourse-dcind
+    repository: cloudgov/concourse-dcind
+    tag: original
 inputs:
   - name: src
   - name: redis

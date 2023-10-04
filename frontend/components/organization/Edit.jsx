@@ -168,7 +168,7 @@ function Edit({ actions }) {
               <td data-title="Updated">
                 {timeFrom(currentMember.updatedAt)}
               </td>
-              <td data-title="Actions" className="table-actions" />
+              <td label="Actions" data-title="Actions" className="table-actions" />
             </tr>
 
             {sortedMembers.map(member => (
