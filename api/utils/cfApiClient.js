@@ -1,4 +1,6 @@
 const _ = require('underscore');
+const parse = require('json-templates');
+
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const HttpClient = require('./httpClient');
 
@@ -112,6 +114,17 @@ class CloudFoundryAPIClient {
     return this.authRequest('GET', `/v3/tasks?${qs.toString()}`).then(
       body => body.resources
     );
+  }
+
+  async startBuildTask(task, job) {
+    // construct the task parameter template by filling in values from the BuildTaskType metadata
+    // TODO: link to template documentation
+    const template = parse(task.BuildTaskType.metadata.template);
+
+    const taskParams = template({ task, job });
+
+    const appGUID = await this.fetchTaskAppGUID(task.BuildTaskType.metadata.appName);
+    return this.authRequest('POST', `/v3/apps/${appGUID}/tasks`, taskParams);
   }
 
   /**
@@ -250,6 +263,15 @@ class CloudFoundryAPIClient {
       .then(token => this.request('GET', `/v3/service_plans?names=${serviceName}`, token))
       .then(res => firstEntity(res, `Not found: @${serviceName} service plan.`))
       .then(service => service.guid);
+  }
+
+  async fetchTaskAppGUID(appName) {
+    return this.accessToken().then(token => this.request(
+      'GET',
+      `/v3/apps/?names=${appName}`,
+      token
+    )).then(res => firstEntity(res))
+      .then(app => app.guid);
   }
 
   // Private methods

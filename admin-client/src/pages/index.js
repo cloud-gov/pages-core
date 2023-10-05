@@ -7,6 +7,7 @@ export { default as NotFound } from './NotFound.svelte';
 export { default as Reports } from './Reports.svelte';
 export { default as Site } from './Site.svelte';
 export { default as Sites } from './Sites.svelte';
+export { default as Tasks } from './Tasks.svelte';
 export * as Domain from './domain';
 export * as Organization from './organization';
 export * as User from './user';

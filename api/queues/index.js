@@ -1,4 +1,5 @@
 const { ArchiveBuildLogsQueue, ArchiveBuildLogsQueueName } = require('./ArchiveBuildLogsQueue');
+const { BuildTasksQueue, BuildTasksQueueName } = require('./BuildTasksQueue');
 const { DomainQueue, DomainQueueName } = require('./DomainQueue');
 const { FailStuckBuildsQueue, FailStuckBuildsQueueName } = require('./FailStuckBuildsQueue');
 const { MailQueue, MailQueueName } = require('./MailQueue');
@@ -11,6 +12,8 @@ const { TimeoutBuildTasksQueue, TimeoutBuildTasksQueueName } = require('./Timeou
 module.exports = {
   ArchiveBuildLogsQueue,
   ArchiveBuildLogsQueueName,
+  BuildTasksQueue,
+  BuildTasksQueueName,
   DomainQueue,
   DomainQueueName,
   FailStuckBuildsQueue,

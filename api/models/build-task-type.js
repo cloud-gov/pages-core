@@ -1,3 +1,5 @@
+const { buildEnum } = require('../utils');
+
 const associate = ({
   BuildTaskType,
   BuildTask,
@@ -11,6 +13,16 @@ const associate = ({
     foreignKey: 'buildTaskTypeId',
   });
 };
+
+const Runners = buildEnum([
+  'cf_task',
+  'worker',
+]);
+
+const StartsWhens = buildEnum([
+  'build',
+  'complete',
+]);
 
 module.exports = (sequelize, DataTypes) => {
   const BuildTaskType = sequelize.define(
@@ -27,11 +39,29 @@ module.exports = (sequelize, DataTypes) => {
       metadata: {
         type: DataTypes.JSON,
       },
+      runner: {
+        type: DataTypes.ENUM,
+        values: Runners.values,
+        allowNull: false,
+        validate: {
+          isIn: [Runners.values],
+        },
+      },
+      startsWhen: {
+        type: DataTypes.ENUM,
+        values: StartsWhens.values,
+        allowNull: false,
+        validate: {
+          isIn: [StartsWhens.values],
+        },
+      },
     }, {
       tableName: 'build_task_type',
     }
   );
 
   BuildTaskType.associate = associate;
+  BuildTaskType.Runners = Runners;
+  BuildTaskType.StartsWhens = StartsWhens;
   return BuildTaskType;
 };

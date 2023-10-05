@@ -5,6 +5,7 @@ const Organization = require('./organization');
 const OrganizationRole = require('./organization-role');
 const Role = require('./role');
 const Site = require('./site');
+const Task = require('./task');
 const UserEnvironmentVariable = require('./user-environment-variable');
 const User = require('./user');
 
@@ -16,6 +17,7 @@ module.exports = {
   OrganizationRole,
   Role,
   Site,
+  Task,
   UserEnvironmentVariable,
   User,
 };

@@ -13,11 +13,23 @@ const Statuses = buildEnum([
   'success',
 ]);
 
-const associate = ({ BuildTask, Build }) => {
+const associate = ({ BuildTask, Build, BuildTaskType }) => {
   BuildTask.belongsTo(Build, {
     foreignKey: 'buildId',
     allowNull: false,
   });
+  BuildTask.belongsTo(BuildTaskType, {
+    foreignKey: 'buildTaskTypeId',
+    allowNull: false,
+  });
+  BuildTask.addScope('bySite', id => ({
+    where: {
+      '$Build.site$': id,
+    },
+    include: [{
+      model: Build,
+    }],
+  }));
 };
 
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
@@ -69,6 +81,6 @@ module.exports = (sequelize, DataTypes) => {
 
   BuildTask.generateToken = generateToken;
   BuildTask.associate = associate;
-
+  BuildTask.siteScope = id => ({ method: ['bySite', id] });
   return BuildTask;
 };

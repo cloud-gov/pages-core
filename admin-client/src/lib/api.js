@@ -282,6 +282,10 @@ async function logout() {
   return get('/logout').catch(() => null);
 }
 
+async function fetchTasks(query = {}) {
+  return get('/tasks', query).catch(() => []);
+}
+
 export {
   destroySite,
   fetchMe,
@@ -323,4 +327,5 @@ export {
   resendInvite,
   logout,
   updateSite,
+  fetchTasks,
 };

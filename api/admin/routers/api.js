@@ -46,6 +46,7 @@ apiRouter.put('/sites/:id', AdminControllers.Site.update);
 apiRouter.get('/sites/:id/webhooks', AdminControllers.Site.listWebhooks);
 apiRouter.post('/sites/:id/webhooks', AdminControllers.Site.createWebhook);
 apiRouter.delete('/sites/:id', authorize(['pages.admin']), AdminControllers.Site.destroy);
+apiRouter.get('/tasks', AdminControllers.Task.list);
 apiRouter.get('/me', AdminControllers.User.me);
 apiRouter.get('/user-environment-variables', AdminControllers.UserEnvironmentVariable.list);
 apiRouter.get('/users', AdminControllers.User.list);
