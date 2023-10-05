@@ -66,7 +66,9 @@
   page('/organizations/new', queryString, render(Pages.Organization.New));
   page('/organizations/:id', queryString, render(Pages.Organization.Show));
   page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
-  page('/organizations-report', queryString, render(Pages.Organization.Report));
+  page('/reports/organizations', queryString, render(Pages.Organization.OrgsReport));
+  page('/reports/published-sites', queryString, render(Pages.Organization.PublishedSitesReport));
+  page('/reports/users', queryString, render(Pages.User.UsersReport));
   page('/reports', queryString, render(Pages.Reports));
   page('/tasks', queryString, render(Pages.Tasks));
   page('*', render(Pages.NotFound));

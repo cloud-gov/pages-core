@@ -1,3 +1,4 @@
+const json2csv = require('@json2csv/plainjs');
 const {
   Organization, Site, User, Event,
 } = require('../../models');
@@ -50,6 +51,59 @@ module.exports = wrapHandlers({
     };
 
     return res.json(json);
+  },
+
+  async listForUsersReport(req, res) {
+    const { limit, page } = req.query;
+
+    const serialize = users => userSerializer.serializeMany(users, true);
+
+    const scopes = ['withUAAIdentity', 'withOrganizationRoles'];
+
+    const pagination = await paginate(User.scope(scopes), serialize, { limit, page });
+
+    const json = {
+      meta: {},
+      ...pagination,
+    };
+
+    return res.json(json);
+  },
+
+  async listForUsersReportCSV(req, res) {
+    const users = await User.scope(['withUAAIdentity', 'withOrganizationRoles']).findAll();
+
+    const fields = [
+      {
+        label: 'ID',
+        value: 'id',
+      },
+      {
+        label: 'Email',
+        value: 'UAAIdentity.email',
+      },
+      {
+        label: 'Organizations',
+        value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}`).join('|')),
+      },
+      {
+        label: 'Details',
+        value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}: ${orgRole.Role.name}`).join(', ')),
+      },
+      {
+        label: 'Created',
+        value: 'createdAt',
+      },
+      {
+        label: 'Last Signed In',
+        value: 'signedInAt',
+      },
+    ];
+
+    const parser = new json2csv.Parser({ fields });
+    const csv = parser.parse(users);
+    res.attachment('users.csv');
+    return res.send(csv);
   },
 
   async findById(req, res) {

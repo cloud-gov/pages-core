@@ -205,6 +205,20 @@ describe('Organization model', () => {
     });
   });
 
+  describe('.byName()', () => {
+    it('returns organizations ordered by name', async () => {
+      const orgB = Organization.create({ name: 'Org B' });
+      const orgA = Organization.create({ name: 'Org A' });
+      const orgC = Organization.create({ name: 'Org C' });
+      const result = await Organization.scope('byName').findAll();
+      expect(result.map((org) => org.id)).to.include.ordered.members([
+        orgA.id,
+        orgB.id,
+        orgC.id,
+      ]);
+    });
+  });
+
   describe('forUser', () => {
     it('returns all orgs for the user and includes the `OrganizationRole` and `User`.', async () => {
       const [user, org1, org2] = await Promise.all([

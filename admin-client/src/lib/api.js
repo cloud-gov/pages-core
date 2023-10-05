@@ -203,11 +203,19 @@ async function fetchOrganizations(query = {}) {
 }
 
 async function fetchOrganizationsReport(query = {}) {
-  return get('/organizations-report', query).catch(() => []);
+  return get('/reports/organizations', query).catch(() => []);
 }
 
 async function fetchOrganizationsReportCSV() {
-  return getAttachedFile('/organizations-report.csv').catch(() => []);
+  return getAttachedFile('/reports/organizations.csv').catch(() => []);
+}
+
+async function fetchPublishedSitesReport(query = {}) {
+  return get('/reports/published-sites', query).catch(() => []);
+}
+
+async function fetchPublishedSitesReportCSV() {
+  return getAttachedFile('/reports/published-sites.csv').catch(() => []);
 }
 
 async function updateOrganization(id, params) {
@@ -270,6 +278,14 @@ async function fetchUsers(query = {}) {
   return get('/users', query).catch(() => []);
 }
 
+async function fetchUsersReport(query = {}) {
+  return get('/reports/users', query).catch(() => []);
+}
+
+async function fetchUsersReportCSV() {
+  return getAttachedFile('/reports/users.csv').catch(() => []);
+}
+
 async function inviteUser(params) {
   return post('/users/invite', params);
 }
@@ -309,6 +325,8 @@ export {
   fetchOrganizations,
   fetchOrganizationsReport,
   fetchOrganizationsReportCSV,
+  fetchPublishedSitesReport,
+  fetchPublishedSitesReportCSV,
   updateOrganization,
   deactivateOrganization,
   activateOrganization,
@@ -323,6 +341,8 @@ export {
   fetchUserEnvironmentVariables,
   fetchUser,
   fetchUsers,
+  fetchUsersReport,
+  fetchUsersReportCSV,
   inviteUser,
   resendInvite,
   logout,

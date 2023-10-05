@@ -1,18 +1,7 @@
 <script>
-  import { fetchOrganizationsReport, fetchOrganizationsReportCSV } from '../../lib/api';
+  import { downloadCSV } from '../../helpers/downloadCSV';
+  import { fetchPublishedSitesReport, fetchPublishedSitesReportCSV } from '../../lib/api';
   import { PaginatedQueryPage, DataTable } from '../../components';
-
-  async function downloadCSV() {
-    const csv = await fetchOrganizationsReportCSV();
-    const blob = new Blob([csv], { type: 'application/octet-stream' });
-    const aElement = document.createElement('a');
-    aElement.setAttribute('download', 'organization-report.csv');
-    const href = URL.createObjectURL(blob);
-    aElement.href = href;
-    aElement.setAttribute('target', '_blank');
-    aElement.click();
-    URL.revokeObjectURL(href);
-  }
 
   const fields = {
     organization: {
@@ -25,9 +14,9 @@
   };
 </script>
 
-<PaginatedQueryPage path="organizations-report" title="Organizations With Published Sites" query={fetchOrganizationsReport} {fields} noSearch let:data>
+<PaginatedQueryPage path="reports/published-sites" title="Organizations With Published Sites" query={fetchPublishedSitesReport} {fields} noSearch let:data>
   <div>
-    <button type="button" class="usa-button margin-left-1" on:click={downloadCSV}>Download CSV of All Published Sites</button>
+    <button type="button" class="usa-button margin-left-1" on:click={() => downloadCSV(fetchPublishedSitesReportCSV, 'published-sites.csv')}>Download CSV of All Published Sites</button>
   </div>
   <DataTable data={data}>
     <tr slot="header">

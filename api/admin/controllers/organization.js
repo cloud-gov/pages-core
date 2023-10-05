@@ -1,3 +1,4 @@
+const json2csv = require('@json2csv/plainjs');
 const { serialize, serializeMany } = require('../../serializers/organization');
 const { paginate, wrapHandlers } = require('../../utils');
 const { Organization, Event } = require('../../models');
@@ -39,6 +40,41 @@ module.exports = wrapHandlers({
     };
 
     return res.json(json);
+  },
+
+  async listOrdered(req, res) {
+    const { limit, page } = req.query;
+
+    const scopes = ['byName'];
+
+    const pagination = await paginate(Organization.scope(scopes), serializeMany, { limit, page });
+
+    const json = {
+      meta: {},
+      ...pagination,
+    };
+
+    return res.json(json);
+  },
+
+  async listOrderedCSV(req, res) {
+    const orgs = await Organization.scope('byName').findAll();
+
+    const fields = [
+      {
+        label: 'Organization',
+        value: 'name',
+      },
+      {
+        label: 'Agency',
+        value: 'agency',
+      },
+    ];
+
+    const parser = new json2csv.Parser({ fields });
+    const csv = parser.parse(orgs);
+    res.attachment('organizations.csv');
+    return res.send(csv);
   },
 
   async findById(req, res) {
