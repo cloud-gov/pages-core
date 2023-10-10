@@ -101,6 +101,10 @@ module.exports = wrapHandlers({
         value: 'Site.Organization.agency',
       },
       {
+        label: 'Self Authorized',
+        value: 'Site.Organization.isSelfAuthorized',
+      },
+      {
         label: 'Site',
         value: 'Site.repository',
       },

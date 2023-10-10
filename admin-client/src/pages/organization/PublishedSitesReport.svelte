@@ -22,6 +22,7 @@
     <tr slot="header">
       <th scope="col">Organization</th>
       <th scope="col">Agency</th>
+      <th scope="col">Self Authorized</th>
       <th scope="col">Site</th>
       <th scope="col">Domains</th>
       <th scope="col">Engine</th>
@@ -35,6 +36,11 @@
       <td>
         {#if domain.Site && domain.Site.Organization}
           {domain.Site.Organization.agency}
+        {/if}
+      </td>
+      <td>
+        {#if domain.Site && domain.Site.Organization}
+          {domain.Site.Organization.isSelfAuthorized ? 'Yes' : 'No'}
         {/if}
       </td>
       <td>

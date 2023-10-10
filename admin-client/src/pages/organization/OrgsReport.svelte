@@ -12,6 +12,7 @@
     <tr slot="header">
       <th scope="col">Organization</th>
       <th scope="col">Agency</th>
+      <th scope="col">Self Authorized</th>
     </tr>
     <tr slot="item" let:item={org}>
       <td>
@@ -19,6 +20,9 @@
       </td>
       <td>
         {org.agency}
+      </td>
+      <td>
+        {org.isSelfAuthorized ? 'Yes' : 'No'}
       </td>
     </tr>
   </DataTable>

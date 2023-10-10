@@ -57,7 +57,10 @@ describe('Admin - Organizations API', () => {
       const user = await factory.user();
 
       const org1 = await factory.organization.create({agency: 'Agency 1'});
-      const org2 = await factory.organization.create({agency: 'Agency 2'});
+      const org2 = await factory.organization.create({
+        agency: 'Agency 2',
+        selfAuthorizedAt: new Date(),
+      });
 
       const cookie = await authenticatedSession(user, sessionConfig);
       const response = await request(app)
@@ -73,14 +76,14 @@ describe('Admin - Organizations API', () => {
       );
       [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
-        '"Organization","Agency"'
+        '"Organization","Agency","Self Authorized"'
       );
       expect(data.length).to.equal(2);
       expect(data[0]).to.equal(
-        `"${org1.name}","${org1.agency}"`
+        `"${org1.name}","${org1.agency}",false`
       );
       expect(data[1]).to.equal(
-        `"${org2.name}","${org2.agency}"`
+        `"${org2.name}","${org2.agency}",true`
       );
     });
   });
