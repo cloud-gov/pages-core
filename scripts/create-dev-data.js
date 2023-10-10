@@ -164,7 +164,11 @@ async function createData() {
   const [agency1, agency2, agency3, agency4, sandbox] = await Promise.all([
     Organization.create({ name: 'agency1', agency: 'GSA' }),
     Organization.create({ name: 'agency2', agency: 'GSA' }),
-    Organization.create({ name: 'agency3', agency: 'Bureau of Testing' }),
+    Organization.create({
+      name: 'agency3',
+      agency: 'Bureau of Testing',
+      selfAuthorizedAt: addDays(new Date(), -183),
+    }),
     Organization.create({
       name: 'agency4',
       agency: 'Demonstration Department',

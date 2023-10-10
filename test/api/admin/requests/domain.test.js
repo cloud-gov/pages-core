@@ -111,6 +111,7 @@ describe('Admin - Domains API', () => {
       const org = await factory.organization.create({
         name: 'Test Org',
         agency: 'Test Agency',
+        selfAuthorizedAt: new Date(),
       });
       const site = await factory.site({ organizationId: org.id });
       const domain = await factory.domain.create({
@@ -140,14 +141,14 @@ describe('Admin - Domains API', () => {
       );
       [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
-        '"Organization","Agency","Site","Domain","Engine"'
+        '"Organization","Agency","Self Authorized","Site","Domain","Engine"'
       );
       expect(data.length).to.equal(2);
       expect(data[0]).to.equal(
-        `"${org.name}","${org.agency}","${site.repository}","${domain.names}","${site.engine}"`
+        `"${org.name}","${org.agency}",true,"${site.repository}","${domain.names}","${site.engine}"`
       );
       expect(data[1]).to.equal(
-        `,,"${orglessSite.repository}","${orglessDomain.names}","${orglessSite.engine}"`
+        `,,,"${orglessSite.repository}","${orglessDomain.names}","${orglessSite.engine}"`
       );
     });
   });

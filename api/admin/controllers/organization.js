@@ -69,6 +69,10 @@ module.exports = wrapHandlers({
         label: 'Agency',
         value: 'agency',
       },
+      {
+        label: 'Self Authorized',
+        value: 'isSelfAuthorized',
+      },
     ];
 
     const parser = new json2csv.Parser({ fields });
