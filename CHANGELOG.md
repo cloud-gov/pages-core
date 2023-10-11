@@ -1,3 +1,25 @@
+## 0.3.0 (2023-10-10)
+
+### Added
+
+- implement build task runners, call CF API directly (#4259)
+- add build task queue and example worker (#4248)
+- add build task router and controller (#4169)
+- add DB models to support build task feature (#4184)
+- Allow users to create custom domains to prepare launch
+
+### Fixed
+
+- Admin UI for updated site branch configs and domains
+
+### Maintenance
+
+- Improve name and path and update published sites report
+- Update deps using json5 #4249
+- Update CF API to V3 #4112
+- update uaa war release download location
+- use correct path for release notes
+
 ## 0.2.1 (2023-08-22)
 
 ### Performance
