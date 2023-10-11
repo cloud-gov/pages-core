@@ -33,9 +33,6 @@
         { "type": ["string"] }
       ]
     },
-    "selfAuthorizedAt": {
-      "type": "date-time"
-    },
     "isSelfAuthorized": {
       "type": "boolean"
     }

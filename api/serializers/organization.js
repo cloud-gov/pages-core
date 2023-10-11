@@ -10,7 +10,6 @@ const attributes = {
   daysUntilSandboxCleaning: '',
   isActive: '',
   agency: '',
-  selfAuthorizedAt: 'date',
   isSelfAuthorized: '',
 };
 

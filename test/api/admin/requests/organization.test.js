@@ -56,11 +56,8 @@ describe('Admin - Organizations API', () => {
     it('returns all organizations', async () => {
       const user = await factory.user();
 
-      const org1 = await factory.organization.create({agency: 'Agency 1'});
-      const org2 = await factory.organization.create({
-        agency: 'Agency 2',
-        selfAuthorizedAt: new Date(),
-      });
+      const org1 = await factory.organization.create({agency: 'Agency 1', isSelfAuthorized: false});
+      const org2 = await factory.organization.create({agency: 'Agency 2', isSelfAuthorized: true});
 
       const cookie = await authenticatedSession(user, sessionConfig);
       const response = await request(app)
