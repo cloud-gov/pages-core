@@ -96,6 +96,7 @@
     "update-proxy-db": "node ./scripts/proxy-edge.js",
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js",
+    "migrate-site-repo": "node ./scripts/migrate-site-repo.js",
     "send-email": "node ./scripts/send-email.js",
     "bootstrap-admins": "node ./scripts/bootstrap-admins.js",
     "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js",

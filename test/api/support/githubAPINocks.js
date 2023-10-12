@@ -270,10 +270,16 @@ const status = ({
   return statusNock.reply(...resp);
 };
 
-const webhook = ({
-  // eslint-disable-next-line no-shadow
-  accessToken, owner, repo, response,
-} = {}) => {
+const webhook = (
+  {
+    // eslint-disable-next-line no-shadow
+    accessToken,
+    owner,
+    repo,
+    response,
+  } = {},
+  { id = 1 } = {}
+) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -298,7 +304,7 @@ const webhook = ({
 
   let resp = response || 201;
   if (typeof resp === 'number') {
-    resp = [resp, { id: 1 }];
+    resp = [resp, { id: id }];
   }
 
   return webhookNock.reply(...resp);
