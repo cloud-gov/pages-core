@@ -167,7 +167,7 @@ async function createData() {
     Organization.create({
       name: 'agency3',
       agency: 'Bureau of Testing',
-      selfAuthorizedAt: addDays(new Date(), -183),
+      isSelfAuthorized: true,
     }),
     Organization.create({
       name: 'agency4',

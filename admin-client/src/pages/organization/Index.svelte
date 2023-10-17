@@ -32,7 +32,7 @@
           regular
         {/if}
       </td>
-      <td>{formatDateTime(org.selfAuthorizedAt)}</td>
+      <td>{org.isSelfAuthorized ? 'Yes' : 'No'}</td>
       <td>
         {#if org.isActive}
           active

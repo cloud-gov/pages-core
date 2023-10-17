@@ -119,20 +119,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    selfAuthorizedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
     isSelfAuthorized: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        return !!this.selfAuthorizedAt;
-      },
-      set(isSelfAuthorized) {
-        if (this.isSelfAuthorized !== isSelfAuthorized) {
-          this.selfAuthorizedAt = isSelfAuthorized ? new Date() : null;
-        }
-      },
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   }, {
     paranoid: true,

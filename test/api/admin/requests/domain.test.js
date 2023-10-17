@@ -111,7 +111,7 @@ describe('Admin - Domains API', () => {
       const org = await factory.organization.create({
         name: 'Test Org',
         agency: 'Test Agency',
-        selfAuthorizedAt: new Date(),
+        isSelfAuthorized: true,
       });
       const site = await factory.site({ organizationId: org.id });
       const domain = await factory.domain.create({
