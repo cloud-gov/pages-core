@@ -15,6 +15,10 @@ More examples can be found at [https://cloud.gov/pages/success-stories/](https:/
 
 For information on development of this application, please see [DEVELOPMENT.md](DEVELOPMENT.md)
 
+## Platform Ops
+
+For information on running platform operations with this application, please see [OPERATIONS.md](OPERATIONS.md)
+
 ## Initial proposal
 
 Federalist is new open source publishing system based on proven open source components and techniques. Once the text has been written, images uploaded, and a page is published, the outward-facing site will act like a simple web site -- fast, reliable, and easily scalable. Administrative tools, which require authentication and additional interactive components, can be responsive with far fewer users.
