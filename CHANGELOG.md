@@ -1,3 +1,9 @@
+## 0.3.1 (2023-10-17)
+
+### Maintenance
+
+- Refine site repo migration docs
+
 ## 0.3.0 (2023-10-10)
 
 ### Added
