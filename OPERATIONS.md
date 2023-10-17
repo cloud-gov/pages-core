@@ -20,5 +20,15 @@ Requirements:
 Example:
 
 ```bash
-$ cf run-task pages-<env> "yarn migrate-site-repo 1 user@agency.gov agency-org site-repo" --name site-1-migrate
+## Running the site repo migration ##
+# Task arguments:
+#   --command Required: Runs migration command with args
+#      ie: yarn migrate-site-repo <siteId> <email> <owner> <repository>
+#   [--name] Optional: Name to give the task (generated if omitted)
+
+## Example migration
+$ cf run-task pages-<env> --command "yarn migrate-site-repo 1 user@agency.gov agency-org site-repo" --name site-1-migrate
+
+## See the migration output
+$ cf logs --recent pages-<env>
 ```
