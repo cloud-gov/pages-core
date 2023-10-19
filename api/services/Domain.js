@@ -254,7 +254,7 @@ async function checkProvisionStatus(id) {
   const service = await cfApi().fetchServiceInstance(domain.serviceName);
   const {
     last_operation: { state: lastOperation },
-  } = service.entity;
+  } = service;
 
   switch (lastOperation) {
     case 'succeeded':
