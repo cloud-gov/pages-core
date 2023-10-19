@@ -1,3 +1,9 @@
+## 0.3.2 (2023-10-19)
+
+### Fixed
+
+- Fixes domain checkProvisionStatus with new CF api response
+
 ## 0.3.1 (2023-10-17)
 
 ### Maintenance
