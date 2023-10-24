@@ -13,7 +13,7 @@
       "example": "feat: this feature enable customize through config file",
       "schema": "<type>: <body>",
       "schema_pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w \\-'])+([\\s\\S]*)",
-      "bump_pattern": "^(.+!|BREAKING CHANGE|chore|docs|feat|fix|perf|refactor|revert|style|test):",
+      "bump_pattern": "^(.+!|BREAKING CHANGE|chore|docs|feat|fix|perf|refactor|revert|style|test)(\\([\\w\\-\\.]+\\))?:",
       "bump_map": {
           ".+!": "MAJOR",
           "BREAKING CHANGE": "MAJOR",
@@ -29,7 +29,7 @@
       },
       "change_type_order": ["Breaking Changes", "Added", "Fixed", "Performance", "Reverted", "Maintenance", "Documentation"],
       "commit_parser": "^((?P<change_type>chore|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?",
-      "changelog_pattern": "^(.+!|BREAKING CHANGE|chore|docs|feat|fix|perf|refactor|revert|style|test):",
+      "changelog_pattern": "^(.+!|BREAKING CHANGE|chore|docs|feat|fix|perf|refactor|revert|style|test)(\\([\\w\\-\\.]+\\))?:",
       "change_type_map": {
         "BREAKING CHANGE": "Breaking Changes",
         "chore": "Maintenance",
