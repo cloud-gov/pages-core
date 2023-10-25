@@ -265,6 +265,8 @@ function defaultContext(req, res) {
   };
 }
 
+const DEFAULT_BUILD_TASK_PARAMS = "-p '{ \"STATUS_CALLBACK\": \"{{job.data.STATUS_CALLBACK}}\", \"TASK_ID\": {{job.data.TASK_ID}}, \"AWS_DEFAULT_REGION\": \"{{job.data.AWS_DEFAULT_REGION}}\", \"AWS_ACCESS_KEY_ID\": \"{{job.data.AWS_ACCESS_KEY_ID}}\", \"AWS_SECRET_ACCESS_KEY\": \"{{job.data.AWS_SECRET_ACCESS_KEY}}\", \"BUCKET\": \"{{job.data.BUCKET}}\" }'";
+
 module.exports = {
   buildEnum,
   generateS3ServiceName,
@@ -288,4 +290,5 @@ module.exports = {
   wrapHandler,
   wrapHandlers,
   defaultContext,
+  DEFAULT_BUILD_TASK_PARAMS,
 };

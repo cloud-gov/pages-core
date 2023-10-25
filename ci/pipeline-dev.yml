@@ -92,6 +92,7 @@ jobs:
             image: cf-image
             params:
               <<: *env-cf
+              APP_ENV: ((deploy-env))
               CF_APP_NAME: pages-((deploy-env))
               CF_TASK_NAME: run-migrations
               CF_TASK_COMMAND: 'yarn run migrate:up'
