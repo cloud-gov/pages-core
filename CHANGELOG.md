@@ -1,3 +1,9 @@
+## 0.3.3 (2023-10-25)
+
+### Maintenance
+
+- update slack release notes format and bump pattern matcher
+
 ## 0.3.2 (2023-10-19)
 
 ### Fixed
