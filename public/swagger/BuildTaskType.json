@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "startsWhen",
+    "url"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "startsWhen": {
+      "type": "string",
+      "enum": [
+        "build",
+        "complete"
+      ]
+    },
+    "url": {
+      "type": "string"
+    }
+  }
+}

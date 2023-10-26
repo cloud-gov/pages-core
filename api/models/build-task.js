@@ -26,9 +26,12 @@ const associate = ({ BuildTask, Build, BuildTaskType }) => {
     where: {
       '$Build.site$': id,
     },
-    include: [{
-      model: Build,
-    }],
+    include: [
+      {
+        model: Build,
+      },
+      BuildTaskType,
+    ],
   }));
 };
 
@@ -63,7 +66,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-    }, {
+      message: {
+        type: DataTypes.STRING,
+      },
+      count: {
+        type: DataTypes.INTEGER,
+      },
+    },
+    {
       tableName: 'build_task',
       paranoid: true,
       indexes: [

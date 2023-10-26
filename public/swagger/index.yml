@@ -231,7 +231,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: 'BuildTask.json'
+              type: 'object'
+              schema:
+                $ref: 'BuildTask.json'
         401:
           description: Unauthorized
           schema:
@@ -1304,3 +1306,13 @@ paths:
           description: Not found
           schema:
             $ref: 'Error.json'
+  /tasks/types:
+    get:
+      summary: List available build task types
+      responses:
+        200:
+          description: An arry of build task types
+          schema:
+            type: array
+            items:
+              $ref: 'BuildTaskType.json'

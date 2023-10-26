@@ -1,5 +1,6 @@
 const { wrapHandlers } = require('../utils');
-const { Build, BuildTask } = require('../models');
+const { Build, BuildTask, BuildTaskType } = require('../models');
+const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -16,6 +17,7 @@ module.exports = wrapHandlers({
     const task = await BuildTask.findOne({
       where: { buildId, id: buildTaskId },
       attributes: { exclude: ['token', 'deletedAt'] },
+      include: BuildTaskType,
     });
 
     if (!task) {
@@ -37,10 +39,21 @@ module.exports = wrapHandlers({
 
     const tasks = await BuildTask.findAll({
       where: { buildId },
-      attributes: { exclude: ['token', 'deletedAt'] },
+      attributes: { exclude: ['token', 'deletedAt', 'name'] },
+      include: BuildTaskType,
     });
 
-    return res.json(tasks);
+    const updatedTasks = await Promise.all(tasks.map(async (task) => {
+      if (task.artifact) {
+        const size = await getTaskArtifactSize(build.Site, task.artifact);
+        const url = await getSignedTaskUrl(build.Site, task.artifact);
+        // eslint-disable-next-line no-param-reassign
+        task.artifact = { size, url };
+      }
+      return task;
+    }));
+
+    return res.json(updatedTasks);
   },
 
   update: async (req, res) => {

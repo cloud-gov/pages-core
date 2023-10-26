@@ -1,5 +1,5 @@
 const {
-  Build, Domain, Site, SiteBranchConfig, User,
+  Build, Domain, Site, SiteBranchConfig, User, BuildTask, BuildTaskType,
 } = require('../models');
 const { buildViewLink } = require('../utils/build');
 const siteSerializer = require('./site');
@@ -61,6 +61,11 @@ const serialize = async (serializable) => {
           model: Site,
           required: true,
           include: [SiteBranchConfig, Domain],
+        },
+        {
+          model: BuildTask,
+          required: false,
+          include: [BuildTaskType],
         },
       ],
     });

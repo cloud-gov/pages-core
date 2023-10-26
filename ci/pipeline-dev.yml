@@ -35,6 +35,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
       - put: gh-status
@@ -68,6 +69,7 @@ jobs:
               APP_HOSTNAME: https://((((deploy-env))-pages-domain))
               NODE_ENV: development
               PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
+              FEATURE_BUILD_TASKS: true
 
           - task: deploy-api
             file: src/ci/partials/deploy.yml
@@ -141,6 +143,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
       - put: gh-status
@@ -205,6 +208,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
       - put: gh-status
@@ -259,6 +263,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
       - get: cf-image
       - get: nightly
@@ -281,6 +286,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         trigger: true
         passed:
         - test-and-deploy-api-pages
@@ -346,6 +352,7 @@ jobs:
     plan: 
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         trigger: true
         passed: [set-pipeline]
       - get: node
@@ -387,6 +394,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
       - get: nightly
         trigger: true
@@ -432,6 +440,7 @@ jobs:
     plan:
     - get: src
       resource: pr-((deploy-env))
+      params: {integration_tool: checkout}
       trigger: true
     - set_pipeline: core
       file: src/ci/pipeline-dev.yml

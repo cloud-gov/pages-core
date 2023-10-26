@@ -44,8 +44,8 @@ export const BranchViewLink = ({ branchName, site, showIcon }) => {
       rel="noopener noreferrer"
       className={showIcon ? 'view-site-link' : ''}
     >
-      View Build Link
       {showIcon && <IconView />}
+      View build
     </a>
   );
 };

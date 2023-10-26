@@ -61,9 +61,12 @@ describe('Build Task API', () => {
         'artifact',
         'buildId',
         'buildTaskTypeId',
+        'BuildTaskType',
         'createdAt',
         'id',
-        'name',
+        'message',
+        'count',
+        // 'name',
         'status',
         'updatedAt',
       ]);
@@ -89,7 +92,7 @@ describe('Build Task API', () => {
         .get(`/v0/build/${buildTask.buildId}/tasks/${buildTask.id}`)
         .expect(403))
         .then((response) => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/tasks/{task_id}', 403, response.body);
+          validateAgainstJSONSchema('GET', '/build/{build_id}/tasks/{task_id}', 404, response.body);
           done();
         }).catch(done);
     });
@@ -108,8 +111,11 @@ describe('Build Task API', () => {
         'artifact',
         'buildId',
         'buildTaskTypeId',
+        'BuildTaskType',
         'createdAt',
         'id',
+        'message',
+        'count',
         'name',
         'status',
         'updatedAt',

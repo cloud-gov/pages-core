@@ -18,7 +18,7 @@ describe('<GitHubLink/>', () => {
     const anchor = wrapper.find('a.repo-link');
     expect(anchor.exists()).to.be.true;
     expect(anchor.prop('href')).to.equal('https://github.com/owner/a-repo');
-    expect(anchor.prop('title')).to.equal('View repository');
+    expect(anchor.prop('title')).to.equal('View repository on GitHub');
     expect(anchor.text()).to.equal('link text');
     expect(wrapper.find('IconGitHub').exists()).to.be.true;
   });
@@ -31,7 +31,7 @@ describe('<GitHubLink/>', () => {
     const anchor = wrapper.find('a.repo-link');
     expect(anchor.exists()).to.be.true;
     expect(anchor.prop('href')).to.equal('https://github.com/pumpkin-pie/candle/tree/the-branch');
-    expect(anchor.prop('title')).to.equal('View branch');
+    expect(anchor.prop('title')).to.equal('View branch on GitHub');
   });
 
   it('encodes the branch name', () => {

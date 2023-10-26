@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { addDays } = require('date-fns');
+const { addDays, addMinutes } = require('date-fns');
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
 const { encrypt } = require('../api/services/Encryptor');
@@ -408,19 +408,68 @@ async function createData() {
   ]);
 
   const nodeSiteBuilds = await Promise.all([
+    // default
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: new Date(),
       source: 'fake-build',
-      state: 'success',
+      createdAt: new Date(),
       site: nodeSite.id,
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
+      requestedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
+    })),
+    // skipped, looks like created
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: addDays(new Date(), -3),
+      createdAt: addMinutes(new Date(), -2),
+      source: 'fake-build',
+      state: 'skipped',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }).then(build => build.update({
+      clonedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
+      requestedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
+    })),
+    // queued, looks like created
+    Build.create({
+      branch: 'longer-branch-names-might-be-truncated',
+      createdAt: new Date(),
+      source: 'fake-build',
+      state: 'queued',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }).then(build => build.update({
+      clonedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
+      requestedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
+    })),
+    // in progress
+    Build.create({
+      branch: nodeSite.defaultBranch,
+      startedAt: addMinutes(new Date(), -1),
+      createdAt: addMinutes(new Date(), -1),
+      source: 'fake-build',
+      state: 'processing',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }).then(build => build.update({
+      clonedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+      requestedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+    })),
+    // error/timed out
+    Build.create({
+      branch: nodeSite.defaultBranch,
+      completedAt: addMinutes(new Date(), -1200),
+      startedAt: addMinutes(new Date(), -1200),
+      createdAt: addMinutes(new Date(), -1200),
       source: 'fake-build',
       state: 'error',
       site: nodeSite.id,
@@ -428,41 +477,168 @@ async function createData() {
       username: user1.username,
       token: 'fake-token',
       error: 'The build timed out',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
+      requestedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
+    })),
+    // completed on default branch
     Build.create({
-      branch: 'dc/fixes',
+      branch: nodeSite.defaultBranch,
+      completedAt: addMinutes(new Date(), -12),
+      startedAt: addMinutes(new Date(), -9),
+      createdAt: addMinutes(new Date(), -9),
       source: 'fake-build',
+      state: 'success',
       site: nodeSite.id,
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
     }).then(build => build.update({
+      clonedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
+      requestedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
+    })),
+    // completed on another branch
+    Build.create({
+      branch: 'longer-branch-names-might-be-truncated',
+      completedAt: addMinutes(new Date(), -56),
+      startedAt: addMinutes(new Date(), -54),
+      createdAt: addMinutes(new Date(), -54),
+      source: 'fake-build',
+      state: 'success',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }).then(build => build.update({
+      clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
       requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
     })),
   ]);
 
-  const taskType = await BuildTaskType.create({
-    name: 'test',
-    description: 'test description',
+  const taskType1 = await BuildTaskType.create({
+    name: 'OWASP ZAP Vulnerability Scan',
+    description: 'This scan identifies potential website security issues like unintended exposure of sensitive data, SQL injection opportunities, cross-site scripting (XSS) flaws, and the use of components with known vulnerabilities.',
     metadata: {
-      foo: 'bar',
+      foo: 'bar', // no metadata is real/used yet
     },
     runner: 'cf_task',
     startsWhen: 'build',
+    url: 'https://cloud.gov/pages/documentation/build-scans/',
   });
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,
-    buildTaskTypeId: taskType.id,
+    buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'processing',
+    artifact: null,
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[2].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'created', // initial value, 'processing' or 'queued' haven't been made yet
+    artifact: null,
+    message: 'Scan in progress',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[4].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'error',
+    artifact: null,
+    message: 'Scan could not be completed',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[5].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'success',
+    artifact: 'filename-1234.html',
+    message: 'Scan successfully completed. See artifact for details.',
+    count: 0,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[6].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'success',
+    artifact: 'filename-1234.html',
+    message: 'Scan successfully completed. See artifact for details.',
+    count: 42,
   });
 
+  const taskType2 = await BuildTaskType.create({
+    name: 'WCAG 2.2 AA Accessibility Scan',
+    description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG 2.2 Level A and AA requirements.',
+    metadata: {
+      foo: 'bar', // no metadata is real/used yet
+    },
+    runner: 'cf_task',
+    startsWhen: 'build',
+    url: 'https://cloud.gov/pages/documentation/build-scans/',
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[0].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    artifact: null,
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[2].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'created', // initial value, 'processing' or 'queued' haven't been made yet
+    artifact: null,
+    message: 'Scan in progress',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[4].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'error',
+    artifact: null,
+    message: 'Scan could not be completed',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[5].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'error',
+    artifact: null,
+    message: 'Scan could not be completed',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[6].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'success',
+    artifact: 'WCAG-scan.txt',
+    message: 'Scan successfully completed. See artifact for details.',
+    count: 3,
+  });
+
+  // task "hook" for each site
   await SiteBuildTask.create({
     siteId: nodeSite.id,
-    buildTaskTypeId: taskType.id,
+    buildTaskTypeId: taskType1.id,
     branch: 'test',
     metadata: {
-      nightly: true,
+      nightly: true, // no metadata is real/used yet
+    },
+  });
+  // task "hook" for each site
+  await SiteBuildTask.create({
+    siteId: nodeSite.id,
+    buildTaskTypeId: taskType2.id,
+    branch: 'test',
+    metadata: {
+      nightly: true, // no metadata is real/used yet
     },
   });
 

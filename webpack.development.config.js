@@ -106,7 +106,7 @@ module.exports = {
     // When webpack bundles moment, it includes all of its locale files,
     // which we don't need, so we'll use this plugin to keep them out of the
     // bundle
-    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/}),
+    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
     new webpack.EnvironmentPlugin([
       ...getFeatureFlags(process.env),
       'APP_HOSTNAME',
@@ -115,6 +115,7 @@ module.exports = {
     ]),
     new BundleAnalyzerPlugin({
       analyzerHost: '0.0.0.0',
+      analyzerPort: '8888'
     }),
   ],
 };
