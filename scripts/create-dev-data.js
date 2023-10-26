@@ -449,12 +449,16 @@ async function createData() {
     },
     runner: 'cf_task',
     startsWhen: 'build',
+    url: 'example.gov',
   });
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,
     buildTaskTypeId: taskType.id,
     name: 'type',
     status: 'processing',
+    artifact: 'filename-1234.html',
+    message: 'something happened',
+    count: 123,
   });
 
   await SiteBuildTask.create({

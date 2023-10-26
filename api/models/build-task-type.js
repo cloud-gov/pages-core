@@ -55,6 +55,9 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [StartsWhens.values],
         },
       },
+      url: {
+        type: DataTypes.STRING,
+      },
     }, {
       tableName: 'build_task_type',
     }

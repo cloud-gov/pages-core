@@ -8,7 +8,9 @@
     "status",
     "updatedAt",
     "name",
-    "artifact"
+    "artifact",
+    "message",
+    "count"
   ],
   "properties": {
     "id": {
@@ -42,6 +44,12 @@
     },
     "artifact": {
       "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "count": {
+      "type": "integer"
     }
   }
 }

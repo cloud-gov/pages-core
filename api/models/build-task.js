@@ -63,6 +63,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      message: {
+        type: DataTypes.STRING,
+      },
+      count: {
+        type: DataTypes.INTEGER,
+      },
     }, {
       tableName: 'build_task',
       paranoid: true,
