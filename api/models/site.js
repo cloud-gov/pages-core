@@ -211,6 +211,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    awsBucketKeyUpdatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
     config: {
       type: DataTypes.JSONB,
       defaultValue: {},

@@ -151,6 +151,70 @@ const mockCreateServiceKeyPost = ({ name, serviceInstanceGuid }) => {
     .reply(200);
 };
 
+const mockDeleteCredentialBindingsInstance = (guid) => {
+  const endpoint = `/v3/service_credential_bindings/${guid}`;
+
+  nock(url, reqheaders).delete(endpoint).reply(200);
+};
+
+const mockfetchCredentialBindingsInstance = (name, { guid, credentials }) => {
+  const endpoint = `/v3/service_credential_bindings?names=${name}`;
+  const response = factory.createCFAPIResource({
+    name,
+    guid,
+    credentials,
+  });
+
+  const resourcesResponse = factory.createCFAPIResourceList({
+    resources: [response],
+  });
+
+  nock(url, reqheaders).get(endpoint).reply(200, resourcesResponse);
+};
+
+const mockfetchCredentialBindingsInstanceEmpty = (name) => {
+  const endpoint = `/v3/service_credential_bindings?names=${name}`;
+
+  const resourcesResponse = factory.createCFAPIResourceList({
+    resources: [],
+  });
+
+  nock(url, reqheaders).get(endpoint).reply(200, resourcesResponse);
+};
+
+const mockBucketKeyRotator = ({
+  serviceInstanceName,
+  serviceInstanceGuid,
+  credentialsInstance,
+}) => {
+  const credentialsName = `${serviceInstanceName}-key`;
+  const instance1 = factory.createCFAPIResource({
+    name: serviceInstanceName,
+    guid: serviceInstanceGuid,
+  });
+  const resourcesResponses = factory.createCFAPIResourceList({
+    resources: [instance1],
+  });
+
+  mockFetchServiceInstancesRequest(resourcesResponses, serviceInstanceName);
+
+  if (credentialsInstance) {
+    mockfetchCredentialBindingsInstance(credentialsName, credentialsInstance);
+    mockDeleteCredentialBindingsInstance(credentialsInstance.guid);
+  } else {
+    mockfetchCredentialBindingsInstanceEmpty(credentialsName);
+  }
+
+  const matcher = (body) =>
+    body.type === "key" &&
+    body.name === credentialsName &&
+    body.relationships.service_instance.data.guid === serviceInstanceGuid;
+
+  nock(url, reqheaders)
+    .post("/v3/service_credential_bindings", matcher)
+    .reply(200, "");
+};
+
 module.exports = {
   mockCreateService,
   mockDeleteRoute,
@@ -163,4 +227,5 @@ module.exports = {
   mockFetchServiceInstanceCredentialsRequest,
   mockFetchSpacesRequest,
   mockFetchS3ServicePlanGUID,
+  mockBucketKeyRotator,
 };

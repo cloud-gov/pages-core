@@ -386,6 +386,51 @@ jobs:
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
+
+  - name: nightly-site-bucket-key-rotator
+    plan:
+      - get: src
+        resource: src-((deploy-env))-tagged
+        passed: [set-pipeline]
+      - get: nightly
+        trigger: true
+      - get: node
+      - get: cf-image
+      - task: install-deps-api
+        file: src/ci/partials/install-deps-api.yml
+        image: node
+      - task: get-app-env
+        file: src/ci/partials/get-app-env.yml
+        image: cf-image
+        params:
+          <<: *env-cf
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: rotate-keys
+        file: src/ci/partials/rotate-bucket-keys.yml
+        image: node
+        params:
+          <<: *env-cf
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+        on_failure:
+          put: slack
+          params:
+            text: |
+              :x: FAILED: Rotate site bucket keys in ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+        on_success:
+          put: slack
+          params:
+            text: |
+              :arrows_counterclockwise: :key: SUCCESS: Rotate site bucket keys in ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
   
   - name: set-pipeline
     plan:
@@ -440,7 +485,7 @@ resources:
     type: docker-image
     source:
       repository: node
-      tag: 18.15
+      tag: 20.9-bullseye
 
   - name: slack
     type: slack-notification

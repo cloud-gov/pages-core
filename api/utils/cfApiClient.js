@@ -228,11 +228,18 @@ class CloudFoundryAPIClient {
   }
 
   fetchCredentialBindingsInstance(name) {
-    const path = `/v3/service_credential_bindings?names=${name}`;
+    const endpoint = `/v3/service_credential_bindings?names=${name}`;
 
     return this.accessToken()
-      .then(token => this.request('GET', path, token))
+      .then(token => this.request('GET', endpoint, token))
       .then(res => findEntity(res, name));
+  }
+
+  deleteServiceInstanceCredentials(guid) {
+    const endpoint = `/v3/service_credential_bindings/${guid}`;
+
+    return this.accessToken()
+      .then(token => this.request('DELETE', endpoint, token));
   }
 
   fetchServiceInstanceCredentials(name) {
@@ -332,5 +339,6 @@ CloudFoundryAPIClient.findEntity = findEntity;
 CloudFoundryAPIClient.firstEntity = firstEntity;
 CloudFoundryAPIClient.objToQueryParams = objToQueryParams;
 CloudFoundryAPIClient.buildRequestBody = buildRequestBody;
+CloudFoundryAPIClient.sleep = sleep;
 
 module.exports = CloudFoundryAPIClient;

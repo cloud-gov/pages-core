@@ -101,7 +101,7 @@ services:
       - 6379:6379
     command: redis-server --loglevel warning
   echo:
-    image: node:18
+    image: node:20.9-bullseye
     volumes:
       - yarn:/usr/local/share/.cache/yarn
       - .:/app

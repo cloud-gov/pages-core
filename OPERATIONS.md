@@ -32,3 +32,13 @@ $ cf run-task pages-<env> --command "yarn migrate-site-repo 1 user@agency.gov ag
 ## See the migration output
 $ cf logs --recent pages-<env>
 ```
+
+## CI
+
+### Nightly site bucket key rotations
+
+This is a CI task that runs nightly in order to rotate a subset of site bucket keys. The script selects __20__ sites based on the oldest `awsBucketKeyUpdatedAt` timestamps. A site's S3 service instance credentials are deleted and then regenerated. Any failures in the rotation will trigger a Slack notification.
+
+Task name: `nightly-site-bucket-key-rotator`
+Task script: [`rotate-bucket-keys.js`](./ci/tasks/rotate-bucket-keys.js)
+Task partial: [`rotate-bucket-keys.yml`](./ci/partials/rotate-bucket-keys.yml)
