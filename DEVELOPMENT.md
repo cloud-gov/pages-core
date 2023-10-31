@@ -57,19 +57,19 @@ Note that `npm run update-local-config` will need to be re-run with some frequen
 
 If local UAA authentication is not needed, Docker can be set up and started with these commands:
 
-1. Run `docker-compose build`.
-1. Run `docker-compose run --rm app yarn` to install dependencies.
-1. Run `docker-compose run --rm admin-client yarn` to install dependencies.
-1. Run `docker-compose run --rm app yarn migrate:up` to initialize the local database.
-1. Run `docker-compose run --rm app yarn create-dev-data` to create some fake development data for your local database.
-1. Run `docker-compose up` to start the development environment.
+1. Run `docker compose build`.
+1. Run `docker compose run --rm app yarn` to install dependencies.
+1. Run `docker compose run --rm admin-client yarn` to install dependencies.
+1. Run `docker compose run --rm app yarn migrate:up` to initialize the local database.
+1. Run `docker compose run --rm app yarn create-dev-data` to create some fake development data for your local database.
+1. Run `docker compose up` to start the development environment.
 
-Any time the node dependencies are changed (like from a recently completed new feature), `docker-compose run --rm app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
+Any time the node dependencies are changed (like from a recently completed new feature), `docker compose run --rm app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
 
-In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker-compose configuration file when executing the docker-compose commands which build containers or start the development environment, e.g.:
+In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker compose configuration file when executing the docker compose commands which build containers or start the development environment, e.g.:
 
-1. `docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build`
-1. `docker-compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up`
+1. `docker compose -f ./docker compose.yml -f ./docker compose.uaa.yml build`
+1. `docker compose -f ./docker compose.yml -f ./docker compose.uaa.yml up`
 
 #### Check to see if everything is working correctly
 
@@ -78,16 +78,16 @@ In order to make it possible to log in with local UAA authentication in a develo
 
 **Pro tips:**
 
-In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker-compose run --rm app <THE COMMAND>`.
+In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker compose run --rm app <THE COMMAND>`.
 
 For example:
 
-- Use `docker-compose run --rm app yarn test` to run local testing on the app.
-- Use `docker-compose run --rm app yarn lint` to check that your local changes meet our linting standards.
+- Use `docker compose run --rm app yarn test` to run local testing on the app.
+- Use `docker compose run --rm app yarn lint` to check that your local changes meet our linting standards.
 
-Similarly you can run any command in the context of the database container `db` by running `docker-compose run --rm db <THE COMMAND>`.
+Similarly you can run any command in the context of the database container `db` by running `docker compose run --rm db <THE COMMAND>`.
 
-Note that when using `docker-compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker-compose run --rm --service-ports app <THE COMMAND>`.
+Note that when using `docker compose run`, the docker network will not be exposed to your local machine. If you do need the network available, run `docker compose run --rm --service-ports app <THE COMMAND>`.
 
 The `db` container is exposed on port `5433` of your host computer to make it easier to run commands on. For instance, you can open a `psql` session to it by running `psql -h localhost -p 5433 -d federalist -U postgres`.
 
@@ -325,29 +325,49 @@ When making code changes, be sure to write new or modify existing tests to cover
 The full test suite of both front and back end tests can be run via:
 
 ```sh
-docker-compose run --rm app yarn test
+docker compose run --rm app yarn test
 ```
 
 You can also just run back or front end tests via:
 
 ```sh
-docker-compose run --rm app yarn test:server  # for all back end tests
-docker-compose run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
-docker-compose run --rm app yarn test:client  # for all front end tests
-docker-compose run --rm app yarn test:client:watch  # to watch and re-run front end tests
-docker-compose run --rm app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
+docker compose run --rm app yarn test:server  # for all back end tests
+docker compose run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
+docker compose run --rm app yarn test:client  # for all front end tests
+docker compose run --rm app yarn test:client:watch  # to watch and re-run front end tests
+docker compose run --rm app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
 To view coverage reports as HTML:
 
 ```sh
-docker-compose run --rm app yarn test:cover
-docker-compose run --rm --service-ports app yarn serve-coverage
+docker compose run --rm app yarn test:cover
+docker compose run --rm --service-ports app yarn serve-coverage
 ```
 
 and then visit http://localhost:8080.
 
 For the full list of available commands that you can run with `yarn` or `npm`, see the `"scripts"` section of `package.json`.
+
+**End-to-end testing (experimental)**
+
+We also have end-to-end (e2e) testing available via [playwright](https://playwright.dev/). Before your first run, make sure you have Playwright and all the necessary dependencies:
+
+```sh
+yarn install playwright
+yarn playwright install-deps
+yarn playwright install
+```
+
+To run, start the application with `docker compose up` and then run the following commands:
+
+```sh
+docker compose run --rm app node scripts/create-test-users.js
+yarn test:e2e
+docker compose run --rm app node scripts/remove-test-users.js
+```
+
+Note that the create/remove test user scripts only need to be run once per day to create a new valid test session. You can also run Playwright tests with the [VSCode Extension](https://playwright.dev/docs/getting-started-vscode)
 
 ### Linting
 
@@ -358,13 +378,13 @@ Because this project was not initially written in a way that complies with our c
 To lint the files in a branch, run:
 
 ```sh
-docker-compose run --rm app yarn lint
+docker compose run --rm app yarn lint
 ```
 
 `eslint` also has a helpful auto-fix command that can be run by:
 
 ```sh
-docker-compose run --rm app node_modules/.bin/eslint --fix path/to/file.js
+docker compose run --rm app node_modules/.bin/eslint --fix path/to/file.js
 ```
 
 ## Feature Flags
@@ -463,3 +483,5 @@ This convention is enforced via [this ruleset](https://github.com/cloud-gov/page
 The benefit of adhering to this convention is that we can more easily reason about our commit history and also generate nice changelogs via [Commitizen](https://commitizen-tools.github.io/commitizen/).
 
 If you didn't follow this convention while making your commits locally or on a development branch, you'll still have an opportunity to edit the commit history to match the Convention Commits specification. While the code is on a non-default branch, you can perform an [interactive rebase](https://git-scm.com/docs/git-rebase) to rewrite the history.
+
+##

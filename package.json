@@ -102,7 +102,10 @@
     "migrate-build-notification-settings": "node ./scripts/migrate-build-notification-settings.js",
     "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js",
     "check-object-paths": "node ./scripts/check-object-paths.js",
-    "queued-builds-check": "node ./scripts/queued-builds-check.js"
+    "queued-builds-check": "node ./scripts/queued-builds-check.js",
+    "test:e2e": "yarn playwright test",
+    "create-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/create-test-users.js",
+    "remove-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/remove-test-users.js"
   },
   "main": "index.js",
   "repository": {
@@ -118,7 +121,9 @@
     "@babel/preset-react": "^7.12.10",
     "@babel/register": "^7.22.15",
     "@cfaester/enzyme-adapter-react-18": "^0.6.0",
+    "@playwright/test": "^1.39.0",
     "@svgr/webpack": "8.0.1",
+    "@types/node": "^20.8.10",
     "autoprefixer": "^10.2.5",
     "aws-sdk-client-mock": "^3.0.0",
     "babel-eslint": "^10.0.1",
@@ -151,6 +156,7 @@
     "nock": "^13.0.5",
     "nodemon": "^2.0.6",
     "nyc": "^15.1.0",
+    "playwright": "^1.39.0",
     "postcss": "^8.3.0",
     "postcss-loader": "^5.3.0",
     "promise-props": "^1.0.0",
