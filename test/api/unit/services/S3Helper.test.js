@@ -18,6 +18,30 @@ describe('S3Helper', () => {
   after(() => s3Mock.restore());
   beforeEach(() => s3Mock.reset());
 
+  describe('.listHelper(prefix, property)', () => {
+    it('returns an empty array if the prefix doesn\'t exist', (done) => {
+      const prefix = 'nonexistant-prefix/';
+
+      s3Mock.on(ListObjectsV2Command, {
+        Bucket: config.s3.bucket,
+        Prefix: prefix,
+      }).resolvesOnce({
+        IsTruncated: false,
+        KeyCount: 0,
+        ContinuationToken: null,
+        NextContinuationToken: null,
+      });
+
+      const client = new S3Helper.S3Client(config.s3);
+      client.listObjects(prefix)
+        .then((objects) => {
+          expect(objects.length).to.equal(0);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
   describe('.listObjects(prefix)', () => {
     it('can get objects', (done) => {
       const prefix = 'some-prefix/';
@@ -27,6 +51,7 @@ describe('S3Helper', () => {
         Prefix: prefix,
       }).resolvesOnce({
         IsTruncated: false,
+        KeyCount: 3,
         Contents: ['a', 'b', 'c'],
         ContinuationToken: null,
         NextContinuationToken: null,
@@ -49,16 +74,19 @@ describe('S3Helper', () => {
         Prefix: prefix,
       }).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 3,
         Contents: [1, 2, 3],
         ContinuationToken: 'first-token',
         NextContinuationToken: 'next-token',
       }).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 3,
         Contents: [4, 5, 6],
         ContinuationToken: 'next-token',
         NextContinuationToken: 'last-token',
       }).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 3,
         Contents: [7, 8, 9],
         ContinuationToken: 'last-token',
         NextContinuationToken: null,
@@ -92,6 +120,7 @@ describe('S3Helper', () => {
       s3Mock
         .on(ListObjectsV2Command).resolves({
           IsTruncated: false,
+          KeyCount: objectsToDelete.length,
           Contents: objectsToDelete.map(object => ({ Key: object })),
           ContinuationToken: 'A',
           NextContinuationToken: null,
@@ -172,6 +201,7 @@ describe('S3Helper', () => {
         Prefix: prefix,
       }).resolvesOnce({
         IsTruncated: false,
+        KeyCount: 3,
         CommonPrefixes: ['a', 'b', 'c'],
         ContinuationToken: null,
         NextContinuationToken: null,
@@ -194,16 +224,19 @@ describe('S3Helper', () => {
         Prefix: prefix,
       }).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 3,
         CommonPrefixes: [1, 2, 3],
         ContinuationToken: 'first-token',
         NextContinuationToken: 'next-token',
       }).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 3,
         CommonPrefixes: [4, 5, 6],
         ContinuationToken: 'next-token',
         NextContinuationToken: 'last-token',
       }).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 3,
         CommonPrefixes: [7, 8, 9],
         ContinuationToken: 'last-token',
         NextContinuationToken: null,

@@ -39,7 +39,9 @@ class S3Client {
     const results = [];
     // eslint-disable-next-line no-restricted-syntax
     for await (const page of paginator) {
-      results.push(...page[property]);
+      if (page.KeyCount > 0) {
+        results.push(...page[property]);
+      }
     }
     return results;
   }

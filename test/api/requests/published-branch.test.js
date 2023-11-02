@@ -66,6 +66,7 @@ describe('Published Branches API', () => {
 
       s3Mock.on(ListObjectsV2Command).resolvesOnce({
         IsTruncated: true,
+        KeyCount: 2,
         CommonPrefixes: [
           { Prefix: 'abc' },
           { Prefix: 'def' },
@@ -74,6 +75,7 @@ describe('Published Branches API', () => {
         NextContinuationToken: 'B',
       }).resolvesOnce({
         IsTruncated: false,
+        KeyCount: 1,
         CommonPrefixes: [
           { Prefix: 'ghi' },
         ],
@@ -114,6 +116,7 @@ describe('Published Branches API', () => {
 
       s3Mock.on(ListObjectsV2Command).resolves({
         IsTruncated: false,
+        KeyCount: 1,
         CommonPrefixes: [
           { Prefix: 'abc' },
         ],

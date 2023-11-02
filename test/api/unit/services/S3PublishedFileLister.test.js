@@ -27,6 +27,7 @@ describe('S3PublishedFileLister', () => {
 
         s3Mock.on(ListObjectsV2Command).resolvesOnce({
           IsTruncated: true,
+          KeyCount: 3,
           CommonPrefixes: [
             { Prefix: `preview/${site.owner}/${site.repository}/abc/` },
             { Prefix: `preview/${site.owner}/${site.repository}/def/` },
@@ -80,6 +81,7 @@ describe('S3PublishedFileLister', () => {
 
         s3Mock.on(ListObjectsV2Command).resolvesOnce({
           IsTruncated: true,
+          KeyCount: 3,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
@@ -123,6 +125,7 @@ describe('S3PublishedFileLister', () => {
 
         s3Mock.on(ListObjectsV2Command).resolvesOnce({
           IsTruncated: true,
+          KeyCount: 3,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
@@ -166,6 +169,7 @@ describe('S3PublishedFileLister', () => {
 
         s3Mock.on(ListObjectsV2Command).resolvesOnce({
           IsTruncated: true,
+          KeyCount: 3,
           Contents: [
             { Key: `${prefix}abc`, Size: 123 },
             { Key: `${prefix}abc/def`, Size: 456 },
