@@ -5,7 +5,6 @@ chai.use(chaiAsPromised);
 
 Promise.props = require('promise-props');
 
-require('./support/aws-mocks');
 const cleanDatabase = require('../../api/utils/cleanDatabase');
 const { ActionType, Role } = require('../../api/models');
 global.Notification = require('../frontend/support/_mockNotification');

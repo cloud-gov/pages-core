@@ -48,7 +48,7 @@ const setupBucket = async (build) => {
 
   // Wait until AWS credentials are usable in case we had to
   // provision new ones. This may take up to 10 seconds.
-  await s3Client.waitForCredentials();
+  await s3Client.waitForBucket();
 
   return true;
 };

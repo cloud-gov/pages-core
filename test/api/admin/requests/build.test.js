@@ -1,12 +1,12 @@
 const request = require('supertest');
 const { expect } = require('chai');
 
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { mockClient } = require('aws-sdk-client-mock');
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
 const { authenticatedSession } = require('../../support/session');
 const factory = require('../../support/factory');
 const csrfToken = require('../../support/csrfToken');
-const s3ClientMocks = require('../../support/s3HelperMocks');
-
 const config = require('../../../../config');
 const { Site, User, BuildLog } = require('../../../../api/models');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
@@ -36,6 +36,8 @@ const buildResponseExpectations = (response, build) => {
   expect(response.user.id).to.equal(build.user || build.User.id);
   expect(response.buildLogs).to.be.undefined;
 };
+
+const s3Mock = mockClient(S3Client);
 
 describe('Admin - Site API', () => {
   afterEach(() => Promise.all([
@@ -77,7 +79,6 @@ describe('Admin - Site API', () => {
     itShouldRequireAdminAuthentication('/builds/1', '/build/{id}');
 
     it('returns the site with admin serialization', async () => {
-
       const user = await factory.user();
       const build = await factory.build();//.{ site: site.id });
 
@@ -131,7 +132,6 @@ describe('Admin - Site API', () => {
     itShouldRequireAdminAuthentication('/builds/1/log', '/build/{build_id}/log');
 
     describe('from database', () => {
-
       it('gets the following site build logs', async () => {
         const [user, build] = await Promise.all([
           factory.user(),
@@ -160,16 +160,18 @@ describe('Admin - Site API', () => {
 
     describe('from s3', () => {
       after(() => {
-        s3ClientMocks.resetMocks();
+        after(() => s3Mock.restore());
       });
+      beforeEach(() => s3Mock.reset());
 
       it('gets the following site build logs', async () => {
-        const body = 'this\nis a\n test\n response\n body.'
-        const contentLength = new Blob([body]).size
-        s3ClientMocks.createMock('getObject', {
+        const body = 'this\nis a\n test\n response\n body.';
+        const contentLength = new Blob([body]).size;
+
+        s3Mock.on(GetObjectCommand).resolves({
           Body: body,
           ContentLength: contentLength,
-        })
+        });
 
         const [user, build] = await Promise.all([
           factory.user(),
