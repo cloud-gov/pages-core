@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const AWS = require('aws-sdk');
+const { S3 } = require('@aws-sdk/client-s3');
 const PromisePool = require('@supercharge/promise-pool');
 const { Site } = require('../api/models');
 const CloudFoundryAPIClient = require('../api/utils/cfApiClient');
@@ -20,14 +20,15 @@ async function removeBucketWebsiteConfig(site) {
     throw new Error(`S3 service bucket name ${bucket} does not match site bucket name ${site.awsBucketName}.`);
   }
 
-  const s3 = new AWS.S3({
-    accessKeyId,
+  const s3 = new S3({
     region,
-    secretAccessKey,
-    apiVersion: '2006-03-01',
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
   });
 
-  await s3.deleteBucketWebsite({ Bucket: bucket }).promise();
+  await s3.deleteBucketWebsite({ Bucket: bucket });
 }
 
 async function runRemoveBucketWebsiteConfig(site) {
