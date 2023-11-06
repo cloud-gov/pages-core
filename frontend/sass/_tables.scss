@@ -24,6 +24,10 @@
     padding: 1.5rem 1rem;
   }
 
+  th:first-child {
+    padding-left: 2rem;
+  }
+
   .build-info {
     display: flex;
     flex-direction: row;
@@ -31,7 +35,7 @@
     justify-content: space-between;
     align-items: flex-start;
     .build-info-icon {
-      padding:.3em .6em .3em 0;
+      padding:.3em 1em .3em 0;
       flex: 1;
       text-align: center;
     }
@@ -45,7 +49,7 @@
       }
     }
   }
-  .repo-link, .view-site-link {
+  .repo-link, .view-site-link, .result-link {
     font-weight: 600;
     svg {
       fill: $link-color;
@@ -66,6 +70,19 @@
     }
     .commit-time {
       opacity: .85;
+    }
+    .commit-sha {
+      font-family: monospace;
+      font-size: .85em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow:clip;
+      max-width: 7ch;
+      display: inline-block;
+      vertical-align: top;
+      line-height: .85em;
+      height: 1.4em;
+      padding-top: 0.4em;
     }
   }
   .unstyled-list {
@@ -88,13 +105,12 @@
     padding: .4em .6em;
     font-size: 1.1em;
     border-radius: 4px;
-    vertical-align: middle;
     white-space: nowrap;
     svg {
       margin-right: .4em;
       height: 1em;
       width: auto;
-      vertical-align: middle;
+      vertical-align: bottom;
     }
   }
 
@@ -106,7 +122,7 @@
   }
 
   td, tbody th {
-    vertical-align: top;
+    vertical-align: middle;
     padding: 1.5rem 1rem;
   }
 
