@@ -188,25 +188,6 @@ function wait(time = 500) {
   return new Promise((r => setTimeout(r, time)));
 }
 
-// Retry an async function with exponential backoff
-async function retry(fn, { maxAttempts = 5, waitTime = 100 } = {}) {
-  let attempts = 0;
-  while (attempts < maxAttempts) {
-    attempts += 1;
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      return await fn();
-    } catch (err) {
-      if (attempts >= maxAttempts) {
-        throw err;
-      }
-      // eslint-disable-next-line no-await-in-loop
-      await wait(waitTime * (2 ** (attempts - 1)));
-    }
-  }
-  throw new Error('Exited retry loop without returning...');
-}
-
 function omitBy(fn, obj) {
   const pickedKeys = Object
     .keys(obj)
@@ -265,6 +246,8 @@ function defaultContext(req, res) {
   };
 }
 
+const DEFAULT_BUILD_TASK_PARAMS = "-p '{ \"STATUS_CALLBACK\": \"{{job.data.STATUS_CALLBACK}}\", \"TASK_ID\": {{job.data.TASK_ID}}, \"AWS_DEFAULT_REGION\": \"{{job.data.AWS_DEFAULT_REGION}}\", \"AWS_ACCESS_KEY_ID\": \"{{job.data.AWS_ACCESS_KEY_ID}}\", \"AWS_SECRET_ACCESS_KEY\": \"{{job.data.AWS_SECRET_ACCESS_KEY}}\", \"BUCKET\": \"{{job.data.BUCKET}}\" }'";
+
 module.exports = {
   buildEnum,
   generateS3ServiceName,
@@ -280,7 +263,6 @@ module.exports = {
   omit,
   paginate,
   pick,
-  retry,
   shouldIncludeTracking,
   toInt,
   toSubdomainPart,
@@ -288,4 +270,5 @@ module.exports = {
   wrapHandler,
   wrapHandlers,
   defaultContext,
+  DEFAULT_BUILD_TASK_PARAMS,
 };

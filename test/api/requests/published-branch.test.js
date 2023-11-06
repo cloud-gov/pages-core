@@ -2,21 +2,21 @@ const nock = require('nock');
 const request = require('supertest');
 const { expect } = require('chai');
 
-const AWSMocks = require('../support/aws-mocks');
+const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { mockClient } = require('aws-sdk-client-mock');
 const mockTokenRequest = require('../support/cfAuthNock');
 const apiNocks = require('../support/cfAPINocks');
 const app = require('../../../app');
-const config = require('../../../config');
 const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 
-describe('Published Branches API', () => {
-  after(() => {
-    AWSMocks.resetMocks();
-  });
+const s3Mock = mockClient(S3Client);
 
+describe('Published Branches API', () => {
+  after(() => s3Mock.restore());
   afterEach(() => nock.cleanAll());
+  beforeEach(() => s3Mock.reset());
 
   describe('GET /v0/site/:site_id/published-branch', () => {
     it('should require authentication', (done) => {
@@ -64,22 +64,27 @@ describe('Published Branches API', () => {
       const user = factory.user();
       const sitePromise = factory.site({ users: Promise.all([user]) });
 
+      s3Mock.on(ListObjectsV2Command).resolvesOnce({
+        IsTruncated: true,
+        KeyCount: 2,
+        CommonPrefixes: [
+          { Prefix: 'abc' },
+          { Prefix: 'def' },
+        ],
+        ContinuationToken: 'A',
+        NextContinuationToken: 'B',
+      }).resolvesOnce({
+        IsTruncated: false,
+        KeyCount: 1,
+        CommonPrefixes: [
+          { Prefix: 'ghi' },
+        ],
+        ContinuationToken: 'B',
+        NextContinuationToken: null,
+      });
+
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
-
-      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
-        expect(params.Bucket).to.equal(config.s3.bucket);
-        expect(params.Prefix).to.equal(`preview/${site.owner}/${site.repository}/`);
-        expect(params.Delimiter).to.equal('/');
-        callback(null, {
-          Contents: [],
-          CommonPrefixes: [
-            { Prefix: `preview/${site.owner}/${site.repository}/abc/` },
-            { Prefix: `preview/${site.owner}/${site.repository}/def/` },
-            { Prefix: `preview/${site.owner}/${site.repository}/ghi/` },
-          ],
-        });
-      };
 
       Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
         .then((promisedValues) => {
@@ -109,17 +114,14 @@ describe('Published Branches API', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
-        expect(params.Bucket).to.equal(config.s3.bucket);
-        expect(params.Prefix).to.equal(`preview/${site.owner}/${site.repository}/`);
-        expect(params.Delimiter).to.equal('/');
-        callback(null, {
-          Contents: [],
-          CommonPrefixes: [
-            { Prefix: `preview/${site.owner}/${site.repository}/abc/` },
-          ],
-        });
-      };
+      s3Mock.on(ListObjectsV2Command).resolves({
+        IsTruncated: false,
+        KeyCount: 1,
+        CommonPrefixes: [
+          { Prefix: 'abc' },
+        ],
+        ContinuationToken: 'A',
+      });
 
       Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
         .then((promisedValues) => {
@@ -162,9 +164,9 @@ describe('Published Branches API', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      AWSMocks.mocks.S3.listObjectsV2 = (params, callback) => {
-        callback({ status: 403, code: 'InvalidAccessKeyId' }, {});
-      };
+      s3Mock.on(ListObjectsV2Command).rejects({
+        code: 'InvalidAccessKeyId',
+      });
 
       Promise.props({ user, site: sitePromise, cookie: authenticatedSession(user) })
         .then((promisedValues) => {

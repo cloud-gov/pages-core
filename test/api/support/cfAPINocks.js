@@ -89,7 +89,7 @@ const mockFetchSpacesRequest = (name, resources) =>
 const mockDefaultCredentials = (exists = true) => {
   const serviceGuid = 'testing-guid';
   const serviceName = 'federalist-dev-s3';
-  const credentials = factory.responses.credentials();
+  const credentials = exists ? factory.responses.credentials() : [];
 
   return mockFetchServiceInstanceCredentialsRequest(serviceName, {
     guid: serviceGuid,
