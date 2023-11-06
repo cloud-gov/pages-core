@@ -30,6 +30,7 @@ services:
       DOMAIN: localhost:1337
       FEATURE_AUTH_GITHUB: 'true'
       FEATURE_AUTH_UAA: 'true'
+      FEATURE_BUILD_TASKS: 'true'
       PORT: 1337
       PRODUCT: pages
       UAA_HOST: http://localhost:9000

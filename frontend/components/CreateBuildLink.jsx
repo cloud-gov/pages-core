@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { IconRebuild } from './icons';
 
 function CreateBuildLink(props) {
   const {
@@ -16,6 +17,7 @@ function CreateBuildLink(props) {
       onClick={localHandleClick}
       className={className}
     >
+      <IconRebuild />
       {children}
     </button>
   );
@@ -33,7 +35,7 @@ CreateBuildLink.propTypes = {
 
 CreateBuildLink.defaultProps = {
   handlerParams: {},
-  className: '',
+  className: 'usa-button',
 };
 
 export default CreateBuildLink;

@@ -146,13 +146,6 @@ $image-path: '../../node_modules/uswds/src/img';
   overflow-x: scroll;
 }
 
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
-}
-
 // unclear why this isn't already the case...
 @media screen and (min-width: $mobile-size) {
   .usa-width-five-sixths {
