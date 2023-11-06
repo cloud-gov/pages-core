@@ -416,7 +416,10 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
+      requestedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
+    })),
     // skipped, looks like created
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -426,7 +429,10 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
+      requestedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
+    })),
     // queued, looks like created
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
@@ -436,7 +442,10 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
+      requestedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
+    })),
     // in progress
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -446,7 +455,10 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+      requestedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+    })),
     // error/timed out
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -458,7 +470,10 @@ async function createData() {
       username: user1.username,
       token: 'fake-token',
       error: 'The build timed out',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
+      requestedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
+    })),
     // completed on default branch
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -469,7 +484,10 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }),
+    }).then(build => build.update({
+      clonedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
+      requestedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
+    })),
     // completed on another branch
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
@@ -481,6 +499,7 @@ async function createData() {
       username: user1.username,
       token: 'fake-token',
     }).then(build => build.update({
+      clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
       requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
     })),
   ]);

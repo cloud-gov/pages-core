@@ -38,6 +38,7 @@ const buildStateData = ({ state, error }) => {
       messageIcon = { message: 'Skipped', icon: null };
       break;
     case 'queued':
+    case 'created':
       messageIcon = { message: 'Queued', icon: IconClock };
       break;
     case 'success':
@@ -50,10 +51,10 @@ const buildStateData = ({ state, error }) => {
 };
 
 function buildLogsLink(build) {
-  return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View build logs</Link>;
+  return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View build logs</Link>;
 }
 function resultLink(build) {
-  return <Link to={`/sites/${build.site.id}/builds/${build.id}/scans`}>View scan results</Link>;
+  return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/scans`}>View scan results</Link>;
 }
 
 function commitLink(build) {
@@ -66,6 +67,7 @@ function commitLink(build) {
       sha={build.requestedCommitSha}
       branch={build.requestedCommitSha ? null : build.branch}
       text={build.branch}
+      icon="branch"
     />
   );
 }
@@ -170,9 +172,6 @@ function SiteBuilds() {
                           <div className="build-info-details">
                             <h3 className="build-info-status">{ message }</h3>
                             <p>Build <b>#{ build.id }</b></p>
-                            <span hidden>
-                              Duration: { duration(build.startedAt, build.completedAt) }
-                            </span>
                           </div>
                         </div>
                         
@@ -182,24 +181,26 @@ function SiteBuilds() {
                           { commitLink(build) }
                         </div>
                         <div className="commit-info">
-                          <span className="commit-user">{ build.username }</span>
-                          <span className="commit-time">{ timeFrom(build.createdAt) }</span>
+                          <span className="commit-sha" title={build.clonedCommitSha}>{build.clonedCommitSha}</span>
+                          <span className="commit-user" title={build.user.email}>{ build.username }</span>
+                          <span className="commit-time" title={build.createdAt}>{ timeFrom(build.createdAt) }</span>
                         </div>
                       </td>
                       <td data-title="Results">
                         <ul className="results-list unstyled-list">
                           <li className="result-item">
                             { buildLogsLink(build) }
+                            <span> ({ duration(build.startedAt, build.completedAt) })</span>
                           </li>
                           <li className="result-item">
                             { result.state && result.state === 'success' && resultLink(build) }
                             {['created', 'queued', 'in progress', 'error'].includes(result.state) && (
-                               <span>Scan {result.state} (queued / in progress / canceled)</span>
+                               <span>WIP: Scan {result.state}</span>
                             )
                             }
                           </li>
                         </ul>
-                      </td>
+                      </td >
                       <td data-title="Actions" className="table-actions">
                         <div>
                             { previewBuilds[build.branch] === build.id && build.state === 'success'
@@ -219,7 +220,7 @@ function SiteBuilds() {
                           <CreateBuildLink
                             handlerParams={{ buildId: build.id, siteId: site.id }}
                             handleClick={buildActions.restartBuild}
-                            className="usa-button usa-button-secondary rebuild-button"
+                            className="usa-button rebuild-button"
                           >
                             Rebuild
                           </CreateBuildLink>
