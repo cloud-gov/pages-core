@@ -32,7 +32,13 @@ if (fs.existsSync(path.join(__dirname, 'local-from-staging.js'))) {
   deepExtend(config, require(path.join(__dirname, 'local-from-staging.js')));
 }
 
-const environment = process.env.NODE_ENV;
+let environment = process.env.NODE_ENV;
+
+// TODO: the dev deploy needs production.js to connect to the DB in certain situations (which?)
+// but otherwise should use NODE_ENV as 'development'; we override in this one case
+if (process.env.APP_ENV === 'dev') {
+  environment = 'production';
+}
 
 if (environment) {
   const environmentFilepath = path.join(__dirname, 'env', `${environment}.js`);
