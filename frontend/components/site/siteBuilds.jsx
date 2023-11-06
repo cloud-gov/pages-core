@@ -19,6 +19,9 @@ import { sandboxMsg } from '../../util';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
+// for now, get this value per build from API
+let result = { state: "error"}
+
 const buildStateData = ({ state, error }) => {
   let messageIcon;
   switch (state) {
@@ -47,7 +50,10 @@ const buildStateData = ({ state, error }) => {
 };
 
 function buildLogsLink(build) {
-  return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
+  return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View build logs</Link>;
+}
+function resultLink(build) {
+  return <Link to={`/sites/${build.site.id}/builds/${build.id}/scans`}>View scan results</Link>;
 }
 
 function commitLink(build) {
@@ -141,14 +147,12 @@ function SiteBuilds() {
           <div className="table-container">
             <table
               className="usa-table-borderless log-table log-table__site-builds table-full-width"
-            >
+            > 
               <thead>
                 <tr>
+                  <th scope="col">Build</th>
                   <th scope="col">Branch</th>
-                  <th scope="col">Message</th>
-                  <th scope="col">User</th>
-                  <th scope="col">Completed</th>
-                  <th scope="col">Duration</th>
+                  <th scope="col">Results</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -158,13 +162,46 @@ function SiteBuilds() {
 
                   return (
                     <tr key={build.id}>
-                      <th scope="row" data-title="Branch">
-                        <div>
-                          <p className="commit-link truncate">
+                      <th scope="row" data-title="Build">
+                        <div className="build-info">
+                          <div className="build-info-icon">
                             { icon && React.createElement(icon) }
-                            { commitLink(build) }
-                          </p>
-                          <div>
+                          </div>
+                          <div className="build-info-details">
+                            <h3 className="build-info-status">{ message }</h3>
+                            <p>Build <b>#{ build.id }</b></p>
+                            <span hidden>
+                              Duration: { duration(build.startedAt, build.completedAt) }
+                            </span>
+                          </div>
+                        </div>
+                        
+                      </th>
+                      <td data-title="Branch">
+                        <div className="branch-info">
+                          { commitLink(build) }
+                        </div>
+                        <div className="commit-info">
+                          <span className="commit-user">{ build.username }</span>
+                          <span className="commit-time">{ timeFrom(build.createdAt) }</span>
+                        </div>
+                      </td>
+                      <td data-title="Results">
+                        <ul className="results-list unstyled-list">
+                          <li className="result-item">
+                            { buildLogsLink(build) }
+                          </li>
+                          <li className="result-item">
+                            { result.state && result.state === 'success' && resultLink(build) }
+                            {['created', 'queued', 'in progress', 'error'].includes(result.state) && (
+                               <span>Scan {result.state} (queued / in progress / canceled)</span>
+                            )
+                            }
+                          </li>
+                        </ul>
+                      </td>
+                      <td data-title="Actions" className="table-actions">
+                        <div>
                             { previewBuilds[build.branch] === build.id && build.state === 'success'
                           && (
                           <BranchViewLink
@@ -174,23 +211,7 @@ function SiteBuilds() {
                             completedAt={build.completedAt}
                           />
                           ) }
-                          </div>
                         </div>
-                      </th>
-                      <td data-title="Message">
-                        <div>
-                          <p>{ message }</p>
-                          { buildLogsLink(build) }
-                        </div>
-                      </td>
-                      <td data-title="User"><span>{ build.username }</span></td>
-                      <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
-                      <td data-title="Duration">
-                        <span>
-                          { duration(build.startedAt, build.completedAt) }
-                        </span>
-                      </td>
-                      <td data-title="Actions" className="table-actions">
                         <span>
                           {
                           ['error', 'success'].includes(build.state)
@@ -198,7 +219,7 @@ function SiteBuilds() {
                           <CreateBuildLink
                             handlerParams={{ buildId: build.id, siteId: site.id }}
                             handleClick={buildActions.restartBuild}
-                            className="usa-button usa-button-secondary"
+                            className="usa-button usa-button-secondary rebuild-button"
                           >
                             Rebuild
                           </CreateBuildLink>

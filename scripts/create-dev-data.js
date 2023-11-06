@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { addDays } = require('date-fns');
+const { addDays, addMinutes } = require('date-fns');
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
 const { encrypt } = require('../api/services/Encryptor');
@@ -408,19 +408,49 @@ async function createData() {
   ]);
 
   const nodeSiteBuilds = await Promise.all([
+    // default
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: new Date(),
       source: 'fake-build',
-      state: 'success',
       site: nodeSite.id,
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
     }),
+    // skipped, looks like created
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: addDays(new Date(), -3),
+      source: 'fake-build',
+      state: 'skipped',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }),
+    // queued, looks like created
+    Build.create({
+      branch: 'longer-branch-names-might-be-truncated',
+      source: 'fake-build',
+      state: 'queued',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }),
+    // in progress
+    Build.create({
+      branch: nodeSite.defaultBranch,
+      source: 'fake-build',
+      state: 'processing',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }),
+    // error/timed out
+    Build.create({
+      branch: nodeSite.defaultBranch,
+      completedAt: addMinutes(new Date(), -3),
       source: 'fake-build',
       state: 'error',
       site: nodeSite.id,
@@ -429,9 +459,23 @@ async function createData() {
       token: 'fake-token',
       error: 'The build timed out',
     }),
+    // completed on default branch
     Build.create({
-      branch: 'dc/fixes',
+      branch: nodeSite.defaultBranch,
+      completedAt: addDays(new Date(), -3),
       source: 'fake-build',
+      state: 'success',
+      site: nodeSite.id,
+      user: user1.id,
+      username: user1.username,
+      token: 'fake-token',
+    }),
+    // completed on another branch
+    Build.create({
+      branch: 'longer-branch-names-might-be-truncated',
+      completedAt: addDays(new Date(), -2),
+      source: 'fake-build',
+      state: 'success',
       site: nodeSite.id,
       user: user1.id,
       username: user1.username,
@@ -441,34 +485,97 @@ async function createData() {
     })),
   ]);
 
-  const taskType = await BuildTaskType.create({
-    name: 'test',
-    description: 'test description',
+  const taskType1 = await BuildTaskType.create({
+    name: 'OWASP ZAP Vulnerability Scan',
+    description: 'This scan identifies potential website security issues like unintended exposure of sensitive data, SQL injection opportunities, cross-site scripting (XSS) flaws, and the use of components with known vulnerabilities.',
     metadata: {
-      foo: 'bar',
+      foo: 'bar', // no metadata is real/used yet
     },
     runner: 'cf_task',
     startsWhen: 'build',
-    url: 'example.gov',
+    // url: 'https://cloud.gov/pages/documentation/build-scans/',
   });
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,
-    buildTaskTypeId: taskType.id,
+    buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'processing',
+    status: 'success', // 'created', // initial value, 'success', 'error' // TBD 'processing' or 'queued'
     artifact: 'filename-1234.html',
-    message: 'something happened',
+    message: 'Scan successfully completed. See artifact for details.',
     count: 123,
   });
-
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[1].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'created',
+    artifact: null,
+    message: 'Scan in progress',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[2].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'error',
+    artifact: null,
+    message: 'Scan could not be completed',
+    count: null,
+  });
   await SiteBuildTask.create({
     siteId: nodeSite.id,
-    buildTaskTypeId: taskType.id,
+    buildTaskTypeId: taskType1.id,
     branch: 'test',
     metadata: {
-      nightly: true,
+      nightly: true, // no metadata is real/used yet
     },
   });
+  // const taskType2 = await BuildTaskType.create({
+  //   name: 'WCAG 2.2 AA Accessibility Scan',
+  //   description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG level 2.2 A and AA.',
+  //   metadata: {
+  //     foo: 'bar', // no metadata is real/used yet
+  //   },
+  //   runner: 'cf_task',
+  //   startsWhen: 'build',
+  //   // url: 'https://cloud.gov/pages/documentation/build-scans/',
+  // });
+  // await BuildTask.create({
+  //   buildId: nodeSiteBuilds[1].id,
+  //   buildTaskTypeId: taskType2.id,
+  //   name: 'type',
+  //   status: 'success', // 'created', // initial value, 'success', 'error' // TBD 'processing' or 'queued'
+  //   artifact: 'filename-1234.txt',
+  //   message: 'Scan successfully completed. See artifact for details.',
+  //   count: 123,
+  // });
+  // await BuildTask.create({
+  //   buildId: nodeSiteBuilds[1].id,
+  //   buildTaskTypeId: taskType2.id,
+  //   name: 'type',
+  //   status: 'created',
+  //   artifact: null,
+  //   message: 'Scan in progress',
+  //   count: null,
+  // });
+  // await BuildTask.create({
+  //   buildId: nodeSiteBuilds[1].id,
+  //   buildTaskTypeId: taskType2.id,
+  //   name: 'type',
+  //   status: 'error',
+  //   artifact: null,
+  //   message: 'Scan could not be completed',
+  //   count: null,
+  // });
+  // // task "hook" for each site
+  // await SiteBuildTask.create({
+  //   siteId: nodeSite.id,
+  //   buildTaskTypeId: taskType2.id,
+  //   branch: 'test',
+  //   metadata: {
+  //     nightly: true, // no metadata is real/used yet
+  //   },
+  // });
 
   const goSiteBuilds = await Promise.all([
     Build.create({
