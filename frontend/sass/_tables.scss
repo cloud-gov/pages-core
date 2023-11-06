@@ -17,27 +17,87 @@
     // overflow: auto;
     white-space: pre-wrap;
   }
-  .usa-button {
-    font-size: 1.5rem;
+
+
+  th, td {
+    // min-width: 124px;
+    padding: 1.5rem 1rem;
+  }
+
+  .build-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    .build-info-icon {
+      padding:.3em .6em .3em 0;
+      flex: 1;
+      text-align: center;
+    }
+    .build-info-details {
+      flex: 4;
+      h3, p {
+        margin: 0;
+      }
+      h3 {
+        font-size: 1.4em;
+      }
+    }
+  }
+  .repo-link, .view-site-link {
+    font-weight: 600;
+    svg {
+      fill: $link-color;
+    }
+  }
+  .branch-info {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 30ch;
+  }
+  .commit-info {
+    span {
+      margin-right: .5em;
+    }
+    .commit-user {
+      font-weight: 600;
+    }
+    .commit-time {
+      opacity: .85;
+    }
+  }
+  .unstyled-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .results-list {
+    li {
+      margin: .25em 0;
+    }
   }
   .table-actions {
     a {
       margin: 0;
     }
-    .usa-button {
-      border-radius: 10px;
-      font-weight: bold;
+  }
+  .rebuild-button {
+    margin-bottom: 0;
+    padding: .4em .6em;
+    font-size: 1.1em;
+    border-radius: 4px;
+    vertical-align: middle;
+    white-space: nowrap;
+    svg {
+      margin-right: .4em;
+      height: 1em;
+      width: auto;
+      vertical-align: middle;
     }
   }
 
-  th, td {
-    min-width: 124px;
-    padding: 1.5rem 1rem;
-  }
-
-  .branch-link {
-    margin-top: 1.5rem;
-  }
 }
 
 .table-full-width.log-table__site-builds {
@@ -48,24 +108,6 @@
   td, tbody th {
     vertical-align: top;
     padding: 1.5rem 1rem;
-  }
-
-  .commit-link {
-    * {
-      vertical-align: top;
-    }
-
-    a {
-      margin-left: 1rem;
-    }
-
-    + * {
-      margin-left: 3.5rem;
-    }
-  }
-
-  .usa-button {
-    width: initial;
   }
 
   @media screen and (max-width: 990px) {

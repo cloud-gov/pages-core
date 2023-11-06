@@ -55,12 +55,12 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [StartsWhens.values],
         },
       },
-      url: {
-        type: DataTypes.STRING,
-      },
+      // url: {
+      //   type: DataTypes.STRING,
+      // }, // not in the database
     }, {
-      tableName: 'build_task_type',
-    }
+    tableName: 'build_task_type',
+  }
   );
 
   BuildTaskType.associate = associate;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { IconGitHub } from './icons';
+import { IconGitHub, IconBranch } from './icons';
 
 const BASE = 'https://github.com';
 
@@ -29,8 +29,11 @@ const GitHubLink = ({
       target="_blank"
       rel="noopener noreferrer"
     >
+      { branch 
+        ? <IconBranch />
+        : <IconGitHub />
+      }
       {text}
-      <IconGitHub />
     </a>
   );
 };
