@@ -7,7 +7,7 @@ import buildActions from '../../actions/buildActions';
 import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
-import { duration, timeFrom } from '../../util/datetime';
+import { duration, timeFrom, dateAndTime } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
@@ -57,15 +57,29 @@ function resultLink(build) {
   return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/scans`}>View scan results</Link>;
 }
 
-function commitLink(build) {
+function shaLink(build) {
   const { owner, repository } = build.site;
 
   return (
     <GitHubLink
       owner={owner}
       repository={repository}
-      sha={build.requestedCommitSha}
-      branch={build.requestedCommitSha ? null : build.branch}
+      sha={build.clonedCommitSha}
+      branch={null}
+      text={build.clonedCommitSha.slice(0,6)}
+      icon="sha"
+    />
+  );
+}
+function branchLink(build) {
+  const { owner, repository } = build.site;
+
+  return (
+    <GitHubLink
+      owner={owner}
+      repository={repository}
+      sha={null}
+      branch={build.branch}
       text={build.branch}
       icon="branch"
     />
@@ -178,12 +192,13 @@ function SiteBuilds() {
                       </th>
                       <td data-title="Branch">
                         <div className="branch-info">
-                          { commitLink(build) }
-                        </div>
-                        <div className="commit-info">
-                          <span className="commit-sha" title={build.clonedCommitSha}>{build.clonedCommitSha}</span>
-                          <span className="commit-user" title={build.user.email}>{ build.username }</span>
-                          <span className="commit-time" title={build.createdAt}>{ timeFrom(build.createdAt) }</span>
+                          { branchLink(build) }
+                          <div className="commit-info">
+                            {/* <span className="commit-sha" title={("Full Sha: ") + build.clonedCommitSha}>{build.clonedCommitSha}</span> */}
+                            { shaLink(build) }
+                            <span className="commit-user" title={build.user.email}>{ build.username }</span>
+                            <span className="commit-time" title={dateAndTime(build.createdAt)}>{ timeFrom(build.createdAt) }</span>
+                          </div>
                         </div>
                       </td>
                       <td data-title="Results">

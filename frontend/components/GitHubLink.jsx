@@ -15,24 +15,41 @@ const GitHubLink = ({
 
   if (branch) {
     href = `${baseHref}/tree/${encodeURIComponent(branch)}`;
-    title = 'View branch';
+    title = 'View branch on GitHub';
   } else if (sha) {
     href = `${baseHref}/commit/${sha}`;
-    title = 'View commit';
+    title = 'View commit on GitHub';
+  }
+  function chooseIcon(icon){
+    switch (icon) {
+      case 'branch':
+        return (
+          <IconBranch />
+        )
+      case 'commit':
+      case 'sha':
+        // return (
+        //   <IconBranch />
+        // )
+        break;
+      case 'repo':
+      default:  
+      return (
+        <IconGitHub />
+      )
+    }
   }
 
   return (
     <a
-      className="repo-link"
+      className={icon + "-link"}
       href={href}
       title={title}
       target="_blank"
       rel="noopener noreferrer"
     >
-      { icon === "branch" 
-        ? <IconBranch />
-        : <IconGitHub />
-      }
+      
+      { (chooseIcon(icon) )}
       {text}
     </a>
   );
@@ -51,8 +68,8 @@ GitHubLink.propTypes = {
 GitHubLink.defaultProps = {
   branch: null,
   sha: null,
-  icon: null,
-  title: 'View repository',
+  icon: 'repo',
+  title: 'View repository on GitHub',
 };
 
 export default GitHubLink;
