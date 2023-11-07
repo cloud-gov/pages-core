@@ -64,7 +64,7 @@ const serialize = async (serializable) => {
         },
         {
           model: BuildTask,
-          required: true,
+          required: false,
           include: [BuildTaskType],
         },
       ],
