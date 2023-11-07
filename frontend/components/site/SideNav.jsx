@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import * as icons from '../icons';
 
 const SideNav = ({ config, siteId }) => (
-  <div className="usa-width-one-sixth side-nav">
+  <div className="usa-width-one-sixth side-nav" role="navigation">
     <ul className="usa-sidenav-list">
       {
         config.map((conf) => {

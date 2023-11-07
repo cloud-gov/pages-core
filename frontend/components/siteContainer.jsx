@@ -116,7 +116,7 @@ export function SiteContainer(props) {
   return (
     <div className="usa-grid site">
       <SideNav siteId={site.id} config={SITE_NAVIGATION_CONFIG} />
-      <div className="usa-width-five-sixths site-main" id="pages-container">
+      <div className="usa-width-five-sixths site-main" id="pages-container" role="main">
 
         <AlertBanner
           message={alert.message}

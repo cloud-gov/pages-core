@@ -22,6 +22,8 @@
   th, td {
     // min-width: 124px;
     padding: 1.5rem 1rem;
+    line-height: 1.4em;    
+    vertical-align: middle;
   }
 
   th:first-child {
@@ -49,29 +51,36 @@
       }
     }
   }
-  .repo-link, .view-site-link, .result-link {
-    font-weight: 600;
+  .repo-link, .view-site-link, .result-link, .branch-link, .commit-link {
+    // font-weight: 600;
     svg {
       fill: $link-color;
+      width: 12px;
+      height: auto;
+      margin-right: .3em;
+      vertical-align: middle;
     }
   }
   .branch-info {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 30ch;
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+    // max-width: 30ch;
+    margin: 0.25em 0;
+    line-height: 1.3em;
   }
   .commit-info {
-    span {
+    margin: 0.25em 0;
+    .commit-user {
+      white-space: nowrap;
+      font-weight: 600;
       margin-right: .5em;
     }
-    .commit-user {
-      font-weight: 600;
-    }
     .commit-time {
-      opacity: .85;
+      white-space: nowrap;
     }
-    .commit-sha {
+    // .commit-sha,
+    .sha-link {
       font-family: monospace;
       font-size: .85em;
       white-space: nowrap;
@@ -83,6 +92,12 @@
       line-height: .85em;
       height: 1.4em;
       padding-top: 0.4em;
+      text-decoration: none;
+      margin-right: .5em;
+      color: inherit;
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
   .unstyled-list {
@@ -93,6 +108,8 @@
   .results-list {
     li {
       margin: .25em 0;
+      line-height: 1.4em;
+      white-space: nowrap;
     }
   }
   .table-actions {
@@ -122,7 +139,6 @@
   }
 
   td, tbody th {
-    vertical-align: middle;
     padding: 1.5rem 1rem;
   }
 
@@ -146,7 +162,35 @@
       }
 
       td > *:first-child {
-        margin-left: 3.5rem;
+        margin-left: 1.5em;
+      }
+      td > *:nth-child(2) {
+        margin-left: auto;
+      }
+
+      .branch-info {
+        margin: 1em 1.5em;         
+        max-width: fit-content;
+      }
+      .commit-info {
+      }
+      .results-list {
+        margin: 1em auto;         
+        .unstyled-list {
+          padding: 0;
+          li {
+            display: inline-block;
+            margin-right: .5em;
+          }
+        }
+      }
+      .table-actions > * {
+        margin-top: auto;
+        margin-bottom: auto;
+        .usa-button {
+          margin-top: 0;
+          margin-right: 0;
+        }
       }
 
       th, td {
@@ -154,9 +198,13 @@
         align-items: stretch;
         padding: 0;
         position: relative;
+        vertical-align: top;
 
-        > *:first-child {
-          padding: 1.5rem;
+        > * {
+          margin: 1.5em;
+        }
+        &:first-child {
+          padding-left: 0
         }
 
         &::before {
