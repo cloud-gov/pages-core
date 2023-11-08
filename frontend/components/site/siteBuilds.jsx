@@ -19,9 +19,6 @@ import { sandboxMsg } from '../../util';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
-// for now, get this value per build from API
-let result = { state: "error"}
-
 const buildStateData = ({ state, error }) => {
   let messageIcon;
   switch (state) {
@@ -59,18 +56,21 @@ function resultLink(build) {
 
 function shaLink(build) {
   const { owner, repository } = build.site;
-
-  return (
-    <GitHubLink
-      owner={owner}
-      repository={repository}
-      sha={build.clonedCommitSha}
-      branch={null}
-      text={build.clonedCommitSha.slice(0,6)}
-      icon="sha"
-    />
-  );
+  const sha = build.clonedCommitSha || build.requestedCommitSha
+  if (sha) {
+    return (
+      <GitHubLink
+        owner={owner}
+        repository={repository}
+        sha={sha}
+        branch={null}
+        text={sha.slice(0,6)}
+        icon="sha"
+      />
+    );
+  }
 }
+
 function branchLink(build) {
   const { owner, repository } = build.site;
 
@@ -194,10 +194,13 @@ function SiteBuilds() {
                         <div className="branch-info">
                           { branchLink(build) }
                           <div className="commit-info">
-                            {/* <span className="commit-sha" title={("Full Sha: ") + build.clonedCommitSha}>{build.clonedCommitSha}</span> */}
                             { shaLink(build) }
-                            <span className="commit-user" title={build.user.email}>{ build.username }</span>
-                            <span className="commit-time" title={dateAndTime(build.createdAt)}>{ timeFrom(build.createdAt) }</span>
+                            <span className="commit-user" title={build.user.email}>
+                              { build.username }
+                            </span>
+                            <span className="commit-time" title={dateAndTime(build.createdAt)}>
+                              { timeFrom(build.createdAt) }
+                            </span>
                           </div>
                         </div>
                       </td>
@@ -207,13 +210,22 @@ function SiteBuilds() {
                             { buildLogsLink(build) }
                             <span> ({ duration(build.startedAt, build.completedAt) })</span>
                           </li>
-                          <li className="result-item">
-                            { result.state && result.state === 'success' && resultLink(build) }
-                            {['created', 'queued', 'in progress', 'error'].includes(result.state) && (
-                               <span>WIP: Scan {result.state}</span>
-                            )
-                            }
-                          </li>
+                          {build.BuildTasks.map((task) => {
+                            const taskSuccess = task.status && task.status === 'success';
+                            return (
+                              <li className="result-item" key={task.id}>
+                                { taskSuccess && resultLink(build) }
+                                { taskSuccess && (<span> ({ task.count } issues)</span>)}
+                                {!taskSuccess && (
+                                  <span>
+                                    {task.status === "error" && ( 'Scan canceled' )}
+                                    {task.status === "created" && ( 'Scan queued' )}
+                                  </span>
+                                )}
+                              </li>
+                            )}
+                          )}
+                      
                         </ul>
                       </td >
                       <td data-title="Actions" className="table-actions">

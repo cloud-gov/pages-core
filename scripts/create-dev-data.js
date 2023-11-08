@@ -412,6 +412,7 @@ async function createData() {
     Build.create({
       branch: nodeSite.defaultBranch,
       source: 'fake-build',
+      createdAt: new Date(),
       site: nodeSite.id,
       user: user1.id,
       username: user1.username,
@@ -423,6 +424,7 @@ async function createData() {
     // skipped, looks like created
     Build.create({
       branch: nodeSite.defaultBranch,
+      createdAt: addMinutes(new Date(), -2),
       source: 'fake-build',
       state: 'skipped',
       site: nodeSite.id,
@@ -436,6 +438,7 @@ async function createData() {
     // queued, looks like created
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
+      createdAt: new Date(),
       source: 'fake-build',
       state: 'queued',
       site: nodeSite.id,
@@ -449,6 +452,8 @@ async function createData() {
     // in progress
     Build.create({
       branch: nodeSite.defaultBranch,
+      startedAt: addMinutes(new Date(), -1),
+      createdAt: addMinutes(new Date(), -1),
       source: 'fake-build',
       state: 'processing',
       site: nodeSite.id,
@@ -462,7 +467,9 @@ async function createData() {
     // error/timed out
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: addMinutes(new Date(), -3),
+      completedAt: addMinutes(new Date(), -1200),
+      startedAt: addMinutes(new Date(), -1200),
+      createdAt: addMinutes(new Date(), -1200),
       source: 'fake-build',
       state: 'error',
       site: nodeSite.id,
@@ -477,7 +484,9 @@ async function createData() {
     // completed on default branch
     Build.create({
       branch: nodeSite.defaultBranch,
-      completedAt: addDays(new Date(), -3),
+      completedAt: addMinutes(new Date(), -12),
+      startedAt: addMinutes(new Date(), -9),
+      createdAt: addMinutes(new Date(), -9),
       source: 'fake-build',
       state: 'success',
       site: nodeSite.id,
@@ -491,7 +500,9 @@ async function createData() {
     // completed on another branch
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
-      completedAt: addDays(new Date(), -2),
+      completedAt: addMinutes(new Date(), -56),
+      startedAt: addMinutes(new Date(), -54),
+      createdAt: addMinutes(new Date(), -54),
       source: 'fake-build',
       state: 'success',
       site: nodeSite.id,
@@ -512,28 +523,26 @@ async function createData() {
     },
     runner: 'cf_task',
     startsWhen: 'build',
-    // url: 'https://cloud.gov/pages/documentation/build-scans/',
+    url: 'https://cloud.gov/pages/documentation/build-scans/',
   });
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'success', // 'created', // initial value, 'success', 'error' // TBD 'processing' or 'queued'
-    artifact: 'filename-1234.html',
-    message: 'Scan successfully completed. See artifact for details.',
-    count: 123,
+    artifact: null,
+    count: null,
   });
   await BuildTask.create({
-    buildId: nodeSiteBuilds[1].id,
+    buildId: nodeSiteBuilds[2].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'created',
+    status: 'created', // initial value, 'processing' or 'queued' haven't been made yet
     artifact: null,
     message: 'Scan in progress',
     count: null,
   });
   await BuildTask.create({
-    buildId: nodeSiteBuilds[2].id,
+    buildId: nodeSiteBuilds[4].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
     status: 'error',
@@ -541,6 +550,27 @@ async function createData() {
     message: 'Scan could not be completed',
     count: null,
   });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[5].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'success',
+    artifact: 'filename-1234.html',
+    message: 'Scan successfully completed. See artifact for details.',
+    count: 0,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[6].id,
+    buildTaskTypeId: taskType1.id,
+    name: 'type',
+    status: 'success',
+    artifact: 'filename-1234.html',
+    message: 'Scan successfully completed. See artifact for details.',
+    count: 42,
+  });
+
+
+
   await SiteBuildTask.create({
     siteId: nodeSite.id,
     buildTaskTypeId: taskType1.id,
