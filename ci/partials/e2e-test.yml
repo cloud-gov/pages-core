@@ -1,0 +1,8 @@
+platform: linux
+inputs: [name: src]
+outputs: [name: src]
+run:
+  dir: src
+  path: ci/tasks/e2e-test.sh
+params:
+  PW_TEST_HTML_REPORT_OPEN: never

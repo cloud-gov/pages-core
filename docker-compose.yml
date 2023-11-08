@@ -5,6 +5,7 @@ volumes:
   yarn:
   nm-app:
   nm-admin:
+  pw-deps:
 
 services:
   app:
