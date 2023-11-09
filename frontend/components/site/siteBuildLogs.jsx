@@ -12,18 +12,12 @@ export const REFRESH_INTERVAL = 15 * 1000;
 // figure out how to get this out of the API wrapper like Features.enabled(Features.Flags.FEATURE_BUILD_TASKS)
 export const FEATURE_BUILD_TASKS = true;
 
+
 const SiteBuildLogs = () => {
   const { buildId: buildIdStr } = useParams();
   const buildId = parseInt(buildIdStr, 10);
   const { logs, state } = useBuildLogs(buildId);
 
-  if (!logs || logs?.length === 0) {
-    return (
-      <div>
-        <SiteBuildLogTable buildLogs={['This build does not have any build logs.']} />
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -35,7 +29,14 @@ const SiteBuildLogs = () => {
           <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={logs} /></li>
         </ul>
       </div>
+    {(!logs || logs?.length === 0) && (
+      <div>
+        <SiteBuildLogTable buildLogs={['This build does not have any build logs.']} />
+      </div>
+    )}
+    {(logs && logs?.length > 0) && (
       <SiteBuildLogTable buildLogs={logs} buildState={state} />
+    )}
     </div>
   );
 };

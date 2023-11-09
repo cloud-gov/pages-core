@@ -123,7 +123,7 @@ const SiteBuildTasks = () => {
                           </div>
                           <div className="build-info-details">
                             <h3 className="build-info-status">{ task.BuildTaskType.name }</h3>
-                            <p className="build-info-details">{task.BuildTaskType.description}. For more information, check out the &nbsp;<a href={task.BuildTaskType.url} target="_blank ">documentation</a>.</p>
+                            <p className="build-info-details">{task.BuildTaskType.description}. For more information, check out the&nbsp;<a href={task.BuildTaskType.url} target="_blank ">documentation</a>.</p>
                           </div>
                         </div>
                       </th>
