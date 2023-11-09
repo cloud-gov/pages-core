@@ -1,5 +1,5 @@
 const { wrapHandlers } = require('../utils');
-const { Build, BuildTask } = require('../models');
+const { Build, BuildTask, BuildTaskType } = require('../models');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -16,6 +16,7 @@ module.exports = wrapHandlers({
     const task = await BuildTask.findOne({
       where: { buildId, id: buildTaskId },
       attributes: { exclude: ['token', 'deletedAt'] },
+      include: BuildTaskType,
     });
 
     if (!task) {
@@ -38,6 +39,7 @@ module.exports = wrapHandlers({
     const tasks = await BuildTask.findAll({
       where: { buildId },
       attributes: { exclude: ['token', 'deletedAt'] },
+      include: BuildTaskType,
     });
 
     return res.json(tasks);
