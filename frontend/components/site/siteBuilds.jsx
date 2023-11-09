@@ -19,6 +19,9 @@ import { sandboxMsg } from '../../util';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
+// do this better, with Drew's help
+export const FEATURE_BUILD_TASKS = true;
+
 const buildStateData = ({ state, error }) => {
   let messageIcon;
   switch (state) {
@@ -84,6 +87,35 @@ function branchLink(build) {
       icon="branch"
     />
   );
+}
+// roll up the tasks -- if any are complete, show a results count, if all have errored, show canceled, otherwise show queued if there are any tasks
+function summarizeTaskResults(build) {
+  const tasksWithResults = build.BuildTasks.filter((task) => task.status === 'success');
+  const allTasksErrored =  build.BuildTasks.every((task) => task.status === 'error');
+
+  if (!build.BuildTasks || build.BuildTasks.length < 1) return (
+    <span> No scan queued </span>
+  );
+
+  if (tasksWithResults.length > 0) {
+    const totalResults = tasksWithResults.reduce((results, task) => results + task.count, 0)
+    return (
+      <>
+        { resultLink(build) }
+        <span> ({ totalResults } issues)</span>
+      </>
+    )
+  }
+
+  if (allTasksErrored) {
+    return (
+    <span> Scan canceled </span>
+    )
+  }
+
+  return (
+    <span> Scan queued </span>
+  )
 }
 
 function latestBuildByBranch(builds) {
@@ -210,22 +242,11 @@ function SiteBuilds() {
                             { buildLogsLink(build) }
                             <span> ({ duration(build.startedAt, build.completedAt) })</span>
                           </li>
-                          {build.BuildTasks.map((task) => {
-                            const taskSuccess = task.status && task.status === 'success';
-                            return (
-                              <li className="result-item" key={task.id}>
-                                { taskSuccess && resultLink(build) }
-                                { taskSuccess && (<span> ({ task.count } issues)</span>)}
-                                {!taskSuccess && (
-                                  <span>
-                                    {task.status === "error" && ( 'Scan canceled' )}
-                                    {task.status === "created" && ( 'Scan queued' )}
-                                  </span>
-                                )}
-                              </li>
-                            )}
+                          { FEATURE_BUILD_TASKS && (
+                            <li className="result-item">
+                              { summarizeTaskResults(build) }
+                            </li>
                           )}
-                      
                         </ul>
                       </td >
                       <td data-title="Actions" className="table-actions">
