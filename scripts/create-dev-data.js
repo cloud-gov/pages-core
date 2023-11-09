@@ -571,6 +571,62 @@ async function createData() {
 
 
 
+  const taskType2 = await BuildTaskType.create({
+    name: 'WCAG 2.2 AA Accessibility Scan',
+    description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG level 2.2 A and AA.',
+    metadata: {
+      foo: 'bar', // no metadata is real/used yet
+    },
+    runner: 'cf_task',
+    startsWhen: 'build',
+    url: 'https://cloud.gov/pages/documentation/build-scans/',
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[0].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    artifact: null,
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[2].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'created', // initial value, 'processing' or 'queued' haven't been made yet
+    artifact: null,
+    message: 'Scan in progress',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[4].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'error',
+    artifact: null,
+    message: 'Scan could not be completed',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[5].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'error',
+    artifact: null,
+    message: 'Scan could not be completed',
+    count: null,
+  });
+  await BuildTask.create({
+    buildId: nodeSiteBuilds[6].id,
+    buildTaskTypeId: taskType2.id,
+    name: 'type',
+    status: 'success',
+    artifact: 'WCAG-scan.txt',
+    message: 'Scan successfully completed. See artifact for details.',
+    count: 3,
+  });
+
+
+  // task "hook" for each site
   await SiteBuildTask.create({
     siteId: nodeSite.id,
     buildTaskTypeId: taskType1.id,
@@ -579,52 +635,15 @@ async function createData() {
       nightly: true, // no metadata is real/used yet
     },
   });
-  // const taskType2 = await BuildTaskType.create({
-  //   name: 'WCAG 2.2 AA Accessibility Scan',
-  //   description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG level 2.2 A and AA.',
-  //   metadata: {
-  //     foo: 'bar', // no metadata is real/used yet
-  //   },
-  //   runner: 'cf_task',
-  //   startsWhen: 'build',
-  //   // url: 'https://cloud.gov/pages/documentation/build-scans/',
-  // });
-  // await BuildTask.create({
-  //   buildId: nodeSiteBuilds[1].id,
-  //   buildTaskTypeId: taskType2.id,
-  //   name: 'type',
-  //   status: 'success', // 'created', // initial value, 'success', 'error' // TBD 'processing' or 'queued'
-  //   artifact: 'filename-1234.txt',
-  //   message: 'Scan successfully completed. See artifact for details.',
-  //   count: 123,
-  // });
-  // await BuildTask.create({
-  //   buildId: nodeSiteBuilds[1].id,
-  //   buildTaskTypeId: taskType2.id,
-  //   name: 'type',
-  //   status: 'created',
-  //   artifact: null,
-  //   message: 'Scan in progress',
-  //   count: null,
-  // });
-  // await BuildTask.create({
-  //   buildId: nodeSiteBuilds[1].id,
-  //   buildTaskTypeId: taskType2.id,
-  //   name: 'type',
-  //   status: 'error',
-  //   artifact: null,
-  //   message: 'Scan could not be completed',
-  //   count: null,
-  // });
-  // // task "hook" for each site
-  // await SiteBuildTask.create({
-  //   siteId: nodeSite.id,
-  //   buildTaskTypeId: taskType2.id,
-  //   branch: 'test',
-  //   metadata: {
-  //     nightly: true, // no metadata is real/used yet
-  //   },
-  // });
+  // task "hook" for each site
+  await SiteBuildTask.create({
+    siteId: nodeSite.id,
+    buildTaskTypeId: taskType2.id,
+    branch: 'test',
+    metadata: {
+      nightly: true, // no metadata is real/used yet
+    },
+  });
 
   const goSiteBuilds = await Promise.all([
     Build.create({
