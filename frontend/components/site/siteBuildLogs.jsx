@@ -1,13 +1,16 @@
 /* eslint-disable react/forbid-prop-types */
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { useBuildLogs } from '../../hooks';
 import SiteBuildLogTable from './siteBuildLogTable';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
 
 export const REFRESH_INTERVAL = 15 * 1000;
+
+// figure out how to get this out of the API wrapper like Features.enabled(Features.Flags.FEATURE_BUILD_TASKS)
+const { FEATURE_BUILD_TASKS } = process.env;
 
 const SiteBuildLogs = () => {
   const { buildId: buildIdStr } = useParams();
@@ -26,6 +29,9 @@ const SiteBuildLogs = () => {
     <div>
       <div className="log-tools">
         <ul className="usa-unstyled-list">
+            {(FEATURE_BUILD_TASKS) && (
+              <li><Link className="usa-button usa-button-secondary" to={`./../scans`}>View scan results</Link></li>
+            )}
           <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={logs} /></li>
         </ul>
       </div>
