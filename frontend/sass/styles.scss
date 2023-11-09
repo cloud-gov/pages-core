@@ -119,7 +119,11 @@ $image-path: '../../node_modules/uswds/src/img';
     display: block;
   }
 }
-
+@media screen and (min-width: 1000px) {
+  .site-main {
+    min-height: calc(100vh - 235px);
+  }
+}
 @media screen and (min-width: 600px) {
 .usa-grid.site:before {
     background-color: $color-gray-lightest;
@@ -143,7 +147,11 @@ $image-path: '../../node_modules/uswds/src/img';
 }
 
 .table-container {
-  overflow-x: scroll;
+  overflow-x: auto;
+  margin-bottom: 3em;
+  table, tr {
+    margin-bottom: 0;
+  }
 }
 
 // unclear why this isn't already the case...

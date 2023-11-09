@@ -10,7 +10,7 @@ import DownloadBuildLogsButton from './downloadBuildLogsButton';
 export const REFRESH_INTERVAL = 15 * 1000;
 
 // figure out how to get this out of the API wrapper like Features.enabled(Features.Flags.FEATURE_BUILD_TASKS)
-const { FEATURE_BUILD_TASKS } = process.env;
+export const FEATURE_BUILD_TASKS = true;
 
 const SiteBuildLogs = () => {
   const { buildId: buildIdStr } = useParams();
