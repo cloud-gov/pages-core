@@ -345,7 +345,7 @@ jobs:
   - name: audit-dependencies
     plan: 
       - get: src
-        resource: pr-((deploy-env))
+        resource: src-((deploy-env))-tagged
         trigger: true
         passed: [set-pipeline]
       - get: node
