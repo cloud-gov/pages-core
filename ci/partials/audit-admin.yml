@@ -1,0 +1,8 @@
+platform: linux
+inputs: [name: src]
+outputs: [name: src]
+run:
+  dir: src/admin-client
+  path: bash
+  # https://classic.yarnpkg.com/lang/en/docs/cli/audit
+  args: [-c, "yarn audit; [[ $? -ge $VULN_THRESHOLD ]] && exit 1 || exit 0"]

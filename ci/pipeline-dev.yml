@@ -277,6 +277,116 @@ jobs:
             <<: *env-cf
             CF_APP_NAME: pages-queues-ui-((deploy-env))
 
+  - name: e2e-test
+    plan:
+      - get: src
+        resource: pr-((deploy-env))
+        trigger: true
+        passed:
+        - test-and-deploy-api-pages
+        - test-and-deploy-admin-client-pages
+        - deploy-queues-ui-pages
+      - get: node
+      - get: cf-image
+      - put: gh-status
+        inputs: [src]
+        params: {state: pending}
+      - task: get-app-env
+        file: src/ci/partials/get-app-env.yml
+        image: cf-image
+        params:
+          <<: *env-cf
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: run-e2e-tests
+        file: src/ci/partials/e2e-test.yml
+        image: node
+        params:
+          APP_ENV: ((deploy-env))
+          APP_HOSTNAME: https://((((deploy-env))-pages-domain))
+          DOMAIN: ((((deploy-env))-pages-domain))
+          PRODUCT: pages
+        ensure:
+          do:
+          - task: remove-test-users
+            file: src/ci/partials/remove-test-users.yml
+            image: node
+            params:
+              APP_ENV: ((deploy-env))
+              PRODUCT: pages
+          - put: s3
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: failure}
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages e2e testing on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully passed e2e testing on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+  - name: audit-dependencies
+    plan: 
+      - get: src
+        resource: pr-((deploy-env))
+        trigger: true
+        passed: [set-pipeline]
+      - get: node
+      - in_parallel:
+          - task: audit-app
+            file: src/ci/partials/audit.yml
+            image: node
+            params:
+              VULN_THRESHOLD: 8 # errors on critical or high
+          - task: audit-admin
+            file: src/ci/partials/audit-admin.yml
+            image: node
+            params:
+              VULN_THRESHOLD: 8 # errors on critical or high
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: failure}
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: dependency audit on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully passed dependency audit on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
   - name: set-pipeline
     plan:
     - get: src
@@ -350,6 +460,18 @@ resources:
       aws_region: us-gov-west-1
       tag: ((harden-concourse-task-tag))
 
+  - name: s3
+    type: s3-resource
+    source:
+      access_key_id: ((test-results-access-key-id))
+      secret_access_key: ((test-results-secret-access-key))
+      bucket: ((test-results-bucket))
+      region: us-gov-west-1
+      change_dir_to: src
+      options:
+      - "--exclude '*'"
+      - "--include 'playwright-report/*'"
+
 ############################
 #  RESOURCE TYPES
 
@@ -370,3 +492,8 @@ resource_types:
     type: docker-image
     source:
       repository: cfcommunity/slack-notification-resource
+
+  - name: s3-resource
+    type: docker-image
+    source:
+      repository: 18fgsa/s3-resource-simple

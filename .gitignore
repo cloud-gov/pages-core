@@ -44,3 +44,9 @@ credentials*.json
 tmp
 ci/vars/.*
 uaa/cloudfoundry-identity-uaa-4.19.0.war
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/*
+!playwright/.auth/.gitkeep 
