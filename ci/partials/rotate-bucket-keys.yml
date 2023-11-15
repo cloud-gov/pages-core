@@ -1,0 +1,7 @@
+platform: linux
+inputs: [name: src]
+outputs: [name: src]
+run:
+  dir: src
+  path: bash
+  args: [-c,  node --env-file=.env ./ci/tasks/rotate-bucket-keys.js]

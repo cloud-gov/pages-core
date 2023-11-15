@@ -188,8 +188,8 @@
     "webpack-manifest-plugin": "^5.0.0"
   },
   "engines": {
-    "node": "^18.x.x",
-    "npm": "^8.1.2"
+    "node": "^20.x.x",
+    "npm": "^10.x.x"
   },
   "lint-staged": {
     "*.js": "eslint",

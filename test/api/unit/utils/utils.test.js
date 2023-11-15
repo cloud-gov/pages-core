@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const fs = require('node:fs');
 const sinon = require('sinon');
 const moment = require('moment');
 const fsMock = require('mock-fs');
@@ -125,21 +126,44 @@ describe('utils', () => {
   });
 
   describe('.getDirectoryFiles', () => {
+    const directoryStructure = {
+      mydir: {
+        'foobar.html': 'foobar content',
+        subdir: {
+          'beep.txt': 'beep content',
+          'boop.txt': 'boop content',
+        },
+      },
+    }
+
+    beforeEach(() => {
+      const fsReaddirStub = sinon.stub(fs, 'readdirSync')
+      const fsStatStub = sinon.stub(fs, 'statSync')
+
+      fsReaddirStub.withArgs('mydir').returns(Object.keys(directoryStructure.mydir))
+      fsStatStub.withArgs('mydir/foobar.html').returns({
+        isDirectory: () => false
+      })
+
+      fsReaddirStub.withArgs('mydir/subdir').returns(Object.keys(directoryStructure.mydir.subdir))
+      fsStatStub.withArgs('mydir/subdir').returns({
+        isDirectory: () => true
+      })
+
+      fsStatStub.withArgs('mydir/subdir/beep.txt').returns({
+        isDirectory: () => false
+      })
+
+      fsStatStub.withArgs('mydir/subdir/boop.txt').returns({
+        isDirectory: () => false
+      })
+    })
+
     afterEach(() => {
-      fsMock.restore();
+      sinon.restore()
     });
 
     it('returns a listing of all files in the given directory', () => {
-      fsMock({
-        mydir: {
-          'foobar.html': 'foobar content',
-          subdir: {
-            'beep.txt': 'beep content',
-            'boop.txt': 'boop content',
-          },
-        },
-      });
-
       const result = utils.getDirectoryFiles('mydir');
       expect(result).to.have.length(3);
       expect(result).to.deep.equal([
@@ -162,13 +186,12 @@ describe('utils', () => {
 
   describe('.loadProductionManifest', () => {
     beforeEach(() => {
-      fsMock({
-        'webpack-manifest.json': JSON.stringify({ manifest: 'yay' }),
-      });
+      sinon.stub(fs, 'existsSync').returns(true)
+      sinon.stub(fs, 'readFileSync').returns(JSON.stringify({ manifest: 'yay' }))
     });
 
     afterEach(() => {
-      fsMock.restore();
+      sinon.restore();
     });
 
     it('loads webpack-manifest.json', () => {
@@ -249,7 +272,7 @@ describe('utils', () => {
 
       const wrappedFn = utils.wrapHandler(handler);
 
-      await wrappedFn({}, { error: spy }, () => {});
+      await wrappedFn({}, { error: spy }, () => { });
 
       expect(spy.calledWith(error));
     });
@@ -265,12 +288,12 @@ describe('utils', () => {
         foo: async (_req, _res, _next) => {
           throw error;
         },
-        bar: async () => {},
+        bar: async () => { },
       };
 
       const wrappedObj = utils.wrapHandlers(handlers);
 
-      await wrappedObj.foo({}, { error: spy }, () => {});
+      await wrappedObj.foo({}, { error: spy }, () => { });
 
       expect(spy.calledWith(error));
     });

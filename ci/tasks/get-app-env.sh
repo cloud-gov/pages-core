@@ -7,5 +7,8 @@ cf auth
 
 cf t -o $CF_ORG -s $CF_SPACE
 
-echo "VCAP_SERVICES={`cf env $CF_APP_NAME | tail -n+3 | awk -v RS= 'NR==1' | tail -n+2 | tr -d '\n'`" >> .env
-echo "VCAP_APPLICATION={`cf env $CF_APP_NAME | tail -n+3 | awk -v RS= 'NR==2' | tail -n+2 | tr -d '\n'`" >> .env
+CF_APP_GUID=`cf app $CF_APP_NAME --guid`
+
+cf curl /v3/apps/$CF_APP_GUID/env | \
+    jq -r 'to_entries | .[] | .value | to_entries | map({key, value: (.value | tostring) }) | .[] | join("=")' \
+    > .env

@@ -13,7 +13,7 @@ node-image: &node-image
   type: docker-image
   source:
     repository: node
-    tag: 18
+    tag: 20.9-bullseye
 
 cf-image: &cf-image
   platform: linux
