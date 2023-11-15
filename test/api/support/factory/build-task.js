@@ -5,14 +5,20 @@ const { BuildTask } = require('../../../../api/models');
 // eslint-disable-next-line no-underscore-dangle
 const _attributes = ({
   build,
-  buildTaskType,
+  buildTaskTypeId,
+  BuildTaskType = {},
   name,
   artifact,
+  count,
+  message
 } = {}) => ({
   buildId: build || buildFactory(),
-  buildTaskTypeId: buildTaskType || buildTaskTypeFactory(),
+  buildTaskTypeId: buildTaskTypeId || buildTaskTypeFactory(),
+  BuildTaskType: BuildTaskType || buildTaskTypeFactory(),
   name: name || 'build task name',
   artifact: artifact || 'build task artifact',
+  count: count || 0,
+  message: message || 'build task message'
 });
 
 const buildTask = overrides => Promise.props(_attributes(overrides))

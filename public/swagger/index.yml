@@ -231,7 +231,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: 'BuildTask.json'
+              type: 'object'
+              schema:
+                $ref: 'BuildTask.json'
         401:
           description: Unauthorized
           schema:

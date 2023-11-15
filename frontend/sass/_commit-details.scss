@@ -1,0 +1,20 @@
+.commit-details {
+  svg {
+    height: 1em;
+    width: auto;
+    vertical-align: text-bottom;
+  }
+  h3 {
+    margin-left: .3em;
+    margin-bottom: .3em;
+    font-size: 1.475em;
+  }
+  p {
+    margin-left: 2em;
+  }
+  .sha-link {
+    font-family: Consolas, "Lucida Console", Menlo, monospace;
+    font-weight: 400;
+    font-size: .85em;
+  }
+}

@@ -68,6 +68,18 @@ module.exports = wrapHandlers({
    *
    * e.g. `sites/1/builds/1`
    */
+
+  async findById(req, res) {
+    const { user, params } = req;
+    const { id } = params;
+    const build = await Build.forSiteUser(user).findByPk(id);
+    if (!build) {
+      return res.notFound();
+    }
+    const buildJSON = await buildSerializer.serialize(build);
+    return res.json(buildJSON);
+  },
+
   async create(req, res) {
     await siteAuthorizer.createBuild(req.user, { id: req.body.siteId });
     const requestBuild = await Build.findOne({

@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
 } from '../icons';
+import CommitSummary from './CommitSummary';
 
 import api from '../../util/federalistApi';
 
@@ -84,6 +85,7 @@ const SiteBuildTasks = () => {
 
   return (
     <div>
+      <CommitSummary buildId={buildId} />
       <div className="log-tools">
         <ul className="usa-unstyled-list">
           <li>
