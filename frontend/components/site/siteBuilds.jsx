@@ -90,12 +90,13 @@ function branchLink(build) {
 }
 // roll up the tasks -- if any are complete, show a results count, if all have errored, show canceled, otherwise show queued if there are any tasks
 function summarizeTaskResults(build) {
-  const tasksWithResults = build.BuildTasks.filter((task) => task.status === 'success');
-  const allTasksErrored =  build.BuildTasks.every((task) => task.status === 'error');
 
   if (!build.BuildTasks || build.BuildTasks.length < 1) return (
     <span> No scan queued </span>
   );
+
+  const tasksWithResults = build.BuildTasks.filter((task) => task.status === 'success');
+  const allTasksErrored =  build.BuildTasks.every((task) => task.status === 'error');
 
   if (tasksWithResults.length > 0) {
     const totalResults = tasksWithResults.reduce((results, task) => results + task.count, 0)
@@ -242,7 +243,7 @@ function SiteBuilds() {
                             { buildLogsLink(build) }
                             <span> ({ duration(build.startedAt, build.completedAt) })</span>
                           </li>
-                          { FEATURE_BUILD_TASKS && (
+                          { FEATURE_BUILD_TASKS && build.BuildTasks && (
                             <li className="result-item">
                               { summarizeTaskResults(build) }
                             </li>

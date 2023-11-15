@@ -38,7 +38,7 @@ module.exports = wrapHandlers({
 
     const tasks = await BuildTask.findAll({
       where: { buildId },
-      attributes: { exclude: ['token', 'deletedAt'] },
+      attributes: { exclude: ['token', 'deletedAt', 'name'] },
       include: BuildTaskType,
     });
 

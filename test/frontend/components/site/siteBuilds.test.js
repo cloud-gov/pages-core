@@ -21,8 +21,8 @@ const { SiteBuilds, REFRESH_INTERVAL } = proxyquire('../../../../frontend/compon
     IconExclamationCircle: () => <span />,
     IconSpinner: () => <span />,
   },
-  '../branchViewLink': () => <span className="branch-view-link" />,
-  '../GitHubLink': () => <span className="github-link" />,
+  '../branchViewLink': () => <span className="view-site-link">View build</span>,
+  '../GitHubLink': () => <span className='GitHubLinkMock' />,
   '../CreateBuildLink': () => <span className="build-link" />,
   '../../actions/buildActions': buildActions,
 });
@@ -89,20 +89,41 @@ describe('<SiteBuilds/>', () => {
     fetchBuildMock.resetHistory();
   });
 
-  it("should render the username for a build's user", () => {
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    const userIndex = columnIndex(wrapper, 'User');
-
-    const userCell = wrapper.find('tr').at(1).find('td').at(userIndex - 1);
-    expect(userCell.text()).to.equal(defaultBuild.username);
+  describe("should render the branch name and commit details for a build", () => {
+    it("should render a username", () => {
+      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
+      const commitUserName = branchCell.find('.commit-user');
+      expect(commitUserName).to.exist;
+      expect(commitUserName.text()).to.equal(defaultBuild.username);
+    });
+    it("should render a commit timestamp", () => {
+      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
+      const commitTime = branchCell.find('.commit-time');
+      expect(commitTime).to.exist;
+      expect(commitTime.text()).to.include('ago');
+    });
+    it("should render a link to the branch on GitHub using <GitHubLink>", () => {
+      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
+      const branchLink = branchCell.find('.branch-info .GitHubLinkMock');
+      expect(branchLink).to.exist;
+    });
+    it("should render a link to the sha on GitHub using <GitHubLink>", () => {
+      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
+      const commitSha = branchCell.find('.commit-info .GitHubLinkMock');
+      expect(commitSha).to.exist;
+    });
   });
 
   it('should render an empty string for the username for builds where there is no user', () => {
     state.builds.data[0].username = undefined;
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
-    const userCell = wrapper.find('td[data-title="User"]');
-    expect(userCell.text()).to.equal('');
+    const userNameSpan = wrapper.find('.commit-user');
+    expect(userNameSpan.text()).to.equal('');
   });
 
   it('should render a `-` if the commit SHA is absent', () => {
@@ -117,32 +138,32 @@ describe('<SiteBuilds/>', () => {
     expect(wrapper.find({ owner, repository, branch: siteBuild.branch })).to.have.length(1);
   });
 
-  it('should render a `GitHubLink` component if commit SHA present', () => {
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'github-link' })).to.have.length(1);
-  });
 
   it('should render a `BranchViewLink` component if state is successful', () => {
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(1);
+    const actionsCell = wrapper.find('tr').at(1).find('td[data-title="Actions"]');
+    const viewBuildLink = actionsCell.find('.view-site-link');
+    expect(actionsCell).to.exist;
+    expect(viewBuildLink).to.exist;
+    expect(viewBuildLink.text()).to.equal('View build');
   });
 
-  it('should not render a `BranchViewLink` component if state is not successful', () => {
+  it('should not render a `GitHubLinkMock` component if state is not successful', () => {
     state.builds.data[0].state = 'error';
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(0);
+    expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
   });
 
   it('should not render a `BranchViewLink` component if state is queued', () => {
     state.builds.data[0].state = 'queued';
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(0);
+    expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
   });
 
   it('should not error if state is unkown/unexpected', () => {
     state.builds.data[0].state = 'unexpected';
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'branch-view-link' })).to.have.length(0);
+    expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
   });
 
   it('should render a button to refresh builds', () => {

@@ -26,9 +26,12 @@ const associate = ({ BuildTask, Build, BuildTaskType }) => {
     where: {
       '$Build.site$': id,
     },
-    include: [{
-      model: Build,
-    }],
+    include: [
+      {
+        model: Build,
+      },
+      models.BuildTaskType
+    ],
   }));
 };
 
@@ -70,19 +73,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
     }, {
-      tableName: 'build_task',
-      paranoid: true,
-      indexes: [
-        {
-          name: 'build_task_build_id_type_index',
-          unique: true,
-          fields: ['buildId', 'buildTaskTypeId'],
-        },
-      ],
-      hooks: {
-        beforeValidate,
+    tableName: 'build_task',
+    paranoid: true,
+    indexes: [
+      {
+        name: 'build_task_build_id_type_index',
+        unique: true,
+        fields: ['buildId', 'buildTaskTypeId'],
       },
-    }
+    ],
+    hooks: {
+      beforeValidate,
+    },
+  }
   );
 
   BuildTask.generateToken = generateToken;

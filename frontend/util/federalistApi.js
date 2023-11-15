@@ -35,6 +35,10 @@ export default {
     return request(`build/${build.id}/log/offset/${offset}`);
   },
 
+  fetchBuild(buildId) {
+    return request(`build/${buildId}`);
+  },
+
   fetchTasks(buildId) {
     return request(`build/${buildId}/tasks`);
   },

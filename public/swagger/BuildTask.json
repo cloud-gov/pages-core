@@ -29,6 +29,7 @@
         "processing",
         "skipped",
         "success",
+        "tasked",
         "queued",
         "created"
       ]
@@ -38,6 +39,12 @@
     },
     "buildTaskTypeId": {
       "type": "number"
+    },
+    "BuildTaskType": {
+      "oneOf": [
+        { "type": ["null"] },
+        { "$ref": "BuildTaskType.json" }
+      ]
     },
     "name": {
       "type": "string"

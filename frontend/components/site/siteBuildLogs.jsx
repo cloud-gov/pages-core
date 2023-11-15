@@ -6,6 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useBuildLogs } from '../../hooks';
 import SiteBuildLogTable from './siteBuildLogTable';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
+import CommitSummary from './CommitSummary';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
@@ -21,6 +22,7 @@ const SiteBuildLogs = () => {
 
   return (
     <div>
+      <CommitSummary buildId={buildId} />
       <div className="log-tools">
         <ul className="usa-unstyled-list">
             {(FEATURE_BUILD_TASKS) && (
