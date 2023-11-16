@@ -234,6 +234,9 @@ describe('Build model', () => {
   });
 
   describe('validations', () => {
+    const branchNameError = 'Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.'
+    const branchNameLengthError = 'Validation error: Invalid branch name — branch names are limitted to 299 characters.'
+
     it('should require a site object before saving', () => {
       const buildPromise = Build.create({ user: 1, site: null });
 
@@ -286,7 +289,7 @@ describe('Build model', () => {
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
+        .rejectedWith(ValidationError, branchNameError);
     });
 
     it('requires a valid branch name before saving no end slash', () => {
@@ -298,7 +301,7 @@ describe('Build model', () => {
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
+        .rejectedWith(ValidationError, branchNameError);
     });
 
     it('requires a valid branch name before saving no begin /', () => {
@@ -310,7 +313,20 @@ describe('Build model', () => {
       });
 
       return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on branch failed');
+        .rejectedWith(ValidationError, branchNameError);
+    });
+
+    it('requires a valid branch name before saving and it cannot be >= 300 characters /', () => {
+      const branch = Array(301).join("b")
+      const buildPromise = Build.create({
+        user: 1,
+        site: 1,
+        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+        branch,
+      });
+
+      return expect(buildPromise).to.be
+        .rejectedWith(ValidationError, branchNameLengthError);
     });
   });
 

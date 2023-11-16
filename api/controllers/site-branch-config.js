@@ -6,7 +6,6 @@ const {
 } = require('../serializers/site-branch-config');
 const EventCreator = require('../services/EventCreator');
 const {
-  branchRegex,
   ValidationError,
   parseSiteConfig,
 } = require('../utils/validators');
@@ -31,10 +30,6 @@ function validate({ branch, config = {}, context } = {}) {
 
   if (context && typeof context !== 'string') {
     throw new ValidationError('Context must be a valid string.');
-  }
-
-  if (!branchRegex.test(branch)) {
-    throw new ValidationError('Branch name must be valid.');
   }
 
   if (

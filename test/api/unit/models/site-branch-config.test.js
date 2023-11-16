@@ -13,13 +13,23 @@ describe('Site Branch Config model', () => {
   before(clean);
   afterEach(clean);
 
-  it('`branch` to be an with invalid branch name', async () => {
+  it('`branch` to be an invalid branch name', async () => {
     const instance = SiteBranchConfig.build({ branch: 'Th!s I$ an 1nvalid *branch name' });
     const error = await instance.validate().catch(e => e);
 
     expect(error).to.be.an('Error');
     expect(error.name).to.eq('SequelizeValidationError');
-    expect(error.errors.map(e => e.message)).to.include('Validation is on branch failed');
+    expect(error.errors.map(e => e.message)).to.include('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+  });
+
+  it('`branch` to be an invalid branch name length >= 300 characters', async () => {
+    const branch = Array(301).join("b")
+    const instance = SiteBranchConfig.build({ branch });
+    const error = await instance.validate().catch(e => e);
+
+    expect(error).to.be.an('Error');
+    expect(error.name).to.eq('SequelizeValidationError');
+    expect(error.errors.map(e => e.message)).to.include('Invalid branch name — branch names are limitted to 299 characters.');
   });
 
   it('`branch` cannot be null when context is not `preview`', async () => {
