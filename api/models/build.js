@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const URLSafeBase64 = require('urlsafe-base64');
 const SiteBuildQueue = require('../services/SiteBuildQueue');
 
-const { branchRegex, shaRegex, isEmptyOrUrl } = require('../utils/validators');
+const { isEmptyOrBranch, isEmptyOrUrl, shaRegex } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
 const { buildEnum } = require('../utils');
 
@@ -262,7 +262,7 @@ module.exports = (sequelize, DataTypes) => {
       branch: {
         type: DataTypes.STRING,
         validate: {
-          is: branchRegex,
+          isEmptyOrBranch,
         },
         allowNull: false,
       },

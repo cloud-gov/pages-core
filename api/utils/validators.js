@@ -94,6 +94,16 @@ function parseSiteConfigs(siteConfigs) {
   return parsedSiteConfigs;
 }
 
+function isEmptyOrBranch(value) {
+  if (value?.length >= 300) {
+    throw new Error('Invalid branch name — branch names are limitted to 299 characters.');
+  }
+
+  if (value && value.length && !branchRegex.test(value)) {
+    throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+  }
+}
+
 function isEmptyOrUrl(value) {
   const validUrlOptions = {
     require_protocol: true,
@@ -133,6 +143,7 @@ module.exports = {
   isValidYaml,
   parseSiteConfig,
   parseSiteConfigs,
+  isEmptyOrBranch,
   isEmptyOrUrl,
   ValidationError,
   validBasicAuthUsername,

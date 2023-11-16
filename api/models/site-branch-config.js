@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { branchRegex } = require('../utils/validators');
+const { isEmptyOrBranch } = require('../utils/validators');
 
 function associate({ Domain, SiteBranchConfig, Site }) {
   // Associations
@@ -30,7 +30,7 @@ function define(sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: true,
         validate: {
-          is: branchRegex,
+          isEmptyOrBranch,
         },
       },
       s3Key: {

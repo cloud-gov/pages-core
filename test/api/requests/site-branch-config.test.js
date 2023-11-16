@@ -7,7 +7,6 @@ const csrfToken = require('../support/csrfToken');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const app = require('../../../app');
-const config = require('../../../config');
 const { Build, Role, Site, SiteBranchConfig } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
 
@@ -487,7 +486,34 @@ describe('Site Branch Config API', () => {
           body
         );
         expect(body.message).to.eq(
-          'An error occurred creating the site branch config: Branch name must be valid.'
+          'An error occurred creating the site branch config: Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.'
+        );
+      });
+
+      it('returns a 400 when branch name is too long', async () => {
+        const userPromise = factory.user();
+        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const user = await userPromise;
+        const branch = Array(301).join('b')
+        const cookie = await authenticatedSession(user);
+        const context = 'preview';
+
+        const { body } = await request(app)
+          .post(`/v0/site/${site.id}/branch-config`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send({ branch, context })
+          .expect(400);
+
+        validateAgainstJSONSchema(
+          'POST',
+          '/site/{site_id}/branch-config',
+          400,
+          body
+        );
+        expect(body.message).to.eq(
+          'An error occurred creating the site branch config: Validation error: Invalid branch name — branch names are limitted to 299 characters.'
         );
       });
     });

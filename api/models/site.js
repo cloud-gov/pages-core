@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { toInt } = require('../utils');
 const {
-  branchRegex, isEmptyOrUrl, isValidSubdomain,
+  isEmptyOrBranch, isEmptyOrUrl, isValidSubdomain,
 } = require('../utils/validators');
 
 const afterValidate = (site) => {
@@ -131,12 +131,6 @@ const beforeValidate = (site) => {
     site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
   }
 };
-
-function isEmptyOrBranch(value) {
-  if (value && value.length && !branchRegex.test(value)) {
-    throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
-  }
-}
 
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
