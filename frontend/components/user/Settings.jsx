@@ -10,8 +10,9 @@ import federalistApi from '../../util/federalistApi';
 import LoadingIndicator from '../LoadingIndicator';
 import SettingsForm from './SettingsForm';
 import GithubAuthButton from '../GithubAuthButton';
-import userActions from '../../reducers/userActions';
+import userActions from '../../actions/userActions';
 import alertActions from '../../actions/alertActions';
+import notificationActions from '../../actions/notificationActions';
 
 function buildInitialValues(sites, user) {
   return {
@@ -28,6 +29,7 @@ function buildInitialValues(sites, user) {
 const onGithubAuthSuccess = () => {
   userActions.fetchUser();
   alertActions.alertSuccess('Github authorization successful');
+  notificationActions.success('Github authorization successful');
 };
 
 const onGithubAuthFailure = (_error) => {
