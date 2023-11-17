@@ -67,7 +67,7 @@ function shaLink(build) {
         repository={repository}
         sha={sha}
         branch={null}
-        text={sha.slice(0,6)}
+        text={sha.slice(0,7)}
         icon="sha"
       />
     );
@@ -88,7 +88,7 @@ function branchLink(build) {
     />
   );
 }
-// roll up the tasks -- if any are complete, show a results count, if all have errored, show canceled, otherwise show queued if there are any tasks
+
 function summarizeTaskResults(build) {
 
   if (!build.BuildTasks || build.BuildTasks.length < 1) return (

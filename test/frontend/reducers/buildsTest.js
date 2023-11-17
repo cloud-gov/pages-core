@@ -7,6 +7,8 @@ describe('buildsReducer', () => {
   let fixture;
   const BUILDS_FETCH_STARTED = 'builds fetch started';
   const BUILDS_RECEIVED = 'builds received';
+  const BUILD_FETCH_STARTED = 'build fetch started';
+  const BUILD_RECEIVED = 'build received';
   const BUILD_RESTARTED = 'build restarted';
   const defaultState = {
     isLoading: false,
@@ -18,6 +20,8 @@ describe('buildsReducer', () => {
       '../actions/actionCreators/buildActions': {
         buildsFetchStartedType: BUILDS_FETCH_STARTED,
         buildsReceivedType: BUILDS_RECEIVED,
+        buildFetchStartedType: BUILD_FETCH_STARTED,
+        buildReceivedType: BUILD_RECEIVED,
         buildRestartedType: BUILD_RESTARTED,
       },
     }).default;
