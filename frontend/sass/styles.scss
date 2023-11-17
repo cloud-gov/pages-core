@@ -14,7 +14,7 @@ $image-path: '../../node_modules/uswds/src/img';
 @import "_case_study";
 @import "_criteria_list";
 @import "_checklist";
-@import "_commit-details";
+@import "_commit-summary";
 @import "_dashboard";
 @import "_example_sites";
 @import "_feature_group";
@@ -61,13 +61,6 @@ $image-path: '../../node_modules/uswds/src/img';
   > [data-reactroot] {
     height: inherit;
   }
-}
-
-.main-loader {
-  color: #5b616b;
-  margin: 40px 0;
-  min-height: 200px;
-  text-align: center;
 }
 
 .site-main {

@@ -126,6 +126,8 @@
     transform: rotate(360deg);
   }
 }
+
+
 .uil-ring-css {
   background: none;
   position: relative;
@@ -148,4 +150,34 @@
   -webkit-animation: uil-ring-anim 1s linear infinite;
   -o-animation: uil-ring-anim 1s linear infinite;
   animation: uil-ring-anim 1s linear infinite;
+}
+
+.loader {
+  color: #5b616b;
+  margin: 40px 0;
+  min-height: 200px;
+  text-align: center;
+  &--main {
+    margin: 40px 0;
+    min-height: 200px;
+  }
+  &--mini {
+    margin: 20px auto;
+    min-height: 100px;
+    .uil-ring-css {
+      width: 100px;
+      height: 100px;
+      & > div {
+        width: 80px;
+        height: 80px;
+        top: 10px;
+        left: 10px;
+        border-radius: 80px;
+      }
+    }
+  }
+}
+.mini-loader {
+  min-height: 100px;
+  margin: 0 auto;
 }

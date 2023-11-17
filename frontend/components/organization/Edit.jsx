@@ -175,6 +175,7 @@ function Edit({ actions }) {
               <tr key={member.User.id}>
                 <th scope="row" data-title="Email">{member.User.UAAIdentity.email}</th>
                 <td data-title="Role">
+                  foo
                   <UpdateUserForm
                     form={`updateOrganizationUser-${member.User.id}`}
                     initialValues={{ roleId: member.Role.id }}
@@ -197,6 +198,7 @@ function Edit({ actions }) {
                   {timeFrom(member.updatedAt)}
                 </td>
                 <td data-title="Actions" className="table-actions">
+                  foo
                   <RemoveUserForm
                     form={`removeOrganizationUser-${member.User.id}`}
                     onSubmit={() => true}
