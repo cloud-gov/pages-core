@@ -4,7 +4,7 @@ import { useSelector, connect } from 'react-redux';
 import PropTypes, { BUILD } from 'prop-types';
 import { IconBranch } from '../icons';
 import LoadingIndicator from '../LoadingIndicator';
-// import api from '../../util/federalistApi';
+
 import buildActions from '../../actions/buildActions';
 import { timeFrom, dateAndTime } from '../../util/datetime';
 
@@ -58,6 +58,7 @@ CommitSummary.propTypes = {
   buildId: PropTypes.number.isRequired,
   build: PropTypes.shape({
     isLoading: PropTypes.bool,
+    data: PropTypes.object
   }),
 };
 
