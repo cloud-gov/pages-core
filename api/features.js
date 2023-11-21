@@ -9,8 +9,6 @@ const Flags = {
     */
   FEATURE_AUTH_GITHUB: 'FEATURE_AUTH_GITHUB',
   FEATURE_AUTH_UAA: 'FEATURE_AUTH_UAA',
-  FEATURE_BUILD_TASKS: 'FEATURE_BUILD_TASKS',
-
 };
 
 const TRUTHY_VALUES = [true, 'True', 'true', 'TRUE'];
