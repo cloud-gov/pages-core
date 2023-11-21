@@ -92,7 +92,6 @@ describe('Build Task API', () => {
         .get(`/v0/build/${buildTask.buildId}/tasks/${buildTask.id}`)
         .expect(403))
         .then((response) => {
-          console.log(response.body)
           validateAgainstJSONSchema('GET', '/build/{build_id}/tasks/{task_id}', 404, response.body);
           done();
         }).catch(done);
