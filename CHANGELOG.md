@@ -1,3 +1,27 @@
+## 0.4.0 (2023-11-16)
+
+### Added
+
+- Auto rotate site bucket keys #153
+- add owasp zap scan task type migration (#4260)
+
+### Fixed
+
+- call correct fetchUser function on github auth (#4301)
+- **ci**: Update ci staging audit src
+- Make site uploaded files page work properly for sites without previews
+
+### Maintenance
+
+- Add length limit validation before branch name regex
+- correct audit in staging, prod ci
+- add yarn audit to ci (#4250)
+- security/dependency updates
+- add initial playwright implementation (#4102)
+- add small adjustment to dev env setting
+- Upgrade to AWS SDK V3 (#3989)
+- update slack release notes format and bump pattern matcher
+
 ## 0.3.2 (2023-10-19)
 
 ### Fixed
