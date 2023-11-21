@@ -10,9 +10,6 @@ import CommitSummary from './CommitSummary';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
-// figure out how to get this out of the API wrapper like Features.enabled(Features.Flags.FEATURE_BUILD_TASKS)
-export const FEATURE_BUILD_TASKS = true;
-
 
 const SiteBuildLogs = () => {
   const { buildId: buildIdStr } = useParams();
@@ -25,7 +22,7 @@ const SiteBuildLogs = () => {
       <CommitSummary buildId={buildId} />
       <div className="log-tools">
         <ul className="usa-unstyled-list">
-            {(FEATURE_BUILD_TASKS) && (
+            {(process.env.FEATURE_BUILD_TASKS) && (
               <li><Link className="usa-button usa-button-secondary" to={`./../scans`}>View scan results</Link></li>
             )}
           <li><DownloadBuildLogsButton buildId={buildId} buildLogsData={logs} /></li>
