@@ -19,9 +19,6 @@ import { sandboxMsg } from '../../util';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
-// do this better, with Drew's help
-export const FEATURE_BUILD_TASKS = true;
-
 const buildStateData = ({ state, error }) => {
   let messageIcon;
   switch (state) {
@@ -243,7 +240,7 @@ function SiteBuilds() {
                             { buildLogsLink(build) }
                             <span> ({ duration(build.startedAt, build.completedAt) })</span>
                           </li>
-                          { FEATURE_BUILD_TASKS && build.BuildTasks && (
+                          { process.env.FEATURE_BUILD_TASKS && build.BuildTasks && (
                             <li className="result-item">
                               { summarizeTaskResults(build) }
                             </li>

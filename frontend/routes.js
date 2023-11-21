@@ -30,9 +30,6 @@ if (NODE_ENV !== 'development') {
   ErrorElement = <Error />;
 }
 
-// figure out how to get this out of the API wrapper like Features.enabled(Features.Flags.FEATURE_BUILD_TASKS)
-const { FEATURE_BUILD_TASKS } = process.env;
-
 const fetchInitialData = () => {
   userActions.fetchUser();
   siteActions.fetchSites();
@@ -55,7 +52,7 @@ export default (
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
-      {(FEATURE_BUILD_TASKS) && (
+      {(process.env.FEATURE_BUILD_TASKS) && (
         <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />
       )}
     </Route>
@@ -63,4 +60,3 @@ export default (
     <Route path="*" element={<NotFound />} />
   </Route>
 );
-// todo: make sure not to let a user visit a tasks page if the feature flag is off for build tasks, i get to decide the env variable name `FEATURE_BUILD_TASKS`, define in docker compose file
