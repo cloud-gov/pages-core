@@ -29,5 +29,5 @@ export {
   IconPlus,
   IconRebuild,
   IconSpinner,
-  IconView
+  IconView,
 };

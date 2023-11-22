@@ -59,8 +59,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
     }, {
-    tableName: 'build_task_type',
-  }
+      tableName: 'build_task_type',
+    }
   );
 
   BuildTaskType.associate = associate;

@@ -39,13 +39,13 @@ export const SITE_TITLE_CONFIG = [
   ...SITE_NAVIGATION_CONFIG,
   {
     display: 'Scan results for build #',
-    route: 'scans'
+    route: 'scans',
   },
   {
     display: 'Logs for build #',
-    route: 'logs'
-  }
-]
+    route: 'logs',
+  },
+];
 
 function getPageTitle(pathname, buildId = null) {
   const route = pathname.split('/').pop();

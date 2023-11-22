@@ -68,8 +68,8 @@ Any time the node dependencies are changed (like from a recently completed new f
 
 In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker compose configuration file when executing the docker compose commands which build containers or start the development environment, e.g.:
 
-1. `docker compose -f ./docker compose.yml -f ./docker compose.uaa.yml build`
-1. `docker compose -f ./docker compose.yml -f ./docker compose.uaa.yml up`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up`
 
 #### Check to see if everything is working correctly
 

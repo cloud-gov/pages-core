@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const LoadingIndicator = ({ text, size = 'main' }) => (
-  <div className={"loader loader--"+size} id="main-loader">
+  <div className={`loader loader--${size}`} id="main-loader">
     <div className="uil-ring-css">
       <div />
     </div>

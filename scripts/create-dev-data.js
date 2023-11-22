@@ -569,8 +569,6 @@ async function createData() {
     count: 42,
   });
 
-
-
   const taskType2 = await BuildTaskType.create({
     name: 'WCAG 2.2 AA Accessibility Scan',
     description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG level 2.2 A and AA.',
@@ -624,7 +622,6 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 3,
   });
-
 
   // task "hook" for each site
   await SiteBuildTask.create({
