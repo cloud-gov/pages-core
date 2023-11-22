@@ -1,5 +1,6 @@
 const { wrapHandlers } = require('../utils');
 const { Build, BuildTask, BuildTaskType } = require('../models');
+const { getSignedUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -40,6 +41,16 @@ module.exports = wrapHandlers({
       where: { buildId },
       attributes: { exclude: ['token', 'deletedAt', 'name'] },
       include: BuildTaskType,
+    });
+
+    tasks.forEach(async (task) => {
+      if (task.artifact) {
+        const size = await getTaskArtifactSize(build.Site, task.artifact);
+        const url = await getSignedUrl(build.Site, task.artifact);
+
+        // eslint-disable-next-line no-param-reassign
+        task.artifact = { size, url };
+      }
     });
 
     return res.json(tasks);

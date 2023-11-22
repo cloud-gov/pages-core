@@ -56,7 +56,7 @@ function resultLink(build) {
 
 function shaLink(build) {
   const { owner, repository } = build.site;
-  const sha = build.clonedCommitSha || build.requestedCommitSha
+  const sha = build.clonedCommitSha || build.requestedCommitSha;
   if (sha) {
     return (
       <GitHubLink
@@ -64,11 +64,12 @@ function shaLink(build) {
         repository={repository}
         sha={sha}
         branch={null}
-        text={sha.slice(0,7)}
+        text={sha.slice(0, 7)}
         icon="sha"
       />
     );
   }
+  return null;
 }
 
 function branchLink(build) {
@@ -87,33 +88,40 @@ function branchLink(build) {
 }
 
 function summarizeTaskResults(build) {
+  if (!build.BuildTasks || build.BuildTasks.length < 1) {
+    return (
+      <span> No scan queued </span>
+    );
+  }
 
-  if (!build.BuildTasks || build.BuildTasks.length < 1) return (
-    <span> No scan queued </span>
-  );
-
-  const tasksWithResults = build.BuildTasks.filter((task) => task.status === 'success');
-  const allTasksErrored =  build.BuildTasks.every((task) => task.status === 'error');
+  const tasksWithResults = build.BuildTasks.filter(task => task.status === 'success');
+  const allTasksErrored = build.BuildTasks.every(task => task.status === 'error');
 
   if (tasksWithResults.length > 0) {
-    const totalResults = tasksWithResults.reduce((results, task) => results + task.count, 0)
+    const totalResults = tasksWithResults.reduce((results, task) => results + task.count, 0);
     return (
       <>
         { resultLink(build) }
-        <span> ({ totalResults } issues)</span>
+        <span>
+          {' '}
+          (
+          { totalResults }
+          {' '}
+          issues)
+        </span>
       </>
-    )
+    );
   }
 
   if (allTasksErrored) {
     return (
-    <span> Scan canceled </span>
-    )
+      <span> Scan canceled </span>
+    );
   }
 
   return (
     <span> Scan queued </span>
-  )
+  );
 }
 
 function latestBuildByBranch(builds) {
@@ -193,7 +201,7 @@ function SiteBuilds() {
           <div className="table-container">
             <table
               className="usa-table-borderless log-table log-table__site-builds table-full-width"
-            > 
+            >
               <thead>
                 <tr>
                   <th scope="col">Build</th>
@@ -215,10 +223,16 @@ function SiteBuilds() {
                           </div>
                           <div className="build-info-details">
                             <h3 className="build-info-status">{ message }</h3>
-                            <p>Build <b>#{ build.id }</b></p>
+                            <p>
+                              Build
+                              <b>
+                                #
+                                { build.id }
+                              </b>
+                            </p>
                           </div>
                         </div>
-                        
+
                       </th>
                       <td data-title="Branch">
                         <div className="branch-info">
@@ -238,7 +252,12 @@ function SiteBuilds() {
                         <ul className="results-list unstyled-list">
                           <li className="result-item">
                             { buildLogsLink(build) }
-                            <span> ({ duration(build.startedAt, build.completedAt) })</span>
+                            <span>
+                              {' '}
+                              (
+                              { duration(build.startedAt, build.completedAt) }
+                              )
+                            </span>
                           </li>
                           { process.env.FEATURE_BUILD_TASKS && build.BuildTasks && (
                             <li className="result-item">
@@ -246,10 +265,10 @@ function SiteBuilds() {
                             </li>
                           )}
                         </ul>
-                      </td >
+                      </td>
                       <td data-title="Actions" className="table-actions">
                         <div>
-                            { previewBuilds[build.branch] === build.id && build.state === 'success'
+                          { previewBuilds[build.branch] === build.id && build.state === 'success'
                           && (
                           <BranchViewLink
                             branchName={build.branch}

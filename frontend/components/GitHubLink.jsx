@@ -20,12 +20,12 @@ const GitHubLink = ({
     href = `${baseHref}/commit/${sha}`;
     title = 'View commit on GitHub';
   }
-  function chooseIcon(icon){
-    switch (icon) {
+  function chooseIcon(iconStr) {
+    switch (iconStr) {
       case 'branch':
         return (
           <IconBranch />
-        )
+        );
       case 'commit':
       case 'sha':
         // return (
@@ -33,23 +33,24 @@ const GitHubLink = ({
         // )
         break;
       case 'repo':
-      default:  
-      return (
-        <IconGitHub />
-      )
+      default:
+        return (
+          <IconGitHub />
+        );
     }
+    return iconStr;
   }
 
   return (
     <a
-      className={icon + "-link"}
+      className={`${icon}-link`}
       href={href}
       title={title}
       target="_blank"
       rel="noopener noreferrer"
     >
-      
-      { (chooseIcon(icon) )}
+
+      { (chooseIcon(icon))}
       {text}
     </a>
   );

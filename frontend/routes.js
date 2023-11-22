@@ -23,7 +23,6 @@ import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 import organizationActions from './actions/organizationActions';
 
-
 const { NODE_ENV } = process.env;
 let ErrorElement = null;
 if (NODE_ENV !== 'development') {
