@@ -23,7 +23,7 @@ import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 import organizationActions from './actions/organizationActions';
 
-const { NODE_ENV } = process.env;
+const { NODE_ENV, FEATURE_BUILD_TASKS } = process.env;
 let ErrorElement = null;
 if (NODE_ENV !== 'development') {
   ErrorElement = <Error />;
@@ -51,7 +51,7 @@ export default (
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
-      {(process.env.FEATURE_BUILD_TASKS) && (
+      {(FEATURE_BUILD_TASKS) && (
         <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />
       )}
     </Route>
