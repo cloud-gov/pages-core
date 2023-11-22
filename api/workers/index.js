@@ -1,5 +1,4 @@
 const path = require('path');
-const { QueueScheduler } = require('bullmq');
 const IORedis = require('ioredis');
 
 const {
@@ -96,19 +95,6 @@ function pagesWorker(connection) {
     new QueueWorker(TimeoutBuildTasksQueueName, connection, timeoutBuildsProcessor),
   ];
 
-  const schedulers = [
-    new QueueScheduler(ArchiveBuildLogsQueueName, { connection }),
-    new QueueScheduler(BuildTasksQueueName, { connection }),
-    new QueueScheduler(DomainQueueName, { connection }),
-    new QueueScheduler(FailStuckBuildsQueueName, { connection }),
-    new QueueScheduler(MailQueueName, { connection }),
-    new QueueScheduler(NightlyBuildsQueueName, { connection }),
-    new QueueScheduler(ScheduledQueueName, { connection }),
-    new QueueScheduler(SiteDeletionQueueName, { connection }),
-    new QueueScheduler(SlackQueueName, { connection }),
-    new QueueScheduler(TimeoutBuildTasksQueueName, { connection }),
-  ];
-
   const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
   const buildTasksQueue = new BuildTasksQueue(connection);
   const failStuckBuildsQueue = new FailStuckBuildsQueue(connection);
@@ -136,7 +122,7 @@ function pagesWorker(connection) {
   ]);
 
   return {
-    jobs, queues, schedulers, workers,
+    jobs, queues, workers,
   };
 }
 
@@ -147,14 +133,13 @@ async function start() {
   });
 
   const {
-    jobs, queues, schedulers, workers,
+    jobs, queues, workers,
   } = pagesWorker(connection);
 
   const cleanup = async () => {
     logger.info('Worker process received request to shutdown, cleaning up and shutting down.');
     const closables = [
       ...workers,
-      ...schedulers,
       ...queues,
     ];
 

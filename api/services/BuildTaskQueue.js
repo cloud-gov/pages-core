@@ -40,8 +40,8 @@ const setupBucket = async (build) => {
   } = credentials;
 
   const s3Client = new S3Helper.S3Client({
-    accessKeyId: access_key_id,
-    secretAccessKey: secret_access_key,
+    accessKeyId: access_key_id, // eslint-disable-line
+    secretAccessKey: secret_access_key, // eslint-disable-line
     bucket,
     region,
   });
