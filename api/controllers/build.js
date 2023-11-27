@@ -40,6 +40,7 @@ const emitBuildStatus = async (build) => {
 module.exports = wrapHandlers({
   async find(req, res) {
     const site = await fetchModelById(req.params.site_id, Site);
+    console.log(site)
     if (!site) {
       return res.notFound();
     }
