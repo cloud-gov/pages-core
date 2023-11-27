@@ -44,6 +44,7 @@ module.exports = wrapHandlers({
     });
 
     tasks.forEach(async (task) => {
+      console.log(task)
       if (task.artifact) {
         const size = await getTaskArtifactSize(build.Site, task.artifact);
         const url = await getSignedUrl(build.Site, task.artifact);
