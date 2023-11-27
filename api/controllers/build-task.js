@@ -1,6 +1,6 @@
 const { wrapHandlers } = require('../utils');
 const { Build, BuildTask, BuildTaskType } = require('../models');
-const { getSignedUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
+const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -47,7 +47,7 @@ module.exports = wrapHandlers({
       console.log(task)
       if (task.artifact) {
         const size = await getTaskArtifactSize(build.Site, task.artifact);
-        const url = await getSignedUrl(build.Site, task.artifact);
+        const url = await getSignedTaskUrl(build.Site, task.artifact);
 
         // eslint-disable-next-line no-param-reassign
         task.artifact = { size, url };
