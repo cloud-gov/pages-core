@@ -15,4 +15,3 @@ new_relic_app_name: web-pages-dev
 proxy_domain: sites.pages-dev.cloud.gov
 cf_cdn_space_name: sites-dev
 node_env: development
-feature_build_tasks: 'true'
