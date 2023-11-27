@@ -15,4 +15,3 @@ new_relic_app_name: web-pages-staging
 proxy_domain: sites.pages-staging.cloud.gov
 cf_cdn_space_name: sites-staging
 node_env: production
-feature_build_tasks: 'true'
