@@ -55,7 +55,9 @@ describe('SiteBuildQueue', () => {
 
       await SiteBuildQueue.sendBuildMessage(build, 2);
 
-      const params = sendMessageStub.firstCall.args[0];
+      const jobName = sendMessageStub.firstCall.args[0];
+      const params = sendMessageStub.firstCall.args[1];
+      expect(jobName).to.equal('sendBuildMessage');
       expect(params).to.have.property('environment');
       expect(params.environment.length).to.equal(15);
       expect(params).to.have.property('containerName');
