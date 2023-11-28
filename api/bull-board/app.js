@@ -1,5 +1,4 @@
 const express = require('express');
-const Queue = require('bull');
 const { createBullBoard } = require('@bull-board/api');
 const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
@@ -16,6 +15,7 @@ const {
   FailStuckBuildsQueue,
   MailQueue,
   NightlyBuildsQueue,
+  SiteBuildQueue,
   SiteDeletionQueue,
   ScheduledQueue,
   SlackQueue,
@@ -33,17 +33,11 @@ const connection = new IORedis(config.redis.url, {
   maxRetriesPerRequest: null,
 });
 
-const createQueue = name => new Queue(name, config.redis.url, {
-  redis: {
-    tls: config.redis.tls,
-  },
-});
-
 const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
   queues: [
-    new BullAdapter(createQueue('site-build-queue')),
+    new BullAdapter(new SiteBuildQueue(connection)),
     new BullMQAdapter(new ArchiveBuildLogsQueue(connection)),
     new BullMQAdapter(new BuildTasksQueue(connection)),
     new BullMQAdapter(new DomainQueue(connection)),

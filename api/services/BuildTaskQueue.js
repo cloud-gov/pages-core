@@ -1,10 +1,16 @@
 const path = require('path');
+const IORedis = require('ioredis');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const BullQueueClient = require('../utils/bullQueueClient');
+const { BuildTasksQueue } = require('../queues');
 const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
+
+const connection = new IORedis(config.redis.url, {
+  tls: config.redis.tls,
+  maxRetriesPerRequest: null,
+});
 
 const statusCallbackURL = buildTask => new URL(
   path.join('/v0/tasks', String(buildTask.id), buildTask.token),
@@ -31,7 +37,9 @@ const buildContainerEnvironment = async (buildTask) => {
 };
 
 const setupBucket = async (build) => {
-  const credentials = await apiClient.fetchServiceInstanceCredentials(build.Site.s3ServiceName);
+  const credentials = await apiClient.fetchServiceInstanceCredentials(
+    build.Site.s3ServiceName
+  );
   const {
     access_key_id, // eslint-disable-line
     bucket,
@@ -54,7 +62,7 @@ const setupBucket = async (build) => {
 };
 
 const BuildTaskQueue = {
-  bullClient: new BullQueueClient('build-tasks'),
+  bullClient: new BuildTasksQueue(connection),
 };
 
 BuildTaskQueue.messageBodyForBuild = buildTask => buildContainerEnvironment(buildTask);
