@@ -1,12 +1,18 @@
 const url = require('url');
+const IORedis = require('ioredis');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const BullQueueClient = require('../utils/bullQueueClient');
+const { SiteBuildQueue: SiteBuildBullQueue } = require('../queues');
 const { buildViewLink, buildUrl } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
+
+const connection = new IORedis(config.redis.url, {
+  tls: config.redis.tls,
+  maxRetriesPerRequest: null,
+});
 
 const siteConfig = (build, siteBranchConfigs = []) => {
   const configRecord = siteBranchConfigs.find(c => c.branch === build.branch)
@@ -106,7 +112,7 @@ const setupBucket = async (build, buildCount) => {
 };
 
 const SiteBuildQueue = {
-  bullClient: new BullQueueClient('site-build-queue'),
+  bullClient: new SiteBuildBullQueue(connection),
 };
 
 SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
