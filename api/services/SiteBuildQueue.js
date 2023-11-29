@@ -129,7 +129,7 @@ SiteBuildQueue.sendBuildMessage = async (build, buildCount) => {
   const message = await SiteBuildQueue.messageBodyForBuild(build);
   await setupBucket(build, buildCount);
 
-  return SiteBuildQueue.bullClient.add(message);
+  return SiteBuildQueue.bullClient.add('sendBuildMessage', message);
 };
 
 module.exports = SiteBuildQueue;

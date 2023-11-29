@@ -70,7 +70,8 @@ BuildTaskQueue.messageBodyForBuild = buildTask => buildContainerEnvironment(buil
 BuildTaskQueue.sendTaskMessage = async (buildTask) => {
   const message = await BuildTaskQueue.messageBodyForBuild(buildTask);
   await setupBucket(buildTask.Build);
-  return BuildTaskQueue.bullClient.add(message);
+
+  return BuildTaskQueue.bullClient.add('sendTaskMessage', message);
 };
 
 module.exports = BuildTaskQueue;
