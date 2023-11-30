@@ -70,7 +70,8 @@ const BuildLogs = {
         params.Range = `bytes=${startBytes}-${endBytes}`;
       }
       const response = await this.s3().getObject(build.logsS3Key, params);
-      const output = response.Body.toString().split('\n');
+      const bodyString = await response.Body.transformToString();
+      const output = bodyString.split('\n');
       const byteLength = response.ContentLength;
 
       return { output, byteLength };

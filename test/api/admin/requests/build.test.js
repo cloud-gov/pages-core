@@ -1,3 +1,5 @@
+const { Readable } = require('stream');
+const { sdkStreamMixin } = require('@aws-sdk/util-stream-node');
 const request = require('supertest');
 const { expect } = require('chai');
 
@@ -165,11 +167,17 @@ describe('Admin - Site API', () => {
       beforeEach(() => s3Mock.reset());
 
       it('gets the following site build logs', async () => {
+
         const body = 'this\nis a\n test\n response\n body.';
+        const stream = new Readable();
+        stream.push(body);
+        stream.push(null);
+        const sdkStream = sdkStreamMixin(stream);
+
         const contentLength = new Blob([body]).size;
 
         s3Mock.on(GetObjectCommand).resolves({
-          Body: body,
+          Body: sdkStream,
           ContentLength: contentLength,
         });
 

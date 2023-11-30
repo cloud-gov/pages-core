@@ -113,6 +113,7 @@
   "author": "dhcole",
   "license": "CC0-1.0",
   "devDependencies": {
+    "@aws-sdk/util-stream-node": "^3.374.0",
     "@babel/core": "^7.23.3",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.23.3",
