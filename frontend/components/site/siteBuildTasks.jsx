@@ -140,7 +140,10 @@ const SiteBuildTasks = () => {
                           </li>
                           {task.status === 'success' && (
                             <li className="result-item">
-                              <Link to={artifactLink(task.artifact, artifactFilePrefix)} className="" target="_blank" rel="noopener noreferrer">{ task.artifact }</Link>
+                              <Link to={artifactLink(task.artifact.url, artifactFilePrefix)} className="" target="_blank" rel="noopener noreferrer">
+                                { task.artifact.url }
+                                { task.artifact.size }
+                              </Link>
                               <br />
                             </li>
                           )}

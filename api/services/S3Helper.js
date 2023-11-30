@@ -5,7 +5,7 @@ const {
   GetObjectCommand,
   waitUntilBucketExists,
   DeleteObjectsCommand,
-  HeadBucketCommand,
+  HeadObjectCommand,
 } = require('@aws-sdk/client-s3');
 
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
@@ -159,7 +159,7 @@ class S3Client {
 
   async headObject(key) {
     const { bucket, client } = this;
-    const command = new HeadBucketCommand({
+    const command = new HeadObjectCommand({
       Bucket: bucket,
       Key: key,
     });
