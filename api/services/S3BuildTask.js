@@ -29,6 +29,7 @@ async function getTaskArtifactSize(site, key) {
       });
 
       return s3Client.headObject(key)
+        .then(metadata => metadata.ContentLength)
         .catch(handleInvalidAccessKeyError);
     });
 }
