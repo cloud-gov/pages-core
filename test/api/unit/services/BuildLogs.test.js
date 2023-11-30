@@ -1,5 +1,8 @@
+const { Readable } = require('stream');
 const { expect } = require('chai');
 const sinon = require('sinon');
+const { sdkStreamMixin } = require('@aws-sdk/util-stream-node');
+
 const factory = require('../../support/factory');
 
 const { BuildLog } = require('../../../../api/models');
@@ -138,9 +141,14 @@ describe('BuildLogs Service', () => {
       const contentLength = new Blob([string]).size
 
       const build = { logsS3Key: key };
+      const stream = new Readable();
+      stream.push(string);
+      stream.push(null);
+      const sdkStream = sdkStreamMixin(stream);
+
       getObjectStub.resolves(
         {
-          Body: Buffer.from(string),
+          Body: sdkStream,
           ContentLength: contentLength,
         }
       );
@@ -161,9 +169,13 @@ describe('BuildLogs Service', () => {
       const contentLength = new Blob([multiline]).size
 
       const build = { logsS3Key: key };
+      const stream = new Readable();
+      stream.push(multiline);
+      stream.push(null);
+      const sdkStream = sdkStreamMixin(stream);
       getObjectStub.resolves(
         {
-          Body: Buffer.from(multiline),
+          Body: sdkStream,
           ContentLength: contentLength,
         }
       );
