@@ -43,19 +43,17 @@ module.exports = wrapHandlers({
       include: BuildTaskType,
     });
 
-    tasks.forEach(async (task) => {
-      // why isn't this happening?
+    const updatedTasks = await Promise.all(tasks.map(async (task) => {
       if (task.artifact) {
-        console.log(build.Site, task)
         const size = await getTaskArtifactSize(build.Site, task.artifact);
         const url = await getSignedTaskUrl(build.Site, task.artifact);
-
         // eslint-disable-next-line no-param-reassign
         task.artifact = { size, url };
       }
-    });
+      return task;
+    }));
 
-    return res.json(tasks);
+    return res.json(updatedTasks);
   },
 
   update: async (req, res) => {
