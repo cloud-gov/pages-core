@@ -1,3 +1,16 @@
+## 0.4.1 (2023-11-30)
+
+### Fixed
+
+- transform AWS SDK Readable to string
+- Add queue name for site build and build task  queues
+
+### Maintenance
+
+- Remove bull to complete bullmq transition
+- upgrade major deps from audit
+- update dependencies, minor patch bumps for pages core and admin client
+
 ## 0.4.0 (2023-11-16)
 
 ### Added
