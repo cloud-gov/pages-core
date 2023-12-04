@@ -9,6 +9,57 @@ const Mailer = require('../../services/mailer');
 const EventCreator = require('../../services/EventCreator');
 const OrganizationService = require('../../services/organization');
 
+async function listForUsersReportHelper(req, res, scopes) {
+  const { limit, page } = req.query;
+
+  const serialize = users => userSerializer.serializeMany(users, true);
+
+  const pagination = await paginate(User.scope(scopes), serialize, { limit, page });
+
+  const json = {
+    meta: {},
+    ...pagination,
+  };
+
+  return res.json(json);
+}
+
+async function listForUsersReportCSVHelper(req, res, scopes) {
+  const users = await User.scope(scopes).findAll();
+
+  const fields = [
+    {
+      label: 'ID',
+      value: 'id',
+    },
+    {
+      label: 'Email',
+      value: 'UAAIdentity.email',
+    },
+    {
+      label: 'Organizations',
+      value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}`).join('|')),
+    },
+    {
+      label: 'Details',
+      value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}: ${orgRole.Role.name}`).join(', ')),
+    },
+    {
+      label: 'Created',
+      value: 'createdAt',
+    },
+    {
+      label: 'Last Signed In',
+      value: 'signedInAt',
+    },
+  ];
+
+  const parser = new json2csv.Parser({ fields });
+  const csv = parser.parse(users);
+  res.attachment('users.csv');
+  return res.send(csv);
+}
+
 module.exports = wrapHandlers({
   async me(req, res) {
     res.json({
@@ -54,56 +105,23 @@ module.exports = wrapHandlers({
   },
 
   async listForUsersReport(req, res) {
-    const { limit, page } = req.query;
-
-    const serialize = users => userSerializer.serializeMany(users, true);
-
     const scopes = ['withUAAIdentity', 'withOrganizationRoles'];
-
-    const pagination = await paginate(User.scope(scopes), serialize, { limit, page });
-
-    const json = {
-      meta: {},
-      ...pagination,
-    };
-
-    return res.json(json);
+    return listForUsersReportHelper(req, res, scopes);
   },
 
   async listForUsersReportCSV(req, res) {
-    const users = await User.scope(['withUAAIdentity', 'withOrganizationRoles']).findAll();
+    const scopes = ['withUAAIdentity', 'withOrganizationRoles'];
+    return listForUsersReportCSVHelper(req, res, scopes);
+  },
 
-    const fields = [
-      {
-        label: 'ID',
-        value: 'id',
-      },
-      {
-        label: 'Email',
-        value: 'UAAIdentity.email',
-      },
-      {
-        label: 'Organizations',
-        value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}`).join('|')),
-      },
-      {
-        label: 'Details',
-        value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}: ${orgRole.Role.name}`).join(', ')),
-      },
-      {
-        label: 'Created',
-        value: 'createdAt',
-      },
-      {
-        label: 'Last Signed In',
-        value: 'signedInAt',
-      },
-    ];
+  async listForActiveUsersReport(req, res) {
+    const scopes = ['havingUAAIdentity', 'withOrganizationRoles'];
+    return listForUsersReportHelper(req, res, scopes);
+  },
 
-    const parser = new json2csv.Parser({ fields });
-    const csv = parser.parse(users);
-    res.attachment('users.csv');
-    return res.send(csv);
+  async listForActiveUsersReportCSV(req, res) {
+    const scopes = ['havingUAAIdentity', 'withOrganizationRoles'];
+    return listForUsersReportCSVHelper(req, res, scopes);
   },
 
   async findById(req, res) {

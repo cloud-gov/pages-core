@@ -77,6 +77,12 @@ const associate = ({
   User.addScope('withUAAIdentity', {
     include: UAAIdentity,
   });
+  User.addScope('havingUAAIdentity', {
+    include: [{
+      model: UAAIdentity,
+      required: true,
+    }],
+  });
   User.addScope('withOrganizationRoles', {
     include: {
       model: OrganizationRole,

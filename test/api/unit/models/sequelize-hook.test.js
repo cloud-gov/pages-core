@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { OrganizationRole, Role, User  } = require('../../../../api/models');
+const { OrganizationRole, Role, User } = require('../../../../api/models');
 const orgFactory = require('../../support/factory/organization');
 const createUser = require('../../support/factory/user');
 
