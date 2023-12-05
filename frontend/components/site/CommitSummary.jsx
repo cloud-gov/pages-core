@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, connect } from 'react-redux';
 
-import PropTypes, { BUILD } from 'prop-types';
+import PropTypes from 'prop-types';
 import { IconBranch } from '../icons';
 import LoadingIndicator from '../LoadingIndicator';
 
@@ -63,14 +63,6 @@ function CommitSummary({ buildId }) {
 }
 CommitSummary.propTypes = {
   buildId: PropTypes.number.isRequired,
-  build: PropTypes.shape({
-    isLoading: PropTypes.bool,
-    data: PropTypes.objectOf(BUILD),
-  }),
-};
-
-CommitSummary.defaultProps = {
-  build: null,
 };
 
 const mapStateToProps = ({ build }) => ({ build });
