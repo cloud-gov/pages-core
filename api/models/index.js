@@ -15,6 +15,21 @@ const sequelize = new Sequelize(database, username, password, {
   retry,
 });
 
+// Add a permanent global hook to prevent unknowingly hitting this Sequelize bug:
+//   https://github.com/sequelize/sequelize/issues/10557#issuecomment-481399247
+sequelize.addHook('beforeCount', function (options) {
+  /* eslint-disable no-underscore-dangle, no-param-reassign */
+  if (this._scope.include && this._scope.include.length > 0) {
+    options.distinct = true;
+    options.col = this._scope.col || options.col || `"${this.options.name.singular}".id`;
+  }
+
+  if (options.include && options.include.length > 0) {
+    options.include = null;
+  }
+  /* eslint-enable no-underscore-dangle, no-param-reassign */
+});
+
 require('./build')(sequelize, DataTypes);
 require('./build-log')(sequelize, DataTypes);
 require('./build-task-type')(sequelize, DataTypes);
