@@ -1,3 +1,13 @@
+## 0.4.2 (2023-12-05)
+
+### Fixed
+
+- Add global Sequelize hook to make count behavior consistent with find.
+
+### Maintenance
+
+- Fix syntax error and remove outdated setup step from developer documentation
+
 ## 0.4.1 (2023-11-30)
 
 ### Fixed
