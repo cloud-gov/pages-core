@@ -286,6 +286,14 @@ async function fetchUsersReportCSV() {
   return getAttachedFile('/reports/users.csv').catch(() => []);
 }
 
+async function fetchActiveUsersReport(query = {}) {
+  return get('/reports/active-users', query).catch(() => []);
+}
+
+async function fetchActiveUsersReportCSV() {
+  return getAttachedFile('/reports/active-users.csv').catch(() => []);
+}
+
 async function inviteUser(params) {
   return post('/users/invite', params);
 }
@@ -343,6 +351,8 @@ export {
   fetchUsers,
   fetchUsersReport,
   fetchUsersReportCSV,
+  fetchActiveUsersReport,
+  fetchActiveUsersReportCSV,
   inviteUser,
   resendInvite,
   logout,

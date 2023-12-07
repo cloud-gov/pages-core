@@ -41,6 +41,8 @@ apiRouter.get('/reports/published-sites', AdminControllers.Domain.listPublished)
 apiRouter.get('/reports/published-sites.csv', AdminControllers.Domain.listPublishedCSV);
 apiRouter.get('/reports/users', AdminControllers.User.listForUsersReport);
 apiRouter.get('/reports/users.csv', AdminControllers.User.listForUsersReportCSV);
+apiRouter.get('/reports/active-users', AdminControllers.User.listForActiveUsersReport);
+apiRouter.get('/reports/active-users.csv', AdminControllers.User.listForActiveUsersReportCSV);
 apiRouter.put('/organization-role', AdminControllers.OrganizationRole.update);
 apiRouter.get('/roles', AdminControllers.Role.list);
 apiRouter.get('/sites', AdminControllers.Site.list);

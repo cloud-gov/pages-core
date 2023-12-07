@@ -209,6 +209,23 @@ describe('User model', () => {
     });
   });
 
+  describe('havingUAAIdentity', () => {
+    it('includes the UAAIdentity', async () => {
+      const { id: userId } = await createUser();
+      const uaaIdentity = await createUAAIdentity({ userId });
+
+      const user = await User.scope('havingUAAIdentity').findOne({ where: { id: userId } });
+      expect(user.UAAIdentity.id).to.eq(uaaIdentity.id);
+    });
+
+    it('excludes users without a UAAIdentity', async () => {
+      const { id: userId } = await createUser();
+
+      const user = await User.scope('havingUAAIdentity').findOne({ where: { id: userId } });
+      expect(user).to.be.null;
+    });
+  });
+
   describe('byUAAEmail', () => {
     it('filters users by uaa email and includes UAAIdentity', async () => {
       const [user1, user2] = await Promise.all([
