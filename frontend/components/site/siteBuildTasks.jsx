@@ -61,14 +61,19 @@ const SiteBuildTasks = () => {
   const { buildId: buildIdStr } = useParams();
   const buildId = parseInt(buildIdStr, 10);
   const [buildTasks, setBuildTasks] = useState([]);
+  const [errorMessage, setErrorMessage] = useState([]);
 
   let intervalHandle;
   useEffect(() => {
-    function fetchTasks(thisBuildId) {
-      return api.fetchTasks(thisBuildId).then((tasks) => {
+    function fetchTasks(id) {
+      return api.fetchTasks(id).then((tasks) => {
+        if (!tasks) {
+          throw new Error('Tasks could not be retrieved for this build.');
+        }
         setBuildTasks([...tasks]);
+        setErrorMessage(null);
         return tasks;
-      });
+      }).catch((error) => { setErrorMessage(error.message); });
     }
     fetchTasks(buildId);
     // Really need to stop interval if all tasks are complete
@@ -93,7 +98,13 @@ const SiteBuildTasks = () => {
           </li>
         </ul>
       </div>
-      {(!buildTasks || buildTasks?.length === 0) && (
+
+      { errorMessage && buildTasks && (
+        <div>
+          { errorMessage }
+        </div>
+      )}
+      {(!buildTasks || buildTasks?.length === 0) && !errorMessage && (
         <div>
           This build does not have any scans queued.
         </div>
