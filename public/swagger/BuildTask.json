@@ -42,15 +42,29 @@
     },
     "BuildTaskType": {
       "oneOf": [
-        { "type": ["null"] },
-        { "$ref": "BuildTaskType.json" }
+        {
+          "type": [
+            "null"
+          ]
+        },
+        {
+          "$ref": "BuildTaskType.json"
+        }
       ]
     },
     "name": {
       "type": "string"
     },
     "artifact": {
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        }
+      }
     },
     "message": {
       "type": "string"

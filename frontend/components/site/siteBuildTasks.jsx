@@ -1,22 +1,19 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable react/forbid-prop-types */
 
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import prettyBytes from 'pretty-bytes';
 import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
 } from '../icons';
 import CommitSummary from './CommitSummary';
-
 import api from '../../util/federalistApi';
 
 export const REFRESH_INTERVAL = 15 * 10000;
 
-// what should this be?
-const artifactFilePrefix = '';
-
-// how do we rename files that are previously created?
-function artifactLink(fileName, filePath = artifactFilePrefix) {
-  return filePath + fileName;
+function createArtifactFileName(whichBuildTask, whichBuildId) {
+  return whichBuildTask.name + whichBuildId;
 }
 
 const taskSummaryIcon = ({ status, count }) => {
@@ -136,7 +133,8 @@ const SiteBuildTasks = () => {
                             <h3 className="build-info-status">{ task.BuildTaskType.name }</h3>
                             <p className="build-info-details">
                               {task.BuildTaskType.description}
-                              . For more information, check out the&nbsp;
+                              {' '}
+                              For more information, check out the&nbsp;
                               <a href={task.BuildTaskType.url} target="_blank ">documentation</a>
                               .
                             </p>
@@ -149,13 +147,20 @@ const SiteBuildTasks = () => {
                             { summary }
                             <br />
                           </li>
-                          {task.status === 'success' && (
+                          {task.status === 'success' && task.artifact && task.artifact.url && (
                             <li className="result-item">
-                              <Link to={artifactLink(task.artifact.url, artifactFilePrefix)} className="" target="_blank" rel="noopener noreferrer">
-                                { task.artifact.url }
-                                { task.artifact.size }
+                              <Link
+                                to={task.artifact.url}
+                                title={'Download scan results for ' && task.BuildTaskType.name}
+                                className="artifact-filename"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Download scan results
                               </Link>
-                              <br />
+                              <span className="artifact-filesize">
+                                &nbsp;({ prettyBytes(task.artifact.size) })
+                              </span>
                             </li>
                           )}
                         </ul>
@@ -170,6 +175,7 @@ const SiteBuildTasks = () => {
           <div>
             <p>
               We welcome your feedback on this experimental feature. Email
+              {' '}
               <a href="mailto:pages-support@cloud.gov?subject=Build%20scans%20feedback" target="_blank" rel="noreferrer">pages-support@cloud.gov</a>
               {' '}
               with the subject line “Build scans feedback” to let us know what you think!

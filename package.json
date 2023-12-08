@@ -46,6 +46,7 @@
     "passport-oauth2": "^1.7.0",
     "pg": "^8.11.3",
     "pg-native": "^3.0.0",
+    "pretty-bytes": "^6.1.1",
     "rc": "^1.2.8",
     "react-router": "6.18.0",
     "react-router-dom": "^6.18.0",
