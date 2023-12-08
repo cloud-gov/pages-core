@@ -35,6 +35,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
       - put: gh-status
@@ -142,6 +143,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
       - put: gh-status
@@ -206,6 +208,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
       - put: gh-status
@@ -260,6 +263,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
       - get: cf-image
       - get: nightly
@@ -282,6 +286,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         trigger: true
         passed:
         - test-and-deploy-api-pages
@@ -347,6 +352,7 @@ jobs:
     plan: 
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         trigger: true
         passed: [set-pipeline]
       - get: node
@@ -388,6 +394,7 @@ jobs:
     plan:
       - get: src
         resource: pr-((deploy-env))
+        params: {integration_tool: checkout}
         passed: [set-pipeline]
       - get: nightly
         trigger: true
@@ -433,6 +440,7 @@ jobs:
     plan:
     - get: src
       resource: pr-((deploy-env))
+      params: {integration_tool: checkout}
       trigger: true
     - set_pipeline: core
       file: src/ci/pipeline-dev.yml
