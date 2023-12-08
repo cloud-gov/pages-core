@@ -16,9 +16,9 @@ const _attributes = ({
   buildTaskTypeId: buildTaskTypeId || buildTaskTypeFactory(),
   BuildTaskType: BuildTaskType || buildTaskTypeFactory(),
   name: name || 'build task name',
-  artifact: artifact || 'build task artifact',
+  artifact: artifact || '',
   count: count || 0,
-  message: message || 'build task message'
+  message: message || 'build task message',
 });
 
 const buildTask = overrides => Promise.props(_attributes(overrides))
