@@ -12,10 +12,6 @@ import api from '../../util/federalistApi';
 
 export const REFRESH_INTERVAL = 15 * 10000;
 
-function createArtifactFileName(whichBuildTask, whichBuildId) {
-  return whichBuildTask.name + whichBuildId;
-}
-
 const taskSummaryIcon = ({ status, count }) => {
   let summary;
   let icon;
