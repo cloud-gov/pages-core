@@ -110,3 +110,15 @@ services:
       HOST: 0.0.0.0
       PORT: 8989
     command: node app/scripts/echo.js
+  localstack:
+    build:
+      dockerfile: Dockerfile-localstack
+      context: .
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
