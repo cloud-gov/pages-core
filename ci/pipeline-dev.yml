@@ -46,7 +46,6 @@ jobs:
         - get: redis
           params: {save: true}
         - get: postgres
-          params: {save: true}
         - get: node
           params: {save: true}
       - task: install-deps-api
@@ -476,10 +475,10 @@ resources:
       tag: 5-alpine
 
   - name: postgres
-    type: docker-image
+    type: registry-image
     source:
       repository: postgres
-      tag: 11-alpine
+      tag: 15-alpine
 
   - name: node
     type: docker-image
