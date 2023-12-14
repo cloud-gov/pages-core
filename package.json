@@ -144,7 +144,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-sonarjs": "^0.23.0",
     "fetch-mock": "^9.11.0",
-    "jsdom": "^22.1.0",
+    "jsdom": "^23.0.1",
     "json-schema-deref-sync": "^0.14.0",
     "jsonschema": "^1.4.0",
     "lint-staged": "^13.2.2",

@@ -15,8 +15,8 @@
     "start": "node src/index.js"
   },
   "dependencies": {
-    "axios": "^0.26.0",
-    "jsonwebtoken": "^8.5.1",
+    "axios": "^1.6.0",
+    "jsonwebtoken": "^9.0.2",
     "pino": "^7.8.0"
   },
   "devDependencies": {
