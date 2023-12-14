@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@aws-sdk/client-s3": "^3.451.0",
+    "@aws-sdk/s3-request-presigner": "^3.456.0",
     "@bull-board/express": "4.11.3",
     "@json2csv/plainjs": "^7.0.1",
     "@octokit/request": "^6.2.2",
@@ -45,6 +46,7 @@
     "passport-oauth2": "^1.7.0",
     "pg": "^8.11.3",
     "pg-native": "^3.0.0",
+    "pretty-bytes": "^6.1.1",
     "rc": "^1.2.8",
     "react-router": "6.18.0",
     "react-router-dom": "^6.18.0",

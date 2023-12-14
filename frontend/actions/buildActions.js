@@ -4,6 +4,8 @@ import { dispatch } from '../store';
 import {
   buildsFetchStarted as createBuildsFetchStartedAction,
   buildsReceived as createBuildsReceivedAction,
+  buildFetchStarted as createBuildFetchStartedAction,
+  buildReceived as createBuildReceivedAction,
   buildRestarted as createBuildRestartedAction,
 } from './actionCreators/buildActions';
 
@@ -17,6 +19,14 @@ const dispatchBuildsReceivedAction = (builds) => {
   dispatch(createBuildsReceivedAction(builds));
 };
 
+const dispatchBuildFetchStartedAction = () => {
+  dispatch(createBuildFetchStartedAction());
+};
+
+const dispatchBuildReceivedAction = (build) => {
+  dispatch(createBuildReceivedAction(build));
+};
+
 const dispatchBuildRestartedAction = (build) => {
   dispatch(createBuildRestartedAction(build));
 };
@@ -26,6 +36,12 @@ export default {
     dispatchBuildsFetchStartedAction();
     return api.fetchBuilds(site)
       .then(dispatchBuildsReceivedAction);
+  },
+
+  fetchBuild(buildId) {
+    dispatchBuildFetchStartedAction();
+    return api.fetchBuild(buildId)
+      .then(dispatchBuildReceivedAction);
   },
 
   restartBuild(buildId, siteId) {

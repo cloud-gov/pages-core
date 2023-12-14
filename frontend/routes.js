@@ -8,6 +8,7 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
+import SiteBuildTasks from './components/site/siteBuildTasks';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
@@ -23,7 +24,6 @@ import userActions from './actions/userActions';
 import organizationActions from './actions/organizationActions';
 
 const { NODE_ENV } = process.env;
-
 let ErrorElement = null;
 if (NODE_ENV !== 'development') {
   ErrorElement = <Error />;
@@ -51,6 +51,9 @@ export default (
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
+      {(process.env.FEATURE_BUILD_TASKS) && (
+        <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />
+      )}
     </Route>
     <Route path="settings" element={<UserSettings />} />
     <Route path="*" element={<NotFound />} />

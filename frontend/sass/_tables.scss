@@ -17,27 +17,125 @@
     // overflow: auto;
     white-space: pre-wrap;
   }
-  .usa-button {
-    font-size: 1.5rem;
+
+
+  th, td {
+    // min-width: 124px;
+    padding: 1.5rem 1rem;
+    line-height: 1.4em;    
+    vertical-align: middle;
+  }
+
+  th:first-child {
+    padding-left: 2rem;
+  }
+
+  .build-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    .build-info-icon {
+      padding:.3em 1em .3em 0;
+      flex: 1;
+      text-align: center;
+      max-width: 3em;
+    }
+    .build-info-details {
+      flex: 4;
+      padding-right: 1em;
+      p {
+        margin: 0;
+        white-space: initial;
+        line-height: 1.4em;
+      }
+      h3 {
+        margin: 0;
+        font-size: 1.4em;
+      }
+    }
+  }
+  .repo-link, .view-site-link, .result-link, .branch-link, .commit-link {
+    // font-weight: 600;
+    svg {
+      fill: $link-color;
+      width: 12px;
+      height: auto;
+      margin-right: .3em;
+      vertical-align: middle;
+    }
+  }
+  .branch-info {
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+    // max-width: 30ch;
+    margin: 0.25em 0;
+    line-height: 1.3em;
+  }
+  .commit-info {
+    margin: 0.25em 0;
+    .commit-user {
+      white-space: nowrap;
+      font-weight: 600;
+      margin-right: .5em;
+    }
+    .commit-time {
+      white-space: nowrap;
+    }
+    // .commit-sha,
+    .sha-link {
+      font-family: Consolas, "Lucida Console", Menlo, monospace;
+      font-size: .85em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow:clip;
+      max-width: 7ch;
+      display: inline-block;
+      vertical-align: top;
+      line-height: .85em;
+      height: 1.4em;
+      padding-top: 0.4em;
+      text-decoration: none;
+      margin-right: .5em;
+      color: inherit;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  .unstyled-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .results-list {
+    li {
+      margin: .25em 0;
+      line-height: 1.4em;
+      white-space: nowrap;
+    }
   }
   .table-actions {
     a {
       margin: 0;
     }
-    .usa-button {
-      border-radius: 10px;
-      font-weight: bold;
+  }
+  .rebuild-button {
+    margin-bottom: 0;
+    padding: .4em .6em;
+    font-size: 1.1em;
+    border-radius: 4px;
+    white-space: nowrap;
+    svg {
+      margin-right: .4em;
+      height: 1em;
+      width: auto;
+      vertical-align: bottom;
     }
   }
 
-  th, td {
-    min-width: 124px;
-    padding: 1.5rem 1rem;
-  }
-
-  .branch-link {
-    margin-top: 1.5rem;
-  }
 }
 
 .table-full-width.log-table__site-builds {
@@ -46,26 +144,7 @@
   }
 
   td, tbody th {
-    vertical-align: top;
     padding: 1.5rem 1rem;
-  }
-
-  .commit-link {
-    * {
-      vertical-align: top;
-    }
-
-    a {
-      margin-left: 1rem;
-    }
-
-    + * {
-      margin-left: 3.5rem;
-    }
-  }
-
-  .usa-button {
-    width: initial;
   }
 
   @media screen and (max-width: 990px) {
@@ -83,12 +162,39 @@
       tr {
         display: block;
         border: 1px solid rgb(104, 104, 104);
-        margin-bottom: 3rem;
         position: relative;
       }
 
       td > *:first-child {
-        margin-left: 3.5rem;
+        margin-left: 1.5em;
+      }
+      td > *:nth-child(2) {
+        margin-left: auto;
+      }
+
+      .branch-info {
+        margin: 1em 1.5em;         
+        max-width: fit-content;
+      }
+      .commit-info {
+      }
+      .results-list {
+        margin: 1em auto;         
+        .unstyled-list {
+          padding: 0;
+          li {
+            display: inline-block;
+            margin-right: .5em;
+          }
+        }
+      }
+      .table-actions > * {
+        margin-top: auto;
+        margin-bottom: auto;
+        .usa-button {
+          margin-top: 0;
+          margin-right: 0;
+        }
       }
 
       th, td {
@@ -96,9 +202,13 @@
         align-items: stretch;
         padding: 0;
         position: relative;
+        vertical-align: top;
 
-        > *:first-child {
-          padding: 1.5rem;
+        > * {
+          margin: 1.5em;
+        }
+        &:first-child {
+          padding-left: 0
         }
 
         &::before {

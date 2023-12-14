@@ -7,7 +7,7 @@ import buildActions from '../../actions/buildActions';
 import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
-import { duration, timeFrom } from '../../util/datetime';
+import { duration, timeFrom, dateAndTime } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
@@ -35,6 +35,7 @@ const buildStateData = ({ state, error }) => {
       messageIcon = { message: 'Skipped', icon: null };
       break;
     case 'queued':
+    case 'created':
       messageIcon = { message: 'Queued', icon: IconClock };
       break;
     case 'success':
@@ -47,20 +48,79 @@ const buildStateData = ({ state, error }) => {
 };
 
 function buildLogsLink(build) {
-  return <Link to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View logs</Link>;
+  return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View build logs</Link>;
+}
+function resultLink(build) {
+  return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/scans`}>View scan results</Link>;
 }
 
-function commitLink(build) {
+function shaLink(build) {
+  const { owner, repository } = build.site;
+  const sha = build.clonedCommitSha || build.requestedCommitSha;
+  if (sha) {
+    return (
+      <GitHubLink
+        owner={owner}
+        repository={repository}
+        sha={sha}
+        branch={null}
+        text={sha.slice(0, 7)}
+        icon="sha"
+      />
+    );
+  }
+  return null;
+}
+
+function branchLink(build) {
   const { owner, repository } = build.site;
 
   return (
     <GitHubLink
       owner={owner}
       repository={repository}
-      sha={build.requestedCommitSha}
-      branch={build.requestedCommitSha ? null : build.branch}
+      sha={null}
+      branch={build.branch}
       text={build.branch}
+      icon="branch"
     />
+  );
+}
+
+function summarizeTaskResults(build) {
+  if (!build.BuildTasks || build.BuildTasks.length < 1) {
+    return (
+      <span> No scan queued </span>
+    );
+  }
+
+  const tasksWithResults = build.BuildTasks.filter(task => task.status === 'success');
+  const allTasksErrored = build.BuildTasks.every(task => task.status === 'error');
+
+  if (tasksWithResults.length > 0) {
+    const totalResults = tasksWithResults.reduce((results, task) => results + task.count, 0);
+    return (
+      <>
+        { resultLink(build) }
+        <span>
+          {' '}
+          (
+          { totalResults }
+          {' '}
+          issues)
+        </span>
+      </>
+    );
+  }
+
+  if (allTasksErrored) {
+    return (
+      <span> Scan canceled </span>
+    );
+  }
+
+  return (
+    <span> Scan queued </span>
   );
 }
 
@@ -144,11 +204,9 @@ function SiteBuilds() {
             >
               <thead>
                 <tr>
+                  <th scope="col">Build</th>
                   <th scope="col">Branch</th>
-                  <th scope="col">Message</th>
-                  <th scope="col">User</th>
-                  <th scope="col">Completed</th>
-                  <th scope="col">Duration</th>
+                  <th scope="col">Results</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -158,14 +216,59 @@ function SiteBuilds() {
 
                   return (
                     <tr key={build.id}>
-                      <th scope="row" data-title="Branch">
-                        <div>
-                          <p className="commit-link truncate">
+                      <th scope="row" data-title="Build">
+                        <div className="build-info">
+                          <div className="build-info-icon">
                             { icon && React.createElement(icon) }
-                            { commitLink(build) }
-                          </p>
-                          <div>
-                            { previewBuilds[build.branch] === build.id && build.state === 'success'
+                          </div>
+                          <div className="build-info-details">
+                            <h3 className="build-info-status">{ message }</h3>
+                            <p>
+                              Build
+                              <b>
+                                #
+                                { build.id }
+                              </b>
+                            </p>
+                          </div>
+                        </div>
+
+                      </th>
+                      <td data-title="Branch">
+                        <div className="branch-info">
+                          { branchLink(build) }
+                          <div className="commit-info">
+                            { shaLink(build) }
+                            <span className="commit-user" title={build.user.email}>
+                              { build.username }
+                            </span>
+                            <span className="commit-time" title={dateAndTime(build.createdAt)}>
+                              { timeFrom(build.createdAt) }
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td data-title="Results">
+                        <ul className="results-list unstyled-list">
+                          <li className="result-item">
+                            { buildLogsLink(build) }
+                            <span>
+                              {' '}
+                              (
+                              { duration(build.startedAt, build.completedAt) }
+                              )
+                            </span>
+                          </li>
+                          { process.env.FEATURE_BUILD_TASKS && build.BuildTasks && (
+                            <li className="result-item">
+                              { summarizeTaskResults(build) }
+                            </li>
+                          )}
+                        </ul>
+                      </td>
+                      <td data-title="Actions" className="table-actions">
+                        <div>
+                          { previewBuilds[build.branch] === build.id && build.state === 'success'
                           && (
                           <BranchViewLink
                             branchName={build.branch}
@@ -174,23 +277,7 @@ function SiteBuilds() {
                             completedAt={build.completedAt}
                           />
                           ) }
-                          </div>
                         </div>
-                      </th>
-                      <td data-title="Message">
-                        <div>
-                          <p>{ message }</p>
-                          { buildLogsLink(build) }
-                        </div>
-                      </td>
-                      <td data-title="User"><span>{ build.username }</span></td>
-                      <td data-title="Completed"><span>{ timeFrom(build.completedAt) }</span></td>
-                      <td data-title="Duration">
-                        <span>
-                          { duration(build.startedAt, build.completedAt) }
-                        </span>
-                      </td>
-                      <td data-title="Actions" className="table-actions">
                         <span>
                           {
                           ['error', 'success'].includes(build.state)
@@ -198,7 +285,7 @@ function SiteBuilds() {
                           <CreateBuildLink
                             handlerParams={{ buildId: build.id, siteId: site.id }}
                             handleClick={buildActions.restartBuild}
-                            className="usa-button usa-button-secondary"
+                            className="usa-button rebuild-button"
                           >
                             Rebuild
                           </CreateBuildLink>

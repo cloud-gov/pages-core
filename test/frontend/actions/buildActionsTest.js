@@ -9,7 +9,10 @@ describe("buildActions", () => {
   let dispatch;
   let buildsFetchStartedActionCreator;
   let buildsReceivedActionCreator;
+  let buildFetchStartedActionCreator;
+  let buildReceivedActionCreator;
   let buildRestartedActionCreator;
+  let fetchBuild;
   let fetchBuilds;
   let restartBuild;
   let alertSuccess;
@@ -18,8 +21,11 @@ describe("buildActions", () => {
     dispatch = spy();
     buildsFetchStartedActionCreator = stub()
     buildsReceivedActionCreator = stub()
+    buildFetchStartedActionCreator = stub()
+    buildReceivedActionCreator = stub()
     buildRestartedActionCreator = stub();
 
+    fetchBuild = stub()
     fetchBuilds = stub()
     restartBuild = stub();
 
@@ -29,10 +35,13 @@ describe("buildActions", () => {
       "./actionCreators/buildActions": {
         buildsFetchStarted: buildsFetchStartedActionCreator,
         buildsReceived: buildsReceivedActionCreator,
+        buildFetchStarted: buildFetchStartedActionCreator,
+        buildReceived: buildReceivedActionCreator,
         buildRestarted: buildRestartedActionCreator,
       },
       "../util/federalistApi": {
         fetchBuilds: fetchBuilds,
+        fetchBuild: fetchBuild,
         restartBuild: restartBuild,
       },
       "../store": {
@@ -56,6 +65,30 @@ describe("buildActions", () => {
     buildsReceivedActionCreator.withArgs(builds).returns(receivedAction)
 
     const actual = fixture.fetchBuilds(site)
+
+    actual.then(() => {
+      expect(dispatch.calledTwice).to.be.true
+      expect(dispatch.calledWith(startedAction)).to.be.true
+      expect(dispatch.calledWith(receivedAction)).to.be.true
+      done()
+    })
+  })
+
+  it("fetchBuild", done => {
+    const id = "🎫"
+    const build = {
+      "we": "like to build it's true",
+      "how": "about you?"
+    };
+    const buildPromise = Promise.resolve(build)
+    const startedAction = { action: "🚦" }
+    const receivedAction = { action: "🏁" }
+
+    fetchBuild.withArgs(id).returns(buildPromise)
+    buildFetchStartedActionCreator.withArgs().returns(startedAction)
+    buildReceivedActionCreator.withArgs(build).returns(receivedAction)
+
+    const actual = fixture.fetchBuild(id)
 
     actual.then(() => {
       expect(dispatch.calledTwice).to.be.true

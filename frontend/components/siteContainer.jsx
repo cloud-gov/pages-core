@@ -35,16 +35,31 @@ export const SITE_NAVIGATION_CONFIG = [
   },
 ];
 
-function getPageTitle(pathname) {
+export const SITE_TITLE_CONFIG = [
+  ...SITE_NAVIGATION_CONFIG,
+  {
+    display: 'Scan results for build #',
+    route: 'scans',
+  },
+  {
+    display: 'Logs for build #',
+    route: 'logs',
+  },
+];
+
+function getPageTitle(pathname, buildId = null) {
   const route = pathname.split('/').pop();
-  const routeConf = SITE_NAVIGATION_CONFIG.find(conf => conf.route === route);
+  const routeConf = SITE_TITLE_CONFIG.find(conf => conf.route === route);
   if (routeConf) {
+    if (buildId) {
+      return routeConf.display + buildId;
+    }
     return routeConf.display;
   }
   return '';
 }
 export function SiteContainer(props) {
-  const { id } = useParams();
+  const { id, buildId } = useParams();
   const location = useLocation();
   const params = useSearchParams();
   const sites = useSelector(state => state.sites);
@@ -111,12 +126,12 @@ export function SiteContainer(props) {
     );
   }
 
-  const pageTitle = getPageTitle(location.pathname);
+  const pageTitle = getPageTitle(location.pathname, buildId);
 
   return (
     <div className="usa-grid site">
       <SideNav siteId={site.id} config={SITE_NAVIGATION_CONFIG} />
-      <div className="usa-width-five-sixths site-main" id="pages-container">
+      <div className="usa-width-five-sixths site-main" id="pages-container" role="main">
 
         <AlertBanner
           message={alert.message}

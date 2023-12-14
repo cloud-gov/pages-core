@@ -5,7 +5,10 @@ const {
   GetObjectCommand,
   waitUntilBucketExists,
   DeleteObjectsCommand,
+  HeadObjectCommand,
 } = require('@aws-sdk/client-s3');
+
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
 
@@ -152,6 +155,24 @@ class S3Client {
       ...extras,
     });
     return client.send(command);
+  }
+
+  async headObject(key) {
+    const { bucket, client } = this;
+    const command = new HeadObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+    return client.send(command);
+  }
+
+  async getSignedUrl(key) {
+    const { bucket, client } = this;
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+    return getSignedUrl(client, command, { expiresIn: 300 });
   }
 }
 

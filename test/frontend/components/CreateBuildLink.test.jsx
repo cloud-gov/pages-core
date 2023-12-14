@@ -13,7 +13,7 @@ describe('<CreateBuildLink />', () => {
 
   it('renders its children', () => {
     const wrapper = shallow(<CreateBuildLink {...props} />);
-    expect(wrapper.children()).to.have.length(1);
+    expect(wrapper.children()).to.have.length(2);
   });
 
   it('calls the .handleClick function, passing handler params', () => {

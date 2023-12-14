@@ -34,3 +34,10 @@
     }
   }
 }
+
+.results-list {
+  .artifact-filename {}
+  .artifact-filesize {
+    color: $color-gray-dark;
+  }
+}
