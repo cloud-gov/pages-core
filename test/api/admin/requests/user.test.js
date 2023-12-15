@@ -73,10 +73,10 @@ describe('Admin - Users API', () => {
 
     it('returns all users', async () => {
       const user1 = await factory.user();
-      createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
+      await createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
 
       const user2 = await factory.user();
-      createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
+      await createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
 
       const org1 = await factory.organization.create();
       const org2 = await factory.organization.create();
@@ -121,10 +121,10 @@ describe('Admin - Users API', () => {
 
     it('returns all users with UAA identities', async () => {
       const user1 = await factory.user();
-      createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
+      await createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
 
       const user2 = await factory.user();
-      createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
+      await createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
 
       const user3 = await factory.user();
       const user4 = await factory.user();
@@ -166,10 +166,10 @@ describe('Admin - Users API', () => {
 
     it('returns all users with UAA identities', async () => {
       const user1 = await factory.user();
-      createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
+      await createUAAIdentity({uaaId: 'user_id_1', email: 'user1@example.com', userId: user1.id });
 
       const user2 = await factory.user();
-      createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
+      await createUAAIdentity({uaaId: 'user_id_2', email: 'user2@example.com', userId: user2.id });
 
       const user3 = await factory.user();
       const user4 = await factory.user();
