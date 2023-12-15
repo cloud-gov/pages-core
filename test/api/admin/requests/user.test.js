@@ -26,6 +26,7 @@ describe('Admin - Users API', () => {
       Organization.truncate({ force: true, cascade: true }),
       OrganizationRole.truncate({ force: true, cascade: true }),
       User.truncate({ force: true, cascade: true }),
+      UAAIdentity.truncate({ force: true, cascade: true }),
     ])
   );
 
