@@ -25,6 +25,7 @@ services:
     depends_on:
       - db
       - redis
+      - localstack
     environment:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
@@ -39,6 +40,7 @@ services:
       CF_API_USERNAME: deploy_user
       CF_API_PASSWORD: deploy_pass
       PROXY_DOMAIN: localhost:1337
+      AWS_ENDPOINT_URL: localstack:4566
   bull-board:
     build:
       dockerfile: Dockerfile-app

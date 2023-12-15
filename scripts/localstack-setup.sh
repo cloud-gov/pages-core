@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# link to config/env/development.js
 awslocal s3api create-bucket --bucket build-logs
 
 # how should we link this to the site factories in create-dev-data
