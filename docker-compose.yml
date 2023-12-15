@@ -122,3 +122,13 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+  localstack-setup:
+    build:
+      dockerfile: Dockerfile-localstack
+      context: .
+    entrypoint: /bin/bash
+    command: ["scripts/wait-for-it.sh", "localstack:4566", "--", "./scripts/localstack-setup.sh"]
+    depends_on:
+      - localstack
+    environment:
+      - LOCALSTACK_HOST=localstack:4566
