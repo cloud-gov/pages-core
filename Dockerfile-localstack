@@ -1,7 +1,6 @@
 FROM localstack/localstack:latest
 
 COPY zscaler.crt /usr/local/share/ca-certificates/cert-bundle.crt
-COPY scripts /opt/code/localstack/scripts
 RUN update-ca-certificates
 ENV CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt

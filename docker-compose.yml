@@ -40,7 +40,7 @@ services:
       CF_API_USERNAME: deploy_user
       CF_API_PASSWORD: deploy_pass
       PROXY_DOMAIN: localhost:1337
-      AWS_ENDPOINT_URL: localstack:4566
+      AWS_ENDPOINT_URL: http://localstack:4566
   bull-board:
     build:
       dockerfile: Dockerfile-app
@@ -126,11 +126,16 @@ services:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
   localstack-setup:
     build:
-      dockerfile: Dockerfile-localstack
+      dockerfile: Dockerfile-app
       context: .
-    entrypoint: /bin/bash
-    command: ["scripts/wait-for-it.sh", "localstack:4566", "--", "./scripts/localstack-setup.sh"]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+      - nm-app:/app/node_modules
+    command: ["scripts/wait-for-it.sh", "localstack:4566", "--", "yarn", "localstack-setup"]
     depends_on:
       - localstack
+      - db # race condition waiting to happen as we don't wait for DB
     environment:
-      - LOCALSTACK_HOST=localstack:4566
+      NODE_ENV: development
+      AWS_ENDPOINT_URL: http://localstack:4566
