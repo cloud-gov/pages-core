@@ -22,7 +22,7 @@ services:
       CF_API_PASSWORD: deploy_pass
       PROXY_DOMAIN: localhost:1337
   db:
-    image: postgres:11-alpine
+    image: postgres:15-alpine
     environment:
       POSTGRES_PASSWORD: password
   redis:
