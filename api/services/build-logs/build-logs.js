@@ -7,7 +7,6 @@ const S3Helper = require('../S3Helper');
 
 const BuildLogs = {
   s3() {
-    console.log(config.s3BuildLogs)
     return new S3Helper.S3Client(config.s3BuildLogs);
   },
 
