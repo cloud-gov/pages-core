@@ -173,6 +173,8 @@ jobs:
         params:
           APP_HOSTNAME: https://((((deploy-env))-pages-domain))
           PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
+          FEATURE_BUILD_TASKS: true
+
 
       - task: deploy-api
         file: src/ci/partials/deploy.yml
@@ -500,6 +502,71 @@ jobs:
           params:
             text: |
               :arrows_counterclockwise: :key: SUCCESS: Rotate site bucket keys in ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+
+  - name: e2e-test
+    plan:
+      - get: src
+        resource: pr-((deploy-env))
+        trigger: true
+        passed:
+        - test-and-deploy-api-pages
+        - test-and-deploy-admin-client-pages
+        - deploy-queues-ui-pages
+      - get: node
+      - get: cf-image
+      - put: gh-status
+        inputs: [src]
+        params: {state: pending}
+      - task: get-app-env
+        file: src/ci/partials/get-app-env.yml
+        image: cf-image
+        params:
+          <<: *env-cf
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: run-e2e-tests
+        file: src/ci/partials/e2e-test.yml
+        image: node
+        params:
+          APP_ENV: ((deploy-env))
+          APP_HOSTNAME: https://((((deploy-env))-pages-domain))
+          DOMAIN: ((((deploy-env))-pages-domain))
+          PRODUCT: pages
+        ensure:
+          do:
+          - task: remove-test-users
+            file: src/ci/partials/remove-test-users.yml
+            image: node
+            params:
+              APP_ENV: ((deploy-env))
+              PRODUCT: pages
+          - put: s3
+    on_failure:
+      in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: failure}
+        - put: slack
+          params:
+            text: |
+              :x: FAILED: pages e2e testing on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
+    on_success:
+      in_parallel:
+        - put: gh-status
+          inputs: [src]
+          params: {state: success}
+        - put: slack
+          params:
+            text: |
+              :white_check_mark: SUCCESS: Successfully passed e2e testing on pages ((deploy-env))
               <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
             channel: ((slack-channel))
             username: ((slack-username))
