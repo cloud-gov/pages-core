@@ -5,7 +5,6 @@ import publishedBranches from './reducers/publishedBranches';
 import publishedFiles from './reducers/publishedFiles';
 import sites from './reducers/sites';
 import builds from './reducers/builds';
-import build from './reducers/build';
 import user from './reducers/user';
 import form from './reducers/form';
 import githubBranches from './reducers/githubBranches';
@@ -19,7 +18,6 @@ export default {
   publishedBranches,
   publishedFiles,
   sites,
-  build,
   builds,
   user,
   githubBranches,
