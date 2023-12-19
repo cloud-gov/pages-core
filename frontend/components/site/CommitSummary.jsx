@@ -9,6 +9,10 @@ import buildActions from '../../actions/buildActions';
 import { timeFrom, dateAndTime } from '../../util/datetime';
 
 function buildShaLink(owner, repo, sha) {
+  if (!owner || !repo || !sha) {
+    return null;
+  }
+
   const BASE = 'https://github.com';
   const baseHref = `${BASE}/${owner}/${repo}`;
   const linkHref = `${baseHref}/commit/${sha}`;
