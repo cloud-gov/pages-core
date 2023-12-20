@@ -51,7 +51,7 @@ export default (
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
-      {(process.env.FEATURE_BUILD_TASKS) && (
+      {(process.env.FEATURE_BUILD_TASKS === 'active') && (
         <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />
       )}
     </Route>
