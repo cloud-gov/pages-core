@@ -1,3 +1,28 @@
+## 0.5.0 (2023-12-20)
+
+### Added
+
+- add build task ui (#4171)
+- **admin**: Add active users report #4313
+
+### Fixed
+
+- don't throw if user isn't present on build
+- catch the InvalidRange v3 error, don't fail the last build log fetch
+- Check buildShaLink args if null on site build logs page
+- add e2e tests in staging, build env vars to build step
+- Await createUAAIdentity in admin user API tests
+- Explicitly truncate UAAIdentity after admin user API tests
+- Add global Sequelize hook to make count behavior consistent with find.
+
+### Maintenance
+
+- Update CommitSummary commponent data fetch to useState
+- correct staging e2e pipeline
+- Upgrade local and CI to Postgres v15
+- update depedencies
+- Fix syntax error and remove outdated setup step from developer documentation
+
 ## 0.4.1 (2023-11-30)
 
 ### Fixed
