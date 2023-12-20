@@ -9,6 +9,7 @@ function generateUniqueAtts() {
     owner: `repo-owner-${siteAttsStep}`,
     repository: `repo-name-${siteAttsStep}`,
     awsBucketName: `cg-bucket-name-${siteAttsStep}`,
+    s3ServiceName: `s3-service-${siteAttsStep}`,
   };
   siteAttsStep += 1;
   return res;
@@ -21,13 +22,15 @@ function makeAttributes(overrides = {}) {
     users = Promise.all([userFactory()]);
   }
 
-  const { owner, repository, awsBucketName } = generateUniqueAtts();
+  const {
+    owner, repository, awsBucketName, s3ServiceName,
+  } = generateUniqueAtts();
 
   return {
     owner,
     repository,
     engine: 'jekyll',
-    s3ServiceName: 'federalist-dev-s3',
+    s3ServiceName,
     awsBucketName,
     awsBucketRegion: 'us-gov-west-1',
     defaultBranch: 'main',
