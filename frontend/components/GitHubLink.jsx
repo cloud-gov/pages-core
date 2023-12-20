@@ -29,14 +29,13 @@ const GitHubLink = ({
       case 'commit':
       case 'sha':
         // use no icon for these types of links
-        break;
+        return '';
       case 'repo':
       default:
         return (
           <IconGitHub />
         );
     }
-    return iconStr;
   }
 
   return (

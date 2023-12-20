@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react';
-import { useSelector, connect } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
-import PropTypes, { BUILD } from 'prop-types';
+import api from '../../util/federalistApi';
 import { IconBranch } from '../icons';
 import LoadingIndicator from '../LoadingIndicator';
-
-import buildActions from '../../actions/buildActions';
 import { timeFrom, dateAndTime } from '../../util/datetime';
 
 function buildShaLink(owner, repo, sha) {
@@ -24,60 +22,60 @@ function buildShaLink(owner, repo, sha) {
       target="_blank"
       rel="noopener noreferrer"
     >
-      { sha.slice(0, 7) }
+      {sha.slice(0, 7)}
     </a>
   );
 }
 
 function CommitSummary({ buildId }) {
-  const { isLoading, data: buildDetails } = useSelector(state => state.build);
+  const [build, setBuild] = useState({
+    isLoading: true,
+    buildDetails: null,
+  });
+  const { isLoading, buildDetails } = build;
 
   useEffect(() => {
-    buildActions.fetchBuild(buildId);
-  }, [buildId]);
+    if (!buildDetails) {
+      api.fetchBuild(buildId).then(data => setBuild({
+        isLoading: false,
+        buildDetails: data,
+      }));
+    }
+  }, [buildDetails]);
 
   if (isLoading) {
-    return (<LoadingIndicator size="mini" text="Getting commit details..." />);
+    return <LoadingIndicator size="mini" text="Getting commit details..." />;
   }
 
   return (
-    (!isLoading && buildDetails && (
     <div className="commit-summary">
       <h3 className="commit-branch">
         <IconBranch />
         {' '}
-        {buildDetails.branch}
+        {buildDetails?.branch}
       </h3>
       <p className="commit-details">
         {buildShaLink(
-          buildDetails.site.owner,
-          buildDetails.site.repository,
-          buildDetails.clonedCommitSha
+          buildDetails?.site?.owner,
+          buildDetails?.site?.repository,
+          buildDetails?.clonedCommitSha
         )}
         &nbsp;by&nbsp;
-        <b className="commit-username">{buildDetails.username}</b>
-&nbsp;
-        <span className="commit-time" title={dateAndTime(buildDetails.createdAt)}>
-          { timeFrom(buildDetails.createdAt) }
+        <b className="commit-username">{buildDetails?.username}</b>
+        &nbsp;
+        <span
+          className="commit-time"
+          title={dateAndTime(buildDetails?.createdAt)}
+        >
+          {timeFrom(buildDetails?.createdAt)}
         </span>
       </p>
     </div>
-    ))
   );
 }
 CommitSummary.propTypes = {
   buildId: PropTypes.number.isRequired,
-  build: PropTypes.shape({
-    isLoading: PropTypes.bool,
-    data: PropTypes.objectOf(BUILD),
-  }),
 };
-
-CommitSummary.defaultProps = {
-  build: null,
-};
-
-const mapStateToProps = ({ build }) => ({ build });
 
 export { CommitSummary };
-export default connect(mapStateToProps)(CommitSummary);
+export default CommitSummary;
