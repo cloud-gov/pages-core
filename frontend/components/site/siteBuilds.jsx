@@ -239,7 +239,7 @@ function SiteBuilds() {
                           { branchLink(build) }
                           <div className="commit-info">
                             { shaLink(build) }
-                            <span className="commit-user" title={build.user.email}>
+                            <span className="commit-user" title={build.user?.email}>
                               { build.username }
                             </span>
                             <span className="commit-time" title={dateAndTime(build.createdAt)}>
