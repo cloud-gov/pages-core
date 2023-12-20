@@ -194,7 +194,7 @@ describe('BuildLogs Service', () => {
 
       const build = { logsS3Key: key };
       const error = new Error('foo');
-      error.code = 'InvalidRange';
+      error.Code = 'InvalidRange';
       getObjectStub.rejects(error);
 
       const { output, byteLength } = await BuildLogs.getBuildLogs(build, 100, 199);

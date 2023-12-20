@@ -76,7 +76,7 @@ const BuildLogs = {
 
       return { output, byteLength };
     } catch (error) {
-      if (error.code === 'InvalidRange') {
+      if (error.Code === 'InvalidRange') {
         return { output: null, byteLength: 0 };
       }
       throw error;
