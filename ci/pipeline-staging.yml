@@ -173,7 +173,7 @@ jobs:
         params:
           APP_HOSTNAME: https://((((deploy-env))-pages-domain))
           PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
-          FEATURE_BUILD_TASKS: true
+          FEATURE_BUILD_TASKS: 'active'
 
 
       - task: deploy-api
