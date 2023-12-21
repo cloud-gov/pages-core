@@ -1,3 +1,9 @@
+## 0.5.2 (2023-12-21)
+
+### Maintenance
+
+- Fix build task feature flag
+
 ## 0.5.1 (2023-12-20)
 
 ### Maintenance
