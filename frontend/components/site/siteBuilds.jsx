@@ -259,7 +259,7 @@ function SiteBuilds() {
                               )
                             </span>
                           </li>
-                          { process.env.FEATURE_BUILD_TASKS && build.BuildTasks && (
+                          { process.env.FEATURE_BUILD_TASKS === 'active' && build.BuildTasks && (
                             <li className="result-item">
                               { summarizeTaskResults(build) }
                             </li>
