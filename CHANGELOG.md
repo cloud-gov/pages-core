@@ -1,3 +1,9 @@
+## 0.5.1 (2023-12-20)
+
+### Maintenance
+
+- reimplement build task feature flag handling
+
 ## 0.5.0 (2023-12-20)
 
 ### Added
