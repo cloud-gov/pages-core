@@ -36,14 +36,19 @@ router.get('/service_credential_bindings', (req, res) => {
 });
 
 router.get('/service_credential_bindings/:guid/details', (req, res) => {
-  const service = serviceCredentialBindings.find(scb => scb.guid === req.params.guid);
+  const serviceCredentialBinding = serviceCredentialBindings
+    .find(scb => scb.guid === req.params.guid);
+
+  if (!serviceCredentialBinding) {
+    return res.notFound();
+  }
   const credentials = {
-    accessKeyId: 'test',
-    secretAccessKey: 'test',
-    region: service.siteInfo.awsBucketRegion,
-    bucket: service.siteInfo.awsBucketName,
+    access_key_id: 'test',
+    secret_access_key: 'test',
+    region: serviceCredentialBinding.siteInfo.awsBucketRegion,
+    bucket: serviceCredentialBinding.siteInfo.awsBucketName,
   };
-  return res.send(credentials);
+  return res.send({ credentials });
 });
 
 module.exports = router;

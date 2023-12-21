@@ -1,4 +1,4 @@
-const { S3Client, CreateBucketCommand } = require('@aws-sdk/client-s3');
+const { S3Client, CreateBucketCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 const moment = require('moment');
 const { Op } = require('sequelize');
 
@@ -26,9 +26,17 @@ s3.send(cmd);
 
 Site.findAll()
   .then((sites) => {
-    sites.forEach((site) => {
+    sites.forEach(async (site) => {
       const siteCmd = new CreateBucketCommand({ Bucket: site.awsBucketName });
-      s3.send(siteCmd);
+      await s3.send(siteCmd);
+      const folders = ['preview', 'site', 'demo']
+      folders.forEach((folder) => {
+        const folderCmd = new PutObjectCommand({
+          Bucket: site.awsBucketName,
+          Key: `${folder}/${site.owner}/${site.repository}`,
+        });
+        s3.send(folderCmd);
+      });
     });
   })
   .catch(err => console.error(err));

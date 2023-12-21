@@ -33,7 +33,6 @@ function findEntity(res, name, field = 'name', { errorMessage } = {}) {
 }
 
 function firstEntity(res, errorName) {
-  console.log(res)
   if (res.resources.length === 0) {
     const error = new Error('Not found');
     error.name = errorName;
@@ -251,14 +250,11 @@ class CloudFoundryAPIClient {
         token
       ))
       .then(resources => firstEntity(resources, `${name} Service Keys`))
-      .then(({ guid }) => {
-        console.log('guid', guid)
-        return this.accessToken().then(token => this.request(
+      .then(({ guid }) => this.accessToken().then(token => this.request(
         'GET',
         `/v3/service_credential_bindings/${guid}/details`,
         token
-      ))}
-      )
+      )))
       .then(resource => resource.credentials);
   }
 

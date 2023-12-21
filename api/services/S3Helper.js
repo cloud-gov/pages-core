@@ -99,6 +99,9 @@ class S3Client {
     // Concatenate S3 pages until there are enough for OUR page size
     // eslint-disable-next-line no-restricted-syntax
     for await (const page of paginator) {
+      if (!page.Contents) {
+        break;
+      }
       objects.push(...page.Contents);
       if (objects.length >= totalMaxObjects) {
         break;

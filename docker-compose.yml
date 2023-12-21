@@ -41,6 +41,7 @@ services:
       CF_API_PASSWORD: deploy_pass
       PROXY_DOMAIN: localhost:1337
       AWS_ENDPOINT_URL: http://localstack:4566
+      NODE_ENV: development
   bull-board:
     build:
       dockerfile: Dockerfile-app
