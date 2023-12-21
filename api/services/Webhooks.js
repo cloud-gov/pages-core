@@ -51,9 +51,6 @@ const organizationWebhookRequest = async (payload) => {
   }
 
   if (user) {
-    if (isActive !== user.isActive) {
-      await user.update({ isActive });
-    }
     EventCreator.audit(Event.labels.FEDERALIST_USERS_MEMBERSHIP, user, action);
   }
 };

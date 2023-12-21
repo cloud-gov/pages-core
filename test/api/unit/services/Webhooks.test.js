@@ -434,28 +434,6 @@ describe('Webhooks Service', () => {
   });
 
   describe('organizationWebhookRequest', () => {
-    it('should set a user to inActive if removed from federalist-users', (done) => {
-      let user;
-      let payload;
-
-      factory.user({ isActive: true })
-        .then((model) => {
-          user = model;
-          expect(user.isActive).to.be.true;
-          payload = organizationWebhookPayload('member_removed', user.username);
-
-
-          return Webhooks.organizationWebhookRequest(payload);
-        })
-        .then(() => user.reload())
-        .then((model) => {
-          user = model;
-          expect(user.isActive).to.be.false;
-          expect(auditStub.args[0][0]).to.equal(Event.labels.FEDERALIST_USERS_MEMBERSHIP);
-          expect(auditStub.args[0][1].id).to.eql(user.id);
-          done();
-        });
-    });
     it('should create a new user added to federalist-users', (done) => {
       const username = 'added_member';
       User.findOne({ where: { username } })
@@ -468,34 +446,10 @@ describe('Webhooks Service', () => {
         })
         .then(() => User.findOne({ where: { username } }))
         .then((user) => {
-          expect(user.isActive).to.be.true;
           expect(auditStub.args[0][0]).to.equal(Event.labels.FEDERALIST_USERS_MEMBERSHIP);
           expect(auditStub.args[0][1].id).to.eql(user.id);
           done();
         });
-    });
-
-    it('should set an existing user to Active if added to federalist-users', (done) => {
-      let user;
-
-      factory.user({ isActive: false})
-        .then((model) => {
-          user = model;
-          expect(user.isActive).to.be.false;
-          const payload = organizationWebhookPayload('member_added', user.username);
-
-
-          return Webhooks.organizationWebhookRequest(payload);
-        })
-        .then(() => user.reload())
-        .then((model) => {
-          user = model;
-          expect(user.isActive).to.be.true;
-          expect(auditStub.args[0][0]).to.equal(Event.labels.FEDERALIST_USERS_MEMBERSHIP);
-          expect(auditStub.args[0][1].id).to.eql(user.id);
-          done();
-        })
-        .catch(done);
     });
 
     it('should do nothing if org webhook for non added/removed_member', async () => {
@@ -529,7 +483,7 @@ describe('Webhooks Service', () => {
     });
 
     it('should do nothing if not federalist-org webhook', (done) => {
-      factory.user({ isActive: true })
+      factory.user()
         .then((user) => {
           const payload = organizationWebhookPayload('member_removed', user.username, 'not-federalist-users');
 
@@ -542,9 +496,8 @@ describe('Webhooks Service', () => {
     });
 
     it('should do nothing if action not added, removed nor invited', (done) => {
-      factory.user({ isActive: true })
+      factory.user()
         .then((user) => {
-          expect(user.isActive).to.be.true;
           const payload = organizationWebhookPayload('member_ignored_action', user.username);
 
 
@@ -554,25 +507,6 @@ describe('Webhooks Service', () => {
           expect(auditStub.notCalled).to.be.true;
           done();
         });
-    });
-
-    it('should do nothing if the user has a uaa identity', async () => {
-      const isActive = false;
-      const user = await factory.user({ isActive });
-      await user.createUAAIdentity({
-        uaaId: `${user.username}-placeholder-id`,
-        email: `${user.username}@example.com`,
-        userName: `${user.username}@example.com`,
-        origin: 'example.com',
-      });
-
-      const payload = organizationWebhookPayload('member_added', user.username);
-
-      await Webhooks.organizationWebhookRequest(payload);
-
-      await user.reload();
-
-      expect(user.isActive).to.be.false;
     });
   });
 });

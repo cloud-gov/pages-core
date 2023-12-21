@@ -22,7 +22,6 @@ const adminAttributes = {
   updatedAt: 'date',
   signedInAt: 'date',
   pushedAt: 'date',
-  isActive: '',
   adminEmail: '',
   deletedAt: 'date',
 };
