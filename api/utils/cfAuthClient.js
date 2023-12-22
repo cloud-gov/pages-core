@@ -40,8 +40,7 @@ class CloudFoundryAuthClient {
         response_type: 'token',
       }).toString(),
     })
-      .then(response => response.data.access_token)
-      .catch(err => console.error(err));
+      .then(response => response.data.access_token);
   }
 
   tokenExpired() {
