@@ -321,6 +321,9 @@ module.exports = (sequelize, DataTypes) => {
           is: shaRegex,
         },
       },
+      metrcis: {
+        type: DataTypes.JSON,
+      },
     },
     {
       tableName: 'build',
