@@ -159,4 +159,27 @@ module.exports = wrapHandlers({
 
     return res.ok();
   },
+
+  async metrics(req, res) {
+    const { params, body } = req;
+
+    const build = await fetchModelById(params.id, Build, {
+      include: [
+        { model: Site, include: [{ model: User }, Domain, SiteBranchConfig] },
+      ],
+    });
+
+    if (!build) {
+      return res.notFound();
+    }
+    if (build.token !== params.token) {
+      return res.forbidden();
+    }
+
+    // use the full body to update the metrics, leave existing properties
+    const metrics = { ...build.metrics, ...body };
+    await build.update({ metrics });
+
+    return res.ok();
+  },
 });

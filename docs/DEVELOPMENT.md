@@ -568,3 +568,17 @@ Queue jobs are actions that add a job to a queue and are kept in the [./api/queu
 ### Workers
 
 Workers are the processors that handle a job in a queue and are kept in the [./api/workers](../api/workers) directory.
+
+## Architecture Notes
+
+### Build Metrics API
+
+Additional information about a build can be sent back from [`pages-build-container`](https://github.com/cloud-gov/pages-build-container/) to `/build/:id/metrics/:token`. The function in that repository, `post_metrics` will send an arbitrary JSON object of metrics. By convention, we structure it in the following way:
+
+```js
+{
+   machine: {}, \\ information about to the container running the build
+   engine: { node: {}, ruby: {}, hugo: {} }, \\ information about the language or build engine
+   other: {} \\ other information from the build (e.g. file counts)
+}
+```

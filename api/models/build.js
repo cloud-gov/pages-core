@@ -329,6 +329,9 @@ module.exports = (sequelize, DataTypes) => {
           is: shaRegex,
         },
       },
+      metrics: {
+        type: DataTypes.JSON,
+      },
     },
     {
       tableName: 'build',

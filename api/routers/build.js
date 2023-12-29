@@ -6,5 +6,6 @@ router.get('/site/:site_id/build', sessionAuth, BuildController.find);
 router.get('/build/:id', sessionAuth, BuildController.findById);
 router.post('/build', sessionAuth, csrfProtection, BuildController.create);
 router.post('/build/:id/status/:token', BuildController.status);
+router.post('/build/:id/metrics/:token', BuildController.metrics);
 
 module.exports = router;
