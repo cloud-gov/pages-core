@@ -117,11 +117,10 @@ describe('Authentication requests', () => {
             let user;
             let userCount;
             const oauthState = 'state-123abc';
-            factory.user({ isActive: true })
+            factory.user()
               .then((model) => {
                 user = model;
                 githubAPINocks.githubAuth(user.username, [{ id: 123456 }]);
-                expect(user.isActive).to.be.true;
                 return User.count();
               })
               .then((count) => {
@@ -135,11 +134,6 @@ describe('Authentication requests', () => {
               .then(() => User.count())
               .then((count) => {
                 expect(count).to.equal(userCount);
-                return user.reload();
-              })
-              .then((model) => {
-                user = model;
-                expect(user.isActive).to.be.true;
                 done();
               })
               .catch(done);

@@ -77,11 +77,6 @@
       <div class="tablet:grid-col-fill padding-bottom-1">
         <LabeledItem label="id" value={user.id} />
         <LabeledItem label="username" value={user.username} />
-        <LabeledItem label="status">
-          <span class="usa-tag {user.isActive ? 'bg-mint' : 'bg-gray-30'}">
-            {user.isActive ? 'Active' : 'Inactive'}
-          </span>
-        </LabeledItem>
 
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
