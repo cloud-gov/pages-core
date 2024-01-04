@@ -117,9 +117,7 @@ function pagesWorker(connection) {
   ];
 
   const jobs = () => Promise.all([
-    appEnv === 'production'
-      ? archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig)
-      : Promise.resolve(),
+    archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig),
     deleteOlderBuildsQueue.add('deleteOlderBuilds', {}, nightlyJobConfig),
     failStuckBuildsQueue.add('failStuckBuilds', {}, everyTenMinutesJobConfig),
     nightlyBuildsQueue.add('nightlyBuilds', {}, nightlyJobConfig),
