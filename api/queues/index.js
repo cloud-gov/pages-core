@@ -1,4 +1,5 @@
 const { ArchiveBuildLogsQueue, ArchiveBuildLogsQueueName } = require('./ArchiveBuildLogsQueue');
+const { DeleteOlderBuildsQueue, DeleteOlderBuildsQueueName } = require('./DeleteOlderBuildsQueue');
 const { BuildTasksQueue, BuildTasksQueueName } = require('./BuildTasksQueue');
 const { DomainQueue, DomainQueueName } = require('./DomainQueue');
 const { FailStuckBuildsQueue, FailStuckBuildsQueueName } = require('./FailStuckBuildsQueue');
@@ -15,6 +16,8 @@ module.exports = {
   ArchiveBuildLogsQueueName,
   BuildTasksQueue,
   BuildTasksQueueName,
+  DeleteOlderBuildsQueue,
+  DeleteOlderBuildsQueueName,
   DomainQueue,
   DomainQueueName,
   FailStuckBuildsQueue,

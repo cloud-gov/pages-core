@@ -1,5 +1,6 @@
 const archiveBuildLogsDaily = require('./archiveBuildLogsDaily');
 const buildTaskRunner = require('./buildTaskRunner');
+const deleteOlderBuilds = require('./deleteOlderBuilds');
 const destroySiteInfra = require('./destroySiteInfra');
 const failStuckBuilds = require('./failStuckBuilds');
 const multiJobProcessor = require('./multiJobProcessor');
@@ -11,6 +12,7 @@ const cleanSandboxOrganizations = require('./cleanSandboxOrganizations');
 module.exports = {
   archiveBuildLogsDaily,
   buildTaskRunner,
+  deleteOlderBuilds,
   destroySiteInfra,
   failStuckBuilds,
   multiJobProcessor,

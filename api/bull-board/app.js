@@ -11,6 +11,7 @@ const slowDown = require('express-slow-down');
 const {
   ArchiveBuildLogsQueue,
   BuildTasksQueue,
+  DeleteOlderBuildsQueue,
   DomainQueue,
   FailStuckBuildsQueue,
   MailQueue,
@@ -40,6 +41,7 @@ createBullBoard({
     new BullAdapter(new SiteBuildQueue(connection)),
     new BullMQAdapter(new ArchiveBuildLogsQueue(connection)),
     new BullMQAdapter(new BuildTasksQueue(connection)),
+    new BullMQAdapter(new DeleteOlderBuildsQueue(connection)),
     new BullMQAdapter(new DomainQueue(connection)),
     new BullMQAdapter(new FailStuckBuildsQueue(connection)),
     new BullMQAdapter(new MailQueue(connection)),

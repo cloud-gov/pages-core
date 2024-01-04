@@ -158,7 +158,7 @@ function SiteBuilds() {
   }, []);
 
   if (!builds.isLoading && !builds.data.length) {
-    const header = 'This site does not yet have any builds.';
+    const header = 'This site has not had any builds in the past 180 days.';
     const message = 'If this site was just added, the first build should be available within a few minutes.';
     return (
       <AlertBanner status="info" header={header} message={message}>

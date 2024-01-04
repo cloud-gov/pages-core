@@ -176,7 +176,7 @@ describe('<SiteBuilds/>', () => {
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
 
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('AlertBanner').prop('header')).to.equal('This site does not yet have any builds.');
+    expect(wrapper.find('AlertBanner').prop('header')).to.equal('This site has not had any builds in the past 180 days.');
     expect(wrapper.find('AlertBanner').prop('message')).to.equal(
       'If this site was just added, the first build should be available within a few minutes.'
     );

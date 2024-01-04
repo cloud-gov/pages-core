@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const moment = require('moment');
+const { Build } = require('../../../api/models');
 const BuildLogs = require('../../../api/services/build-logs');
 const TimeoutBuilds = require('../../../api/services/TimeoutBuilds');
 const NightlyBuildsHelper = require('../../../api/services/NightlyBuildsHelper');
@@ -83,6 +84,24 @@ describe('job processors', () => {
 
       expect(result.message.split(',')[0]).to
         .equal(`Archive build logs for ${startDate.format('YYYY-MM-DD')} - ${endDate.format('YYYY-MM-DD')} completed with errors`);
+    });
+  });
+
+  context('deleteOlderBuilds', () => {
+    it('all deleted successfully', async () => {
+      sinon.stub(Build, 'destroy').resolves();
+      const result = await jobProcessors.deleteOlderBuilds(job);
+      expect(result).to.not.be.an('error');
+    });
+
+    it('fails to delete successfully', async () => {
+      sinon.stub(Build, 'destroy').rejects('nope');
+      const result = await jobProcessors.deleteOlderBuilds(job).catch(e => e);
+      expect(result).to.be.an('error');
+      const cutoffDate = moment().subtract(180, 'days').startOf('day');
+
+      expect(result.message.split(',')[0]).to
+        .equal(`Delete builds before ${cutoffDate.format('YYYY-MM-DD')} completed with error`);
     });
   });
 

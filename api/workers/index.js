@@ -16,6 +16,8 @@ const {
   ArchiveBuildLogsQueueName,
   BuildTasksQueue,
   BuildTasksQueueName,
+  DeleteOlderBuildsQueue,
+  DeleteOlderBuildsQueueName,
   DomainQueueName,
   FailStuckBuildsQueue,
   FailStuckBuildsQueueName,
@@ -85,6 +87,8 @@ function pagesWorker(connection) {
     new QueueWorker(ArchiveBuildLogsQueueName, connection,
       path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
     new QueueWorker(BuildTasksQueueName, connection, buildTasksProcessor),
+    new QueueWorker(DeleteOlderBuildsQueueName, connection,
+      path.join(__dirname, 'jobProcessors', 'deleteOlderBuilds.js')),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(FailStuckBuildsQueueName, connection, failBuildsProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
@@ -97,6 +101,7 @@ function pagesWorker(connection) {
 
   const archiveBuildLogsQueue = new ArchiveBuildLogsQueue(connection);
   const buildTasksQueue = new BuildTasksQueue(connection);
+  const deleteOlderBuildsQueue = new DeleteOlderBuildsQueue(connection);
   const failStuckBuildsQueue = new FailStuckBuildsQueue(connection);
   const nightlyBuildsQueue = new NightlyBuildsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
@@ -104,6 +109,7 @@ function pagesWorker(connection) {
   const queues = [
     archiveBuildLogsQueue,
     buildTasksQueue,
+    deleteOlderBuildsQueue,
     failStuckBuildsQueue,
     nightlyBuildsQueue,
     scheduledQueue,
@@ -114,6 +120,7 @@ function pagesWorker(connection) {
     appEnv === 'production'
       ? archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig)
       : Promise.resolve(),
+    deleteOlderBuildsQueue.add('deleteOlderBuilds', {}, nightlyJobConfig),
     failStuckBuildsQueue.add('failStuckBuilds', {}, everyTenMinutesJobConfig),
     nightlyBuildsQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
