@@ -88,13 +88,13 @@ describe('job processors', () => {
   });
 
   context('deleteOlderBuilds', () => {
-    it('all deleted successfully', async () => {
+    it('handles successful deletion properly', async () => {
       sinon.stub(Build, 'destroy').resolves();
       const result = await jobProcessors.deleteOlderBuilds(job);
       expect(result).to.not.be.an('error');
     });
 
-    it('fails to delete successfully', async () => {
+    it('handles failed deletion properly', async () => {
       sinon.stub(Build, 'destroy').rejects('nope');
       const result = await jobProcessors.deleteOlderBuilds(job).catch(e => e);
       expect(result).to.be.an('error');
@@ -102,6 +102,30 @@ describe('job processors', () => {
 
       expect(result.message.split(',')[0]).to
         .equal(`Delete builds before ${cutoffDate.format('YYYY-MM-DD')} completed with error`);
+    });
+
+    it('deletes the correct builds', async () => {
+      const newerCompletedAt = moment().subtract(179, 'days').startOf('day');;
+      const newerBuild = await factory.build({ completedAt: newerCompletedAt });
+
+      const olderCompletedAt = moment().subtract(181, 'days').startOf('day');;
+      const olderBuild = await factory.build({ completedAt: olderCompletedAt });
+
+      const buildsBefore = await Build.count();
+      const result = await jobProcessors.deleteOlderBuilds(job);
+      expect(result).to.not.be.an('error');
+
+      const buildsAfter = await Build.count();
+      const buildsDeleted = buildsBefore - buildsAfter;
+      expect(buildsDeleted).to.equal(1);
+
+      const foundNewerBuild =  await Build.findOne( { where: { id: newerBuild.id } });
+      expect(foundNewerBuild).to.not.be.null;
+
+      const foundOlderBuild =  await Build.findOne( { where: { id: olderBuild.id } });
+      expect(foundOlderBuild).to.be.null;
+
+      Build.truncate({ force: true, cascade: true });
     });
   });
 
