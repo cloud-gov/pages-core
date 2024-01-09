@@ -64,6 +64,8 @@ function pagesWorker(connection) {
 
   const buildTasksProcessor = job => Processors.buildTaskRunner(job);
 
+  const deleteOlderBuildsProcessor = job => Processors.deleteOlderBuilds(job);
+
   const failBuildsProcessor = job => Processors.failStuckBuilds(job);
 
   const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
@@ -87,8 +89,7 @@ function pagesWorker(connection) {
     new QueueWorker(ArchiveBuildLogsQueueName, connection,
       path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
     new QueueWorker(BuildTasksQueueName, connection, buildTasksProcessor),
-    new QueueWorker(DeleteOlderBuildsQueueName, connection,
-      path.join(__dirname, 'jobProcessors', 'deleteOlderBuilds.js')),
+    new QueueWorker(DeleteOlderBuildsQueueName, connection, deleteOlderBuildsProcessor),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(FailStuckBuildsQueueName, connection, failBuildsProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
