@@ -106,10 +106,12 @@ describe('job processors', () => {
 
     it('deletes the correct builds', async () => {
       const newerCompletedAt = moment().subtract(179, 'days').startOf('day');;
-      const newerBuild = await factory.build({ completedAt: newerCompletedAt });
+      const newerBuild1 = await factory.build({ completedAt: newerCompletedAt });
+      const newerBuild2 = await factory.build({ completedAt: newerCompletedAt });
 
       const olderCompletedAt = moment().subtract(181, 'days').startOf('day');;
-      const olderBuild = await factory.build({ completedAt: olderCompletedAt });
+      const olderBuild1 = await factory.build({ completedAt: olderCompletedAt });
+      const olderBuild2 = await factory.build({ completedAt: olderCompletedAt });
 
       const buildsBefore = await Build.count();
       const result = await jobProcessors.deleteOlderBuilds(job);
@@ -117,15 +119,43 @@ describe('job processors', () => {
 
       const buildsAfter = await Build.count();
       const buildsDeleted = buildsBefore - buildsAfter;
-      expect(buildsDeleted).to.equal(1);
+      expect(buildsDeleted).to.equal(2);
 
-      const foundNewerBuild =  await Build.findOne( { where: { id: newerBuild.id } });
-      expect(foundNewerBuild).to.not.be.null;
+      const foundNewerBuild1 =  await Build.findOne( { where: { id: newerBuild1.id } });
+      const foundNewerBuild2 =  await Build.findOne( { where: { id: newerBuild2.id } });
+      expect(foundNewerBuild1).to.not.be.null;
+      expect(foundNewerBuild2).to.not.be.null;
 
-      const foundOlderBuild =  await Build.findOne( { where: { id: olderBuild.id } });
-      expect(foundOlderBuild).to.be.null;
+      const foundOlderBuild1 =  await Build.findOne( { where: { id: olderBuild1.id } });
+      const foundOlderBuild2 =  await Build.findOne( { where: { id: olderBuild2.id } });
+      expect(foundOlderBuild1).to.be.null;
+      expect(foundOlderBuild2).to.be.null;
 
       Build.truncate({ force: true, cascade: true });
+    });
+
+    it('deletes nothing when there are no older builds', async () => {
+      const completedAt = moment().subtract(30, 'days').startOf('day');;
+      await factory.build({ completedAt });
+      await factory.build({ completedAt });
+      await factory.build({ completedAt });
+
+      const buildsBefore = await Build.count();
+      const result = await jobProcessors.deleteOlderBuilds(job);
+      expect(result).to.not.be.an('error');
+
+      const buildsAfter = await Build.count();
+      const buildsDeleted = buildsBefore - buildsAfter;
+      expect(buildsDeleted).to.equal(0);
+
+      Build.truncate({ force: true, cascade: true });
+    });
+
+    it('runs harmlessly when there are no builds at all', async () => {
+      Build.truncate({ force: true, cascade: true });
+
+      const result = await jobProcessors.deleteOlderBuilds(job);
+      expect(result).to.not.be.an('error');
     });
   });
 
