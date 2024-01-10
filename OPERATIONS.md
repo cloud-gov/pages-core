@@ -33,6 +33,15 @@ $ cf run-task pages-<env> --command "yarn migrate-site-repo 1 user@agency.gov ag
 $ cf logs --recent pages-<env>
 ```
 
+## Queues
+
+### Nightly deletion of older builds
+
+This is a job that runs nightly and removes all builds older than 180 days, based on `completedAt` timestamps.
+
+Queue name: `delete-older-builds`
+Queue worker: [`deleteOlderBuilds.js`](./api/workers/jobProcessors/deleteOlderBuilds.js)
+
 ## CI
 
 ### Nightly site bucket key rotations
