@@ -47,7 +47,6 @@ jobs:
           params: {save: true}
         - get: postgres
         - get: node
-          params: {save: true}
       - task: install-deps-api
         file: src/ci/partials/install-deps-api.yml
         image: node
@@ -88,15 +87,20 @@ jobs:
                   <<: *env-cf
                   CF_APP_NAME: pages-((deploy-env))
 
-          - task: run-database-migrations
-            file: src/ci/partials/run-task.yml
+          - task: get-app-env
+            file: src/ci/partials/get-app-env.yml
             image: cf-image
             params:
               <<: *env-cf
               APP_ENV: ((deploy-env))
-              CF_APP_NAME: pages-((deploy-env))
-              CF_TASK_NAME: run-migrations
-              CF_TASK_COMMAND: 'yarn run migrate:up'
+              CF_APP_NAME: pages-((deploy-env))       
+
+          - task: run-database-migrations
+            file: src/ci/partials/run-database-migrations.yml
+            image: node
+            params:
+              <<: *env-cf
+              APP_ENV: ((deploy-env))
             on_failure:
               in_parallel:
                 - put: gh-status
@@ -481,7 +485,7 @@ resources:
       tag: 15-alpine
 
   - name: node
-    type: docker-image
+    type: registry-image
     source:
       repository: node
       tag: 20.9-bullseye
