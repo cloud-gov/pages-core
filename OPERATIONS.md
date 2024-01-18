@@ -33,6 +33,27 @@ $ cf run-task pages-<env> --command "yarn migrate-site-repo 1 user@agency.gov ag
 $ cf logs --recent pages-<env>
 ```
 
+## Dev and Staging
+
+### Manually running migrations in dev or staging environments
+
+It may necessary at some point to `migrate:down` or `:up` to explore something in the dev or staging environment, or to resolve an earlier failure.
+
+This can be done by first doing a `cf login` and selecting the appropriate org and space.
+
+Then, shell into the environment, e.g. `cf ssh pages-dev`.
+
+From there:
+
+```bash
+$ /tmp/lifecycle/shell
+
+$ node --env-file=.env ./ci/tasks/configure-database-migrations.js
+
+## Example migrate down
+$ node node_modules/.bin/db-migrate down --config database.json -e production
+```
+
 ## CI
 
 ### Nightly site bucket key rotations

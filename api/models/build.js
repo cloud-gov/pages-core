@@ -329,6 +329,7 @@ module.exports = (sequelize, DataTypes) => {
         afterCreate,
         afterUpdate,
       },
+      paranoid: true,
     }
   );
 
