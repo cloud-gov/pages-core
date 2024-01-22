@@ -158,28 +158,6 @@ describe('OrganizationService', () => {
           expect(invite.email).to.eq(uaaEmail);
         });
       });
-
-      context('when a user for the provided githubusername exists', () => {
-        it('invites the user via UAA and creates a UAA Identity', async () => {
-          const githubUsername = 'githubUsername';
-          const uaaEmail = 'foo@bar.com';
-          const currentUser = await createUserWithUAAIdentity();
-
-          await userFactory({ username: githubUsername });
-
-          expect(await OrganizationService.findUserByUAAIdentity(uaaEmail)).to.be.null;
-
-          const [user, invite] = await OrganizationService.findOrCreateUAAUser(
-            currentUser.UAAIdentity, uaaEmail, githubUsername
-          );
-          sinon.assert.calledOnceWithExactly(inviteUAAUserStub, currentUser.UAAIdentity, uaaEmail);
-
-          const userWithUAAIdentity = await OrganizationService.findUserByUAAIdentity(uaaEmail);
-          expect(userWithUAAIdentity.UAAIdentity.email).to.eq(uaaEmail);
-          expect(user.username).to.eq(githubUsername.toLowerCase());
-          expect(invite.email).to.eq(uaaEmail);
-        });
-      });
     });
   });
 
@@ -297,7 +275,6 @@ describe('OrganizationService', () => {
 
     context('when the current user is a manager in the target org and the target user exists in Pages and UAA', () => {
       it('adds them to the org with the provided role', async () => {
-        const githubUsername = 'username';
         const uaaEmail = 'foo@bar.com';
 
         const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
@@ -322,11 +299,11 @@ describe('OrganizationService', () => {
         expect((await targetUser.getOrganizations()).length).to.eq(0);
 
         const uaaUserAttributes = await OrganizationService.inviteUserToOrganization(
-          currentUser, org.id, userRole.id, uaaEmail, githubUsername
+          currentUser, org.id, userRole.id, uaaEmail
         );
 
         sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
-          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail, githubUsername);
+          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail);
 
         const targetUserOrgs = await targetUser.getOrganizations();
         expect(targetUserOrgs.length).to.eq(1);
@@ -354,7 +331,6 @@ describe('OrganizationService', () => {
 
     context('when the current user is a uaa admin and the target user exists in Pages and UAA', () => {
       it('adds them to the org with the provided role', async () => {
-        const githubUsername = 'username';
         const uaaEmail = 'foo@bar.com';
 
         const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
@@ -376,11 +352,11 @@ describe('OrganizationService', () => {
         expect((await targetUser.getOrganizations()).length).to.eq(0);
 
         const uaaUserAttributes = await OrganizationService.inviteUserToOrganization(
-          currentUser, org.id, userRole.id, uaaEmail, githubUsername
+          currentUser, org.id, userRole.id, uaaEmail
         );
 
         sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
-          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail, githubUsername);
+          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail);
 
         const targetUserOrgs = await targetUser.getOrganizations();
         expect(targetUserOrgs.length).to.eq(1);
@@ -438,7 +414,6 @@ describe('OrganizationService', () => {
 
     context('when the target user exists in Pages and UAA', () => {
       it('adds them to the org with the manager role', async () => {
-        const githubUsername = 'username';
         const agency = 'GSA';
         const orgName = 'org';
         const uaaEmail = 'foo@bar.com';
@@ -455,13 +430,13 @@ describe('OrganizationService', () => {
 
         const [org, invite] = await OrganizationService.createOrganization(
           { agency, name: orgName, isSelfAuthorized: false },
-          currentUser, uaaEmail, githubUsername
+          currentUser, uaaEmail
         );
 
         expect(org.name).to.eq(orgName);
 
         sinon.assert.calledOnceWithMatch(findOrCreateUAAUserStub,
-          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail, githubUsername);
+          sinon.match({ id: currentUser.UAAIdentity.id }), uaaEmail);
 
         const targetUserOrgs = await targetUser.getOrganizations();
         expect(targetUserOrgs.length).to.eq(1);

@@ -15,7 +15,7 @@
     "@supercharge/promise-pool": "^1.5.0",
     "ajv": "^8.12.0",
     "axios": "^0.21.2",
-    "bullmq": "^4.14.2",
+    "bullmq": "^5.1.4",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
     "connect-redis": "^6.1.1",

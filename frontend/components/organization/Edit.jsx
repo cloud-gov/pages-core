@@ -4,7 +4,6 @@ import { success } from 'react-notification-system-redux';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import federalistApi from '../../util/federalistApi';
-import ExpandableArea from '../ExpandableArea';
 import LoadingIndicator from '../LoadingIndicator';
 import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
@@ -127,24 +126,22 @@ function Edit({ actions }) {
           />
           )}
         <h3>Members</h3>
-        <ExpandableArea title="Add user" bordered>
-          <AddUserForm
-            className="well"
-            roleOptions={roleOptions}
-            onSubmit={
-              data => actions.inviteToOrganization(org.id, data)
-            }
-            onSubmitSuccess={
-              ({ member, invite: { email, link } }, reduxDispatch) => {
-                dispatch({ type: 'addMember', payload: member });
-                if (link) {
-                  showInviteAlert(email, link);
-                }
-                reduxDispatch(successNotification('Successfully added user.'));
+        <AddUserForm
+          className="well"
+          roleOptions={roleOptions}
+          onSubmit={
+            data => actions.inviteToOrganization(org.id, data)
+          }
+          onSubmitSuccess={
+            ({ member, invite: { email, link } }, reduxDispatch) => {
+              dispatch({ type: 'addMember', payload: member });
+              if (link) {
+                showInviteAlert(email, link);
               }
+              reduxDispatch(successNotification('Successfully added user.'));
             }
-          />
-        </ExpandableArea>
+          }
+        />
 
         <table className="usa-table-borderless log-table log-table__site-builds org-member-table table-full-width">
           <thead>
@@ -157,19 +154,21 @@ function Edit({ actions }) {
             </tr>
           </thead>
           <tbody>
-            <tr key={currentMember.User.id}>
-              <th scope="row" data-title="Email">{currentMember.User.UAAIdentity.email}</th>
-              <td data-title="Role">
-                manager
-              </td>
-              <td data-title="Added">
-                {timeFrom(currentMember.createdAt)}
-              </td>
-              <td data-title="Updated">
-                {timeFrom(currentMember.updatedAt)}
-              </td>
-              <td label="Actions" data-title="Actions" className="table-actions" />
-            </tr>
+            {currentMember?.User && (
+              <tr key={currentMember.User?.id}>
+                <th scope="row" data-title="Email">{currentMember.User?.UAAIdentity?.email}</th>
+                <td data-title="Role">
+                  manager
+                </td>
+                <td data-title="Added">
+                  {timeFrom(currentMember?.createdAt)}
+                </td>
+                <td data-title="Updated">
+                  {timeFrom(currentMember?.updatedAt)}
+                </td>
+                <td label="Actions" data-title="Actions" className="table-actions" />
+              </tr>
+            )}
 
             {sortedMembers.map(member => (
               <tr key={member.User.id}>

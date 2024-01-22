@@ -27,7 +27,7 @@ const AddUserForm = ({
 }) => (
   <form className={className} onSubmit={data => handleSubmit(data).then(reset)}>
     <fieldset>
-      <legend className="usa-sr-only">Add user</legend>
+      <legend className="sr-only">Add new organization member</legend>
       <Field
         id="uaaEmail"
         name="uaaEmail"
@@ -46,14 +46,6 @@ const AddUserForm = ({
         label="Role:"
         options={roleOptions}
         validate={[validateRole]}
-      />
-      <Field
-        id="githubUsername"
-        name="githubUsername"
-        type="text"
-        label="Github Username:"
-        component={InputWithErrorField}
-        minLength={4}
       />
     </fieldset>
     <button

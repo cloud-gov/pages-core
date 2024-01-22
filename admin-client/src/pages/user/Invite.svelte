@@ -16,12 +16,11 @@
   async function handleSubmit(event) {
     submitting = true;
     const {
-      uaaEmail, githubUsername, organizationId, roleId,
+      uaaEmail, organizationId, roleId,
     } = event.target.elements;
 
     const params = {
       uaaEmail: uaaEmail.value,
-      githubUsername: githubUsername.value,
       organizationId: organizationId.value,
       roleId: roleId.value,
     };
@@ -55,12 +54,6 @@
         <label class="usa-label" for="uaaEmail">UAA Email<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
         <span class="usa-hint">The user will be created and invited to UAA if necessary.</span>
         <input type="email" class="usa-input" name="uaaEmail" id="uaaEmail" value={urlUAAEmail} required>
-      </fieldset>
-
-      <fieldset class="usa-fieldset">
-        <label class="usa-label" for="githubUsername">Github Username</label>
-        <span class="usa-hint">Required to migrate an existing user.</span>
-        <input type="text" class="usa-input" name="githubUsername" id="githubUsername">
       </fieldset>
 
       <fieldset class="usa-fieldset">

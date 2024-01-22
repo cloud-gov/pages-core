@@ -1,8 +1,9 @@
 const organizationSerializer = require('../serializers/organization');
 const organizationRoleSerializer = require('../serializers/organization-role');
 const {
-  Organization, OrganizationRole, User,
+  Event, Organization, OrganizationRole, User,
 } = require('../models');
+const EventCreator = require('../services/EventCreator');
 const Mailer = require('../services/mailer');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
@@ -37,7 +38,7 @@ module.exports = wrapHandlers({
 
   async invite(req, res) {
     const {
-      body: { roleId, uaaEmail, githubUsername },
+      body: { roleId, uaaEmail },
       params: { id },
       user,
     } = req;
@@ -48,7 +49,7 @@ module.exports = wrapHandlers({
     }
 
     const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
-      user, org.id, toInt(roleId), uaaEmail, githubUsername
+      user, org.id, toInt(roleId), uaaEmail
     );
 
     // TODO - refactor above method to return user so this extra query is not necessary
@@ -64,6 +65,13 @@ module.exports = wrapHandlers({
       member: organizationRoleSerializer.serialize(member),
       invite: { email, link },
     };
+
+    EventCreator.audit(Event.labels.ORG_MANAGER_ACTION, req.user, 'User Invited by Org Manager', {
+      organizationId: org.id,
+      roleId,
+      email,
+      link,
+    });
 
     return res.json(json);
   },
