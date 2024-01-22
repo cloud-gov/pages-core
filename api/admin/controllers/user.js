@@ -1,6 +1,9 @@
 const json2csv = require('@json2csv/plainjs');
 const {
-  Organization, Site, User, Event,
+  Organization,
+  Site,
+  User,
+  Event,
 } = require('../../models');
 const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
@@ -14,7 +17,10 @@ async function listForUsersReportHelper(req, res, scopes) {
 
   const serialize = users => userSerializer.serializeMany(users, true);
 
-  const pagination = await paginate(User.scope(scopes), serialize, { limit, page });
+  const pagination = await paginate(User.scope(scopes), serialize, {
+    limit,
+    page,
+  });
 
   const json = {
     meta: {},
@@ -38,11 +44,14 @@ async function listForUsersReportCSVHelper(req, res, scopes) {
     },
     {
       label: 'Organizations',
-      value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}`).join('|')),
+      value: user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}`)
+        .join('|'),
     },
     {
       label: 'Details',
-      value: (user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}: ${orgRole.Role.name}`).join(', ')),
+      value: user => user.OrganizationRoles.map(
+        orgRole => `${orgRole.Organization.name}: ${orgRole.Role.name}`)
+        .join(', '),
     },
     {
       label: 'Created',
@@ -129,7 +138,10 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const user = await fetchModelById(id, User.scope(['withUAAIdentity', 'withOrganizationRoles']));
+    const user = await fetchModelById(
+      id,
+      User.scope(['withUAAIdentity', 'withOrganizationRoles'])
+    );
     if (!user) {
       return res.notFound();
     }
@@ -141,24 +153,30 @@ module.exports = wrapHandlers({
 
   async invite(req, res) {
     const {
-      body: {
-        uaaEmail,
-        githubUsername,
-        organizationId,
-        roleId,
-      },
+      body: { uaaEmail, organizationId, roleId },
       user,
     } = req;
 
     const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
-      user, toInt(organizationId), toInt(roleId), uaaEmail, githubUsername
+      user,
+      toInt(organizationId),
+      toInt(roleId),
+      uaaEmail
     );
     EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invited', {
-      organizationId, roleId, email, link, githubUsername,
+      organizationId,
+      roleId,
+      email,
+      link,
     });
     if (link) {
       await Mailer.sendUAAInvite(email, link);
-      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invite Sent', { user: { email }, link });
+      EventCreator.audit(
+        Event.labels.ADMIN_ACTION,
+        req.user,
+        'User Invite Sent',
+        { user: { email }, link }
+      );
     }
 
     const json = {
@@ -174,8 +192,16 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const { email, inviteLink: link } = await OrganizationService.resendInvite(user, uaaEmail);
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invite Resent', { user: { email }, link });
+    const { email, inviteLink: link } = await OrganizationService.resendInvite(
+      user,
+      uaaEmail
+    );
+    EventCreator.audit(
+      Event.labels.ADMIN_ACTION,
+      req.user,
+      'User Invite Resent',
+      { user: { email }, link }
+    );
     if (link) {
       await Mailer.sendUAAInvite(email, link);
     }

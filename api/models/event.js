@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     SITE_USER: 'site-user',
     REQUEST_HANDLER: 'request-handler',
     USER_ACTION: 'user-action',
+    ORG_MANAGER_ACTION: 'org-manager-action',
     ADMIN_ACTION: 'admin-action',
     TOKEN_ACTION: 'token-action',
   };

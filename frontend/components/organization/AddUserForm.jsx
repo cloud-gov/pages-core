@@ -47,14 +47,6 @@ const AddUserForm = ({
         options={roleOptions}
         validate={[validateRole]}
       />
-      <Field
-        id="githubUsername"
-        name="githubUsername"
-        type="text"
-        label="Github Username:"
-        component={InputWithErrorField}
-        minLength={4}
-      />
     </fieldset>
     <button
       type="submit"
