@@ -1,3 +1,17 @@
+## 0.5.3 (2024-01-22)
+
+### Fixed
+
+- **ci**: Remove erroneous container params in stage/prod
+- **ci**: Run db migrations in CI task container with SSL #4354
+
+### Maintenance
+
+- Run build log archive job in dev and staging as well #4367
+- Add Dev and Staging section to OPERATIONS.md, starting with manual migrations #4366
+- Make Build a paranoid model (enable soft deletion) #4366
+- Remove isActive from User #4338
+
 ## 0.5.2 (2023-12-21)
 
 ### Maintenance
