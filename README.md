@@ -13,11 +13,15 @@ More examples can be found at [https://cloud.gov/pages/success-stories/](https:/
 
 ## Development
 
-For information on development of this application, please see [DEVELOPMENT.md](DEVELOPMENT.md)
+For information on development of this application, please see [DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 
 ## Platform Ops
 
-For information on running platform operations with this application, please see [OPERATIONS.md](OPERATIONS.md)
+For information on running platform operations with this application, please see [OPERATIONS.md](./docs/OPERATIONS.md)
+
+## Platform diagrams
+
+Documents and visuallizes different system components and user flows within the Pages platform, please see [diagrams](./docs/diagrams/).
 
 ## Initial proposal
 
