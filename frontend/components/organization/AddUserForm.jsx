@@ -27,7 +27,7 @@ const AddUserForm = ({
 }) => (
   <form className={className} onSubmit={data => handleSubmit(data).then(reset)}>
     <fieldset>
-      <legend className="usa-sr-only">Add user</legend>
+      <legend className="sr-only">Add new organization member</legend>
       <Field
         id="uaaEmail"
         name="uaaEmail"
