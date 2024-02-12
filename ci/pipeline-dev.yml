@@ -38,9 +38,13 @@ jobs:
         params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
+      - put: src
+        resource: pr-((deploy-env))
+        params:
+          path: src
+          status: pending
+          base_context: concourse
+          context: test-and-deploy-api-pages
       - in_parallel:
         - get: cf-image
         - get: redis
@@ -59,6 +63,7 @@ jobs:
         - task: test-api
           privileged: true
           file: src/ci/partials/test-api.yml
+
         - do:
           - task: build-api
             file: src/ci/partials/build-api.yml
@@ -93,7 +98,7 @@ jobs:
             params:
               <<: *env-cf
               APP_ENV: ((deploy-env))
-              CF_APP_NAME: pages-((deploy-env))       
+              CF_APP_NAME: pages-((deploy-env))
 
           - task: run-database-migrations
             file: src/ci/partials/run-database-migrations.yml
@@ -102,24 +107,24 @@ jobs:
               <<: *env-cf
               APP_ENV: ((deploy-env))
             on_failure:
-              in_parallel:
-                - put: gh-status
-                  inputs: [src]
-                  params: {state: failure}
-                - put: slack
-                  params:
-                    text: |
-                      :x: FAILED: to migrate database for pages ((deploy-env))
-                      <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-                    channel: ((slack-channel))
-                    username: ((slack-username))
-                    icon_url: ((slack-icon-url))
+              put: slack
+              params:
+                text: |
+                  :x: FAILED: to migrate database for pages ((deploy-env))
+                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+                channel: ((slack-channel))
+                username: ((slack-username))
+                icon_url: ((slack-icon-url))
 
     on_failure:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: failure
+            base_context: concourse
+            context: test-and-deploy-api-pages
         - put: slack
           params:
             text: |
@@ -130,9 +135,13 @@ jobs:
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: success
+            base_context: concourse
+            context: test-and-deploy-api-pages
         - put: slack
           params:
             text: |
@@ -149,10 +158,13 @@ jobs:
         params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
-
+      - put: src
+        resource: pr-((deploy-env))
+        params:
+          path: src
+          status: pending
+          base_context: concourse
+          context: test-and-deploy-admin-client-pages
       - do: *test-admin-client
       - get: cf-image
       - task: configure-nginx
@@ -181,9 +193,13 @@ jobs:
 
     on_failure:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: failure
+            base_context: concourse
+            context: test-and-deploy-admin-client-pages
         - put: slack
           params:
             text: |
@@ -195,9 +211,13 @@ jobs:
 
     on_success:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: success
+            base_context: concourse
+            context: test-and-deploy-admin-client-pages
         - put: slack
           params:
             text: |
@@ -214,9 +234,13 @@ jobs:
         params: {integration_tool: checkout}
         passed: [set-pipeline]
         trigger: true
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
+      - put: src
+        resource: pr-((deploy-env))
+        params:
+          path: src
+          status: pending
+          base_context: concourse
+          context: deploy-queues-ui-pages
       - get: cf-image
       - task: deploy-queues-ui
         file: src/ci/partials/deploy.yml
@@ -237,9 +261,13 @@ jobs:
               CF_APP_NAME: pages-queues-ui-((deploy-env))
     on_failure:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: failure
+            base_context: concourse
+            context: deploy-queues-ui-pages
         - put: slack
           params:
             text: |
@@ -250,9 +278,13 @@ jobs:
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: success
+            base_context: concourse
+            context: deploy-queues-ui-pages
         - put: slack
           params:
             text: |
@@ -297,9 +329,13 @@ jobs:
         - deploy-queues-ui-pages
       - get: node
       - get: cf-image
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
+      - put: src
+        resource: pr-((deploy-env))
+        params:
+          path: src
+          status: pending
+          base_context: concourse
+          context: e2e-test
       - task: get-app-env
         file: src/ci/partials/get-app-env.yml
         image: cf-image
@@ -326,9 +362,13 @@ jobs:
           - put: s3
     on_failure:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: failure
+            base_context: concourse
+            context: e2e-test
         - put: slack
           params:
             text: |
@@ -339,9 +379,13 @@ jobs:
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: success
+            base_context: concourse
+            context: e2e-test
         - put: slack
           params:
             text: |
@@ -352,13 +396,20 @@ jobs:
             icon_url: ((slack-icon-url))
 
   - name: audit-dependencies
-    plan: 
+    plan:
       - get: src
         resource: pr-((deploy-env))
         params: {integration_tool: checkout}
         trigger: true
         passed: [set-pipeline]
       - get: node
+      - put: src
+        resource: pr-((deploy-env))
+        params:
+          path: src
+          status: pending
+          base_context: concourse
+          context: audit-dependencies
       - in_parallel:
           - task: audit-app
             file: src/ci/partials/audit.yml
@@ -372,9 +423,13 @@ jobs:
               VULN_THRESHOLD: 8 # errors on critical or high
     on_failure:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: failure
+            base_context: concourse
+            context: audit-dependencies
         - put: slack
           params:
             text: |
@@ -385,9 +440,13 @@ jobs:
             icon_url: ((slack-icon-url))
     on_success:
       in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
+        - put: src
+          resource: pr-((deploy-env))
+          params:
+            path: src
+            status: success
+            base_context: concourse
+            context: audit-dependencies
         - put: slack
           params:
             text: |
@@ -438,7 +497,7 @@ jobs:
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
-    
+
   - name: set-pipeline
     plan:
     - get: src
@@ -495,15 +554,6 @@ resources:
     source:
       url: ((slack-webhook-url))
 
-  - name: gh-status
-    type: cogito
-    check_every: 1h
-    source:
-      owner: cloud-gov
-      repo: pages-core
-      access_token: ((gh-access-token))
-      context_prefix: concourse
-
   - name: cf-image
     type: registry-image
     source:
@@ -530,23 +580,38 @@ resources:
 
 resource_types:
 
-  - name: cogito
-    type: docker-image
-    check_every: 24h
-    source:
-      repository: pix4d/cogito
-
   - name: pull-request
-    type: docker-image
+    type: registry-image
     source:
-      repository: teliaoss/github-pr-resource
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: github-pr-resource
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: slack-notification
-    type: docker-image
+    type: registry-image
     source:
-      repository: cfcommunity/slack-notification-resource
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: slack-notification-resource
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: s3-resource
-    type: docker-image
+    type: registry-image
     source:
-      repository: 18fgsa/s3-resource-simple
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: s3-simple-resource
+      aws_region: us-gov-west-1
+      tag: latest
+
+  - name: time
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: time-resource
+      aws_region: us-gov-west-1
+      tag: latest
