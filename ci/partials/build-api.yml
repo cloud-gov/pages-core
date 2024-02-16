@@ -1,6 +1,8 @@
 platform: linux
-inputs: [name: src]
-outputs: [name: src]
+inputs:
+  - name: src
+outputs:
+  - name: src
 params:
   PRODUCT: pages
 run:

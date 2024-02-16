@@ -2,13 +2,15 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: cloudgov/concourse-dcind
-    tag: original
+    aws_access_key_id: ((ecr-aws-key))
+    aws_secret_access_key: ((ecr-aws-secret))
+    repository: pages-dind-v25
+    aws_region: us-gov-west-1
+    tag: latest
 inputs:
   - name: src
   - name: redis
   - name: postgres
-  - name: node
 run:
   dir: src
   path: ci/docker/entrypoint.sh

@@ -56,9 +56,6 @@ jobs:
         passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
       - get: cf-image
       - do: *test-api
       - task: build-api
@@ -94,7 +91,7 @@ jobs:
         params:
           <<: *env-cf
           APP_ENV: ((deploy-env))
-          CF_APP_NAME: pages-((deploy-env))       
+          CF_APP_NAME: pages-((deploy-env))
 
       - task: run-database-migrations
         file: src/ci/partials/run-database-migrations.yml
@@ -103,59 +100,43 @@ jobs:
           <<: *env-cf
           APP_ENV: ((deploy-env))
         on_failure:
-          in_parallel:
-            - put: gh-status
-              inputs: [src]
-              params: {state: failure}
-            - put: slack
-              params:
-                text: |
-                  :x: FAILED: to migrate database for pages ((deploy-env))
-                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-                channel: ((slack-channel))
-                username: ((slack-username))
-                icon_url: ((slack-icon-url))
+          put: slack
+          params:
+            text: |
+              :x: FAILED: to migrate database for pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
         on_failure:
-          in_parallel:
-            - put: gh-status
-              inputs: [src]
-              params: {state: failure}
-            - put: slack
-              params:
-                text: |
-                  :x: FAILED: to migrate database for pages ((deploy-env))
-                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-                channel: ((slack-channel))
-                username: ((slack-username))
-                icon_url: ((slack-icon-url))
+          put: slack
+          params:
+            text: |
+              :x: FAILED: to migrate database for pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
     on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
-        - put: slack
-          params:
-            text: |
-              :x: FAILED: api deployment on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :x: FAILED: api deployment on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
     on_success:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
-        - put: slack
-          params:
-            text: |
-              :white_check_mark: SUCCESS: Successfully deployed api on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :white_check_mark: SUCCESS: Successfully deployed api on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
   - name: test-and-deploy-admin-client-pages-((deploy-env))
     plan:
@@ -165,9 +146,6 @@ jobs:
         trigger: true
         params: {depth: 1}
       - get: node
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
 
       - do: *test-admin-client
       - get: cf-image
@@ -196,32 +174,24 @@ jobs:
               CF_APP_NAME: pages-admin-((deploy-env))
 
     on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
-        - put: slack
-          params:
-            text: |
-              :x: FAILED: admin client deployment on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      - put: slack
+        params:
+          text: |
+            :x: FAILED: admin client deployment on pages ((deploy-env))
+            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+          channel: ((slack-channel))
+          username: ((slack-username))
+          icon_url: ((slack-icon-url))
 
     on_success:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
-        - put: slack
-          params:
-            text: |
-              :white_check_mark: SUCCESS: Successfully deployed admin client on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      - put: slack
+        params:
+          text: |
+            :white_check_mark: SUCCESS: Successfully deployed admin client on pages ((deploy-env))
+            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+          channel: ((slack-channel))
+          username: ((slack-username))
+          icon_url: ((slack-icon-url))
 
   - name: deploy-queues-ui-pages-((deploy-env))
     plan:
@@ -230,9 +200,6 @@ jobs:
         passed: [set-pipeline]
         trigger: true
         params: {depth: 1}
-      - put: gh-status
-        inputs: [src]
-        params: {state: pending}
       - get: cf-image
       - task: deploy-queues-ui
         file: src/ci/partials/deploy.yml
@@ -252,31 +219,23 @@ jobs:
               <<: *env-cf
               CF_APP_NAME: pages-queues-ui-((deploy-env))
     on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
-        - put: slack
-          params:
-            text: |
-              :x: FAILED: pages queues UI deployment on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :x: FAILED: pages queues UI deployment on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
     on_success:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
-        - put: slack
-          params:
-            text: |
-              :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :white_check_mark: SUCCESS: Successfully deployed pages queues UI on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
   - name: nightly-tasks-pages-((deploy-env))
     plan:
@@ -320,15 +279,14 @@ jobs:
             CF_TASK_NAME: queued-builds-check
             CF_TASK_COMMAND: yarn queued-builds-check ((support-email))
         on_failure:
-          in_parallel:
-            - put: slack
-              params:
-                text: |
-                  :x: FAILED: sites builds checks on pages ((deploy-env))
-                  <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-                channel: ((slack-channel))
-                username: ((slack-username))
-                icon_url: ((slack-icon-url))
+          put: slack
+          params:
+            text: |
+              :x: FAILED: sites builds checks on pages ((deploy-env))
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+            channel: ((slack-channel))
+            username: ((slack-username))
+            icon_url: ((slack-icon-url))
 
   - name: release
     plan:
@@ -362,7 +320,7 @@ jobs:
         icon_url: ((slack-icon-url))
 
   - name: audit-dependencies
-    plan: 
+    plan:
       - get: src
         resource: src-((deploy-env))-tagged
         trigger: true
@@ -380,31 +338,23 @@ jobs:
             params:
               VULN_THRESHOLD: 8 # errors on critical or high
     on_failure:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: failure}
-        - put: slack
-          params:
-            text: |
-              :x: FAILED: dependency audit on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :x: FAILED: dependency audit on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
     on_success:
-      in_parallel:
-        - put: gh-status
-          inputs: [src]
-          params: {state: success}
-        - put: slack
-          params:
-            text: |
-              :white_check_mark: SUCCESS: Successfully passed dependency audit on pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :white_check_mark: SUCCESS: Successfully passed dependency audit on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
   - name: nightly-site-bucket-key-rotator
     plan:
@@ -450,7 +400,7 @@ jobs:
             channel: ((slack-channel))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
-  
+
   - name: set-pipeline
     plan:
     - get: src
@@ -516,15 +466,6 @@ resources:
     source:
       url: ((slack-webhook-url-cg-pages))
 
-  - name: gh-status
-    type: cogito
-    check_every: 1h
-    source:
-      owner: cloud-gov
-      repo: pages-core
-      access_token: ((gh-access-token))
-      context_prefix: concourse
-
   - name: cf-image
     type: registry-image
     source:
@@ -547,18 +488,34 @@ resources:
 
 resource_types:
 
+  - name: git
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: git-resource
+      aws_region: us-gov-west-1
+      tag: latest
+
   - name: github-release
     type: registry-image
     source:
       repository: concourse/github-release-resource
 
-  - name: cogito
-    type: docker-image
-    check_every: 24h
-    source:
-      repository: pix4d/cogito
-
   - name: slack-notification
-    type: docker-image
+    type: registry-image
     source:
-      repository: cfcommunity/slack-notification-resource
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: slack-notification-resource
+      aws_region: us-gov-west-1
+      tag: latest
+
+  - name: time
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: time-resource
+      aws_region: us-gov-west-1
+      tag: latest

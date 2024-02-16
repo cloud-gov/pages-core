@@ -10,10 +10,15 @@ env-cf: &env-cf
   CF_STACK: cflinuxfs4
 
 node-image: &node-image
-  type: docker-image
-  source:
-    repository: node
-    tag: 20.9-bullseye
+  platform: linux
+  image_resource:
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: pages-node-v20
+      aws_region: us-gov-west-1
+      tag: latest
 
 cf-image: &cf-image
   platform: linux
@@ -31,9 +36,7 @@ test-metrics: &test-metrics
     output_mapping:
       src-metrics: src-metrics-dev
     config:
-      platform: linux
-      image_resource:
-        <<: *node-image
+      <<: *node-image
       inputs: [name: src-metrics]
       outputs: [name: src-metrics]
       run:
@@ -44,9 +47,7 @@ test-metrics: &test-metrics
   - in_parallel:
     - task: lint-metrics
       config:
-        platform: linux
-        image_resource:
-          <<: *node-image
+        <<: *node-image
         inputs: [name: src-metrics-dev]
         run:
           dir: src-metrics-dev/apps/metrics
@@ -55,9 +56,7 @@ test-metrics: &test-metrics
 
     - task: test-metrics
       config:
-        platform: linux
-        image_resource:
-          <<: *node-image
+        <<: *node-image
         inputs: [name: src-metrics-dev]
         run:
           dir: src-metrics-dev/apps/metrics
@@ -128,9 +127,11 @@ jobs:
         passed: [set-pipeline-((deploy-env))]
         params: {depth: 1}
         trigger: true
-      - put: gh-status
-        inputs: [src-metrics]
-        params: {state: pending}
+      - put: pr-((git-branch))
+        params:
+          path: pull-request
+          status: pending
+          context: concourse
 
       - do: *test-metrics
 
@@ -138,9 +139,7 @@ jobs:
         output_mapping:
           src-metrics: src-metrics-prod
         config:
-          platform: linux
-          image_resource:
-            <<: *node-image
+          <<: *node-image
           inputs: [name: src-metrics]
           outputs: [name: src-metrics]
           run:
@@ -176,9 +175,11 @@ jobs:
 
     on_failure:
       in_parallel:
-        - put: gh-status
-          inputs: [src-metrics]
-          params: {state: failure}
+        - put: pr-((git-branch))
+          params:
+            path: pull-request
+            status: failure
+            context: concourse
         - put: slack
           params:
             text: |
@@ -190,9 +191,11 @@ jobs:
 
     on_success:
       in_parallel:
-        - put: gh-status
-          inputs: [src-metrics]
-          params: {state: success}
+        - put: pr-((git-branch))
+          params:
+            path: pull-request
+            status: success
+            context: concourse
         - put: slack
           params:
             text: |
@@ -261,15 +264,6 @@ resources:
     source:
       url: ((slack-webhook-url))
 
-  - name: gh-status
-    type: cogito
-    check_every: 1h
-    source:
-      owner: 18F
-      repo: federalist
-      access_token: ((gh-access-token))
-      context_prefix: concourse
-
   - name: nightly
     type: time
     source:
@@ -283,18 +277,29 @@ resources:
 
 resource_types:
 
-  - name: cogito
-    type: docker-image
-    check_every: 24h
-    source:
-      repository: pix4d/cogito
-
   - name: pull-request
-    type: docker-image
+    type: registry-image
     source:
-      repository: teliaoss/github-pr-resource
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: github-pr-resource
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: slack-notification
-    type: docker-image
+    type: registry-image
     source:
-      repository: cfcommunity/slack-notification-resource
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: slack-notification-resource
+      aws_region: us-gov-west-1
+      tag: latest
+
+  - name: time
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: time-resource
+      aws_region: us-gov-west-1
+      tag: latest
