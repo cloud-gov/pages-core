@@ -1,3 +1,24 @@
+## 0.6.0 (2024-02-16)
+
+### Added
+
+- Simplify add org member form
+- Remove Github username from invite #4369
+- **ops**: Add invite flowchart to docs
+
+### Fixed
+
+- **ci**: Remove erroneous container params in stage/prod
+- **ci**: Run db migrations in CI task container with SSL #4354
+
+### Maintenance
+
+- Update resource types to use hardened images
+- Run build log archive job in dev and staging as well #4367
+- Add Dev and Staging section to OPERATIONS.md, starting with manual migrations #4366
+- Make Build a paranoid model (enable soft deletion) #4366
+- Remove isActive from User #4338
+
 ## 0.5.2 (2023-12-21)
 
 ### Maintenance
