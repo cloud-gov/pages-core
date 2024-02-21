@@ -109,16 +109,6 @@ jobs:
             username: ((slack-username))
             icon_url: ((slack-icon-url))
 
-        on_failure:
-          put: slack
-          params:
-            text: |
-              :x: FAILED: to migrate database for pages ((deploy-env))
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-            channel: ((slack-channel))
-            username: ((slack-username))
-            icon_url: ((slack-icon-url))
-
     on_failure:
       put: slack
       params:
@@ -174,24 +164,24 @@ jobs:
               CF_APP_NAME: pages-admin-((deploy-env))
 
     on_failure:
-      - put: slack
-        params:
-          text: |
-            :x: FAILED: admin client deployment on pages ((deploy-env))
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-          channel: ((slack-channel))
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :x: FAILED: admin client deployment on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
     on_success:
-      - put: slack
-        params:
-          text: |
-            :white_check_mark: SUCCESS: Successfully deployed admin client on pages ((deploy-env))
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
-          channel: ((slack-channel))
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      put: slack
+      params:
+        text: |
+          :white_check_mark: SUCCESS: Successfully deployed admin client on pages ((deploy-env))
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME?vars.deploy-env="((deploy-env))"|View build details>
+        channel: ((slack-channel))
+        username: ((slack-username))
+        icon_url: ((slack-icon-url))
 
   - name: deploy-queues-ui-pages-((deploy-env))
     plan:
