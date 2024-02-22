@@ -483,4 +483,19 @@ The benefit of adhering to this convention is that we can more easily reason abo
 
 If you didn't follow this convention while making your commits locally or on a development branch, you'll still have an opportunity to edit the commit history to match the Convention Commits specification. While the code is on a non-default branch, you can perform an [interactive rebase](https://git-scm.com/docs/git-rebase) to rewrite the history.
 
-##
+Summary table of "types" (the first part of the commit message). More details at [cz.json](../cz.json):
+
+| Type     | Description                                               | Version Bump | Changelog Section |
+| -------- | --------------------------------------------------------- | ------------ | ----------------- |
+| feat     | New, user-facing, features                                | minor        | Added             |
+| fix      | Bugfixes                                                  | patch        | Fixed             |
+| chore    | Technical debt, dependencies, general application updates | patch        | Maintenance       |
+| docs     | Updates to documentation                                  | patch        | Documentation     |
+| perf     | Performance improvements                                  | patch        | Performance       |
+| refactor | Refactoring                                               | patch        | Maintenance       |
+| revert   | Reverting previous commits                                | minor        | Reverted          |
+| style    | Changes to CSS or site styling                            | patch        | Maintenance       |
+| test     | Updates or additions of tests                             | patch        | Maintenance       |
+| ci       | Commits to trigger CI actions but no version changes      | none         |                   |
+
+Major version bumps are created when `BREAKING CHANGE` is in the commit body or the type is followed by `!` (e.g. `feat!: add a new major feature`). All types can be modified with an additional "scope" as shown in the conventional commit documentation (e.g. `fix(admin): remove broken link in admin panel`).
