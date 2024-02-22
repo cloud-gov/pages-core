@@ -1,3 +1,9 @@
+## 0.6.1 (2024-02-22)
+
+### Documentation
+
+- update developer documentation about commit patterns
+
 ## 0.6.0 (2024-02-16)
 
 ### Added
