@@ -21,14 +21,26 @@ function successNotification(message) {
   });
 }
 
-function showInviteAlert(email, link) {
-  // eslint-disable-next-line no-alert
-  return window.alert(`${email} does not have cloud.gov account yet, please send them the following link to get started:\n\n${link}`);
-}
-
 function showRemoveConfirm(member, org) {
   // eslint-disable-next-line no-alert
   return window.confirm(`Are you sure you want to remove ${member.User.UAAIdentity.email} from ${org.name}?`);
+}
+
+function getInvitationSentMsg(mostRecentlyAddedUser) {
+  return (
+    <span>
+      The new member must create a Pages account to accept the invitation to this organization.
+      They may check their inbox at
+      {' '}
+      {mostRecentlyAddedUser.email}
+      {' '}
+      for an invitation by email or visit
+      {' '}
+      <a href={`${mostRecentlyAddedUser.link}`}>{mostRecentlyAddedUser.link}</a>
+      {' '}
+      to get started.
+    </span>
+  );
 }
 
 function reducer(state, { type, payload }) {
@@ -38,6 +50,11 @@ function reducer(state, { type, payload }) {
         ...state,
         isLoading: false,
         ...payload,
+      };
+    case 'invitationSent':
+      return {
+        ...state,
+        mostRecentlyAddedUser: payload,
       };
     case 'addMember':
       return {
@@ -64,6 +81,7 @@ const initialState = {
   members: [],
   org: null,
   roles: [],
+  mostRecentlyAddedUser: null,
 };
 
 function Edit({ actions }) {
@@ -84,7 +102,7 @@ function Edit({ actions }) {
   }, ['1']);
 
   const {
-    isLoading, members, org, roles,
+    isLoading, members, org, roles, mostRecentlyAddedUser,
   } = state;
 
   if (isLoading) {
@@ -125,6 +143,15 @@ function Edit({ actions }) {
             alertRole={false}
           />
           )}
+        { mostRecentlyAddedUser
+          && (
+          <AlertBanner
+            status="info"
+            header="Sent invitation to create a Pages account"
+            message={getInvitationSentMsg(mostRecentlyAddedUser)}
+            alertRole={false}
+          />
+          )}
         <h3>Members</h3>
         <AddUserForm
           className="well"
@@ -136,13 +163,12 @@ function Edit({ actions }) {
             ({ member, invite: { email, link } }, reduxDispatch) => {
               dispatch({ type: 'addMember', payload: member });
               if (link) {
-                showInviteAlert(email, link);
+                dispatch({ type: 'invitationSent', payload: { email, link } });
               }
               reduxDispatch(successNotification('Successfully added user.'));
             }
           }
         />
-
         <table className="usa-table-borderless log-table log-table__site-builds org-member-table table-full-width">
           <thead>
             <tr>
