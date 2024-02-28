@@ -327,8 +327,9 @@ jobs:
         - test-and-deploy-api-pages
         - test-and-deploy-admin-client-pages
         - deploy-queues-ui-pages
-      - get: node
+      - get: playwright
       - get: cf-image
+      - get: node
       - put: src
         resource: pr-((deploy-env))
         params:
@@ -343,13 +344,19 @@ jobs:
           <<: *env-cf
           APP_ENV: ((deploy-env))
           CF_APP_NAME: pages-((deploy-env))
+      - task: create-test-users
+        file: src/ci/partials/create-test-users.yml
+        image: node
+        params:
+          DOMAIN: ((((deploy-env))-pages-domain))
+          APP_ENV: ((deploy-env))
+          PRODUCT: pages
       - task: run-e2e-tests
         file: src/ci/partials/e2e-test.yml
-        image: node
+        image: playwright
         params:
           APP_ENV: ((deploy-env))
           APP_HOSTNAME: https://((((deploy-env))-pages-domain))
-          DOMAIN: ((((deploy-env))-pages-domain))
           PRODUCT: pages
         ensure:
           do:
@@ -559,9 +566,18 @@ resources:
     source:
       aws_access_key_id: ((ecr-aws-key))
       aws_secret_access_key: ((ecr-aws-secret))
-      repository: harden-concourse-task
+      repository: general-task
       aws_region: us-gov-west-1
-      tag: ((harden-concourse-task-tag))
+      tag: latest
+
+  - name: playwright
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: harden-playwright
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: s3
     type: s3-resource
@@ -607,6 +623,15 @@ resource_types:
       aws_region: us-gov-west-1
       tag: latest
 
+  - name: registry-image
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: registry-image-resource
+      aws_region: us-gov-west-1
+      tag: latest
+      
   - name: time
     type: registry-image
     source:
@@ -615,3 +640,5 @@ resource_types:
       repository: time-resource
       aws_region: us-gov-west-1
       tag: latest
+
+  

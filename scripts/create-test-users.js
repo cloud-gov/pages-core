@@ -13,7 +13,7 @@ async function createUsers() {
     path: '/',
     expires: (Number(new Date()) + (24 * 60 * 60 * 1000)) / 1000,
     httpOnly: true,
-    secure: process.env.env === 'production',
+    secure: process.env.APP_ENV === 'production',
     sameSite: 'Lax',
   };
 
