@@ -1,3 +1,13 @@
+## 0.6.2 (2024-02-28)
+
+### Fixed
+
+- Make invitation URL copyable (#4108)
+
+### Maintenance
+
+- **ci**: add hardened playwright, registry-image, general-task
+
 ## 0.6.1 (2024-02-22)
 
 ### Documentation
