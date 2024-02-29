@@ -7,9 +7,12 @@
     fetchSite,
     fetchSiteWebhooks,
     fetchTasks,
+    fetchBuildTaskTypes,
     fetchUserEnvironmentVariables,
     fetchUsers,
     updateSite,
+    addSiteBuildTask,
+    removeBuildTask,
   } from '../lib/api';
   import {
     Accordion,
@@ -29,12 +32,14 @@
   } from '../components';
   import { destroySite } from '../flows';
   import { selectSiteDomains, stateColor } from '../lib/utils';
+  import SiteFormBuildTaskType from '../components/SiteFormBuildTaskType.svelte';
 
   const { id } = $router.params;
   $: sitePromise = fetchSite(id);
   $: siteWebhookPromise = fetchSiteWebhooks(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
   $: buildTasksPromise = fetchTasks({ site: id, limit: 10 });
+  $: buildTaskTypesPromise = fetchBuildTaskTypes();
   $: orgsPromise = fetchOrganizations({ limit: 100 });
   $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
@@ -47,8 +52,8 @@
     return updateSite(id, site);
   }
 
-  async function handleOrgUpdateSuccess(site) {
-    sitePromise = Promise.resolve(site);
+  async function handleOrgUpdateSuccess() {
+    sitePromise = fetchSite(id);
     notification.setSuccess('Site added to organization successfully');
   }
 
@@ -56,8 +61,8 @@
     notification.setError('Site organization update error');
   }
 
-  async function handleAdminConfigurationSuccess(site) {
-    sitePromise = Promise.resolve(site);
+  async function handleAdminConfigurationSuccess() {
+    sitePromise = fetchSite(id);
     notification.setSuccess('Site updated successfully');
   }
 
@@ -71,6 +76,24 @@
 
   async function handleWebhookFailure(error) {
     notification.setError(`Site webhook create error: ${error.message}`);
+  }
+
+  async function handleSiteBuildTaskSubmit(buildTaskTypeId, branch) {
+    return addSiteBuildTask(id, { buildTaskTypeId, branch });
+  }
+
+  async function handleSiteBuildTaskSuccess() {
+    sitePromise = fetchSite(id);
+    notification.setSuccess('Build task added successfully');
+  }
+
+  async function handleSiteBuildTaskFailure() {
+    notification.setError('Build task update error');
+  }
+
+  async function handleRemoveBuildTask(sbt) {
+    await removeBuildTask(sbt.id);
+    sitePromise = fetchSite(id);
   }
 
   function configs(site) {
@@ -197,19 +220,39 @@
         </Await>
       </AccordionContent>
       <AccordionContent title="Build Tasks">
+        <Await on={buildTaskTypesPromise} let:response={buildTaskTypes}>
+          <SiteFormBuildTaskType
+            {buildTaskTypes}
+            {site}
+            onSubmit={handleSiteBuildTaskSubmit}
+            onSuccess={handleSiteBuildTaskSuccess}
+            onFailure={handleSiteBuildTaskFailure}
+          />
+        </Await>
         <h3>Registered Build Tasks</h3>
         <DataTable data={site.SiteBuildTasks} borderless={true}>
           <tr slot="header">
-            <th>BuildTaskTypeId</th>
+            <th>Id</th>
+            <th>Build Task Type</th>
+            <th>Type Id</th>
             <th>Branch</th>
             <th>Metadata</th>
             <th>Created At</th>
+            <th>Remove</th>
           </tr>
           <tr slot="item" let:item={sbt}>
+            <td>{sbt.id}</td>
+            <td>{sbt.BuildTaskType.name}</td>
             <td>{sbt.buildTaskTypeId}</td>
             <td>{sbt.branch}</td>
             <td>{JSON.stringify(sbt.metadata)}</td>
             <td>{sbt.createdAt}</td>
+            <td>
+              <input
+                class="usa-button usa-button--base"
+                type="reset"
+                value="Remove"
+                on:click|preventDefault={() => handleRemoveBuildTask(sbt)} /></td>
           </tr>
           <p slot="empty">No build tasks registered</p>
         </DataTable>

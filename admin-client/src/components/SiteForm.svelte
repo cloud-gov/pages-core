@@ -10,12 +10,12 @@
     { label: 'default', value: '' },
     'exp',
   ];
-  
+
   const buildContainerSizes = [
     { label: 'default', value: '' },
     'large',
   ];
-  
+
   const siteStatuses = [
     { label: 'active', value: true },
     { label: 'inactive', value: false },
