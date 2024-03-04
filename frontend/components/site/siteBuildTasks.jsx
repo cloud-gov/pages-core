@@ -7,6 +7,7 @@ import prettyBytes from 'pretty-bytes';
 import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
 } from '../icons';
+import { useBuildDetails } from '../../hooks';
 import CommitSummary from './CommitSummary';
 import api from '../../util/federalistApi';
 
@@ -55,6 +56,8 @@ const SiteBuildTasks = () => {
   const buildId = parseInt(buildIdStr, 10);
   const [buildTasks, setBuildTasks] = useState([]);
 
+  const { buildDetails } = useBuildDetails(buildId);
+
   let intervalHandle;
   useEffect(() => {
     function fetchTasks(thisBuildId) {
@@ -76,7 +79,7 @@ const SiteBuildTasks = () => {
 
   return (
     <div>
-      <CommitSummary buildId={buildId} />
+      <CommitSummary buildDetails={buildDetails} />
       <div className="log-tools">
         <ul className="usa-unstyled-list">
           <li>
