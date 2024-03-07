@@ -154,9 +154,10 @@ describe('Organization API', () => {
       validateAgainstJSONSchema('POST', '/organization/{id}/invite', 400, response.body);
     });
 
-    it('returns the member and the invitation details', async () => {
+    it('returns the member and the invitation details for cloud.gov origin', async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
+      const origin = 'cloud.gov'
 
       const [targetUser, org] = await Promise.all([
         factory.user(),
@@ -174,9 +175,10 @@ describe('Organization API', () => {
 
       sinon.stub(OrganizationService, 'inviteUserToOrganization')
         .resolves({
-          email: uaaEmail,
-          inviteLink,
-        });
+        email: uaaEmail,
+        inviteLink,
+        origin,
+      });
 
       sinon.stub(Mailer, 'sendUAAInvite').resolves();
 
@@ -190,7 +192,13 @@ describe('Organization API', () => {
       expect(invite.email).to.eq(uaaEmail);
       expect(member.Role.id).to.eq(roleId);
       expect(member.User.id).to.eq(targetUser.id);
-      sinon.assert.calledOnceWithExactly(Mailer.sendUAAInvite, uaaEmail, inviteLink);
+      sinon.assert.calledOnceWithExactly(
+        Mailer.sendUAAInvite,
+        uaaEmail,
+        inviteLink,
+        origin,
+        org.name
+      );
     });
 
     it('returns a 400 error if the user is a manager of an inactive organization', async () => {
@@ -213,9 +221,9 @@ describe('Organization API', () => {
 
       sinon.stub(OrganizationService, 'inviteUserToOrganization')
         .resolves({
-          email: uaaEmail,
-          inviteLink,
-        });
+        email: uaaEmail,
+        inviteLink,
+      });
 
       sinon.stub(Mailer, 'sendUAAInvite').resolves();
 

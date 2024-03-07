@@ -1,32 +1,14 @@
 const config = require('../../config');
 const SiteWideErrorLoader = require('../services/SiteWideErrorLoader');
 const { defaultContext } = require('../utils');
-const Features = require('../features');
-
-function alertGithubAuthDeprecation(hasUAAIdentity, context) {
-  if (!hasUAAIdentity && context.authUAA) {
-    context.messages = {
-      ...context.messages,
-      warnings: [
-        `Authenticating with Github is deprecated and will be removed soon. Contact your agreement owner or ${config.app.supportEmail} to setup a cloud.gov account.`,
-      ],
-    };
-  }
-}
 
 module.exports = {
   home(req, res) {
     // redirect to main app if is authenticated
     if (req.session.authenticated) {
-      if (
-        Features.enabled(Features.Flags.FEATURE_AUTH_UAA)
-        && Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB)
-        && !req.user.UAAIdentity
-      ) {
-        return res.redirect('/migrate/new');
-      }
       return res.redirect('/sites');
     }
+
     const context = defaultContext(req, res);
 
     return res.render('home.njk', context);
@@ -58,8 +40,6 @@ module.exports = {
     };
 
     context.frontendConfig = frontendConfig;
-
-    alertGithubAuthDeprecation(hasUAAIdentity, context);
 
     return res.render('app.njk', context);
   },

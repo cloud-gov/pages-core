@@ -21,12 +21,7 @@
       isSelfAuthorized: selfAuthorized.checked,
     };
 
-    const { invite } = await createOrganization(params);
-
-    if (invite?.link) {
-      // eslint-disable-next-line no-alert
-      window.alert(`Invite sent to ${invite.email}: ${invite.link}`);
-    }
+    await createOrganization(params);
 
     page('/organizations');
   }

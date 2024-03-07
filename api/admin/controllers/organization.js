@@ -107,12 +107,12 @@ module.exports = wrapHandlers({
       isSelfAuthorized,
     };
 
-    const [org, { email, inviteLink: link }] = await OrganizationService.createOrganization(
+    const [org, { email, inviteLink: link, origin }] = await OrganizationService.createOrganization(
       organizationParams, user, managerUAAEmail, managerGithubUsername
     );
 
     if (link) {
-      await Mailer.sendUAAInvite(email, link);
+      await Mailer.sendUAAInvite(email, link, origin, org.name);
     }
 
     const json = {

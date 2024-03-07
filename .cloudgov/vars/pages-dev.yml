@@ -6,7 +6,6 @@ instances: 2
 env: dev
 env_postfix: -dev
 log_level: verbose
-feature_auth_github: 'false'
 feature_auth_uaa: 'true'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr-stage.cloud.gov

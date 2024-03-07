@@ -235,7 +235,6 @@ function defaultContext(req, res) {
     siteDisplayEnv: getSiteDisplayEnv(),
     homepageUrl: config.app.homepageUrl,
     webpackAssets: loadAssetManifest(),
-    authGithub: Features.enabled(Features.Flags.FEATURE_AUTH_GITHUB),
     authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
     hasUAAIdentity: false,
     nonce: res.locals.cspNonce,

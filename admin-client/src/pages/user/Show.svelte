@@ -29,12 +29,7 @@
   $: rolesPromise = fetchRoles();
 
   async function handleResendInvite(uaaEmail) {
-    const { invite } = await resendInvite({ uaaEmail });
-
-    if (invite) {
-      // eslint-disable-next-line no-alert
-      window.alert(`Resent invite for ${invite.email}: ${invite.link}`);
-    }
+    return resendInvite({ uaaEmail });
   }
 
   function handleUpdateUserOrgRole(organizationId) {

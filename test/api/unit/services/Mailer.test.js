@@ -23,15 +23,40 @@ describe('mailer', () => {
     });
 
     describe('.sendUAAInvite()', () => {
-      it('adds a `uaa-invite` job to the mail queue', async () => {
-        const email = 'foo@bar.gov';
-        const link = 'https://foobar.gov';
+      const email = 'foo@bar.gov';
+      const link = 'https://foobar.gov';
+      const orgName = 'test-org';
 
-        const job = await Mailer.sendUAAInvite(email, link);
+      it('adds a `uaa-invite` job to the mail queue for cloud.gov IDP users', async () => {
+        const origin = 'cloud.gov';
+
+        const job = await Mailer.sendUAAInvite(email, link, origin, orgName);
 
         expect(job.name).to.eq('uaa-invite');
         expect(job.data.to).to.deep.eq([email]);
         expect(job.data.html).to.eq(Templates.uaaInvite({ link }));
+      });
+
+      it('adds a `uaa-invite` job to the mail queue for uaa IDP users', async () => {
+        const origin = 'uaa';
+
+        const job = await Mailer.sendUAAInvite(email, link, origin, orgName);
+
+        expect(job.name).to.eq('uaa-invite');
+        expect(job.data.to).to.deep.eq([email]);
+        expect(job.data.html).to.eq(Templates.uaaInvite({ link }));
+      });
+
+      it('adds a `uaa-invite` job to the mail queue for agency IDP users', async () => {
+        const origin = 'agency.gov';
+
+        const job = await Mailer.sendUAAInvite(email, link, origin, orgName);
+
+        expect(job.name).to.eq('uaa-invite');
+        expect(job.data.to).to.deep.eq([email]);
+        expect(job.data.html).to.eq(
+          Templates.uaaIDPInvite({ link: hostname, orgName })
+        );
       });
     });
 
@@ -97,8 +122,8 @@ describe('mailer', () => {
           expect(org.Users.find(u => job.data.to.includes(u.email))).to.not.be.null;
           expect(job.data.subject).to.eq(`Your Pages sandbox organization\'s sites will be removed in ${expiryDays} days`);
           expect(job.data.html).to.eq(Templates.sandboxReminder({
-            organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
-          }));
+              organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
+            }));
         });
         expect(jobs.length).to.equal(org.Users.length);
       });

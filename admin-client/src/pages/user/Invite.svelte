@@ -25,12 +25,7 @@
       roleId: roleId.value,
     };
 
-    const { invite } = await inviteUser(params);
-
-    if (invite && invite.link) {
-      // eslint-disable-next-line no-alert
-      window.alert(`Created invite for ${invite.email}: ${invite.link}`);
-    }
+    await inviteUser(params);
 
     page('/users');
   }
