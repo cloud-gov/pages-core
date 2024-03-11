@@ -42,7 +42,6 @@ applications:
       NODE_MODULES_CACHE: false
       USER_AUDITOR: federalist
       S3_SERVICE_PLAN_ID: F36820DC-FDB6-496C-9D96-68861F5D0D95
-      FEATURE_AUTH_GITHUB: ((feature_auth_github))
       FEATURE_AUTH_UAA: ((feature_auth_uaa))
       UAA_HOST: ((uaa_host))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))

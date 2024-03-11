@@ -48,7 +48,7 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
+    const { email, inviteLink: link, origin } = await OrganizationService.inviteUserToOrganization(
       user, org.id, toInt(roleId), uaaEmail
     );
 
@@ -58,7 +58,7 @@ module.exports = wrapHandlers({
       .findOne({ where: { userId: newUser.id } });
 
     if (link) {
-      await Mailer.sendUAAInvite(email, link);
+      await Mailer.sendUAAInvite(email, link, origin, org.name);
     }
 
     const json = {

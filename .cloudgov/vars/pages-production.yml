@@ -6,7 +6,6 @@ instances: 4
 env: production
 env_postfix: -production
 log_level: info
-feature_auth_github: 'false'
 feature_auth_uaa: 'true'
 feature_bull_site_build_queue: 'true'
 uaa_host: https://uaa.fr.cloud.gov

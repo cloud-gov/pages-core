@@ -157,7 +157,12 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const { email, inviteLink: link } = await OrganizationService.inviteUserToOrganization(
+    const {
+      email,
+      inviteLink: link,
+      origin,
+      org,
+    } = await OrganizationService.inviteUserToOrganization(
       user,
       toInt(organizationId),
       toInt(roleId),
@@ -170,7 +175,7 @@ module.exports = wrapHandlers({
       link,
     });
     if (link) {
-      await Mailer.sendUAAInvite(email, link);
+      await Mailer.sendUAAInvite(email, link, origin, org.name);
       EventCreator.audit(
         Event.labels.ADMIN_ACTION,
         req.user,
@@ -192,7 +197,7 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const { email, inviteLink: link } = await OrganizationService.resendInvite(
+    const { email, inviteLink: link, origin } = await OrganizationService.resendInvite(
       user,
       uaaEmail
     );
@@ -203,7 +208,7 @@ module.exports = wrapHandlers({
       { user: { email }, link }
     );
     if (link) {
-      await Mailer.sendUAAInvite(email, link);
+      await Mailer.sendUAAInvite(email, link, origin);
     }
 
     const json = {

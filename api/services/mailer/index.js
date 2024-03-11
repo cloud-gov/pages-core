@@ -24,12 +24,20 @@ function init(connection) {
   mailQueue = new MailQueue(connection || createConnection());
 }
 
-async function sendUAAInvite(email, link) {
+async function sendUAAInvite(email, link, origin, orgName) {
   ensureInit();
+
+  if (origin === 'cloud.gov' || origin === 'uaa') {
+    return mailQueue.add('uaa-invite', {
+      to: [email],
+      subject: 'Invitation to join cloud.gov Pages',
+      html: Templates.uaaInvite({ link }),
+    });
+  }
   return mailQueue.add('uaa-invite', {
     to: [email],
     subject: 'Invitation to join cloud.gov Pages',
-    html: Templates.uaaInvite({ link }),
+    html: Templates.uaaIDPInvite({ link: hostname, orgName }),
   });
 }
 

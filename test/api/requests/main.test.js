@@ -24,17 +24,6 @@ describe('Main Site', () => {
         .expect(200);
     });
 
-    it('should redirect to /migrate/new when authenticated wihout a UAA Identity during the migration period', async () => {
-      process.env.FEATURE_AUTH_UAA = true;
-      const cookie = await authenticatedSession();
-
-      await request(app)
-        .get('/')
-        .set('Cookie', cookie)
-        .expect(302)
-        .expect('Location', '/migrate/new');
-    });
-
     it('should redirect to /sites when authenticated', async () => {
       const cookie = await authenticatedSession();
 
@@ -212,27 +201,6 @@ describe('Main Site', () => {
             .set('Cookie', cookie))
             .then((response) => {
               expect(response.text).to.not.match(/usa-alert-warning/);
-              done();
-            })
-            .catch(done);
-        });
-      });
-
-      describe('With feature authUAA enabled', () => {
-        beforeEach(() => {
-          process.env.FEATURE_AUTH_UAA = true;
-        });
-
-        afterEach(() => {
-          process.env.FEATURE_AUTH_UAA = false;
-        });
-
-        it('should display a banner for authenticated users about Github auth deprecation', (done) => {
-          authenticatedSession().then(cookie => request(app)
-            .get('/sites')
-            .set('Cookie', cookie))
-            .then((response) => {
-              expect(response.text).to.match(/usa-alert-warning/);
               done();
             })
             .catch(done);

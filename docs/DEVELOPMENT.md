@@ -391,7 +391,6 @@ Environment-specific feature flags are supported for both the api and frontend. 
 
 ### Current available features
 
-`FEATURE_AUTH_GITHUB`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with Github oauth.
 `FEATURE_AUTH_UAA`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with the cloud.gov UAA.
 
 ### Api feature flags
