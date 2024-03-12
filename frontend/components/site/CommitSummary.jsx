@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-import api from '../../util/federalistApi';
 import { IconBranch } from '../icons';
 import LoadingIndicator from '../LoadingIndicator';
 import { timeFrom, dateAndTime } from '../../util/datetime';
@@ -27,23 +26,8 @@ function buildShaLink(owner, repo, sha) {
   );
 }
 
-function CommitSummary({ buildId }) {
-  const [build, setBuild] = useState({
-    isLoading: true,
-    buildDetails: null,
-  });
-  const { isLoading, buildDetails } = build;
-
-  useEffect(() => {
-    if (!buildDetails) {
-      api.fetchBuild(buildId).then(data => setBuild({
-        isLoading: false,
-        buildDetails: data,
-      }));
-    }
-  }, [buildDetails]);
-
-  if (isLoading) {
+function CommitSummary({ buildDetails }) {
+  if (!buildDetails) {
     return <LoadingIndicator size="mini" text="Getting commit details..." />;
   }
 
@@ -74,7 +58,20 @@ function CommitSummary({ buildId }) {
   );
 }
 CommitSummary.propTypes = {
-  buildId: PropTypes.number.isRequired,
+  buildDetails: PropTypes.shape({
+    site: PropTypes.shape({
+      owner: PropTypes.string.isRequired,
+      repository: PropTypes.string.isRequired,
+    }).isRequired,
+    branch: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    clonedCommitSha: PropTypes.string.isRequired,
+    createdAt: PropTypes.instanceOf(Date).isRequired,
+  }),
+};
+
+CommitSummary.defaultProps = {
+  buildDetails: null,
 };
 
 export { CommitSummary };
