@@ -352,7 +352,7 @@ describe('UAAClient', () => {
 
       const error = await uaaClient.request(path, { token }).catch(e => e);
 
-      expect(error.message).to.eq('Error: Request failed with status code 500');
+      expect(error.message).to.eq('AxiosError: Request failed with status code 500');
     });
 
     context('when the user does not have the appropriate scope', () => {

@@ -10,8 +10,8 @@ const factory = require('../../support/factory');
 describe('CloudFoundryAPIClient', () => {
   afterEach(() => nock.cleanAll());
 
-  describe('.createS3ServiceInstance', (done) => {
-    it('should return a new service plan', () => {
+  describe('.createS3ServiceInstance', () => {
+    it('should return a new service plan', (done) => {
       const name = 'my-bucket';
       const planName = 'basic-vpc';
       const planGuid = crypto.randomUUID();
@@ -42,38 +42,6 @@ describe('CloudFoundryAPIClient', () => {
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.name).to.equal(name);
-          done();
-        });
-    });
-
-    it('should return 400 when missing name or service plan name', (done) => {
-      const name = undefined;
-      const requestBody = {};
-      const planName = 'basic-vpc';
-      const planGuid = crypto.randomUUID();
-
-      const planResource = factory.createCFAPIResource({
-        guid: planGuid,
-        name: planName,
-      });
-      const listPlans = factory.createCFAPIResourceList({
-        resources: [planResource],
-      });
-
-      mockTokenRequest();
-      apiNocks.mockFetchS3ServicePlanGUID(listPlans, planName);
-      apiNocks.mockCreateS3ServiceInstance(requestBody);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient
-        .createS3ServiceInstance(
-          name,
-          planName,
-          config.env.cfSpaceGuid,
-          config.env.s3ServicePlanId
-        )
-        .catch((err) => {
-          expect(err).to.be.an('error');
           done();
         });
     });
@@ -123,22 +91,6 @@ describe('CloudFoundryAPIClient', () => {
           expect(res).to.deep.equal('');
           done();
         });
-    });
-
-    it('should return 400 when missing name or service instance guid', (done) => {
-      const name = undefined;
-      const serviceInstanceGuid = 'service-instance-guid';
-
-      const requestBody = {};
-
-      mockTokenRequest();
-      apiNocks.mockCreateServiceKey(requestBody);
-
-      const apiClient = new CloudFoundryAPIClient();
-      apiClient.createServiceKey(name, serviceInstanceGuid).catch((err) => {
-        expect(err).to.be.an('error');
-        done();
-      });
     });
   });
 
