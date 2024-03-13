@@ -2,14 +2,13 @@ const crypto = require('crypto');
 const URLSafeBase64 = require('urlsafe-base64');
 
 const { buildEnum } = require('../utils');
+const BuildTaskQueue = require('../services/BuildTaskQueue');
 
 const Statuses = buildEnum([
   'created',
   'queued',
-  'tasked',
   'error',
   'processing',
-  'skipped', // remove?
   'success',
 ]);
 
@@ -33,6 +32,12 @@ const associate = ({ BuildTask, Build, BuildTaskType }) => {
       BuildTaskType,
     ],
   }));
+  BuildTask.addScope('byStartsWhen', startsWhen => ({
+    where: {
+      '$BuildTaskType.startsWhen$': startsWhen,
+    },
+    include: BuildTaskType,
+  }));
 };
 
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
@@ -41,6 +46,26 @@ const beforeValidate = (buildTask) => {
   const { token } = buildTask;
   buildTask.token = token || generateToken(); // eslint-disable-line no-param-reassign
 };
+
+async function enqueue() {
+  const buildTask = this;
+  const {
+    BuildTask,
+    BuildTaskType,
+    Build,
+    Site,
+  } = this.sequelize.models;
+
+  const fullBuildTask = await BuildTask.findByPk(buildTask.id, {
+    include: [
+      { model: BuildTaskType, required: true },
+      { model: Build, required: true, include: [{ model: Site, required: true }] },
+    ],
+  });
+
+  await BuildTaskQueue.sendTaskMessage(fullBuildTask);
+  await this.update({ status: BuildTask.Statuses.Queued });
+}
 
 module.exports = (sequelize, DataTypes) => {
   const BuildTask = sequelize.define(
@@ -92,5 +117,7 @@ module.exports = (sequelize, DataTypes) => {
   BuildTask.generateToken = generateToken;
   BuildTask.associate = associate;
   BuildTask.siteScope = id => ({ method: ['bySite', id] });
+  BuildTask.byStartsWhen = startsWhen => BuildTask.scope({ method: ['byStartsWhen', startsWhen] });
+  BuildTask.prototype.enqueue = enqueue;
   return BuildTask;
 };

@@ -152,12 +152,14 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
 
 const afterCreate = async (build) => {
   // create relevant build tasks on build create
-  const { SiteBuildTask, BuildTaskType } = build.sequelize.models;
+  // start some of them
+  const { SiteBuildTask, BuildTask, BuildTaskType } = build.sequelize.models;
   try {
-    await SiteBuildTask.startBuildTasks({
-      build,
-      startsWhen: BuildTaskType.StartsWhens.Build,
-    });
+    await SiteBuildTask.createBuildTasks({ build });
+    const buildTasks = await BuildTask
+      .byStartsWhen(BuildTaskType.StartsWhens.Build)
+      .findAll({ where: { buildId: build.id } });
+    buildTasks.forEach(task => task.enqueue());
   } catch (err) {
     console.error(err);
   }
@@ -165,13 +167,13 @@ const afterCreate = async (build) => {
 
 const afterUpdate = async (build) => {
   // we start certain build tasks on build completion
-  const { SiteBuildTask, BuildTaskType } = build.sequelize.models;
+  const { BuildTask, BuildTaskType } = build.sequelize.models;
   if (build.state === States.Success) {
     try {
-      await SiteBuildTask.startBuildTasks({
-        build,
-        startsWhen: BuildTaskType.StartsWhens.Complete,
-      });
+      const buildTasks = await BuildTask
+        .byStartsWhen(BuildTaskType.StartsWhens.Complete)
+        .findAll({ where: { buildId: build.id } });
+      buildTasks.forEach(task => task.enqueue());
     } catch (err) {
       console.error(err);
     }

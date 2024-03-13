@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 const factory = require('../../support/factory');
-const { Build, Site } = require('../../../../api/models');
+const { Build, Site, BuildTask } = require('../../../../api/models');
 const config = require('../../../../config');
 
 describe('Build model', () => {
@@ -419,6 +419,28 @@ describe('Build model', () => {
       const buildQuery = await Build.forSiteUser(user).findByPk(build.id);
 
       expect(buildQuery).to.be.null;
+    });
+  });
+
+  describe('model hooks', () => {
+    it('creates build tasks on afterCreate hook', async () => {
+      // prep
+      const site = factory.site();
+      const buildTaskType = await factory.buildTaskType();
+      await factory.siteBuildTask({
+        siteId: site, buildTaskTypeId: buildTaskType,
+      });
+
+      // create the build
+      const build = await factory.build({ site });
+
+      // now we should have a new build task
+      const buildTasks = await BuildTask.findAll({ where: { buildId: build.id } })
+      expect(buildTasks).to.have.length(1);
+
+      const task = buildTasks[0];
+      expect(task.buildTaskTypeId).to.equal(buildTaskType.id);
+      expect(task.buildId).to.equal(build.id);
     });
   });
 });
