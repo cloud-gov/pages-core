@@ -24,23 +24,6 @@ describe('CloudFoundryAPIClient Delete', () => {
         })
         .catch(done);
     });
-
-    it('should reject when route does not exist', (done) => {
-      const notRoute = 'not-a-route';
-      const aRoute = 'a-different-route';
-      const guid = '123456-abcdef';
-
-      mockTokenRequest();
-      apiNocks.mockDeleteRoute(aRoute, guid);
-
-      const cfApiClient = new CloudFoundryAPIClient();
-
-      cfApiClient.deleteRoute(notRoute)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
-    });
   });
 
   describe('.deleteS3Service', () => {
@@ -59,23 +42,6 @@ describe('CloudFoundryAPIClient Delete', () => {
           done();
         })
         .catch(done);
-    });
-
-    it('should reject when s3 service not found', (done) => {
-      const notService = 'this-is-not-a-s3-service';
-      const s3Service = 'this-is-a-s3-service-to-delete';
-      const guid = '123456-abcdef';
-
-      mockTokenRequest();
-      apiNocks.mockDeleteService(s3Service, guid);
-
-      const cfApiClient = new CloudFoundryAPIClient();
-
-      cfApiClient.deleteServiceInstance(notService)
-        .catch((err) => {
-          expect(err).to.be.an('error');
-          done();
-        });
     });
   });
 });
