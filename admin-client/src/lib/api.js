@@ -310,7 +310,21 @@ async function fetchTasks(query = {}) {
   return get('/tasks', query).catch(() => []);
 }
 
+async function fetchBuildTaskTypes() {
+  return get('/tasks/types').catch(() => []);
+}
+
+async function addSiteBuildTask(id, params) {
+  return post(`/sites/${id}/tasks`, params);
+}
+
+async function removeBuildTask(id) {
+  return destroy(`/site-build-tasks/${id}`);
+}
+
 export {
+  addSiteBuildTask,
+  removeBuildTask,
   destroySite,
   fetchMe,
   fetchBuildLogEventSource,
@@ -358,4 +372,5 @@ export {
   logout,
   updateSite,
   fetchTasks,
+  fetchBuildTaskTypes,
 };

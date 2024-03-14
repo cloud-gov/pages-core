@@ -1,4 +1,5 @@
 const {
+  BuildTaskType,
   Domain,
   Event,
   Organization,
@@ -88,7 +89,11 @@ module.exports = wrapHandlers({
     } = req;
 
     const site = await fetchModelById(id, Site, {
-      include: [SiteBranchConfig, Domain, SiteBuildTask],
+      include: [
+        SiteBranchConfig,
+        Domain,
+        { model: SiteBuildTask, include: [BuildTaskType] },
+      ],
     });
     if (!site) return res.notFound();
 

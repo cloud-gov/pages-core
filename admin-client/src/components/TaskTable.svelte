@@ -18,7 +18,6 @@
       <th>Id</th>
       <th>Build</th>
       <th>Task Type</th>
-      <th>Name</th>
       <th>Artifact</th>
       <th>Created</th>
       <th>Updated</th>
@@ -29,20 +28,19 @@
       </td>
       <td>{task.id}</td>
       <td><a href="/builds/{task.buildId}">{task.buildId}</a></td>
-      <td>{task.buildTaskTypeId}</td>
-      <td>{task.name}</td>
+      <td>{task.BuildTaskType.name}</td>
       <td>{task.artifact}</td>
       <td title={formatDateTime(task.createdAt)}>{formatDateTime(task.createdAt, true)}</td>
-      <td title={formatDateTime(task.updatedAt)}>{formatDateTime(task.udpatedAt, true)}</td>
+      <td title={formatDateTime(task.updatedAt)}>{formatDateTime(task.updatedAt, true)}</td>
     </tr>
     <p slot="empty">No build tasks found</p>
   </DataTable>
-  
+
   <style>
     .center {
       text-align: center;
     }
-  
+
     .wrap {
       white-space: normal;
     }
