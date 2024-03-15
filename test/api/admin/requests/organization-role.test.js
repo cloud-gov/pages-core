@@ -8,7 +8,7 @@ const {
 
 const csrfToken = require('../../support/csrfToken');
 const factory = require('../../support/factory');
-const { authenticatedSession } = require('../../support/session');
+const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const config = require('../../../../config');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
@@ -48,9 +48,9 @@ describe('Organization Role Admin API', () => {
 
   beforeEach(async () => {
     currentUser = await factory.user();
-    const cookie = await authenticatedSession(currentUser, sessionConfig);
+    const cookie = await authenticatedAdminOrSupportSession(currentUser, sessionConfig);
     authenticatedRequest = request.agent(app).set('Cookie', cookie);
-    const supportCookie = await authenticatedSession(currentUser, sessionConfig, 'pages.support');
+    const supportCookie = await authenticatedAdminOrSupportSession(currentUser, sessionConfig, 'pages.support');
     supportRequest = request.agent(app).set('Cookie', supportCookie);
   });
 

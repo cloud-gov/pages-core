@@ -6,7 +6,7 @@ const { expect } = require('chai');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { mockClient } = require('aws-sdk-client-mock');
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
-const { authenticatedSession } = require('../../support/session');
+const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const factory = require('../../support/factory');
 const csrfToken = require('../../support/csrfToken');
 const config = require('../../../../config');
@@ -59,7 +59,7 @@ describe('Admin - Site API', () => {
         factory.build({ site: site.id }),
       ]);
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .get(`/builds?site=${site.id}&limit=10`)
         .set('Cookie', cookie)
@@ -84,7 +84,7 @@ describe('Admin - Site API', () => {
       const user = await factory.user();
       const build = await factory.build();//.{ site: site.id });
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { body } = await request(app)
         .get(`/builds/${build.id}`)
         .set('Cookie', cookie)
@@ -104,7 +104,7 @@ describe('Admin - Site API', () => {
     it('updates allowed fields', async () => {
       const user = await factory.user();
       const build = await factory.build({ state: origState });
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const putResponse = await request(app)
         .put(`/builds/${build.id}`)
         .set('Cookie', cookie)
@@ -147,7 +147,7 @@ describe('Admin - Site API', () => {
           }))
         );
 
-        const cookie = await authenticatedSession(user, sessionConfig);
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const response = await request(app)
           .get(`/builds/${build.id}/log`)
           .set('Cookie', cookie)
@@ -186,7 +186,7 @@ describe('Admin - Site API', () => {
           factory.build({ logsS3Key: 's3-logs-key' }),
         ]);
 
-        const cookie = await authenticatedSession(user, sessionConfig);
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const response = await request(app)
           .get(`/builds/${build.id}/log`)
           .set('Cookie', cookie)

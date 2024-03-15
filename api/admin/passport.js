@@ -1,85 +1,77 @@
 const Passport = require('passport');
-const GitHubStrategy = require('passport-github').Strategy;
 const config = require('../../config');
-const env = require('../../services/environment')();
-const { User } = require('../models');
+const { User, Event } = require('../models');
 const { createUAAStrategy, verifyUAAUser } = require('../services/uaaStrategy');
-const GitHub = require('../services/GitHub');
-const Features = require('../features');
+const EventCreator = require('../services/EventCreator');
 
 const passport = new Passport.Passport();
 
 passport.serializeUser((user, next) => {
-  next(null, user.id);
+  next(null, { id: user.id, role: user.role });
 });
 
-passport.deserializeUser((id, next) => {
+passport.deserializeUser(({ id }, next) => {
   User.findByPk(id).then((user) => {
     next(null, user);
   });
 });
 
 /**
- * Github Auth
+ * UAA Auth
  */
-const githubOptions = config.passport.github.authorizationOptions;
-githubOptions.callbackURL = `${env.APP_HOSTNAME}/admin/auth/github2/callback`;
+const uaaOptions = {
+  ...config.passport.uaa.options,
+  callbackURL: `${config.app.hostname}/admin/auth/uaa/callback`,
+  logoutCallbackURL: `${config.app.hostname}/admin/auth/uaa/logout`,
+  passReqToCallback: true,
+};
 
-async function verifyGithub(accessToken, _refreshToken, profile, callback) {
-  const { id, username } = profile;
-
+const verify = async (req, accessToken, refreshToken, profile, callback) => {
   try {
-    await GitHub.ensureFederalistAdmin(accessToken, username.toLowerCase());
+    const supportUser = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      profile,
+      ['pages.support']
+    );
 
-    const user = await User.findOne({ where: { githubUserId: id } });
+    if (supportUser) {
+      return callback(null, { ...supportUser.dataValues, role: 'pages.support' });
+    }
 
-    return callback(null, user);
+    const adminUser = await verifyUAAUser(accessToken, refreshToken, profile, [
+      'pages.admin',
+    ]);
+    if (adminUser) {
+      return callback(null, { ...adminUser.dataValues, role: 'pages.admin' });
+    }
+
+    return callback(null, false);
   } catch (err) {
     return callback(err);
   }
-}
+};
 
-passport.use('github', new GitHubStrategy(githubOptions, verifyGithub));
+const uaaStrategy = createUAAStrategy(uaaOptions, verify);
 
-/**
- * UAA Auth
- */
-if (Features.enabled(Features.Flags.FEATURE_AUTH_UAA)) {
-  const uaaOptions = {
-    ...config.passport.uaa.options,
-    callbackURL: `${config.app.hostname}/admin/auth/uaa/callback`,
-    logoutCallbackURL: `${config.app.hostname}/admin/auth/uaa/logout`,
-    passReqToCallback: true,
-  };
+passport.use('uaa', uaaStrategy);
 
-  const verify = async (req, accessToken, refreshToken, profile, callback) => {
-    try {
-      const supportUser = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.support']);
-      if (supportUser) {
-        req.session.role = 'pages.support';
-        return callback(null, supportUser);
-      }
-
-      const adminUser = await verifyUAAUser(accessToken, refreshToken, profile, ['pages.admin']);
-      if (adminUser) {
-        req.session.role = 'pages.admin';
-        return callback(null, adminUser);
-      }
-
-      return callback(null, false);
-    } catch (err) {
-      return callback(err);
+passport.logout = (req, res) => {
+  const { user } = req;
+  req.logout((logoutError) => {
+    if (logoutError) {
+      EventCreator.error(Event.labels.AUTHENTICATION_ADMIN, logoutError, {
+        user,
+      });
+      return res.redirect(config.app.hostname);
     }
-  };
 
-  const uaaStrategy = createUAAStrategy(uaaOptions, verify);
+    if (user) {
+      EventCreator.audit(Event.labels.AUTHENTICATION_ADMIN, user, 'logout');
+    }
 
-  passport.use('uaa', uaaStrategy);
-
-  passport.logout = (req, res) => {
-    req.logout();
-    res.redirect(uaaStrategy.logoutRedirectURL);
-  };
-}
+    return res.redirect(uaaStrategy.logoutRedirectURL);
+  });
+};
 
 module.exports = passport;

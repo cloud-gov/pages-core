@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../../../../api/admin');
-const { authenticatedSession } = require('../../support/session');
+const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
 const csrfToken = require('../../support/csrfToken');
@@ -79,7 +79,7 @@ describe('Admin - Domains API', () => {
         state: 'provisioned',
       });
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { body } = await request(app)
         .get('/reports/published-sites')
         .set('Cookie', cookie)
@@ -127,7 +127,7 @@ describe('Admin - Domains API', () => {
         state: 'provisioned',
       });
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .get('/reports/published-sites.csv')
         .set('Cookie', cookie)
@@ -159,7 +159,7 @@ describe('Admin - Domains API', () => {
       const siteId = 8771900;
       const siteBranchConfigId = 1010220;
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       await request(app)
         .post('/domains')
         .set('Cookie', cookie)
@@ -178,7 +178,7 @@ describe('Admin - Domains API', () => {
       const site = await factory.site({}, { noSiteBranchConfig: true });
       const siteBranchConfigId = 8772274669;
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       await request(app)
         .post('/domains')
         .set('Cookie', cookie)
@@ -198,7 +198,7 @@ describe('Admin - Domains API', () => {
       const otherSite = await factory.site();
       const otherSBC = otherSite.SiteBranchConfigs[0];
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .post('/domains')
         .set('Cookie', cookie)
@@ -224,7 +224,7 @@ describe('Admin - Domains API', () => {
         context: 'preview',
       });
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .post('/domains')
         .set('Cookie', cookie)
@@ -248,7 +248,7 @@ describe('Admin - Domains API', () => {
       const site = await factory.site();
       const sbc = site.SiteBranchConfigs[0];
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .post('/domains')
         .set('Cookie', cookie)
@@ -278,7 +278,7 @@ describe('Admin - Domains API', () => {
       const site = await factory.site();
       const sbc = site.SiteBranchConfigs[0];
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .post('/domains')
         .set('Cookie', cookie)
