@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../../../../api/admin');
-const { authenticatedSession } = require('../../support/session');
+const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
@@ -32,7 +32,7 @@ describe('Admin - Organizations API', () => {
       const org1 = await factory.organization.create();
       const org2 = await factory.organization.create();
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { body } = await request(app)
         .get('/reports/organizations')
         .set('Cookie', cookie)
@@ -59,7 +59,7 @@ describe('Admin - Organizations API', () => {
       const org1 = await factory.organization.create({agency: 'Agency 1', isSelfAuthorized: false});
       const org2 = await factory.organization.create({agency: 'Agency 2', isSelfAuthorized: true});
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
         .get('/reports/organizations.csv')
         .set('Cookie', cookie)

@@ -8,16 +8,6 @@ const { sessionForCookie, sessionCookieFromResponse } = require('../support/cook
 
 describe('Main Site', () => {
   describe('Home /', () => {
-    const origFeatureAuthUAA = process.env.FEATURE_AUTH_UAA;
-
-    beforeEach(() => {
-      process.env.FEATURE_AUTH_UAA = false;
-    });
-
-    afterEach(() => {
-      process.env.FEATURE_AUTH_UAA = origFeatureAuthUAA;
-    });
-
     it('should work', () => {
       request(app)
         .get('/')
@@ -186,27 +176,6 @@ describe('Main Site', () => {
     });
 
     context('when an error is not present', () => {
-      describe('Without feature authUAA enabled', () => {
-        beforeEach(() => {
-          process.env.FEATURE_AUTH_UAA = false;
-        });
-
-        afterEach(() => {
-          process.env.FEATURE_AUTH_UAA = false;
-        });
-
-        it('should not display a banner for authenticated users', (done) => {
-          authenticatedSession().then(cookie => request(app)
-            .get('/sites')
-            .set('Cookie', cookie))
-            .then((response) => {
-              expect(response.text).to.not.match(/usa-alert-warning/);
-              done();
-            })
-            .catch(done);
-        });
-      });
-
       it('should not display a banner for unauthenticated users', (done) => {
         request(app)
           .get('/site')

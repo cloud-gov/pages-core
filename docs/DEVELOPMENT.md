@@ -391,7 +391,7 @@ Environment-specific feature flags are supported for both the api and frontend. 
 
 ### Current available features
 
-`FEATURE_AUTH_UAA`: Used in [`api/controllers/main.js`](./api/controllers/main.js) to enable authentication with the cloud.gov UAA.
+N/A
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:

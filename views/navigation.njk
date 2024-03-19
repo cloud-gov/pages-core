@@ -41,15 +41,11 @@
               </a>
             </li>
             <li class="nav-action">
-              {% if authUAA and hasUAAIdentity %}
-                <a class="usa-button usa-button-white" href="/logout">Log out</a>
-              {% endif %}
+              <a class="usa-button usa-button-white" href="/logout">Log out</a>
             </li>
           {% else %}
             <li  class="nav-action">
-              {% if authUAA %}
-                <a href="/login" class="usa-button usa-button-white">Log in with cloud.gov</a>
-              {% endif %}
+              <a href="/login" class="usa-button usa-button-white">Log in with cloud.gov</a>
             </li>
           {% endif %}
         </ul>

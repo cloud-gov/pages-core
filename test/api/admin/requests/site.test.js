@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const { restore, stub } = require('sinon');
 
 const validateAgainstJSONSchema = require('../../support/validateAgainstJSONSchema');
-const { authenticatedSession } = require('../../support/session');
+const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const factory = require('../../support/factory');
 const csrfToken = require('../../support/csrfToken');
 
@@ -39,7 +39,7 @@ describe('Admin - Site API', () => {
         factory.site(),
       ]);
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { body } = await request(app)
         .get('/sites')
         .set('Cookie', cookie)
@@ -63,7 +63,7 @@ describe('Admin - Site API', () => {
         factory.site({ containerConfig }),
       ]);
 
-      const cookie = await authenticatedSession(user, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { body } = await request(app)
         .get(`/sites/${site.id}`)
         .set('Cookie', cookie)
@@ -87,7 +87,7 @@ describe('Admin - Site API', () => {
           factory.site({ containerConfig: origContainerConfig }),
         ]);
 
-        const cookie = await authenticatedSession(user, sessionConfig);
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const putResponse = await request(app)
           .put(`/sites/${site.id}`)
           .set('Cookie', cookie)
@@ -117,7 +117,7 @@ describe('Admin - Site API', () => {
           factory.site(),
         ]);
         expect(site.isActive).to.be.true;
-        const cookie = await authenticatedSession(user, sessionConfig);
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const putResponse = await request(app)
           .put(`/sites/${site.id}`)
           .set('Cookie', cookie)
@@ -163,7 +163,7 @@ describe('Admin - Site API', () => {
 
         expect(site.isSoftDeleted()).to.be.false;
 
-        const cookie = await authenticatedSession(user, sessionConfig);
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const deleteResponse = await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)
@@ -202,7 +202,7 @@ describe('Admin - Site API', () => {
 
         expect(site.isSoftDeleted()).to.be.false;
 
-        const cookie = await authenticatedSession(user, sessionConfig);
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const deleteResponse = await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)
@@ -231,7 +231,7 @@ describe('Admin - Site API', () => {
           factory.site(),
         ]);
 
-        const cookie = await authenticatedSession(user, sessionConfig, 'pages.support');
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig, 'pages.support');
         await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)

@@ -18,7 +18,7 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
     flash: {},
     authenticated: false,
     csrfSecret: csrfToken.TEST_CSRF_SECRET,
-    'oauth2:github.com': { state: oauthState },
+    'oauth2:uaa': { state: oauthState },
     authRedirectPath,
   };
 
@@ -52,7 +52,38 @@ function authenticatedSession(user, cfg = sessionConfig, role = 'pages.admin') {
         authenticated: true,
         authenticatedAt: new Date(),
         csrfSecret: csrfToken.TEST_CSRF_SECRET,
-        role,
+      };
+      return cfg.store.set(sessionKey, sessionBody);
+    })
+    .then(() => {
+      const signedSessionKey = `${sessionKey}.${crypto
+        .createHmac('sha256', cfg.secret)
+        .update(sessionKey)
+        .digest('base64')
+        .replace(/=+$/, '')}`;
+      return `${cfg.key}=s%3A${signedSessionKey}`;
+    });
+}
+
+function authenticatedAdminOrSupportSession(user, cfg = sessionConfig, role = 'pages.admin') {
+  const sessionKey = crypto.randomBytes(8).toString('hex');
+
+  return Promise.resolve(user || factory.user())
+    .then((u) => {
+      const sessionBody = {
+        cookie: {
+          originalMaxAge: null,
+          expires: null,
+          httpOnly: true,
+          path: '/',
+        },
+        passport: {
+          user: { id: u.id, role },
+        },
+        flash: {},
+        authenticated: true,
+        authenticatedAt: new Date(),
+        csrfSecret: csrfToken.TEST_CSRF_SECRET,
       };
       return cfg.store.set(sessionKey, sessionBody);
     })
@@ -68,5 +99,6 @@ function authenticatedSession(user, cfg = sessionConfig, role = 'pages.admin') {
 
 module.exports = {
   authenticatedSession,
+  authenticatedAdminOrSupportSession,
   unauthenticatedSession,
 };

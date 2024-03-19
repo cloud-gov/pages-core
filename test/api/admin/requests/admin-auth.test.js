@@ -31,88 +31,97 @@ describe('Admin authentication request', () => {
     });
   });
 
-  if (process.env.FEATURE_AUTH_UAA === 'true') {
-    describe('GET /admin/auth/uaa/callback', () => {
-      it('returns unauthorized if the user is not an admin', async () => {
-        const uaaId = 'user_id_1';
-        const code = 'code';
-        const profile = { email: 'hello@example.com', user_id: uaaId };
+  describe('GET /admin/auth/uaa/callback', () => {
+    it('returns unauthorized if the user is not an admin', async () => {
+      const uaaId = 'user_id_1';
+      const code = 'code';
+      const profile = { email: 'hello@example.com', user_id: uaaId };
+      const user = await userFactory();
+      await createUAAIdentity({
+        uaaId,
+        userId: user.id,
+      });
+      const userProfile = uaaUser({
+        id: uaaId,
+        groups: [{
+          display: 'not.admin',
+        }],
+        ...profile,
+      });
+
+      cfUAANock.mockUAAAuth(profile, code);
+      cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
+      cfUAANock.mockVerifyUserGroup(uaaId, userProfile); // mocked twice for subsequent calls
+
+      return request(app)
+        .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
+        .expect(401);
+    });
+
+    describe('when successful', () => {
+      const uaaId = 'admin_id_1';
+      const code = 'code';
+      const email = 'hello@example.com';
+      const uaaUserProfile = uaaProfile({
+        userId: uaaId,
+        email,
+      });
+      const uaaUserInfo = uaaUser({
+        uaaId,
+        email,
+        groups: [{
+          display: 'pages.admin',
+        }],
+      });
+
+      before(async () => {
         const user = await userFactory();
         await createUAAIdentity({
           uaaId,
+          email,
           userId: user.id,
         });
-        const userProfile = uaaUser({
-          id: uaaId,
-          groups: [{
-            display: 'not.admin',
-          }],
-          ...profile,
-        });
-
-        cfUAANock.mockUAAAuth(profile, code);
-        cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
-        cfUAANock.mockVerifyUserGroup(uaaId, userProfile); // mocked twice for subsequent calls
-
-        return request(app)
-          .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
-          .expect(401);
       });
 
-      describe('when successful', () => {
-        const uaaId = 'admin_id_1';
-        const code = 'code';
-        const email = 'hello@example.com';
-        const uaaUserProfile = uaaProfile({
-          userId: uaaId,
-          email,
-        });
-        const uaaUserInfo = uaaUser({
-          uaaId,
-          email,
-          groups: [{
-            display: 'pages.admin',
-          }],
+      beforeEach(() => {
+        cfUAANock.mockUAAAuth(uaaUserProfile, code);
+        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
+        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo); // mocked twice for subsequent calls
+      });
+
+      it('returns a script tag', (done) => {
+        request(app)
+          .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
+          .expect((res) => {
+            expect(res.text.trim()).to.match(
+              /^<script nonce=".*">(.|\n)*<\/script>$/g
+            );
+          })
+          .expect(200, done);
+      });
+
+      it('authenticates the session', async () => {
+        const cookie = await unauthenticatedSession({
+          oauthState: 'state-123abc',
+          cfg: sessionConfig,
         });
 
-        before(async () => {
-          const user = await userFactory();
-          await createUAAIdentity({
-            uaaId,
-            email,
-            userId: user.id,
-          });
-        });
+        const res = await request(app)
+          .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
+          .set('Cookie', cookie)
+          .expect(200);
 
-        beforeEach(() => {
-          cfUAANock.mockUAAAuth(uaaUserProfile, code);
-          cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
-          cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo); // mocked twice for subsequent calls
-        });
-
-        it('returns a script tag', (done) => {
-          request(app)
-            .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
-            .expect((res) => {
-              expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
-            })
-            .expect(200, done);
-        });
-
-        it('authenticates the session', async () => {
-          const cookie = await unauthenticatedSession({ oauthState: 'state-123abc', cfg: sessionConfig });
-          await request(app)
-            .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
-            .set('Cookie', cookie)
-            .expect(200)
-            .expect((res) => {
-              expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
-            });
-          const session = await sessionForCookie(cookie, 'pages-admin.sid');
-          expect(session.passport.user).to.exist;
-          expect(session.role).to.exist;
-        });
+        const updatedCookie = res.header['set-cookie'][0];
+        const session = await sessionForCookie(
+          updatedCookie,
+          'pages-admin.sid'
+        );
+        expect(res.text.trim()).to.match(
+          /^<script nonce=".*">(.|\n)*<\/script>$/g
+        );
+        expect(session.passport.user).to.exist;
+        expect(session.passport.user.role).to.exist;
       });
     });
-  }
+  });
 });

@@ -28,7 +28,6 @@ services:
     environment:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
-      FEATURE_AUTH_UAA: 'true'
       FEATURE_BUILD_TASKS: 'active'
       PORT: 1337
       PRODUCT: pages

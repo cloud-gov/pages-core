@@ -5,7 +5,6 @@ const moment = require('moment');
 
 const config = require('../../config');
 const { logger } = require('../../winston');
-const Features = require('../features');
 
 /**
  * @param {string[]} values The enum values
@@ -235,7 +234,6 @@ function defaultContext(req, res) {
     siteDisplayEnv: getSiteDisplayEnv(),
     homepageUrl: config.app.homepageUrl,
     webpackAssets: loadAssetManifest(),
-    authUAA: Features.enabled(Features.Flags.FEATURE_AUTH_UAA),
     hasUAAIdentity: false,
     nonce: res.locals.cspNonce,
     isPages: process.env.PRODUCT === 'pages',

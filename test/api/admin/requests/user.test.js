@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../../../../api/admin');
-const { authenticatedSession } = require('../../support/session');
+const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
@@ -49,7 +49,7 @@ describe('Admin - Users API', () => {
       org1.addUser(user2, { through: { roleId: userRole.id } });
       org2.addUser(user1, { through: { roleId: userRole.id } });
 
-      const cookie = await authenticatedSession(user1, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user1, sessionConfig);
       const { body } = await request(app)
         .get('/reports/users')
         .set('Cookie', cookie)
@@ -85,7 +85,7 @@ describe('Admin - Users API', () => {
       org1.addUser(user2, { through: { roleId: userRole.id } });
       org2.addUser(user1, { through: { roleId: userRole.id } });
 
-      const cookie = await authenticatedSession(user1, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user1, sessionConfig);
       const response = await request(app)
         .get('/reports/users.csv')
         .set('Cookie', cookie)
@@ -140,7 +140,7 @@ describe('Admin - Users API', () => {
       org1.addUser(user4, { through: { roleId: userRole.id } });
       org2.addUser(user3, { through: { roleId: userRole.id } });
 
-      const cookie = await authenticatedSession(user1, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user1, sessionConfig);
       const { body } = await request(app)
         .get('/reports/active-users')
         .set('Cookie', cookie)
@@ -185,7 +185,7 @@ describe('Admin - Users API', () => {
       org1.addUser(user4, { through: { roleId: userRole.id } });
       org2.addUser(user3, { through: { roleId: userRole.id } });
 
-      const cookie = await authenticatedSession(user1, sessionConfig);
+      const cookie = await authenticatedAdminOrSupportSession(user1, sessionConfig);
       const response = await request(app)
         .get('/reports/active-users.csv')
         .set('Cookie', cookie)

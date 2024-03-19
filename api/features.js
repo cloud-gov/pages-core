@@ -7,7 +7,6 @@ const Flags = {
     Ex.
     FEATURE_AWESOME_FEATURE: 'FEATURE_AWESOME_FEATURE',
     */
-  FEATURE_AUTH_UAA: 'FEATURE_AUTH_UAA',
 };
 
 const TRUTHY_VALUES = [true, 'True', 'true', 'TRUE'];
