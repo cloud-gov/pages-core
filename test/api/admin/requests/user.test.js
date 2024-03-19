@@ -21,14 +21,12 @@ describe('Admin - Users API', () => {
     ]);
   });
 
-  afterEach(() =>
-    Promise.all([
-      Organization.truncate({ force: true, cascade: true }),
-      OrganizationRole.truncate({ force: true, cascade: true }),
-      User.truncate({ force: true, cascade: true }),
-      UAAIdentity.truncate({ force: true, cascade: true }),
-    ])
-  );
+  afterEach(async () => {
+    await Organization.truncate({ force: true, cascade: true });
+    await OrganizationRole.truncate({ force: true, cascade: true });
+    await UAAIdentity.truncate({ force: true, cascade: true });
+    await User.truncate({ force: true, cascade: true });
+  });
 
   describe('GET /admin/reports/users', () => {
     it('should require admin authentication', async () => {
