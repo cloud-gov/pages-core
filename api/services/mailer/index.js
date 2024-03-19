@@ -49,7 +49,7 @@ async function sendSandboxReminder(organization) {
     Users: users,
   } = organization;
 
-  const dateStr = moment(organization.sandboxNextCleaningAt).format('MM-DD-YYYY');
+  const dateStr = moment(organization.sandboxNextCleaningAt).format('MMMM DD, YYYY');
   const subject = `Your Pages sandbox organization's sites will be removed in ${organization.daysUntilSandboxCleaning} days`;
 
   ensureInit();

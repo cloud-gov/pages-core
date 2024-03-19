@@ -111,7 +111,7 @@ describe('mailer', () => {
       it('`sandbox-reminder` adds job(s) to the mail queue', async () => {
         const expiryDays = 5;
         const sandboxNextCleaningAt = moment().add(expiryDays, 'days');
-        const dateStr = sandboxNextCleaningAt.format('MM-DD-YYYY');
+        const dateStr = sandboxNextCleaningAt.format('MMMM DD, YYYY');
         const org = await createSandboxOrg(sandboxNextCleaningAt.toDate());
         const newUser = await factory.user();
         await org.addUser(newUser, { through: { roleId: userRole.id } });
@@ -122,8 +122,8 @@ describe('mailer', () => {
           expect(org.Users.find(u => job.data.to.includes(u.email))).to.not.be.null;
           expect(job.data.subject).to.eq(`Your Pages sandbox organization\'s sites will be removed in ${expiryDays} days`);
           expect(job.data.html).to.eq(Templates.sandboxReminder({
-              organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
-            }));
+            organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
+          }));
         });
         expect(jobs.length).to.equal(org.Users.length);
       });
