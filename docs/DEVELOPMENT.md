@@ -350,10 +350,9 @@ For the full list of available commands that you can run with `yarn` or `npm`, s
 
 **End-to-end testing (experimental)**
 
-We also have end-to-end (e2e) testing available via [playwright](https://playwright.dev/). Before your first run, make sure you have Playwright and all the necessary dependencies:
+We also have end-to-end (e2e) testing available via [playwright](https://playwright.dev/). Before your first run, make sure you have the necessary dependencies installed:
 
 ```sh
-yarn install playwright
 yarn playwright install-deps
 yarn playwright install
 ```
