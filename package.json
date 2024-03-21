@@ -181,11 +181,11 @@
     "sinon": "^10.0.0",
     "style-loader": "^3.3.3",
     "supertest": "^6.3.3",
-    "webpack": "^5.89.0",
-    "webpack-bundle-analyzer": "^4.9.1",
-    "webpack-cli": "^4.7.0",
-    "webpack-dev-middleware": "^4.0.2",
-    "webpack-dev-server": "^4.15.1",
+    "webpack": "^5.91.0",
+    "webpack-bundle-analyzer": "^4.10.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-middleware": "^7.1.1",
+    "webpack-dev-server": "^5.0.4",
     "webpack-manifest-plugin": "^5.0.0"
   },
   "engines": {
