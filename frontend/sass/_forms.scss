@@ -62,13 +62,14 @@ select {
 }
 
 .update-user-form {
-  display: flex;
+  display: inline-flex;
   justify-content: space-between;
   align-items: center;
   margin: 0;
 
   fieldset {
     margin: 0;
+    padding-right: 1rem;
     display: inline;
   }
 

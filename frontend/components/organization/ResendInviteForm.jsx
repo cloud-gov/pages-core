@@ -1,28 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm } from 'redux-form';
+import { IconEnvelope } from '../icons';
 
-const RemoveUserForm = ({
+const ResendInviteForm = ({
   handleSubmit,
   submitting,
 }) => (
   <form onSubmit={handleSubmit}>
     <button
       type="submit"
-      className="usa-button usa-button-red margin-0 small-button"
+      className="usa-button usa-button-secondary margin-0 small-button"
       disabled={submitting}
     >
-      Remove
+      <IconEnvelope />
+      Resend invite
     </button>
   </form>
 );
 
-RemoveUserForm.propTypes = {
+ResendInviteForm.propTypes = {
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
 };
 
-export { RemoveUserForm };
+export { ResendInviteForm };
 
-export default reduxForm()(RemoveUserForm);
+export default reduxForm()(ResendInviteForm);

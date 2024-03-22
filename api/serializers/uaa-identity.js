@@ -3,6 +3,7 @@ const BaseSerializer = require('./base');
 const attributes = {
   userName: '',
   email: '',
+  origin: '',
 };
 
 const adminAttributes = {
