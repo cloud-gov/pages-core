@@ -285,7 +285,7 @@ function SiteBuilds() {
                           <CreateBuildLink
                             handlerParams={{ buildId: build.id, siteId: site.id }}
                             handleClick={buildActions.restartBuild}
-                            className="usa-button rebuild-button"
+                            className="usa-button small-button rebuild-button"
                           >
                             Rebuild
                           </CreateBuildLink>
