@@ -62,6 +62,13 @@ export default {
     });
   },
 
+  resendInviteToOrganization(id, user, uaaEmail) {
+    return request(`organization/${id}/resend-invite`, {
+      method: 'POST',
+      data: { uaaEmail, user },
+    });
+  },
+
   updateOrganizationRole(organizationId, roleId, userId) {
     return request('organization-role', {
       method: 'PUT',

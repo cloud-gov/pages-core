@@ -236,6 +236,108 @@ describe('Organization API', () => {
     });
   });
 
+  describe('POST /v0/organization/:id/resend-invite', () => {
+    requiresAuthentication('POST', '/organization/1/resend-invite', '/organization/{id}/resend-invite');
+
+    afterEach(sinon.restore);
+
+    it('returns a 400 error if the user is not a manager of the organization', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const roleId = userRole.id;
+      const org = await factory.organization.create();
+      await Promise.all([
+        currentUser.addOrganization(org, { through: { roleId: userRole.id } }),
+        factory.uaaIdentity({ userId: currentUser.id }),
+      ]);
+
+      const response = await authenticatedRequest
+        .post(`/v0/organization/${org.id}/resend-invite`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ roleId, uaaEmail });
+
+      validateAgainstJSONSchema('POST', '/organization/{id}/resend-invite', 400, response.body);
+    });
+
+    it('returns the invitation details for cloud.gov origin', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const roleId = userRole.id;
+      const origin = 'cloud.gov'
+
+      const [targetUser, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create(),
+      ]);
+
+      await Promise.all([
+        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
+        targetUser.addOrganization(org, { through: { roleId } }),
+        factory.uaaIdentity({ userId: currentUser.id }),
+        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+      ]);
+
+      const inviteLink = 'https://example.com';
+
+      sinon.stub(OrganizationService, 'resendInvite')
+        .resolves({
+        email: uaaEmail,
+        inviteLink,
+        origin,
+      });
+
+      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+
+      const response = await authenticatedRequest
+        .post(`/v0/organization/${org.id}/resend-invite`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ roleId, uaaEmail });
+
+      validateAgainstJSONSchema('POST', '/organization/{id}/resend-invite', 200, response.body);
+      const { invite } = response.body;
+      expect(invite.email).to.eq(uaaEmail);
+      sinon.assert.calledOnceWithExactly(
+        Mailer.sendUAAInvite,
+        uaaEmail,
+        inviteLink,
+        origin,
+        org.name
+      );
+    });
+
+    it('returns a 400 error if the user is a manager of an inactive organization', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const roleId = userRole.id;
+
+      const [targetUser, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create({ isActive: false }),
+      ]);
+
+      await Promise.all([
+        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
+        targetUser.addOrganization(org, { through: { roleId } }),
+        factory.uaaIdentity({ userId: currentUser.id }),
+        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+      ]);
+
+      const inviteLink = 'https://example.com';
+
+      sinon.stub(OrganizationService, 'resendInvite')
+        .resolves({
+        email: uaaEmail,
+        inviteLink,
+      });
+
+      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+
+      const response = await authenticatedRequest
+        .post(`/v0/organization/${org.id}/resend-invite`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ roleId, uaaEmail });
+
+      validateAgainstJSONSchema('POST', '/organization/{id}/resend-invite', 400, response.body);
+    });
+  });
+
   describe('GET /v0/organization/:id/members', () => {
     requiresAuthentication('GET', '/organization/1/members', '/organization/{id}/members');
 

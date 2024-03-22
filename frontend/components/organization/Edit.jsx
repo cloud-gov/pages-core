@@ -7,6 +7,7 @@ import federalistApi from '../../util/federalistApi';
 import LoadingIndicator from '../LoadingIndicator';
 import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
+import ResendInviteForm from './ResendInviteForm';
 import UpdateUserForm from './UpdateUserForm';
 import { timeFrom } from '../../util/datetime';
 import { sandboxMsg } from '../../util';
@@ -182,7 +183,6 @@ function Edit({ actions }) {
           <tbody>
             {currentMember?.User && (
               <tr key={currentMember.User?.id}>
-                <th scope="row" data-title="Email">{currentMember.User?.UAAIdentity?.email}</th>
                 <td data-title="Role">
                   manager
                 </td>
@@ -239,6 +239,20 @@ function Edit({ actions }) {
                       }
                     }
                   />
+                  <ResendInviteForm
+                    form={`resendInvite-${member.User.id}`}
+                    onSubmit={() => true}
+                    onSubmitSuccess={
+                      async (_, reduxDispatch) => {
+                        await actions.resendInviteToOrganization(
+                          org.id,
+                          member.User.id,
+                          member.User.UAAIdentity.email
+                        );
+                        reduxDispatch(successNotification('Successfully resent invitation.'));
+                      }
+                    }
+                  />
                 </td>
               </tr>
             ))}
@@ -257,6 +271,7 @@ Edit.propTypes = {
     fetchOrganization: PropTypes.func.isRequired,
     fetchRoles: PropTypes.func.isRequired,
     inviteToOrganization: PropTypes.func.isRequired,
+    resendInviteToOrganization: PropTypes.func.isRequired,
     removeOrganizationRole: PropTypes.func.isRequired,
     updateOrganizationRole: PropTypes.func.isRequired,
   }).isRequired,
@@ -269,6 +284,7 @@ const WrappedEdit = props => (
       fetchOrganization: federalistApi.fetchOrganization,
       fetchRoles: federalistApi.fetchRoles,
       inviteToOrganization: federalistApi.inviteToOrganization,
+      resendInviteToOrganization: federalistApi.resendInviteToOrganization,
       removeOrganizationRole: federalistApi.removeOrganizationRole,
       updateOrganizationRole: federalistApi.updateOrganizationRole,
     }}

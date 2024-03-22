@@ -76,6 +76,40 @@ module.exports = wrapHandlers({
     return res.json(json);
   },
 
+  async resendInvite(req, res) {
+    const {
+      body: { uaaEmail },
+      params: { id },
+      user,
+    } = req;
+
+    const org = await fetchModelById(toInt(id), Organization.forManagerRole(user));
+    if (!org) {
+      return res.notFound();
+    }
+
+    const { email, inviteLink: link, origin } = await OrganizationService.resendInvite(
+      user,
+      uaaEmail
+    );
+
+    if (link) {
+      await Mailer.sendUAAInvite(email, link, origin, org.name);
+    }
+
+    const json = {
+      invite: { email, link },
+    };
+
+    EventCreator.audit(Event.labels.ORG_MANAGER_ACTION, req.user, 'User Invite Resent by Org Manager', {
+      organizationId: org.id,
+      email,
+      link,
+    });
+
+    return res.json(json);
+  },
+
   async members(req, res) {
     const {
       params: { id },
