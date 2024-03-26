@@ -14,6 +14,7 @@ const responses = require('./responses');
 const role = require('./role');
 const site = require('./site');
 const siteBranchConfig = require('./site-branch-config');
+const siteBuildTask = require('./site-build-task');
 const { createUAAIdentity } = require('./uaa-identity');
 const user = require('./user');
 const userEnvironmentVariable = require('./user-environment-variable');
@@ -34,6 +35,7 @@ module.exports = {
   role,
   site,
   siteBranchConfig,
+  siteBuildTask,
   uaaIdentity: createUAAIdentity,
   user,
   userEnvironmentVariable,

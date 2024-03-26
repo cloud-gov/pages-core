@@ -1,5 +1,4 @@
 const { Op } = require('sequelize');
-const BuildTaskQueue = require('../services/BuildTaskQueue');
 
 const associate = ({ BuildTaskType, Site, SiteBuildTask }) => {
   SiteBuildTask.belongsTo(BuildTaskType, {
@@ -11,36 +10,12 @@ const associate = ({ BuildTaskType, Site, SiteBuildTask }) => {
   });
 };
 
-async function startBuildTask(buildId) {
-  const siteBuildTask = this;
+async function createBuildTasks({ build }) {
   const {
     BuildTask,
-    BuildTaskType,
-    Build,
-    Site,
-  } = siteBuildTask.sequelize.models;
-
-  const buildTask = await BuildTask.create({
-    buildTaskTypeId: siteBuildTask.buildTaskTypeId,
-    buildId,
-    name: `build: ${buildId}, type: ${siteBuildTask.buildTaskTypeId}`,
-  });
-
-  const createdBuildTask = await BuildTask.findByPk(buildTask.id, {
-    include: [
-      { model: BuildTaskType, required: true },
-      { model: Build, required: true, include: [{ model: Site, required: true }] },
-    ],
-  });
-
-  BuildTaskQueue.sendTaskMessage(createdBuildTask);
-}
-
-async function findTasksToStart({ build, startsWhen }) {
-  const {
-    BuildTaskType,
   } = this.sequelize.models;
-  return this.findAll({
+
+  const siteBuildTasks = await this.findAll({
     where: {
       [Op.and]: [
         {
@@ -54,17 +29,13 @@ async function findTasksToStart({ build, startsWhen }) {
         },
       ],
     },
-    include: {
-      model: BuildTaskType,
-      where: { startsWhen },
-      required: true,
-    },
   });
-}
 
-async function startBuildTasks({ build, startsWhen }) {
-  const tasks = await this.findTasksToStart({ build, startsWhen });
-  await Promise.allSettled(tasks.map(sbt => sbt.startBuildTask(build.id)));
+  return Promise.all(siteBuildTasks.map(async siteBuildTask => BuildTask.create({
+    buildTaskTypeId: siteBuildTask.buildTaskTypeId,
+    buildId: build.id,
+    name: `build: ${build.id}, type: ${siteBuildTask.buildTaskTypeId}`,
+  })));
 }
 
 module.exports = (sequelize, DataTypes) => {
@@ -87,8 +58,6 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   SiteBuildTask.associate = associate;
-  SiteBuildTask.startBuildTasks = startBuildTasks;
-  SiteBuildTask.findTasksToStart = findTasksToStart;
-  SiteBuildTask.prototype.startBuildTask = startBuildTask;
+  SiteBuildTask.createBuildTasks = createBuildTasks;
   return SiteBuildTask;
 };

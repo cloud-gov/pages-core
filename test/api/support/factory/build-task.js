@@ -10,7 +10,7 @@ const _attributes = ({
   name,
   artifact,
   count,
-  message
+  message,
 } = {}) => ({
   buildId: build || buildFactory(),
   buildTaskTypeId: buildTaskTypeId || buildTaskTypeFactory(),
