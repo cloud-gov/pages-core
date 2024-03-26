@@ -1,3 +1,27 @@
+## 0.7.0 (2024-03-26)
+
+### Added
+
+- update email layouts with new template (#4373)
+- add uswds identifier (#4413)
+- **admin**: add limited ability to register build tasks to a site
+- Update email invites based on user UAA origin #4370
+
+### Fixed
+
+- update build task status logic (#4404)
+- Add message explaining that build logs are deleted after 180 days. (#4379)
+- Make invitation URL copyable (#4108)
+
+### Maintenance
+
+- **ci**: use hardened node image, update playwright docs
+- try separate table dropping for user report test
+- update webpack and associated dependencies
+- Update passport deps and remove deprecated GH auth
+- update axios, remove unnecessary tests
+- **ci**: add hardened playwright, registry-image, general-task
+
 ## 0.6.1 (2024-02-22)
 
 ### Documentation
