@@ -22,9 +22,24 @@ async function buildTaskRunner(job) {
 
     const taskTypeRunner = task.BuildTaskType.runner;
     const apiClient = new CloudFoundryAPIClient();
+
+    let cfResponse = null;
+
     switch (taskTypeRunner) {
       case BuildTaskType.Runners.Cf_task:
-        await apiClient.startBuildTask(task, job);
+        cfResponse = await apiClient.startBuildTask(task, job);
+        try {
+          logger.log(JSON.stringify({
+            state: cfResponse.state,
+            result: cfResponse.result,
+            id: task.id,
+            type: task.BuildTaskType.name,
+          }));
+        } catch (err) {
+          logger.log('Error logging the cfResponse');
+        }
+        // TODO: ideally we'd return false for tasks that fail to start to allow for
+        // retries in the queue
         return true;
       case BuildTaskType.Runners.Worker:
         // TODO: temporary switch for JS worker code
