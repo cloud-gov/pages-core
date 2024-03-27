@@ -370,6 +370,11 @@ paths:
           type: string
           description: The UAA email of the invited user
           required: true
+        - name: isResend
+          in: body
+          type: bool
+          description: Calls for a resent invitation rather than an initial invitation
+          required: false
         - name: githubUsername
           in: body
           type: string
@@ -385,60 +390,6 @@ paths:
                 required: true
                 schema:
                   $ref: 'OrganizationRole.json'
-              invite:
-                description: The invite details
-                required: true
-                schema:
-                  type: object
-                  properties:
-                    email:
-                      type: string
-                      description: the UAA email for the invited user
-                    link:
-                      type: string
-                      description: The confirmation link for the invited user
-        400:
-          description: Bad request
-          schema:
-            $ref: 'Error.json'
-        403:
-          description: Not authorized
-          schema:
-            $ref: 'Error.json'
-        404:
-          description: Not found
-          schema:
-            $ref: 'Error.json'
-  /organization/{id}/resend-invite:
-    parameters:
-      - name: id
-        in: path
-        description: The id of the organization
-        type: integer
-        required: true
-    post:
-      summary: Re-invite a user to a Pages organization and maybe the platform.
-      parameters:
-        - name: roleId
-          in: body
-          type: integer
-          description: The id of the role type
-          required: true
-        - name: uaaEmail
-          in: body
-          type: string
-          description: The UAA email of the invited user
-          required: true
-        - name: githubUsername
-          in: body
-          type: string
-          description: The Github username of the invited user if it exists
-      responses:
-        200:
-          description: The organization role and invite details for the invited user
-          schema:
-            type: object
-            properties:
               invite:
                 description: The invite details
                 required: true

@@ -38,7 +38,7 @@ module.exports = wrapHandlers({
 
   async invite(req, res) {
     const {
-      body: { roleId, uaaEmail },
+      body: { roleId, uaaEmail, isResend },
       params: { id },
       user,
     } = req;
@@ -48,9 +48,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const { email, inviteLink: link, origin } = await OrganizationService.inviteUserToOrganization(
-      user, org.id, toInt(roleId), uaaEmail
-    );
+    const { email, inviteLink: link, origin } = isResend
+      ? await OrganizationService.resendInvite(user, uaaEmail)
+      : await OrganizationService.inviteUserToOrganization(user, org.id, toInt(roleId), uaaEmail);
 
     // TODO - refactor above method to return user so this extra query is not necessary
     const newUser = await User.byUAAEmail(email).findOne();
@@ -66,43 +66,10 @@ module.exports = wrapHandlers({
       invite: { email, link },
     };
 
-    EventCreator.audit(Event.labels.ORG_MANAGER_ACTION, req.user, 'User Invited by Org Manager', {
+    const auditMessage = isResend ? 'User Invite Resent by Org Manager' : 'User Invited by Org Manager';
+    EventCreator.audit(Event.labels.ORG_MANAGER_ACTION, req.user, auditMessage, {
       organizationId: org.id,
       roleId,
-      email,
-      link,
-    });
-
-    return res.json(json);
-  },
-
-  async resendInvite(req, res) {
-    const {
-      body: { uaaEmail },
-      params: { id },
-      user,
-    } = req;
-
-    const org = await fetchModelById(toInt(id), Organization.forManagerRole(user));
-    if (!org) {
-      return res.notFound();
-    }
-
-    const { email, inviteLink: link, origin } = await OrganizationService.resendInvite(
-      user,
-      uaaEmail
-    );
-
-    if (link) {
-      await Mailer.sendUAAInvite(email, link, origin, org.name);
-    }
-
-    const json = {
-      invite: { email, link },
-    };
-
-    EventCreator.audit(Event.labels.ORG_MANAGER_ACTION, req.user, 'User Invite Resent by Org Manager', {
-      organizationId: org.id,
       email,
       link,
     });

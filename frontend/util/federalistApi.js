@@ -62,10 +62,15 @@ export default {
     });
   },
 
-  resendInviteToOrganization(id, user, uaaEmail) {
-    return request(`organization/${id}/resend-invite`, {
+  resendInviteToOrganization(id, user, uaaEmail, roleId) {
+    return request(`organization/${id}/invite`, {
       method: 'POST',
-      data: { uaaEmail, user },
+      data: {
+        uaaEmail,
+        user,
+        roleId,
+        isResend: true,
+      },
     });
   },
 
