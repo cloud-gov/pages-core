@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm } from 'redux-form';
+import { IconEnvelope } from '../icons';
 
 const ResendInviteForm = ({
   handleSubmit,
@@ -9,10 +10,11 @@ const ResendInviteForm = ({
   <form onSubmit={handleSubmit}>
     <button
       type="submit"
-      className="usa-button usa-button-secondary margin-0"
+      className="usa-button usa-button-secondary margin-0 small-button"
       disabled={submitting}
     >
-      Resend Invite
+      <IconEnvelope />
+      Resend invite
     </button>
   </form>
 );

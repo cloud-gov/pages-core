@@ -118,21 +118,30 @@
     }
   }
   .table-actions {
+    
     a {
       margin: 0;
     }
-  }
-  .rebuild-button {
-    margin-bottom: 0;
-    padding: .4em .6em;
-    font-size: 1.1em;
-    border-radius: 4px;
-    white-space: nowrap;
-    svg {
-      margin-right: .4em;
-      height: 1em;
-      width: auto;
-      vertical-align: bottom;
+    form {
+      & + form {
+        margin-top: .5em;
+      }
+    }
+  
+    .small-button {
+      margin-bottom: 0;
+      padding: 0.4em 0.6em;
+      font-size: 1.1em;
+      border-radius: 4px;
+      white-space: nowrap;
+    
+      svg {
+        margin-right: .4em;
+        height: 1em;
+        width: auto;
+        vertical-align: bottom;
+      }
+      
     }
   }
 
@@ -188,15 +197,6 @@
           }
         }
       }
-      .table-actions > * {
-        margin-top: auto;
-        margin-bottom: auto;
-        .usa-button {
-          margin-top: 0;
-          margin-right: 0;
-        }
-      }
-
       th, td {
         display: flex;
         align-items: stretch;

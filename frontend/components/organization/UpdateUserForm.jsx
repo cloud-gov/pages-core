@@ -24,7 +24,7 @@ const UpdateUserForm = ({
     className="update-user-form"
   >
     <fieldset>
-      <legend className="usa-sr-only">Update user</legend>
+      <legend className="usa-sr-only">Update user role</legend>
       <Field
         id="roleId"
         name="roleId"
