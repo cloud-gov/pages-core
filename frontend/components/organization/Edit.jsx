@@ -239,20 +239,23 @@ function Edit({ actions }) {
                       }
                     }
                   />
-                  <ResendInviteForm
-                    form={`resendInvite-${member.User.id}`}
-                    onSubmit={() => true}
-                    onSubmitSuccess={
-                      async (_, reduxDispatch) => {
-                        await actions.resendInviteToOrganization(
-                          org.id,
-                          member.User.id,
-                          member.User.UAAIdentity.email
-                        );
-                        reduxDispatch(successNotification('Successfully resent invitation.'));
+                  { member.User.UAAIdentity.origin === 'uaa' && !member.User.signedInAt && (
+                    <ResendInviteForm
+                      form={`resendInvite-${member.User.id}`}
+                      onSubmit={() => true}
+                      onSubmitSuccess={
+                        async (_, reduxDispatch) => {
+                          await actions.resendInviteToOrganization(
+                            org.id,
+                            member.User.id,
+                            member.User.UAAIdentity.email,
+                            member.Role.id
+                          );
+                          reduxDispatch(successNotification('Successfully resent invitation.'));
+                        }
                       }
-                    }
-                  />
+                    />
+                  )}
                 </td>
               </tr>
             ))}
