@@ -67,7 +67,7 @@ function renderBranchFileRow(file) {
   }
   return (
     <tr key={viewFileLink}>
-      <td>{file.name}</td>
+      <th scope="row">{file.name}</th>
       <td><a href={viewFileLink} target="_blank" rel="noopener noreferrer">View</a></td>
     </tr>
   );
@@ -86,8 +86,8 @@ function renderPublishedFilesTable(files, name, currentPage, lastPage, setCurren
       <table className="usa-table-borderless table-full-width log-table">
         <thead>
           <tr>
-            <th>File</th>
-            <th>Actions</th>
+            <th scope="col">File</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
