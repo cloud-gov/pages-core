@@ -176,7 +176,7 @@ function Edit({ actions }) {
               <th scope="col">Email</th>
               <th scope="col">Role</th>
               <th scope="col">Added</th>
-              <th scope="col">Updated</th>
+              <th scope="col">Last Signed In</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -190,8 +190,8 @@ function Edit({ actions }) {
                 <td data-title="Added">
                   {timeFrom(currentMember?.createdAt)}
                 </td>
-                <td data-title="Updated">
-                  {timeFrom(currentMember?.updatedAt)}
+                <td data-title="Last Signed In">
+                  {currentMember?.User?.signedInAt ? timeFrom(currentMember.User.signedInAt) : 'Never'}
                 </td>
                 <td label="Actions" data-title="Actions" className="table-actions" />
               </tr>
@@ -220,8 +220,8 @@ function Edit({ actions }) {
                 <td data-title="Added">
                   {timeFrom(member.createdAt)}
                 </td>
-                <td data-title="Updated">
-                  {timeFrom(member.updatedAt)}
+                <td data-title="Last Signed In">
+                  {member.User.signedInAt ? timeFrom(member.User.signedInAt) : 'Never'}
                 </td>
                 <td data-title="Actions" className="table-actions">
                   <span className="usa-sr-only">User actions</span>
