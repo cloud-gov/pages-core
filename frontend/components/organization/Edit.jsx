@@ -240,7 +240,8 @@ function Edit({ actions }) {
                       }
                     }
                   />
-                  { member.User.UAAIdentity.origin === 'uaa' && !member.User.signedInAt && (
+                  { (member.User.UAAIdentity.origin === 'uaa' || member.User.UAAIdentity.origin === 'cloud.gov')
+                    && !member.User.signedInAt && (
                     <ResendInviteForm
                       form={`resendInvite-${member.User.id}`}
                       onSubmit={() => true}
