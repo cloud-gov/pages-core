@@ -15,6 +15,7 @@ const attributes = {
     Organization: organizationSerializer.serialize(orgRole.Organization, isSystemAdmin),
     Role: roleSerializer.serialize(orgRole.Role, isSystemAdmin),
   })),
+  signedInAt: '',
 };
 
 const adminAttributes = {

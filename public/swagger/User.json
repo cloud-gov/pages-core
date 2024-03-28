@@ -17,6 +17,9 @@
     },
     "hasGithubAuth": {
       "type": "boolean"
+    },
+    "signedInAt": {
+      "type": "date-time"
     }
   },
   "not": {
