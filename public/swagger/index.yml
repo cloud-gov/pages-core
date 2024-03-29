@@ -370,6 +370,11 @@ paths:
           type: string
           description: The UAA email of the invited user
           required: true
+        - name: isResend
+          in: body
+          type: bool
+          description: Calls for a resent invitation rather than an initial invitation
+          required: false
         - name: githubUsername
           in: body
           type: string

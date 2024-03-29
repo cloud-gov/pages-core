@@ -7,6 +7,7 @@ import federalistApi from '../../util/federalistApi';
 import LoadingIndicator from '../LoadingIndicator';
 import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
+import ResendInviteForm from './ResendInviteForm';
 import UpdateUserForm from './UpdateUserForm';
 import { timeFrom } from '../../util/datetime';
 import { sandboxMsg } from '../../util';
@@ -175,7 +176,7 @@ function Edit({ actions }) {
               <th scope="col">Email</th>
               <th scope="col">Role</th>
               <th scope="col">Added</th>
-              <th scope="col">Updated</th>
+              <th scope="col">Last Signed In</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -189,8 +190,8 @@ function Edit({ actions }) {
                 <td data-title="Added">
                   {timeFrom(currentMember?.createdAt)}
                 </td>
-                <td data-title="Updated">
-                  {timeFrom(currentMember?.updatedAt)}
+                <td data-title="Last Signed In">
+                  {currentMember?.User?.signedInAt ? timeFrom(currentMember.User.signedInAt) : 'Never'}
                 </td>
                 <td label="Actions" data-title="Actions" className="table-actions" />
               </tr>
@@ -200,7 +201,7 @@ function Edit({ actions }) {
               <tr key={member.User.id}>
                 <th scope="row" data-title="Email">{member.User.UAAIdentity.email}</th>
                 <td data-title="Role">
-                  <span className="usa-sr-only">No user to remove</span>
+                  <span className="usa-sr-only">Role</span>
                   <UpdateUserForm
                     form={`updateOrganizationUser-${member.User.id}`}
                     initialValues={{ roleId: member.Role.id }}
@@ -219,11 +220,11 @@ function Edit({ actions }) {
                 <td data-title="Added">
                   {timeFrom(member.createdAt)}
                 </td>
-                <td data-title="Updated">
-                  {timeFrom(member.updatedAt)}
+                <td data-title="Last Signed In">
+                  {member.User.signedInAt ? timeFrom(member.User.signedInAt) : 'Never'}
                 </td>
                 <td data-title="Actions" className="table-actions">
-                  <span className="usa-sr-only">No user to remove</span>
+                  <span className="usa-sr-only">User actions</span>
                   <RemoveUserForm
                     form={`removeOrganizationUser-${member.User.id}`}
                     onSubmit={() => true}
@@ -239,6 +240,27 @@ function Edit({ actions }) {
                       }
                     }
                   />
+                  { (member.User.UAAIdentity.origin === 'uaa' || member.User.UAAIdentity.origin === 'cloud.gov')
+                    && !member.User.signedInAt && (
+                    <ResendInviteForm
+                      form={`resendInvite-${member.User.id}`}
+                      onSubmit={() => true}
+                      onSubmitSuccess={
+                        async (_, reduxDispatch) => {
+                          await actions.inviteToOrganization(
+                            org.id,
+                            {
+                              uaaEmail: member.User.UAAIdentity.email,
+                              user: member.User.id,
+                              roleID: member.Role.id,
+                              isResend: true,
+                            }
+                          );
+                          reduxDispatch(successNotification('Successfully resent invitation.'));
+                        }
+                      }
+                    />
+                  )}
                 </td>
               </tr>
             ))}
@@ -257,6 +279,7 @@ Edit.propTypes = {
     fetchOrganization: PropTypes.func.isRequired,
     fetchRoles: PropTypes.func.isRequired,
     inviteToOrganization: PropTypes.func.isRequired,
+    resendInviteToOrganization: PropTypes.func,
     removeOrganizationRole: PropTypes.func.isRequired,
     updateOrganizationRole: PropTypes.func.isRequired,
   }).isRequired,

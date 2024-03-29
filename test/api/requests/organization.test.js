@@ -154,7 +154,7 @@ describe('Organization API', () => {
       validateAgainstJSONSchema('POST', '/organization/{id}/invite', 400, response.body);
     });
 
-    it('returns the member and the invitation details for cloud.gov origin', async () => {
+    it('returns the member and the invitation details for cloud.gov origin upon invitation', async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
       const origin = 'cloud.gov'
@@ -200,6 +200,53 @@ describe('Organization API', () => {
         org.name
       );
     });
+
+    it('returns the member and the invitation details for cloud.gov origin upon resent invitation', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const roleId = userRole.id;
+      const origin = 'cloud.gov'
+      const isResend = true;
+
+      const [targetUser, org] = await Promise.all([
+        factory.user(),
+        factory.organization.create(),
+      ]);
+
+      await Promise.all([
+        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
+        targetUser.addOrganization(org, { through: { roleId } }),
+        factory.uaaIdentity({ userId: currentUser.id }),
+        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+      ]);
+
+      const inviteLink = 'https://example.com';
+
+      sinon.stub(OrganizationService, 'resendInvite')
+        .resolves({
+        email: uaaEmail,
+        inviteLink,
+        origin,
+      });
+
+      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+
+      const response = await authenticatedRequest
+        .post(`/v0/organization/${org.id}/invite`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ roleId, uaaEmail, isResend });
+
+      validateAgainstJSONSchema('POST', '/organization/{id}/invite', 200, response.body);
+      const { invite } = response.body;
+      expect(invite.email).to.eq(uaaEmail);
+      sinon.assert.calledOnceWithExactly(
+        Mailer.sendUAAInvite,
+        uaaEmail,
+        inviteLink,
+        origin,
+        org.name
+      );
+    });
+
 
     it('returns a 400 error if the user is a manager of an inactive organization', async () => {
       const uaaEmail = 'foo@bar.com';
