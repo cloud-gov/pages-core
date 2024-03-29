@@ -159,7 +159,7 @@ const afterCreate = async (build) => {
     const buildTasks = await BuildTask
       .byStartsWhen(BuildTaskType.StartsWhens.Build)
       .findAll({ where: { buildId: build.id } });
-    buildTasks.forEach(task => task.enqueue());
+    await Promise.all(buildTasks.map(async task => task.enqueue()));
   } catch (err) {
     console.error(err);
   }
@@ -173,7 +173,7 @@ const afterUpdate = async (build) => {
       const buildTasks = await BuildTask
         .byStartsWhen(BuildTaskType.StartsWhens.Complete)
         .findAll({ where: { buildId: build.id } });
-      buildTasks.forEach(task => task.enqueue());
+      await Promise.all(buildTasks.map(async task => task.enqueue()));
     } catch (err) {
       console.error(err);
     }

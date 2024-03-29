@@ -5,7 +5,7 @@ module.exports = wrapHandlers({
   async github(req, res) {
     const { body: payload } = req;
 
-    Webhooks.pushWebhookRequest(payload);
+    await Webhooks.pushWebhookRequest(payload);
 
     res.ok();
   },
@@ -13,7 +13,7 @@ module.exports = wrapHandlers({
   async organization(req, res) {
     const { body: payload } = req;
 
-    Webhooks.organizationWebhookRequest(payload);
+    await Webhooks.organizationWebhookRequest(payload);
 
     res.ok();
   },
