@@ -64,7 +64,7 @@ async function enqueue() {
   });
 
   await BuildTaskQueue.sendTaskMessage(fullBuildTask);
-  await this.update({ status: BuildTask.Statuses.Queued });
+  await this.update({ status: Statuses.Queued });
 }
 
 module.exports = (sequelize, DataTypes) => {
