@@ -7,6 +7,8 @@ const initResultsState = {
   offset: 0,
   logs: [],
   state: '',
+  isLoading: true,
+  totalRequests: 0,
 };
 
 export const useBuildLogs = (id) => {
@@ -25,6 +27,8 @@ export const useBuildLogs = (id) => {
         offset: fetchOffest + outputCount,
         logs: updatedLogs,
         state,
+        isLoading: false,
+        totalRequests: results.totalRequests + 1,
       };
 
       if (['created', 'processing', 'queued', 'tasked'].includes(state)) {
@@ -35,8 +39,14 @@ export const useBuildLogs = (id) => {
         }
       }
 
-      if (outputCount > 0 && ['success', 'error'].includes(state)) {
-        setResults(updatedResults);
+      if (['success', 'error'].includes(state)) {
+        if (outputCount > 0) {
+          setResults(updatedResults);
+        }
+
+        if (outputCount === 0 && results.totalRequests === 0) {
+          setResults(updatedResults);
+        }
       }
     }
 

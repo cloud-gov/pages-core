@@ -76,7 +76,7 @@ const BuildLogs = {
 
       return { output, byteLength };
     } catch (error) {
-      if (error.Code === 'InvalidRange') {
+      if (['InvalidRange', 'NoSuchKey'].includes(error.Code)) {
         return { output: null, byteLength: 0 };
       }
       throw error;
