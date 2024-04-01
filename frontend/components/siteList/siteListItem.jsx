@@ -26,7 +26,7 @@ function SiteListItem({ organization, site, user }) {
   return (
     <li className="sites-list-item">
       <div className="sites-list-item-text">
-        <h4 className="site-list-item-title">
+        <h2 className="site-list-item-title">
           {(!site.isActive || (organization && !organization.isActive))
             ? `${getSiteName(site)} (Inactive)`
             : (
@@ -35,12 +35,12 @@ function SiteListItem({ organization, site, user }) {
               </Link>
             )}
           {' '}
-        </h4>
+        </h2>
         {
           organization && (
-            <h5>
+            <h3>
               {`organization - ${organization.name}`}
-            </h5>
+            </h3>
           )
         }
         <RepoLastVerified site={site} userUpdated={user.updatedAt} />
