@@ -68,7 +68,7 @@ function Settings({
   };
 
   return (
-    <div>
+    <div className="user-settings">
       <div className="page-header usa-grid-full">
         <div className="usa-width-one-half">
           <h1>
@@ -77,14 +77,14 @@ function Settings({
         </div>
       </div>
       <div className="well">
-        <h3>Github Token</h3>
+        <h2>Github Token</h2>
         <GithubAuthButton
           onSuccess={onGithubAuthSuccess}
           onFailure={onGithubAuthFailure}
           text="Reset your Github Access Token."
           revokeFirst
         />
-        <h3>Build Notifications</h3>
+        <h2>Build Notifications</h2>
         <SettingsForm
           initialValues={initialValues}
           organizations={organizations.data}

@@ -73,7 +73,7 @@ describe('<Settings />', () => {
     const wrapper = shallow(<Settings {...props} />);
 
     expect(wrapper.contains(<h1>User Settings</h1>)).to.be.true;
-    expect(wrapper.contains(<h3>Build Notifications</h3>)).to.be.true;
-    expect(wrapper.contains(<h3>Github Token</h3>)).to.be.true;
+    expect(wrapper.contains(<h2>Build Notifications</h2>)).to.be.true;
+    expect(wrapper.contains(<h2>Github Token</h2>)).to.be.true;
   });
 });
