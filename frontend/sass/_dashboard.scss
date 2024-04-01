@@ -17,8 +17,6 @@
   }
 }
 
-
-
 .sites-list-item-text,
 .sites-list-item-actions {
   flex-grow: 1;
@@ -37,6 +35,14 @@
   .repo-verification {
     color: red;
   }
+}
+
+h2.site-list-item-title {
+  font-size: $h4-font-size;
+}
+
+.sites-list-item-text h3 {
+  font-size: $h5-font-size;
 }
 
 .sites-list-item-actions {

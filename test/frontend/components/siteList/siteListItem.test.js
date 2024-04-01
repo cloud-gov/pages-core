@@ -96,7 +96,7 @@ describe('<SiteListItem />', () => {
     const org = { ...testOrganization, isActive: false };
     wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} organization={org} />);
     expect(wrapper.find(Link)).to.have.length(0);
-    expect(wrapper.find('h4')).to.have.length(1);
+    expect(wrapper.find('h2')).to.have.length(1);
   });
 
   it('no Link if org site is inactive', () => {
@@ -109,17 +109,17 @@ describe('<SiteListItem />', () => {
       />
     );
     expect(wrapper.find(Link)).to.have.length(0);
-    expect(wrapper.find('h4')).to.have.length(1);
+    expect(wrapper.find('h2')).to.have.length(1);
   });
 
   it('no Link if non-org site is inactive', () => {
     const site = { ...testSite, isActive: false };
     wrapper = mountRouter(<SiteListItem site={site} user={testUser} />);
     expect(wrapper.find(Link)).to.have.length(0);
-    expect(wrapper.find('h4')).to.have.length(1);
+    expect(wrapper.find('h2')).to.have.length(1);
   });
 
-  it('outputs an h5 with the site\'s organization', () => {
+  it('outputs an h3 with the site\'s organization', () => {
     const organizationId = testOrganization.id;
     const updatedSite = { ...testSite, organizationId };
     wrapper = mountRouter(
@@ -129,10 +129,10 @@ describe('<SiteListItem />', () => {
         organization={testOrganization}
       />
     );
-    expect(wrapper.find('h5')).to.have.length(1);
+    expect(wrapper.find('h3')).to.have.length(1);
     expect(wrapper.find('p')).to.have.length(0); // is not sandbox
   });
-  it('outputs an h5 with the site\'s sandbox organization', () => {
+  it('outputs an h3 with the site\'s sandbox organization', () => {
     const organizationId = testOrganization.id;
     const updatedSite = { ...testSite, organizationId };
     wrapper = mountRouter(
@@ -143,17 +143,17 @@ describe('<SiteListItem />', () => {
       />
     );
     expect(wrapper.find('p')).to.have.length(1); // is sandbox
-    expect(wrapper.find('h5')).to.have.length(1);
+    expect(wrapper.find('h3')).to.have.length(1);
   });
 
-  it('outputs without an h5 with the site\'s organization', () => {
+  it('outputs without an h3 with the site\'s organization', () => {
     wrapper = mountRouter(
       <SiteListItem
         site={testSite}
         user={testUser}
       />
     );
-    expect(wrapper.find('h5')).to.have.length(0);
+    expect(wrapper.find('h3')).to.have.length(0);
   });
 
   it('outputs a link to the GitHub repo', () => {
