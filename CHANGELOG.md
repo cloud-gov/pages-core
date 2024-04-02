@@ -1,3 +1,37 @@
+## 0.7.0 (2024-04-02)
+
+### Added
+
+- Show last signin instead of last update in organization users list
+- Allow organization managers to resend invitations (#4371)
+- add accessibility scan (#4410)
+- update email layouts with new template (#4373)
+- add uswds identifier (#4413)
+- **admin**: add limited ability to register build tasks to a site
+- Update email invites based on user UAA origin #4370
+
+### Fixed
+
+- Fetch error for old build logs based on build details
+- resolve two async/await errors
+- Fix skipped heading levels in user settings page (#4396)
+- Fix skipped heading levels in sites list (#4396)
+- Add row header to published files table (#4397)
+- update reauthenication logic
+- update build task status logic (#4404)
+- Add message explaining that build logs are deleted after 180 days. (#4379)
+- Make invitation URL copyable (#4108)
+
+### Maintenance
+
+- vendor node dependencies
+- **ci**: use hardened node image, update playwright docs
+- try separate table dropping for user report test
+- update webpack and associated dependencies
+- Update passport deps and remove deprecated GH auth
+- update axios, remove unnecessary tests
+- **ci**: add hardened playwright, registry-image, general-task
+
 ## 0.6.1 (2024-02-22)
 
 ### Documentation
