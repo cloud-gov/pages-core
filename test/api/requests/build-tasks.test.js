@@ -159,7 +159,7 @@ describe('Build Task API', () => {
         .send({
           name: 'name',
           artifact: 'artifact',
-          status: 'created',
+          status: BuildTask.Statuses.Created,
         })
         .expect(403);
     });
@@ -173,7 +173,7 @@ describe('Build Task API', () => {
         .send({
           name: 'name',
           artifact: 'artifact',
-          status: 'created',
+          status: BuildTask.Statuses.Created,
         })
         .expect(404);
     });
@@ -183,7 +183,7 @@ describe('Build Task API', () => {
       const newTask = {
         name: 'new name',
         artifact: 'new artifact',
-        status: 'created',
+        status: BuildTask.Statuses.Created,
       };
 
       await request(app)
@@ -196,6 +196,27 @@ describe('Build Task API', () => {
       expect(dbTask.name).to.be.equal(newTask.name);
       expect(dbTask.artifact).to.be.equal(newTask.artifact);
       expect(dbTask.status).to.be.equal(newTask.status);
+    });
+
+    it('should not update a build task for certain statuses', async () => {
+      const { task } = await prepTasks();
+      await task.update({ status: BuildTask.Statuses.Error });
+      const newTask = {
+        name: 'new name',
+        artifact: 'new artifact',
+        status: BuildTask.Statuses.Processing,
+      };
+
+      await request(app)
+        .put(`/v0/tasks/${task.id}/${task.token}`)
+        .type('json')
+        .send(newTask)
+        .expect(403);
+
+      const dbTask = await BuildTask.findByPk(task.id);
+      expect(dbTask.name).to.be.equal(task.name);
+      expect(dbTask.artifact).to.be.equal(task.artifact);
+      expect(dbTask.status).to.be.equal(BuildTask.Statuses.Error);
     });
   });
 });

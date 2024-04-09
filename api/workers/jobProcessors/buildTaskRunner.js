@@ -52,7 +52,7 @@ async function buildTaskRunner(job) {
     logger.log(err);
     // TODO: should this hit the update endpoint instead?
     const errorTask = await BuildTask.findByPk(taskId);
-    await errorTask.update({ status: 'error' });
+    await errorTask.update({ status: BuildTask.Statuses.Error });
     return err;
   }
 }
