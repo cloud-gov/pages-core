@@ -116,6 +116,7 @@ module.exports = (sequelize, DataTypes) => {
 
   BuildTask.generateToken = generateToken;
   BuildTask.associate = associate;
+  BuildTask.Statuses = Statuses;
   BuildTask.siteScope = id => ({ method: ['bySite', id] });
   BuildTask.byStartsWhen = startsWhen => BuildTask.scope({ method: ['byStartsWhen', startsWhen] });
   BuildTask.prototype.enqueue = enqueue;
