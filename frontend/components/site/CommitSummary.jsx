@@ -49,9 +49,9 @@ function CommitSummary({ buildDetails }) {
         &nbsp;
         <span
           className="commit-time"
-          title={dateAndTime(buildDetails?.createdAt)}
+          title={dateAndTime(new Date(buildDetails?.createdAt))}
         >
-          {timeFrom(buildDetails?.createdAt)}
+          {timeFrom(new Date(buildDetails?.createdAt))}
         </span>
       </p>
     </div>
@@ -66,7 +66,7 @@ CommitSummary.propTypes = {
     branch: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
     clonedCommitSha: PropTypes.string.isRequired,
-    createdAt: PropTypes.instanceOf(Date).isRequired,
+    createdAt: PropTypes.string.isRequired,
   }),
 };
 

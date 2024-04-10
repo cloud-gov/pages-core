@@ -10,7 +10,20 @@
 .label-warning {
   background-color: $label-warning-bg-color;
 }
-
+.label-new {
+  margin-right: .25em;
+  -webkit-font-smoothing: antialiased;
+}
+.label-new,
+.label-warning {
+  svg {
+    width: 1.6rem;
+    height: 1.8rem;
+    margin-right: 0.4rem;
+    display: inline-block;
+    vertical-align: text-top;
+  }
+}
 
 h4.label {
   margin-bottom: 0;

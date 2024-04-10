@@ -36,6 +36,10 @@
 }
 
 .results-list {
+  .results-summary {
+    font-size: 1.2em;
+    font-weight: 600;
+  }
   .artifact-filename {}
   .artifact-filesize {
     color: $color-gray-dark;

@@ -7,12 +7,17 @@ import buildActions from '../../actions/buildActions';
 import { currentSite } from '../../selectors/site';
 import LoadingIndicator from '../LoadingIndicator';
 import RefreshBuildsButton from './refreshBuildsButton';
-import { duration, timeFrom, dateAndTime } from '../../util/datetime';
+import {
+  dateAndTimeSimple,
+  duration,
+  timeFrom,
+  dateAndTime,
+} from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
 import BranchViewLink from '../branchViewLink';
 import {
-  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
+  IconCheckCircle, IconClock, IconExclamationCircle, IconExperiment, IconSpinner, IconX,
 } from '../icons';
 import { getOrgById } from '../../selectors/organization';
 import { sandboxMsg } from '../../util';
@@ -20,38 +25,41 @@ import { sandboxMsg } from '../../util';
 export const REFRESH_INTERVAL = 15 * 1000;
 
 const buildStateData = ({ state, error }) => {
-  let messageIcon;
+  let messageDoneIcon;
   switch (state) {
     case 'error':
-      messageIcon = {
+      messageDoneIcon = {
         message: error === 'The build timed out' ? 'Timed out' : 'Failed',
+        done: true,
         icon: IconExclamationCircle,
       };
       break;
     case 'processing':
-      messageIcon = { message: 'In progress', icon: IconSpinner };
+      messageDoneIcon = { message: 'In progress', done: false, icon: IconSpinner };
       break;
     case 'skipped':
-      messageIcon = { message: 'Skipped', icon: null };
+      messageDoneIcon = { message: 'Skipped', done: true, icon: IconX };
       break;
     case 'queued':
+    case 'tasked':
     case 'created':
-      messageIcon = { message: 'Queued', icon: IconClock };
+      messageDoneIcon = { message: 'Queued', done: false, icon: IconClock };
       break;
     case 'success':
-      messageIcon = { message: 'Completed', icon: IconCheckCircle };
+      messageDoneIcon = { message: 'Completed', done: true, icon: IconCheckCircle };
       break;
     default:
-      messageIcon = { message: state, icon: null };
+      messageDoneIcon = { message: state, done: null, icon: null };
   }
-  return messageIcon;
+  return messageDoneIcon;
 };
 
-function buildLogsLink(build) {
-  return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/logs`}>View build logs</Link>;
+function buildLogsLink(build, cta = 'View build logs') {
+  return <Link className="build-info-logs-link" to={`/sites/${build.site.id}/builds/${build.id}/logs`}>{cta}</Link>;
 }
-function resultLink(build) {
-  return <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/scans`}>View scan results</Link>;
+
+function scansDocsLink(url, cta = 'What’s this?') {
+  return <Link className="usa-link" target="_blank" to={url}>{cta}</Link>;
 }
 
 function shaLink(build) {
@@ -88,40 +96,70 @@ function branchLink(build) {
 }
 
 function summarizeTaskResults(build) {
-  if (!build.BuildTasks || build.BuildTasks.length < 1) {
-    return (
-      <span> No scan queued </span>
-    );
-  }
+  const tasksSucceeded = build.BuildTasks.filter(task => task.status === 'success');
+  const tasksIncomplete = build.BuildTasks.filter(task => task.status !== 'success' && task !== 'error');
+  const anyTaskErrored = build.BuildTasks.find(task => task.status === 'error');
 
-  const tasksWithResults = build.BuildTasks.filter(task => task.status === 'success');
-  const allTasksErrored = build.BuildTasks.every(task => task.status === 'error');
-
-  if (tasksWithResults.length > 0) {
-    const totalResults = tasksWithResults.reduce((results, task) => results + task.count, 0);
+  function totalResults(results) {
     return (
       <>
-        { resultLink(build) }
-        <span>
+        {' ('}
+        <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/scans`}>
+          { results.reduce((acc, task) => acc + task.count, 0) }
           {' '}
-          (
-          { totalResults }
-          {' '}
-          issues)
-        </span>
+          issues found
+        </Link>
+        {') '}
       </>
     );
   }
+  // if all tasks succeeded, show # complete and any results
+  // if all tasks incomplete, show # complete out of total, and no results
+  // if some complete, some succeeded, show # complete out of total, and any results
 
-  if (allTasksErrored) {
+  if (anyTaskErrored) {
     return (
-      <span> Scan canceled </span>
+      <div className="label-warning">
+        <IconExclamationCircle />
+        One or more scans failed.
+        {' '}
+        <Link className="result-link" to={`/sites/${build.site.id}/builds/${build.id}/scans`}>Results</Link>
+        {' '}
+        may be incomplete.
+      </div>
     );
   }
-
-  return (
-    <span> Scan queued </span>
+  return !anyTaskErrored?.length > 0 && (
+    <div>
+      <b className="label-new">
+        <IconExperiment />
+        Public beta:
+      </b>
+      {(tasksIncomplete.length > 0) && (
+        <>
+          {tasksSucceeded.length}
+          {' '}
+          of
+          {' '}
+        </>
+      )}
+      {build.BuildTasks.length}
+      {' '}
+      scans completed.
+      {' '}
+      {(tasksSucceeded.length > 0) && totalResults(tasksSucceeded)}
+      (
+      {scansDocsLink('https://cloud.gov/pages/documentation/build-scans/')}
+      )
+    </div>
   );
+}
+
+function buildHasBuildTasks(build) {
+  return process.env.FEATURE_BUILD_TASKS === 'active' && build.BuildTasks?.length > 0;
+}
+function siteHasBuildTasks({ data, isLoading }) {
+  return process.env.FEATURE_BUILD_TASKS === 'active' && !isLoading && data.some(build => build.BuildTasks?.length);
 }
 
 function latestBuildByBranch(builds) {
@@ -206,29 +244,64 @@ function SiteBuilds() {
                 <tr>
                   <th scope="col">Build</th>
                   <th scope="col">Branch</th>
-                  <th scope="col">Results</th>
                   <th scope="col">Actions</th>
+                  { siteHasBuildTasks(builds) && (
+                    <th className="usa-sr-only" scope="col">Scans</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {builds.data.map((build) => {
-                  const { message, icon } = buildStateData(build);
+                  const { message, done, icon } = buildStateData(build);
 
                   return (
-                    <tr key={build.id}>
+                    <tr key={build.id} className={buildHasBuildTasks(build) ? 'build-has-scans' : ''}>
                       <th scope="row" data-title="Build">
                         <div className="build-info">
-                          <div className="build-info-icon">
-                            { icon && React.createElement(icon) }
+                          <div className="build-info-prefix">
+                            #
+                            { build.id }
                           </div>
                           <div className="build-info-details">
-                            <h3 className="build-info-status">{ message }</h3>
+                            <h3 className="build-info-status">
+                              { icon && (
+                                <span className="build-info-inline-icon">
+                                  { React.createElement(icon) }
+                                </span>
+                              )}
+                              { message }
+                            </h3>
+                            {build.startedAt && (
+                              <p>
+                                Started
+                                {' '}
+                                <span title={dateAndTimeSimple(build.startedAt)}>
+                                  { timeFrom(build.startedAt) }
+                                </span>
+                              </p>
+                            )}
                             <p>
-                              Build
-                              <b>
-                                #
-                                { build.id }
-                              </b>
+                              { (done && !!build.startedAt) && (
+                                <>
+                                  {message}
+                                  {' '}
+                                  after
+                                  {' '}
+                                  { duration(build.startedAt, build.completedAt) }
+                                </>
+                              )}
+                              {(!done) && (
+                                <>
+                                  {message}
+                                  {' '}
+                                  for
+                                  {' '}
+                                  { duration(build.createdAt, build.completedAt) }
+                                </>
+                              )}
+                              <br />
+                              {build.startedAt ? buildLogsLink(build) : ''}
+
                             </p>
                           </div>
                         </div>
@@ -248,24 +321,6 @@ function SiteBuilds() {
                           </div>
                         </div>
                       </td>
-                      <td data-title="Results">
-                        <ul className="results-list unstyled-list">
-                          <li className="result-item">
-                            { buildLogsLink(build) }
-                            <span>
-                              {' '}
-                              (
-                              { duration(build.startedAt, build.completedAt) }
-                              )
-                            </span>
-                          </li>
-                          { process.env.FEATURE_BUILD_TASKS === 'active' && build.BuildTasks && (
-                            <li className="result-item">
-                              { summarizeTaskResults(build) }
-                            </li>
-                          )}
-                        </ul>
-                      </td>
                       <td data-title="Actions" className="table-actions">
                         <div>
                           { previewBuilds[build.branch] === build.id && build.state === 'success'
@@ -280,19 +335,30 @@ function SiteBuilds() {
                         </div>
                         <span>
                           {
-                          ['error', 'success'].includes(build.state)
-                          && (
-                          <CreateBuildLink
-                            handlerParams={{ buildId: build.id, siteId: site.id }}
-                            handleClick={buildActions.restartBuild}
-                            className="usa-button small-button rebuild-button"
-                          >
-                            Rebuild
-                          </CreateBuildLink>
-                          )
-                        }
+                            ['error', 'success'].includes(build.state)
+                            && (
+                              <CreateBuildLink
+                                handlerParams={{ buildId: build.id, siteId: site.id }}
+                                handleClick={buildActions.restartBuild}
+                                className="usa-button small-button rebuild-button"
+                              >
+                                Rebuild
+                              </CreateBuildLink>
+                            )
+                          }
                         </span>
                       </td>
+                      { siteHasBuildTasks(builds) && (
+                        buildHasBuildTasks(build)
+                          ? (
+                            <td data-title="Scans" className="scan-results-pseudo-row">
+                              { summarizeTaskResults(build) }
+                            </td>
+                          )
+                          : (
+                            <td className="no-scan-results usa-sr-only">No scans for this build</td>
+                          )
+                      )}
                     </tr>
                   );
                 })}

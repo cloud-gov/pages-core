@@ -27,3 +27,39 @@
   }
 
 }
+.spinner-icon {
+  overflow: visible !important;
+  position: relative;
+  .spinner {
+    animation: rotate-spinner 3s infinite linear;
+    transform-origin: center;
+  }
+  .mask {
+    color: #fff;
+    opacity: .9;
+    animation: rotate-mask 1s infinite linear;
+    transform-origin: center;
+  }
+}
+@keyframes rotate-spinner {
+	0% {
+		transform: rotate(0deg);
+  }
+  50% {
+		transform: rotate(180deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+@keyframes rotate-mask {
+	0% {
+		transform: rotate(0deg);
+  }
+  50% {
+		transform: rotate(-180deg);
+  }
+	100% {
+		transform: rotate(-360deg);
+  }
+}

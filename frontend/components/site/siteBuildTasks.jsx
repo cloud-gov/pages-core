@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import prettyBytes from 'pretty-bytes';
 import {
-  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner,
+  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX,
 } from '../icons';
 import { useBuildDetails } from '../../hooks';
 import CommitSummary from './CommitSummary';
@@ -16,39 +16,42 @@ export const REFRESH_INTERVAL = 15 * 10000;
 const taskSummaryIcon = ({ status, count }) => {
   let summary;
   let icon;
+  let state;
   switch (status) {
     case 'error':
-      summary = 'Scan canceled';
-      icon = IconExclamationCircle;
+      state = 'Failed';
+      summary = 'Scan failed before results could be found';
+      icon = IconX;
       break;
     case 'processing':
+      state = 'Processing';
       summary = 'Scan in progress';
       icon = IconSpinner;
       break;
-    case 'skipped':
-      summary = 'Scan skipped';
-      icon = null;
-      break;
     case 'queued':
     case 'created':
+      state = 'Queued';
       summary = 'Scan queued';
       icon = IconClock;
       break;
     case 'success':
       if (count === 1) {
-        summary = '1 issue found';
+        icon = IconExclamationCircle;
+        state = '1 issue found';
       } else if (count > 1) {
-        summary = `${count} issues found`;
+        icon = IconExclamationCircle;
+        state = `${count} issues found`;
       } else {
-        summary = 'No issues found';
+        icon = IconCheckCircle;
+        state = 'No issues found';
       }
-      icon = IconCheckCircle;
+      summary = 'Full details available:';
       break;
     default:
       summary = status;
       icon = null;
   }
-  return { summary, icon };
+  return { summary, icon, state };
 };
 
 const SiteBuildTasks = () => {
@@ -108,15 +111,12 @@ const SiteBuildTasks = () => {
               </thead>
               <tbody>
                 {buildTasks.map((task) => {
-                  const { summary, icon } = taskSummaryIcon(task);
+                  const { summary, icon, state } = taskSummaryIcon(task);
 
                   return (
                     <tr key={task.id}>
                       <th scope="row" data-title="Scan">
                         <div className="build-info">
-                          <div className="build-info-icon" title={task.status}>
-                            { icon && React.createElement(icon) }
-                          </div>
                           <div className="build-info-details">
                             <h3 className="build-info-status">{ task.BuildTaskType.name }</h3>
                             <p className="build-info-details">
@@ -130,28 +130,35 @@ const SiteBuildTasks = () => {
                         </div>
                       </th>
                       <td data-title="Results">
-                        <ul className="results-list unstyled-list">
-                          <li className="result-item">
-                            { summary }
-                            <br />
-                          </li>
-                          {task.status === 'success' && task.artifact && task.artifact.url && (
+                        <div className="build-info-details">
+                          <h4 className="build-info-status">
+                            <span className="build-info-inline-icon">
+                              { icon && React.createElement(icon) }
+                            </span>
+                            {state}
+                          </h4>
+                          <ul className="results-list unstyled-list">
                             <li className="result-item">
-                              <Link
-                                to={task.artifact.url}
-                                title={'Download scan results for ' && task.BuildTaskType.name}
-                                className="artifact-filename"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Download scan results
-                              </Link>
-                              <span className="artifact-filesize">
-                                &nbsp;({ prettyBytes(task.artifact.size) })
-                              </span>
+                              {summary}
                             </li>
-                          )}
-                        </ul>
+                            {task.status === 'success' && task.artifact?.url && (
+                              <li className="result-item">
+                                <Link
+                                  to={task.artifact.url}
+                                  title={'Download scan results for ' && task.BuildTaskType.name}
+                                  className="artifact-filename"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Download scan results
+                                </Link>
+                                <span className="artifact-filesize">
+                                  &nbsp;({ prettyBytes(task.artifact.size) })
+                                </span>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
                       </td>
 
                     </tr>

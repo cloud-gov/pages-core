@@ -27,9 +27,7 @@
       "enum": [
         "error",
         "processing",
-        "skipped",
         "success",
-        "tasked",
         "queued",
         "created"
       ]
