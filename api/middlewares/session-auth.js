@@ -1,6 +1,7 @@
 const utils = require('../utils');
 const config = require('../../config');
 const EventCreator = require('../services/EventCreator');
+const { Event } = require('../models');
 
 module.exports = function sessionAuth(req, res, next) {
   req.session.authRedirectPath = undefined;
