@@ -6,6 +6,7 @@ const {
     appEnv,
   },
   redis: redisConfig,
+  queues: queuesConfig,
 } = require('../../config');
 
 const { logger } = require('../../winston');
@@ -84,7 +85,12 @@ function pagesWorker(connection) {
   const workers = [
     new QueueWorker(ArchiveBuildLogsQueueName, connection,
       path.join(__dirname, 'jobProcessors', 'archiveBuildLogsDaily.js')),
-    new QueueWorker(BuildTasksQueueName, connection, buildTasksProcessor),
+    new QueueWorker(
+      BuildTasksQueueName,
+      connection,
+      buildTasksProcessor,
+      { concurrency: queuesConfig.buildTasksConcurrency }
+    ),
     new QueueWorker(DomainQueueName, connection, domainJobProcessor),
     new QueueWorker(FailStuckBuildsQueueName, connection, failBuildsProcessor),
     new QueueWorker(MailQueueName, connection, mailJobProcessor),

@@ -3,12 +3,7 @@ const parse = require('json-templates');
 
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const HttpClient = require('./httpClient');
-
-function sleep(ms) {
-  return function runSleep(res) {
-    return new Promise(resolve => setTimeout(() => resolve(res), ms));
-  };
-}
+const { wait } = require('.');
 
 function filterEntity(res, name, field = 'name') {
   const errMsg = `Not found: Entity @${field} = ${name}`;
@@ -104,8 +99,19 @@ class CloudFoundryAPIClient {
     return this.fetchTaskByName(`build-${buildId}`);
   }
 
+  async fetchTaskByGuid(guid) {
+    const response = await this.authRequest('GET', `/v3/tasks/${guid}`);
+
+    if (response?.errors) {
+      return null;
+    }
+
+    return response;
+  }
+
   fetchTaskByName(name) {
-    return this.fetchTasks({ names: name }).then(tasks => tasks.find(task => task.name === name));
+    return this.fetchTasks({ names: name })
+      .then(tasks => tasks.find(task => task.name === name));
   }
 
   fetchTasks(params) {
@@ -116,15 +122,88 @@ class CloudFoundryAPIClient {
     );
   }
 
-  async startBuildTask(task, job) {
+  /**
+  * Polls a CF Task instance for a finished state
+  * Defaults to 1 hour of polling in 15 second intervals
+  * It cancels the task if it runs passed the number of total attempts
+  * @async
+  * @method pollTaskStatus
+  * @param {string} guid - The cf task guid.
+  * @param {Object} options - The options for polling.
+  * @param {number} [options.attempt=1] - The starting attempt count.
+  * @param {number} [options.totalAttempts=240] - The total number of attempts
+  * @param {number} [options.sleepNumber=15000] - The milliseconds
+  * to wait before the next attempt
+  * @return {Promise<{Object}>} An object with the state value or possible error
+  */
+  async pollTaskStatus(
+    guid,
+    { attempt = 1, totalAttempts = 240, sleepInterval = 15000 } = {}
+  ) {
+    if (attempt > totalAttempts) {
+      await this.cancelTask(guid);
+      const totalMins = ((sleepInterval / 1000) * totalAttempts) / 60;
+
+      throw new Error(`Task timed out after ${totalMins} minutes`);
+    }
+
+    const response = await this.fetchTaskByGuid(guid);
+
+    if (!response) {
+      throw new Error('Task not found');
+    }
+
+    if (['SUCCEEDED', 'FAILED'].includes(response.state)) {
+      return {
+        state: response.state,
+      };
+    }
+
+    const nextAttempt = attempt + 1;
+    await wait(sleepInterval);
+
+    return this.pollTaskStatus(guid, {
+      attempt: nextAttempt,
+      totalAttempts,
+      sleepInterval,
+    });
+  }
+
+  async startBuildTask(
+    task,
+    job,
+    { attempt = 1, totalAttempts = 3, sleepInterval = 1000 } = {}
+  ) {
     // construct the task parameter template by filling in values from the BuildTaskType metadata
     // TODO: link to template documentation
     const template = parse(task.BuildTaskType.metadata.template);
 
     const taskParams = template({ task, job });
 
-    const appGUID = await this.fetchTaskAppGUID(task.BuildTaskType.metadata.appName);
-    return this.authRequest('POST', `/v3/apps/${appGUID}/tasks`, taskParams);
+    const appGUID = await this.fetchTaskAppGUID(
+      task.BuildTaskType.metadata.appName
+    );
+
+    try {
+      return await this.authRequest(
+        'POST',
+        `/v3/apps/${appGUID}/tasks`,
+        taskParams
+      );
+    } catch (error) {
+      if (attempt === totalAttempts) {
+        throw error;
+      }
+
+      const nextAttempt = attempt + 1;
+      const retryOptions = {
+        attempt: nextAttempt,
+        totalAttempts,
+        sleepInterval,
+      };
+      await wait(sleepInterval);
+      return this.startBuildTask(task, job, retryOptions);
+    }
   }
 
   /**
@@ -286,7 +365,7 @@ class CloudFoundryAPIClient {
     return this.authClient.accessToken();
   }
 
-  retry(
+  async retry(
     methodName,
     args,
     {
@@ -303,14 +382,15 @@ class CloudFoundryAPIClient {
       !res
       || ['initial', 'in progress'].includes(res?.last_operation?.state)
     ) {
-      return this[methodName](...methodArgs)
-        .then(sleep(retries * sleepInterval))
-        .then(next => this.retry(methodName, methodArgs, {
-          res: next,
-          retries: retries + 1,
-          totalRetries,
-          sleepInterval,
-        }));
+      const next = await this[methodName](...methodArgs);
+      await wait(retries * sleepInterval);
+
+      return this.retry(methodName, methodArgs, {
+        res: next,
+        retries: retries + 1,
+        totalRetries,
+        sleepInterval,
+      });
     }
 
     return res;
@@ -339,6 +419,5 @@ CloudFoundryAPIClient.findEntity = findEntity;
 CloudFoundryAPIClient.firstEntity = firstEntity;
 CloudFoundryAPIClient.objToQueryParams = objToQueryParams;
 CloudFoundryAPIClient.buildRequestBody = buildRequestBody;
-CloudFoundryAPIClient.sleep = sleep;
 
 module.exports = CloudFoundryAPIClient;

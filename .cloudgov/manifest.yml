@@ -49,6 +49,7 @@ applications:
       CF_CDN_SPACE_NAME: ((cf_cdn_space_name))
       CF_DOMAIN_WITH_CDN_PLAN_GUID: 440cce96-8989-428b-a60e-91c1393bf3f2
       NEW_RELIC_ERROR_COLLECTOR_ENABLED: false
+      QUEUES_BUILD_TASKS_CONCURRENCY: ((queues_build_tasks_concurrency))
   - name: pages-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
