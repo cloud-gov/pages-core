@@ -1,3 +1,14 @@
+## 0.7.1 (2024-04-11)
+
+### Fixed
+
+- import Event model for logout error logging
+- prevent restarting build tasks, use enum, add test
+
+### Documentation
+
+- Add frontend conventions to DEVELOPMENT.md
+
 ## 0.7.0 (2024-04-02)
 
 ### Added
