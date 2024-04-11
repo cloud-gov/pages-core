@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const { Op } = require('sequelize');
+
 const URLSafeBase64 = require('urlsafe-base64');
 
 const { buildEnum } = require('../utils');
@@ -63,7 +65,27 @@ async function enqueue() {
     ],
   });
 
-  await BuildTaskQueue.sendTaskMessage(fullBuildTask);
+  // higher number priority (lower actual priority) is given to tasks whose site
+  // has more running (non-error/success) tasks already
+  // https://docs.bullmq.io/guide/jobs/prioritized
+  const { count: priority } = await BuildTask.findAndCountAll({
+    where: {
+      [Op.and]: [
+        { '$Build.site$': fullBuildTask.Build.Site.id },
+        {
+          status: {
+            [Op.notIn]: [
+              BuildTask.Statuses.Error,
+              BuildTask.Statuses.Success,
+            ],
+          },
+        },
+      ],
+    },
+    include: { model: Build, required: true },
+  });
+
+  await BuildTaskQueue.sendTaskMessage(fullBuildTask, priority);
   await this.update({ status: Statuses.Queued });
 }
 
