@@ -65,6 +65,23 @@ describe('notifyOrganizations', () => {
       .to.eql(o.Sites.map(v => v.id)));
   };
 
+  it('includes UAA identities for users who have them', async () => {
+    let org;
+    const orgsToNotify = [];
+    org = await createSandboxOrgDaysRemaining();
+    const user = org.Users[0];
+    await factory.uaaIdentity({ userId: user.id });
+
+    orgsToNotify.push(org.id);
+
+    await notifyOrganizations(moment().toDate());
+
+    expect(mailerSpy.callCount).to.equal(1);
+    expect(mailerSpy.args[0][0].Users.length).to.equal(1);
+    expect(mailerSpy.args[0][0].Users[0].id).to.equal(user.id);
+    expect(mailerSpy.args[0][0].Users[0]).to.haveOwnProperty('UAAIdentity');
+  });
+
   it('notifies agencies with schedule date', async () => {
     let org;
     const orgsToNotify = [];
