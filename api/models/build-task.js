@@ -14,7 +14,12 @@ const Statuses = buildEnum([
   'success',
 ]);
 
-const associate = ({ BuildTask, Build, BuildTaskType }) => {
+const associate = ({
+  BuildTask,
+  Build,
+  BuildTaskType,
+  Site,
+}) => {
   BuildTask.belongsTo(Build, {
     foreignKey: 'buildId',
     allowNull: false,
@@ -28,10 +33,14 @@ const associate = ({ BuildTask, Build, BuildTaskType }) => {
       '$Build.site$': id,
     },
     include: [
+      BuildTaskType,
       {
         model: Build,
+        required: true,
+        include: [
+          { model: Site, required: true },
+        ],
       },
-      BuildTaskType,
     ],
   }));
   BuildTask.addScope('byStartsWhen', startsWhen => ({

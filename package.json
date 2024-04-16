@@ -105,7 +105,8 @@
     "queued-builds-check": "node ./scripts/queued-builds-check.js",
     "test:e2e": "yarn playwright test",
     "create-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/create-test-users.js",
-    "remove-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/remove-test-users.js"
+    "remove-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/remove-test-users.js",
+    "run-scans-for-build": "node ./scripts/run-scans-for-build.js"
   },
   "main": "index.js",
   "repository": {
