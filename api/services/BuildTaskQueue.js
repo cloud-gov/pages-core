@@ -71,7 +71,7 @@ BuildTaskQueue.sendTaskMessage = async (buildTask, priority) => {
   const message = await BuildTaskQueue.messageBodyForBuild(buildTask);
   await setupBucket(buildTask.Build);
 
-  return BuildTaskQueue.bullClient.add('sendTaskMessage', message, { priority });
+  return BuildTaskQueue.bullClient.add(buildTask.BuildTaskType.name, message, { priority });
 };
 
 module.exports = BuildTaskQueue;

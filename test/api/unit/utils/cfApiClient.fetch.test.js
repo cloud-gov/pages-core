@@ -180,6 +180,46 @@ describe('CloudFoundryAPIClient', () => {
     });
   });
 
+  describe('.fetchTaskByGuid', () => {
+    describe('when the task is found', () => {
+      it('returns the task', async () => {
+        const guid = 'foo';
+        const stubArg1 = 'GET';
+        const stubArg2 = `/v3/tasks/${guid}`;
+        const stubResult = { guid };
+
+        const apiClient = new CloudFoundryAPIClient();
+
+        const fetchTasksStub = sinon.stub(apiClient, 'authRequest');
+        fetchTasksStub.resolves(stubResult);
+
+        const result = await apiClient.fetchTaskByGuid(guid);
+
+        expect(result).to.deep.equal({ guid });
+        sinon.assert.calledOnceWithExactly(fetchTasksStub, stubArg1, stubArg2);
+      });
+    });
+
+    describe('when the task is not found', () => {
+      it('returns null', async () => {
+        const guid = 'foo';
+        const stubArg1 = 'GET';
+        const stubArg2 = `/v3/tasks/${guid}`;
+        const stubResult = { errors: [] };
+
+        const apiClient = new CloudFoundryAPIClient();
+
+        const fetchTasksStub = sinon.stub(apiClient, 'authRequest');
+        fetchTasksStub.resolves(stubResult);
+
+        const result = await apiClient.fetchTaskByGuid(guid);
+
+        sinon.assert.calledOnceWithExactly(fetchTasksStub, stubArg1, stubArg2);
+        expect(result).to.be.null;
+      });
+    });
+  });
+
   describe('.fetchTaskByName', () => {
     describe('when the task is found', () => {
       it('returns the only the named task from the results of `fetchTasks`', async () => {
@@ -268,7 +308,7 @@ describe('CloudFoundryAPIClient', () => {
         const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
         cancelTaskStub.resolves();
 
-        const error = await apiClient.cancelBuildTask(buildId).catch((e) => e);
+        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
 
         sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
         sinon.assert.notCalled(cancelTaskStub);
@@ -288,7 +328,7 @@ describe('CloudFoundryAPIClient', () => {
         const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
         cancelTaskStub.rejects();
 
-        const error = await apiClient.cancelBuildTask(buildId).catch((e) => e);
+        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
 
         sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
         sinon.assert.calledOnceWithExactly(cancelTaskStub, taskGuid);
@@ -313,6 +353,96 @@ describe('CloudFoundryAPIClient', () => {
         'POST',
         `/v3/tasks/${taskGuid}/actions/cancel`
       );
+    });
+  });
+
+  describe('.pollTaskStatus', () => {
+    it('throws an error if the task does not exist', async () => {
+      const taskGuid = 'abc123';
+      const apiClient = new CloudFoundryAPIClient();
+
+      const stub = sinon.stub(apiClient, 'fetchTaskByGuid');
+      stub.resolves(null);
+
+      const response = await apiClient
+        .pollTaskStatus(taskGuid)
+        .catch(err => err);
+
+      expect(response).to.throw;
+      expect(response.message).to.equal('Task not found');
+      sinon.assert.calledOnceWithExactly(stub, taskGuid);
+    });
+
+    it('throws an error if pollTaskStatus times out', async () => {
+      const taskGuid = 'abc123';
+      const status = { state: 'PENDING' };
+      const apiClient = new CloudFoundryAPIClient();
+
+      const stubStatus = sinon.stub(apiClient, 'fetchTaskByGuid');
+      stubStatus.resolves(status);
+
+      const stubCancelTask = sinon.stub(apiClient, 'cancelTask');
+      stubCancelTask.resolves();
+
+      const response = await apiClient
+        .pollTaskStatus(taskGuid, { totalAttempts: 5, sleepInterval: 0 })
+        .catch(err => err);
+
+      expect(response).to.throw;
+      expect(response.message).to.equal('Task timed out after 0 minutes');
+      expect(stubStatus.callCount).to.equal(5);
+      sinon.assert.calledWith(stubStatus, taskGuid);
+      sinon.assert.calledOnceWithExactly(stubCancelTask, taskGuid);
+    });
+
+    it('should return the state of a SUCCEEDED task', async () => {
+      const taskGuid = 'abc123';
+      const state = 'SUCCEEDED';
+      const statusPending = { state: 'PENDING' };
+      const statusComplete = { state };
+
+      const apiClient = new CloudFoundryAPIClient();
+
+      const stubStatus = sinon.stub(apiClient, 'fetchTaskByGuid');
+      stubStatus
+        .onFirstCall()
+        .resolves(statusPending)
+        .onSecondCall()
+        .resolves(statusPending)
+        .onThirdCall()
+        .resolves(statusComplete);
+
+      const response = await apiClient
+        .pollTaskStatus(taskGuid, { totalAttempts: 5, sleepInterval: 0 });
+
+      expect(response.state).to.equal(state);
+      expect(stubStatus.callCount).to.equal(3);
+      sinon.assert.calledWith(stubStatus, taskGuid);
+    });
+
+    it('should return the state of a FAILED task', async () => {
+      const taskGuid = 'abc123';
+      const state = 'FAILED';
+      const statusPending = { state: 'PENDING' };
+      const statusComplete = { state };
+
+      const apiClient = new CloudFoundryAPIClient();
+
+      const stubStatus = sinon.stub(apiClient, 'fetchTaskByGuid');
+      stubStatus
+        .onFirstCall()
+        .resolves(statusPending)
+        .onSecondCall()
+        .resolves(statusPending)
+        .onThirdCall()
+        .resolves(statusComplete);
+
+      const response = await apiClient
+        .pollTaskStatus(taskGuid, { totalAttempts: 5, sleepInterval: 0 });
+
+      expect(response.state).to.equal(state);
+      expect(stubStatus.callCount).to.equal(3);
+      sinon.assert.calledWith(stubStatus, taskGuid);
     });
   });
 
@@ -372,7 +502,7 @@ describe('CloudFoundryAPIClient', () => {
         .onCall(3)
         .resolves(resource)
         .onCall(4)
-        .resolves(resource)
+        .resolves(resource);
 
       const response = await apiClient.retry(method, name, {
         sleepInterval: 1,
