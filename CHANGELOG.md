@@ -1,3 +1,15 @@
+## 0.8.0 (2024-04-17)
+
+### Added
+
+- Revamp build scan display per #4446
+- Add concurrency and polling to build task queue worker
+- add build scan priority (#4476)
+
+### Maintenance
+
+- **admin**: add extra information for testing scans
+
 ## 0.7.1 (2024-04-11)
 
 ### Fixed
