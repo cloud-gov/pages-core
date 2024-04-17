@@ -11,11 +11,11 @@ describe('datetime', () => {
 
   describe('duration()', () => {
     it('shows a human readable duration when provided two dates', () => {
-      expect(duration(startTime, endTime)).to.equal('4 minutes');
+      expect(duration(startTime, endTime)).to.equal('3 minutes');
     });
 
     it('works if endTime isn\'t defined', () => {
-      expect(duration(+new Date())).to.equal('less than a minute');
+      expect(duration(+new Date())).to.equal('0 seconds');
     });
 
     it('provides a fallback if startTime isn\'t defined', () => {

@@ -1,5 +1,5 @@
 import {
-  format, formatDistance, formatDistanceStrict, parseISO,
+  format, formatDistanceStrict, parseISO,
 } from 'date-fns';
 
 const NO_TIME = '-';
@@ -44,7 +44,7 @@ export const duration = compat((startTime, endTime) => {
   }
 
   const baseTime = endTime || new Date();
-  return formatDistance(startTime, baseTime);
+  return formatDistanceStrict(startTime, baseTime, { roundingMethod: 'floor' });
 });
 
 /**
@@ -71,6 +71,19 @@ export const dateAndTime = compat((date) => {
   }
 
   return format(date, 'MMMM do yyyy, h:mm:ss aaaa');
+});
+
+/**
+ * Return a shorter human-readable day, months and year (i.e. Dec 25, 2020 at 5:22 PM (GMT-5) )
+ * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
+ * @return {String}
+ */
+export const dateAndTimeSimple = compat((date) => {
+  if (!date) {
+    return NO_TIME;
+  }
+
+  return format(date, "MMM d, yyyy 'at' h:mm aa (z)");
 });
 
 /**

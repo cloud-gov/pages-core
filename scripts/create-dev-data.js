@@ -529,6 +529,7 @@ async function createData() {
     buildId: nodeSiteBuilds[0].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
+    status: 'created',
     artifact: null,
     count: null,
   });
@@ -536,7 +537,7 @@ async function createData() {
     buildId: nodeSiteBuilds[2].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'created', // initial value, 'processing' or 'queued' haven't been made yet
+    status: 'processing',
     artifact: null,
     message: 'Scan in progress',
     count: null,
@@ -545,9 +546,9 @@ async function createData() {
     buildId: nodeSiteBuilds[4].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'error',
+    status: 'processing',
     artifact: null,
-    message: 'Scan could not be completed',
+    message: 'Scan in progress',
     count: null,
   });
   await BuildTask.create({
@@ -555,7 +556,7 @@ async function createData() {
     buildTaskTypeId: taskType1.id,
     name: 'type',
     status: 'success',
-    artifact: 'filename-1234.html',
+    artifact: null,
     message: 'Scan successfully completed. See artifact for details.',
     count: 0,
   });
@@ -564,7 +565,7 @@ async function createData() {
     buildTaskTypeId: taskType1.id,
     name: 'type',
     status: 'success',
-    artifact: 'filename-1234.html',
+    artifact: null,
     message: 'Scan successfully completed. See artifact for details.',
     count: 42,
   });
@@ -583,6 +584,7 @@ async function createData() {
     buildId: nodeSiteBuilds[0].id,
     buildTaskTypeId: taskType2.id,
     name: 'type',
+    status: 'created',
     artifact: null,
     count: null,
   });
@@ -590,7 +592,7 @@ async function createData() {
     buildId: nodeSiteBuilds[2].id,
     buildTaskTypeId: taskType2.id,
     name: 'type',
-    status: 'created', // initial value, 'processing' or 'queued' haven't been made yet
+    status: 'processing',
     artifact: null,
     message: 'Scan in progress',
     count: null,
@@ -618,7 +620,7 @@ async function createData() {
     buildTaskTypeId: taskType2.id,
     name: 'type',
     status: 'success',
-    artifact: 'WCAG-scan.txt',
+    artifact: null,
     message: 'Scan successfully completed. See artifact for details.',
     count: 3,
   });
