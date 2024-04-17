@@ -95,6 +95,7 @@ module.exports = wrapHandlers({
         { model: SiteBuildTask, include: [BuildTaskType] },
       ],
     });
+
     if (!site) return res.notFound();
 
     return res.json(serializeNew(site, true));
