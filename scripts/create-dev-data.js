@@ -546,9 +546,9 @@ async function createData() {
     buildId: nodeSiteBuilds[4].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
-    status: 'processing',
+    status: 'cancelled',
     artifact: null,
-    message: 'Scan in progress',
+    message: 'Scan cancelled',
     count: null,
   });
   await BuildTask.create({
@@ -601,9 +601,9 @@ async function createData() {
     buildId: nodeSiteBuilds[4].id,
     buildTaskTypeId: taskType2.id,
     name: 'type',
-    status: 'error',
+    status: 'cancelled',
     artifact: null,
-    message: 'Scan could not be completed',
+    message: 'Scan cancelled',
     count: null,
   });
   await BuildTask.create({
@@ -612,7 +612,7 @@ async function createData() {
     name: 'type',
     status: 'error',
     artifact: null,
-    message: 'Scan could not be completed',
+    message: 'Scan failed',
     count: null,
   });
   await BuildTask.create({

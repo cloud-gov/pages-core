@@ -168,15 +168,21 @@ const afterCreate = async (build) => {
 const afterUpdate = async (build) => {
   // we start certain build tasks on build completion
   const { BuildTask, BuildTaskType } = build.sequelize.models;
-  if (build.state === States.Success) {
-    try {
+  try {
+    if (build.state === States.Success) {
       const buildTasks = await BuildTask
         .byStartsWhen(BuildTaskType.StartsWhens.Complete)
         .findAll({ where: { buildId: build.id, status: BuildTask.Statuses.Created } });
       await Promise.all(buildTasks.map(async task => task.enqueue()));
-    } catch (err) {
-      console.error(err);
+    } else if (build.state === States.Error) {
+      const buildTasks = await BuildTask
+        .findAll({ where: { buildId: build.id } });
+      await Promise.all(buildTasks.map(async task => (
+        task.update({ status: BuildTask.Statuses.Cancelled })
+      )));
     }
+  } catch (err) {
+    console.error(err);
   }
 };
 

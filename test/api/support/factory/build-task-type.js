@@ -8,7 +8,7 @@ const _attributes = ({
   description: description || 'build task type description',
   metadata: metadata || { some: 'metadata' },
   runner: runner || 'cf_task',
-  startsWhen: startsWhen || 'build',
+  startsWhen: startsWhen || 'complete',
 });
 
 const buildTaskType = overrides => Promise.props(_attributes(overrides))
