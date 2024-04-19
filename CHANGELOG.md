@@ -1,3 +1,9 @@
+## 0.8.1 (2024-04-19)
+
+### Maintenance
+
+- for build task targets, use domain for production branch urls
+
 ## 0.8.0 (2024-04-17)
 
 ### Added
