@@ -1,5 +1,5 @@
 const {
-  BuildTask, BuildTaskType, Build, Site,
+  BuildTask, BuildTaskType,
 } = require('../../models');
 const { createJobLogger } = require('./utils');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
@@ -17,19 +17,7 @@ async function buildTaskRunner(
 
   logger.log(`Running build task id: ${taskId}`);
   try {
-    const task = await BuildTask.findByPk(taskId, {
-      include: [
-        { model: BuildTaskType, required: true },
-        {
-          model: Build,
-          required: true,
-          include: [{ model: Site, required: true }],
-        },
-      ],
-      raw: true,
-      nest: true,
-    });
-
+    const task = await BuildTask.forRunner().findByPk(taskId);
     const taskTypeRunner = task.BuildTaskType.runner;
     const { branch, Site: site } = task.Build;
     const { owner, repository } = site;
@@ -37,11 +25,22 @@ async function buildTaskRunner(
 
     let cfResponse;
 
+    // TODO: rewrite; some tasks rely on scanning the final build url:
+    // for non-production sites, this is task.Build.url
+    // for production sites, we overwrite that value with the production domain
+    const siteBranchConfig = site.SiteBranchConfigs
+      .find(sbc => sbc.branch === task.Build.branch);
+
     if (taskTypeRunner === BuildTaskType.Runners.Cf_task) {
       try {
         logger.log(`Starting ${taskTypeRunner} for ${owner}/${repository} on branch ${branch}`);
 
-        cfResponse = await apiClient.startBuildTask(task, job, { sleepInterval });
+        const rawTask = task.get({ plain: true });
+        if (siteBranchConfig?.Domains?.length) {
+          const domain = siteBranchConfig.Domains[0]; // TODO: always the first domain
+          rawTask.Build.url = `https://${domain.names.split(',')[0]}`;
+        }
+        cfResponse = await apiClient.startBuildTask(rawTask, job, { sleepInterval });
 
         if (cfResponse.state === 'FAILED') {
           logger.log(`CF task failed for ${taskTypeRunner} ${taskId}`);

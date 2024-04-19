@@ -18,7 +18,9 @@ const associate = ({
   BuildTask,
   Build,
   BuildTaskType,
+  Domain,
   Site,
+  SiteBranchConfig,
 }) => {
   BuildTask.belongsTo(Build, {
     foreignKey: 'buildId',
@@ -48,6 +50,21 @@ const associate = ({
       '$BuildTaskType.startsWhen$': startsWhen,
     },
     include: BuildTaskType,
+  }));
+  BuildTask.addScope('forRunner', () => ({
+    include: [
+      BuildTaskType,
+      {
+        model: Build,
+        include: {
+          model: Site,
+          include: {
+            model: SiteBranchConfig,
+            include: Domain,
+          },
+        },
+      },
+    ],
   }));
 };
 
@@ -150,6 +167,7 @@ module.exports = (sequelize, DataTypes) => {
   BuildTask.Statuses = Statuses;
   BuildTask.siteScope = id => ({ method: ['bySite', id] });
   BuildTask.byStartsWhen = startsWhen => BuildTask.scope({ method: ['byStartsWhen', startsWhen] });
+  BuildTask.forRunner = () => BuildTask.scope({ method: ['forRunner'] });
   BuildTask.prototype.enqueue = enqueue;
   return BuildTask;
 };

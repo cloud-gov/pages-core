@@ -6,7 +6,6 @@ const QueueWorker = require('../../../../api/workers/QueueWorker');
 const {
   Build,
   BuildTask,
-  BuildTaskType,
   Site,
 } = require('../../../../api/models');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
@@ -18,19 +17,6 @@ const jobProcessors = require('../../../../api/workers/jobProcessors');
 const { wait } = require('../../../../api/utils');
 const { redis: redisConfig } = require('../../../../config');
 const factory = require('../../support/factory');
-
-const buildTaskIncludesOptions = {
-  include: [
-    { model: BuildTaskType, required: true },
-    {
-      model: Build,
-      required: true,
-      include: [{ model: Site, required: true }],
-    },
-  ],
-  raw: true,
-  nest: true,
-};
 
 const testJobOptions = { sleepNumber: 0, totalAttempts: 240 };
 
@@ -140,7 +126,7 @@ describe('buildTaskRunner', () => {
     it('should fail the job when build task in unknown task runner', async () => {
       const runner = 'unknown-runner';
       const task = await factory.buildTask();
-      const taskWithIncludes = await BuildTask.findByPk(task.id, buildTaskIncludesOptions);
+      const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
       const taskWithUnknownRunner = { ...taskWithIncludes, BuildTaskType: { runner } };
 
       sinon
@@ -205,7 +191,7 @@ describe('buildTaskRunner', () => {
         .resolves({ guid, state: 'PENDING', result: 'Good' });
 
       const task = await factory.buildTask();
-      const taskWithIncludes = await BuildTask.findByPk(task.id, buildTaskIncludesOptions);
+      const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
 
       const stubBuildTask = sinon.stub(BuildTask, 'findByPk');
       stubBuildTask.resolves(taskWithIncludes);
@@ -216,7 +202,7 @@ describe('buildTaskRunner', () => {
       const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
       const result = await promisedQueueEvents(queueEvents, 'completed');
       expect(result.jobId).to.equal(job.id);
-      sinon.assert.calledOnceWithExactly(stubBuildTask, task.id, buildTaskIncludesOptions);
+      sinon.assert.calledOnceWithExactly(stubBuildTask, task.id);
       sinon.assert.calledWith(stubStatus, guid);
     });
 
@@ -239,7 +225,7 @@ describe('buildTaskRunner', () => {
         .resolves(startTaskResponse);
 
       const task = await factory.buildTask();
-      const taskWithIncludes = await BuildTask.findByPk(task.id, buildTaskIncludesOptions);
+      const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
 
       const stubBuildTask = sinon.stub(BuildTask, 'findByPk');
       stubBuildTask.resolves(taskWithIncludes);
@@ -251,7 +237,7 @@ describe('buildTaskRunner', () => {
       const result = await promisedQueueEvents(queueEvents, 'completed');
       expect(cfTaskStub.callCount).to.equal(3);
       expect(result.jobId).to.equal(job.id);
-      sinon.assert.calledOnceWithExactly(stubBuildTask, task.id, buildTaskIncludesOptions);
+      sinon.assert.calledOnceWithExactly(stubBuildTask, task.id);
       sinon.assert.calledWith(stubStatus, guid);
     });
 
@@ -264,7 +250,7 @@ describe('buildTaskRunner', () => {
         .resolves({ guid, state: 'PENDING', result: 'Good' });
 
       const task = await factory.buildTask();
-      const taskWithIncludes = await BuildTask.findByPk(task.id, buildTaskIncludesOptions);
+      const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
 
       const stubBuildTask = sinon.stub(BuildTask, 'findByPk');
       stubBuildTask
@@ -272,6 +258,7 @@ describe('buildTaskRunner', () => {
         .resolves(taskWithIncludes)
         .onSecondCall()
         .resolves(task);
+
 
       const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'pollTaskStatus');
       stubStatus
