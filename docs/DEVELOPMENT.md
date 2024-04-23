@@ -554,3 +554,17 @@ The frontend UI should be structured to improve consistency and developer experi
 - Custom hooks using React hooks should be used in pages and dynamic components to define the specific data and actions related to their corresponding pages and dynamic components. Custom hooks should be defined in a file in the [`./frontend/hooks](../frontend/hooks/) directory. ie:
   - The `useBuildLogs` hook would define the state and effects associated with the build logs dynamic component.
   - The `useSiteBuilds` hook would define the state and effects for a site's build history
+
+## Event Driven Queueing
+
+### Queues
+
+Queues are the different event streams that accept jobs, process them, and are kept in the [./api/queues](../api/queues) directory.
+
+### Queue Jobs
+
+Queue jobs are actions that add a job to a queue and are kept in the [./api/queue-jobs](../api/queue-jobs) directory.
+
+### Workers
+
+Workers are the processors that handle a job in a queue and are kept in the [./api/workers](../api/workers) directory.

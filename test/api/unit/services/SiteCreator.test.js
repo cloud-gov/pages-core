@@ -15,11 +15,11 @@ const {
   User,
   SiteBranchConfig,
 } = require('../../../../api/models');
-const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
+const queueJobs = require('../../../../api/queue-jobs');
 
 describe('SiteCreator', () => {
   beforeEach(() => {
-    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
+    sinon.stub(queueJobs, 'startSiteBuild').resolves();
   });
 
   afterEach(() => {
@@ -601,13 +601,13 @@ describe('SiteCreator', () => {
           const secretAccessKey = crypto.randomBytes(10).toString('hex');
           const region = 'us-gov-other-1';
           const bucket = 'testing-bucket';
-  
+
           const instanceRequestBody = { name, service_plan_guid: planGuid };
           const keyRequestBody = {
             name: keyName,
             serviceInstanceGuid: bucketGuid,
           };
-  
+
           const planResponses = factory.createCFAPIResourceList({
             resources: [
               factory.createCFAPIResource({ guid: planGuid, name: planName }),
@@ -617,12 +617,12 @@ describe('SiteCreator', () => {
             guid: bucketGuid,
             name,
           });
-  
+
           const keyResponse = factory.createCFAPIResource({
             name: keyName,
             serviceInstanceGuid: bucketGuid,
           });
-  
+
           const keyCredentials = factory.responses.credentials({
             access_key_id: accessKeyId,
             secret_access_key: secretAccessKey,
@@ -638,7 +638,7 @@ describe('SiteCreator', () => {
               }),
             ],
           });
-  
+
           const buildResponses = factory.createCFAPIResourceList({
             resources: [
               factory.createCFAPIResource({
@@ -647,7 +647,7 @@ describe('SiteCreator', () => {
               }),
             ],
           });
-  
+
           mockTokenRequest();
           apiNocks.mockFetchS3ServicePlanGUID(planResponses, planName);
           apiNocks.mockCreateS3ServiceInstance(

@@ -27,7 +27,7 @@ const {
 } = require('../../../api/models');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const siteErrors = require('../../../api/responses/siteErrors');
-const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
+const queueJobs = require('../../../api/queue-jobs');
 const EventCreator = require('../../../api/services/EventCreator');
 const DomainService = require('../../../api/services/Domain');
 
@@ -36,7 +36,7 @@ const authErrorMessage =
 
 describe('Site API', () => {
   beforeEach(() => {
-    sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
+    sinon.stub(queueJobs, 'startSiteBuild').resolves();
     sinon.stub(EventCreator, 'error').resolves();
 
     return factory.organization.truncate();

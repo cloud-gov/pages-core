@@ -1,8 +1,7 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize');
 const URLSafeBase64 = require('urlsafe-base64');
-const SiteBuildQueue = require('../services/SiteBuildQueue');
-
+const QueueJobs = require('../queue-jobs');
 const { isEmptyOrBranch, isEmptyOrUrl, shaRegex } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
 const { buildEnum } = require('../utils');
@@ -189,36 +188,37 @@ const afterUpdate = async (build) => {
 async function enqueue() {
   const build = this;
 
-  const {
-    Domain,
-    Site,
-    User,
-    Build,
-    UserEnvironmentVariable,
-    SiteBranchConfig,
-  } = build.sequelize.models;
+  const { Site, Build } = build.sequelize.models;
 
   const foundBuild = await Build.findOne({
     where: { id: build.id },
-    include: [
-      User,
-      {
-        model: Site,
-        required: true,
-        include: [UserEnvironmentVariable, User, SiteBranchConfig, Domain],
-      },
-    ],
+    include: [Site],
   });
 
-  const count = await Build.count({
-    where: { site: foundBuild.site },
+  // Set job priority
+  const { count: priority } = await Build.findAndCountAll({
+    where: {
+      [Op.and]: [
+        { '$Build.site$': foundBuild.Site.id },
+        {
+          state: {
+            [Op.notIn]: [
+              Build.States.Error,
+              Build.States.Success,
+            ],
+          },
+        },
+      ],
+    },
   });
 
   try {
-    await SiteBuildQueue.sendBuildMessage(foundBuild, count);
+    await QueueJobs.startSiteBuild(foundBuild, priority);
     await build.updateJobStatus({ status: States.Queued });
   } catch (err) {
     const errMsg = `There was an error, adding the job to SiteBuildQueue: ${err}`;
+    // logger.error(errMsg);
+
     await build.updateJobStatus({
       status: States.Error,
       message: errMsg,

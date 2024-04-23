@@ -15,6 +15,8 @@ const {
   User,
   UserEnvironmentVariable,
 } = require('../../../../api/models');
+const CFApiClient = require('../../../../api/utils/cfApiClient');
+const S3Helper = require('../../../../api/services/S3Helper');
 
 describe('SiteBuildQueue', () => {
   afterEach(() => {
@@ -28,56 +30,7 @@ describe('SiteBuildQueue', () => {
     apiNocks.mockDefaultCredentials();
   });
 
-  describe('.sendBuildMessage(build)', () => {
-    it('should send a formatted build message', async () => {
-      const sendMessageStub = sinon
-        .stub(SiteBuildQueue.bullClient, 'add')
-        .returns({
-          promise: () => Promise.resolve(),
-        });
-
-      const build = {
-        branch: 'main',
-        state: 'processing',
-        url: 'testBucket.gov/boo/hoo',
-        Site: {
-          owner: 'owner',
-          repository: 'formatted-message-repo',
-          engine: 'jekyll',
-          defaultBranch: 'main',
-          s3ServiceName: config.s3.serviceName,
-          containerConfig: {},
-        },
-        User: {
-          githubAccessToken: '123abc',
-        },
-      };
-
-      await SiteBuildQueue.sendBuildMessage(build, 2);
-
-      const jobName = sendMessageStub.firstCall.args[0];
-      const params = sendMessageStub.firstCall.args[1];
-      expect(jobName).to.equal('sendBuildMessage');
-      expect(params).to.have.property('environment');
-      expect(params.environment.length).to.equal(15);
-      expect(params).to.have.property('containerName');
-      expect(params).to.have.property('containerName');
-    });
-  });
-
   describe('.messageBodyForBuild(build)', () => {
-    let sendMessageStub;
-
-    beforeEach(() => {
-      sendMessageStub = sinon
-        .stub(SiteBuildQueue, 'sendBuildMessage')
-        .returns({});
-    });
-
-    afterEach(() => {
-      sendMessageStub.restore();
-    });
-
     const messageEnv = (message, name) => {
       const element = message.environment.find((el) => el.name === name);
       if (element) {
@@ -133,15 +86,14 @@ describe('SiteBuildQueue', () => {
             ],
           })
         )
-        .then((build) => {
-          // eslint-disable-line
-          return SiteBuildQueue.messageBodyForBuild(build).then((message) => {
+        .then(build => SiteBuildQueue.messageBodyForBuild(build)
+          .then((message) => {
             expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(
               `http://${config.app.domain}/v0/build/${build.id}/status/${build.token}`
             );
             done();
-          });
-        })
+          })
+        )
         .catch(done);
     });
 
@@ -281,12 +233,12 @@ describe('SiteBuildQueue', () => {
           .catch(done);
       });
 
-      /////////////////////////
+      ///
       //  Verify if we actually use the path in a domain name
       //  since the Domain table validates names field to ensure
       //  they are fully qualified domains without paths
-      ///////////////////////////////////////////////////////
-      /////////////////////////
+      ///
+      ///
       // it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
       //   const domains = [
       //     'https://example.com/abc/def',
@@ -852,6 +804,79 @@ describe('SiteBuildQueue', () => {
           expect(message.containerName).to.deep.equal(containerConfig.name);
           expect(message.containerSize).to.deep.equal(containerConfig.size);
         });
+    });
+  });
+
+  describe('.setupBucket', () => {
+    it('should immediately return true if there are more than one site builds', async () => {
+      const build = {};
+      const buildCount = 2;
+
+      const setupSuccess = await SiteBuildQueue.setupBucket(build, buildCount);
+      expect(setupSuccess).to.equal(true);
+    });
+
+    it('should verify the site bucket is available', async () => {
+      const buildCount = 1;
+      const stubCreds = sinon.stub(CFApiClient.prototype, 'fetchServiceInstanceCredentials');
+      const stubS3 = sinon.stub(S3Helper.S3Client.prototype, 'waitForBucket').resolves();
+      const factoryBuild = await factory.build();
+      const build = await Build.findByPk(factoryBuild.id, {
+        include: [
+          {
+            model: Site,
+            required: true,
+            include: [SiteBranchConfig, Domain],
+          },
+          User,
+        ],
+      });
+      const creds = {
+        access_key_id: 'access_key_id', // eslint-disable-line
+        bucket: build.bucket,
+        region: 'region',
+        secret_access_key: 'secret', // eslint-disable-line
+      };
+      stubCreds.resolves(creds);
+      stubS3.resolves();
+
+      const setupSuccess = await SiteBuildQueue.setupBucket(build, buildCount);
+      expect(setupSuccess).to.equal(true);
+      sinon.assert.calledOnceWithExactly(stubCreds, build.Site.s3ServiceName);
+      sinon.assert.calledOnce(stubS3);
+    });
+  });
+
+  describe('.setupTaskEnv', () => {
+    it('shoudld find the build and associated tables to setup the cf task dev', async () => {
+      const factoryBuild = await factory.build();
+      const stub = sinon.stub(SiteBuildQueue, 'setupBucket');
+      stub.resolves();
+
+      const { build, message } = await SiteBuildQueue.setupTaskEnv(factoryBuild.id);
+
+      expect(build.id).to.equal(factoryBuild.id);
+      expect(message.environment).to.be.an('array');
+      message.environment.forEach((i) => {
+        if (i.name === 'BRANCH') {
+          expect(i.value).to.equal(build.branch);
+        }
+      });
+      sinon.assert.calledOnceWithExactly(stub, build, 1);
+    });
+
+    it('shoudld find the build with multiple site builds to setup the cf task dev', async () => {
+      const site = await factory.site();
+      const fb1 = await factory.build({ site });
+      await factory.build({ site });
+      const stub = sinon.stub(SiteBuildQueue, 'setupBucket');
+      stub.resolves();
+
+      const { build, message } = await SiteBuildQueue.setupTaskEnv(fb1.id);
+
+      expect(build.id).to.equal(fb1.id);
+      expect(message.environment).to.be.an('array');
+      sinon.assert.calledOnceWithExactly(stub, build, 2);
     });
   });
 });

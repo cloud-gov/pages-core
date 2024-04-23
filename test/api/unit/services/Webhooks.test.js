@@ -2,10 +2,8 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
 const sinon = require('sinon');
-const request = require('supertest');
-const app = require('../../../../app');
-const { Build, Site, User, Event } = require('../../../../api/models');
-const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
+const { Build, User, Event } = require('../../../../api/models');
+const queueJobs = require('../../../../api/queue-jobs');
 const EventCreator = require('../../../../api/services/EventCreator');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 
@@ -52,7 +50,7 @@ describe('Webhooks Service', () => {
       nock.cleanAll();
       githubAPINocks.status();
       githubAPINocks.repo({ response: [201, { permissions: { admin: true, push: true } }] });
-      sinon.stub(SiteBuildQueue, 'sendBuildMessage').resolves();
+      sinon.stub(queueJobs, 'startSiteBuild').resolves();
     });
 
     it('should create a new site build for the sender', async () => {
