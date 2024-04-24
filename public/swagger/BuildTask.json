@@ -29,7 +29,8 @@
         "processing",
         "success",
         "queued",
-        "created"
+        "created",
+        "cancelled"
       ]
     },
     "buildId": {

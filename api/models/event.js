@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     AUTHENTICATION_PAGES_GH_TOKEN: 'authentication-pages-github-token',
     FEDERALIST_USERS_MEMBERSHIP: 'federalist-users-membership',
     BUILD_STATUS: 'build-status',
+    BUILD_TASK: 'build-task',
     ADMIN: 'admin',
     SOCKET_IO: 'socket.io',
     SITE_USER: 'site-user',

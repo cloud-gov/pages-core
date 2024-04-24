@@ -23,6 +23,11 @@ const taskSummaryIcon = ({ status, count }) => {
       summary = 'Scan failed before results could be found';
       icon = IconX;
       break;
+    case 'cancelled':
+      state = 'Cancelled';
+      summary = 'Failed builds cannot be scanned';
+      icon = IconX;
+      break;
     case 'processing':
       state = 'Processing';
       summary = 'Scan in progress';

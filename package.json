@@ -181,7 +181,7 @@
     "shortid": "^2.2.16",
     "sinon": "^10.0.0",
     "style-loader": "^3.3.3",
-    "supertest": "^6.3.3",
+    "supertest": "^7.0.0",
     "webpack": "^5.91.0",
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^5.1.4",

@@ -12,6 +12,7 @@ const Statuses = buildEnum([
   'error',
   'processing',
   'success',
+  'cancelled',
 ]);
 
 const associate = ({

@@ -84,9 +84,9 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
 
-          expect(build.state).to.equal('error');
+          expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt).to.be.null;
           expect(build.completedAt).to.be.a('date');
@@ -94,7 +94,7 @@ describe('Build model', () => {
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'http://123abc@github.com' });
 
           expect(build.error).not.to.match(/123abc/);
         });
@@ -120,9 +120,9 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
 
-          expect(build.state).to.equal('error');
+          expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt).to.be.null;
           expect(build.completedAt).to.be.a('date');
@@ -130,7 +130,7 @@ describe('Build model', () => {
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'http://123abc@github.com' });
 
           expect(build.error).not.to.match(/123abc/);
         });
@@ -157,9 +157,9 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
 
-          expect(build.state).to.equal('error');
+          expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt).to.be.null;
           expect(build.completedAt).to.be.a('date');
@@ -167,7 +167,7 @@ describe('Build model', () => {
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'http://123abc@github.com' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'http://123abc@github.com' });
 
           expect(build.error).not.to.match(/123abc/);
         });
@@ -207,9 +207,9 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message and w/o commitSha', async () => {
-          await build.updateJobStatus({ status: 'error', message: 'this is an error' });
+          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
 
-          expect(build.state).to.equal('error');
+          expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
           expect(build.completedAt).to.be.a('date');
@@ -220,9 +220,9 @@ describe('Build model', () => {
         it('should mark a build errored with a message and commitSha', async () => {
           const commitSha = 'abcdef0123456789001234567890012345678901';
           const message = 'this is an error with commitsha';
-          await build.updateJobStatus({ status: 'error', message , commitSha });
+          await build.updateJobStatus({ status: Build.States.Error, message , commitSha });
 
-          expect(build.state).to.equal('error');
+          expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal(message);
           expect(build.startedAt.getTime()).to.equal(startedAt.getTime());
           expect(build.clonedCommitSha).to.equal(commitSha);
@@ -441,6 +441,28 @@ describe('Build model', () => {
       const task = buildTasks[0];
       expect(task.buildTaskTypeId).to.equal(buildTaskType.id);
       expect(task.buildId).to.equal(build.id);
+    });
+
+    it('cancels tasks after build failure', async () => {
+      // prep
+      const site = factory.site();
+      const buildTaskType = await factory.buildTaskType();
+      await factory.siteBuildTask({
+        siteId: site, buildTaskTypeId: buildTaskType,
+      });
+
+      // create the build
+      const build = await factory.build({ site });
+
+      // now we should have a new build task
+      const buildTasks = await BuildTask.findAll({ where: { buildId: build.id } });
+      expect(buildTasks).to.have.length(1);
+      const task = buildTasks[0];
+
+      // fail the build and the task should be cancelled
+      await build.updateJobStatus({ status: Build.States.Error });
+      await task.reload();
+      expect(task.status).to.equal(BuildTask.Statuses.Cancelled);
     });
   });
 });

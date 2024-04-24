@@ -97,8 +97,10 @@ function branchLink(build) {
 
 function summarizeTaskResults(build) {
   const tasksSucceeded = build.BuildTasks.filter(task => task.status === 'success');
-  const tasksIncomplete = build.BuildTasks.filter(task => task.status !== 'success' && task !== 'error');
+  const tasksIncomplete = build.BuildTasks.filter(task => task.status !== 'success' && task !== 'error' && task !== 'cancelled');
   const anyTaskErrored = build.BuildTasks.find(task => task.status === 'error');
+  // currently if one is cancelled, they all are cancelled
+  const tasksCancelled = build.BuildTasks.find(task => task.status === 'cancelled');
 
   function totalResults(results) {
     return (
@@ -117,6 +119,15 @@ function summarizeTaskResults(build) {
   // if all tasks incomplete, show # complete out of total, and no results
   // if some complete, some succeeded, show # complete out of total, and any results
 
+  if (tasksCancelled) {
+    return (
+      <div className="label-new">
+        <IconX />
+        <b>Scans cancelled. </b>
+        Failed builds cannot be scanned.
+      </div>
+    );
+  }
   if (anyTaskErrored) {
     return (
       <div className="label-warning">
