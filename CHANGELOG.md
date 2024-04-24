@@ -1,3 +1,9 @@
+## 0.8.2 (2024-04-24)
+
+### Maintenance
+
+- add build task cancelled state
+
 ## 0.8.1 (2024-04-19)
 
 ### Maintenance
