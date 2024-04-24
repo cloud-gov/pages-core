@@ -7,7 +7,7 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider } from 'r
 import routes from './routes';
 import store from './store';
 
-import './sass/styles.scss';
+import './sass/styles.scss'
 
 const mainEl = document.querySelector('#js-app');
 

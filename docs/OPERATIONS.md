@@ -48,10 +48,9 @@ From there:
 ```bash
 $ /tmp/lifecycle/shell
 
-$ node --env-file=.env ./ci/tasks/configure-database-migrations.js
-
 ## Example migrate down
-$ node node_modules/.bin/db-migrate down --config database.json -e production
+$ yarn migrate:down
+
 ```
 
 ## CI
