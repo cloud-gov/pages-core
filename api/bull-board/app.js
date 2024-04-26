@@ -1,6 +1,5 @@
 const express = require('express');
 const { createBullBoard } = require('@bull-board/api');
-const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const { ExpressAdapter } = require('@bull-board/express');
 const IORedis = require('ioredis');
@@ -15,6 +14,7 @@ const {
   FailStuckBuildsQueue,
   MailQueue,
   NightlyBuildsQueue,
+  SiteBuildsQueue,
   SiteBuildQueue,
   SiteDeletionQueue,
   ScheduledQueue,
@@ -37,7 +37,8 @@ const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
   queues: [
-    new BullAdapter(new SiteBuildQueue(connection)),
+    new BullMQAdapter(new SiteBuildQueue(connection)),
+    new BullMQAdapter(new SiteBuildsQueue(connection)),
     new BullMQAdapter(new ArchiveBuildLogsQueue(connection)),
     new BullMQAdapter(new BuildTasksQueue(connection)),
     new BullMQAdapter(new DomainQueue(connection)),

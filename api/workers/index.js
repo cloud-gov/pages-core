@@ -26,6 +26,8 @@ const {
   ScheduledQueue,
   ScheduledQueueName,
   SlackQueueName,
+  SiteBuildsQueue,
+  SiteBuildsQueueName,
   SiteDeletionQueueName,
   TimeoutBuildTasksQueue,
   TimeoutBuildTasksQueueName,
@@ -62,7 +64,7 @@ function pagesWorker(connection) {
   };
 
   const buildTasksProcessor = job => Processors.buildTaskRunner(job);
-
+  const siteBuildProcessor = job => Processors.siteBuildRunner(job);
   const failBuildsProcessor = job => Processors.failStuckBuilds(job);
 
   const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
@@ -96,6 +98,12 @@ function pagesWorker(connection) {
     new QueueWorker(MailQueueName, connection, mailJobProcessor),
     new QueueWorker(NightlyBuildsQueueName, connection, nightlyBuildsProcessor),
     new QueueWorker(ScheduledQueueName, connection, scheduledJobProcessor),
+    new QueueWorker(
+      SiteBuildsQueueName,
+      connection,
+      siteBuildProcessor,
+      { concurrency: queuesConfig.siteBuildsConcurrency }
+    ),
     new QueueWorker(SiteDeletionQueueName, connection, siteDeletionProcessor),
     new QueueWorker(SlackQueueName, connection, slackJobProcessor),
     new QueueWorker(TimeoutBuildTasksQueueName, connection, timeoutBuildsProcessor),
@@ -106,6 +114,7 @@ function pagesWorker(connection) {
   const failStuckBuildsQueue = new FailStuckBuildsQueue(connection);
   const nightlyBuildsQueue = new NightlyBuildsQueue(connection);
   const scheduledQueue = new ScheduledQueue(connection);
+  const siteBuildsQueue = new SiteBuildsQueue(connection);
   const timeoutBuildTasksQueue = new TimeoutBuildTasksQueue(connection);
   const queues = [
     archiveBuildLogsQueue,
@@ -113,6 +122,7 @@ function pagesWorker(connection) {
     failStuckBuildsQueue,
     nightlyBuildsQueue,
     scheduledQueue,
+    siteBuildsQueue,
     timeoutBuildTasksQueue,
   ];
 

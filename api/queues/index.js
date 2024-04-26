@@ -6,6 +6,7 @@ const { MailQueue, MailQueueName } = require('./MailQueue');
 const { NightlyBuildsQueue, NightlyBuildsQueueName } = require('./NightlyBuildsQueue');
 const { ScheduledQueue, ScheduledQueueName } = require('./ScheduledQueue');
 const { SiteBuildQueue, SiteBuildQueueName } = require('./SiteBuildQueue');
+const { SiteBuildsQueue, SiteBuildsQueueName } = require('./SiteBuildsQueue');
 const { SiteDeletionQueue, SiteDeletionQueueName } = require('./SiteDeletionQueue');
 const { SlackQueue, SlackQueueName } = require('./SlackQueue');
 const { TimeoutBuildTasksQueue, TimeoutBuildTasksQueueName } = require('./TimeoutBuildTasksQueue');
@@ -23,12 +24,14 @@ module.exports = {
   MailQueueName,
   NightlyBuildsQueue,
   NightlyBuildsQueueName,
-  SiteBuildQueue,
-  SiteBuildQueueName,
-  SiteDeletionQueue,
-  SiteDeletionQueueName,
   ScheduledQueue,
   ScheduledQueueName,
+  SiteBuildQueue,
+  SiteBuildQueueName,
+  SiteBuildsQueue,
+  SiteBuildsQueueName,
+  SiteDeletionQueue,
+  SiteDeletionQueueName,
   SlackQueue,
   SlackQueueName,
   TimeoutBuildTasksQueue,

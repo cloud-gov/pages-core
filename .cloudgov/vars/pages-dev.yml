@@ -14,4 +14,5 @@ new_relic_app_name: web-pages-dev
 proxy_domain: sites.pages-dev.cloud.gov
 cf_cdn_space_name: sites-dev
 node_env: development
-queues_build_tasks_concurrency: 20
+queues_build_tasks_concurrency: 2
+queues_site_builds_concurrency: 3

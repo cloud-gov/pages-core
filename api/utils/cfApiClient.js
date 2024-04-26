@@ -1,9 +1,11 @@
 const _ = require('underscore');
 const parse = require('json-templates');
-
+const { app: { appEnv } } = require('../../config');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const HttpClient = require('./httpClient');
 const { wait } = require('.');
+
+const TASK_LABEL = 'build-task';
 
 function filterEntity(res, name, field = 'name') {
   const errMsg = `Not found: Entity @${field} = ${name}`;
@@ -203,6 +205,74 @@ class CloudFoundryAPIClient {
       };
       await wait(sleepInterval);
       return this.startBuildTask(task, job, retryOptions);
+    }
+  }
+
+  /**
+  * Starts a CF Task instance to build a site
+  * @async
+  * @method startSiteBuildTask
+  * @param {Object} message - The job message
+  * @param {Array} message.environment - The array of objects of key value command params
+  * @param {Array} [message.containerName] - The name of the app task container to build the site
+  * Defaults to the pages-build-container-{env} app
+  * @param {Array} [message.containerSize] - The container settings for disk and memory
+  * defaults to 4GB disk and 2GB of memory
+  * @param {number} jobId - The queue job id
+  * @return {Promise<{Object}>} An object with the state value or possible error
+  */
+  async startSiteBuildTask(
+    message,
+    jobId,
+    { attempt = 1, totalAttempts = 3, sleepInterval = 1000 } = {}
+  ) {
+    const settings = {
+      default: {
+        disk_in_mb: 4 * 1024,
+        memory_in_mb: 2 * 1024,
+      },
+      large: {
+        disk_in_mb: 6 * 1024,
+        memory_in_mb: 2 * 1024,
+      },
+    };
+
+    const containerName = message?.containerName || `pages-build-container-${appEnv}`;
+    const containerSize = message?.containerSize || 'default';
+    const containerSettings = settings[containerSize];
+    const commandParams = message.environment.reduce(
+      (acc, current) => ({ ...acc, [current.name]: current.value }),
+      {}
+    );
+    const command = `cd app && python main.py -p '${JSON.stringify(commandParams)}'`;
+
+    const taskParams = {
+      ...containerSettings,
+      name: `build-${jobId}`,
+      command,
+      metadata: { labels: { type: TASK_LABEL } },
+    };
+    const appGUID = await this.fetchTaskAppGUID(containerName);
+
+    try {
+      return await this.authRequest(
+        'POST',
+        `/v3/apps/${appGUID}/tasks`,
+        taskParams
+      );
+    } catch (error) {
+      if (attempt === totalAttempts) {
+        throw error;
+      }
+
+      const nextAttempt = attempt + 1;
+      const retryOptions = {
+        attempt: nextAttempt,
+        totalAttempts,
+        sleepInterval,
+      };
+      await wait(sleepInterval);
+      return this.startSiteBuildTask(message, jobId, retryOptions);
     }
   }
 

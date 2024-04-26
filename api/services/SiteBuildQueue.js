@@ -1,18 +1,19 @@
 const url = require('url');
-const IORedis = require('ioredis');
+const {
+  Domain,
+  Site,
+  User,
+  Build,
+  UserEnvironmentVariable,
+  SiteBranchConfig,
+} = require('../models');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const { SiteBuildQueue: SiteBuildBullQueue } = require('../queues');
 const { buildViewLink, buildUrl } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
-
-const connection = new IORedis(config.redis.url, {
-  tls: config.redis.tls,
-  maxRetriesPerRequest: null,
-});
 
 const siteConfig = (build, siteBranchConfigs = []) => {
   const configRecord = siteBranchConfigs.find(c => c.branch === build.branch)
@@ -48,12 +49,16 @@ const buildUEVs = uevs => (uevs
 
 const generateDefaultCredentials = async (build) => {
   const {
-    engine, owner, repository, UserEnvironmentVariables, SiteBranchConfigs,
+    engine,
+    owner,
+    repository,
+    UserEnvironmentVariables,
+    SiteBranchConfigs,
   } = build.Site;
 
   const baseUrl = baseURLForBuild(build);
 
-  return ({
+  return {
     STATUS_CALLBACK: statusCallbackURL(build),
     BASEURL: baseUrl,
     BRANCH: build.branch,
@@ -64,8 +69,10 @@ const generateDefaultCredentials = async (build) => {
     GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
     GENERATOR: engine,
     BUILD_ID: build.id,
-    USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(UserEnvironmentVariables)),
-  });
+    USER_ENVIRONMENT_VARIABLES: JSON.stringify(
+      buildUEVs(UserEnvironmentVariables)
+    ),
+  };
 };
 
 const buildContainerEnvironment = async (build) => {
@@ -86,10 +93,14 @@ const buildContainerEnvironment = async (build) => {
     }));
 };
 
-const setupBucket = async (build, buildCount) => {
+const SiteBuildQueue = {};
+
+SiteBuildQueue.setupBucket = async (build, buildCount) => {
   if (buildCount > 1) return true;
 
-  const credentials = await apiClient.fetchServiceInstanceCredentials(build.Site.s3ServiceName);
+  const credentials = await apiClient.fetchServiceInstanceCredentials(
+    build.Site.s3ServiceName
+  );
   const {
     access_key_id, // eslint-disable-line
     bucket,
@@ -111,10 +122,6 @@ const setupBucket = async (build, buildCount) => {
   return true;
 };
 
-const SiteBuildQueue = {
-  bullClient: new SiteBuildBullQueue(connection),
-};
-
 SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
   .then(environment => ({
     environment: Object.keys(environment).map(key => ({
@@ -125,11 +132,31 @@ SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
     containerSize: build.Site.containerConfig.size,
   }));
 
-SiteBuildQueue.sendBuildMessage = async (build, buildCount) => {
-  const message = await SiteBuildQueue.messageBodyForBuild(build);
-  await setupBucket(build, buildCount);
+SiteBuildQueue.setupTaskEnv = async (buildId) => {
+  const build = await Build.findOne({
+    where: { id: buildId },
+    include: [
+      User,
+      {
+        model: Site,
+        required: true,
+        include: [UserEnvironmentVariable, User, SiteBranchConfig, Domain],
+      },
+    ],
+  });
 
-  return SiteBuildQueue.bullClient.add('sendBuildMessage', message);
+  const count = await Build.count({
+    where: { site: build.site },
+  });
+
+  await SiteBuildQueue.setupBucket(build, count);
+
+  const message = await SiteBuildQueue.messageBodyForBuild(build);
+
+  return {
+    build,
+    message,
+  };
 };
 
 module.exports = SiteBuildQueue;

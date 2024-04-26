@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
-const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
+const queueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
 const { Build, Site, BuildTask } = require('../../../../api/models');
 const config = require('../../../../config');
@@ -33,33 +33,64 @@ describe('Build model', () => {
 
   describe('enqueue', () => {
     it('should send a build new build message', async () => {
-      const sendMessageStub = sinon.stub(SiteBuildQueue, 'sendBuildMessage');
-      sendMessageStub.resolves();
+      const stubStartSiteBuild = sinon.stub(queueJobs, 'startSiteBuild');
 
       const site = await factory.site();
-      const uev = await factory.userEnvironmentVariable.create({ site });
       const build = await factory.build({ site });
+      const queuedBuild = await Build.findOne({
+        where: { id: build.id },
+        include: [Site],
+      });
+      stubStartSiteBuild.resolves(queuedBuild);
+
       await build.enqueue();
 
       await build.reload();
 
+      sinon.assert.calledOnceWithExactly(stubStartSiteBuild, queuedBuild, 1);
       expect(build.completedAt).to.be.null;
       expect(build.startedAt).to.be.null;
 
-      const [queuedBuild, buildCount] = sendMessageStub.getCall(0).args;
-
-      expect(sendMessageStub.called).to.be.true;
       expect(queuedBuild.id).to.equal(build.id);
-      expect(buildCount).to.equal(1);
       expect(build.state).to.equal('queued');
 
       // The build should include the site
       expect(queuedBuild.Site).to.be.an.instanceof(Site);
       expect(queuedBuild.Site.id).to.eq(site.id);
+    });
 
-      // The site should include the environment variables
-      expect(queuedBuild.Site.UserEnvironmentVariables).to.be.an.instanceof(Array);
-      expect(queuedBuild.Site.UserEnvironmentVariables[0].id).to.eq(uev.id);
+    it('should send a build new build message', async () => {
+      const stubStartSiteBuild = sinon.stub(queueJobs, 'startSiteBuild');
+
+      const site = await factory.site();
+      const build = await factory.build({ site });
+      await Promise.all([
+        factory.build({ site }),
+        factory.build({ site }),
+        factory.build({ site }),
+        factory.build({ site }),
+        factory.build({ site }),
+      ]);
+      const queuedBuild = await Build.findOne({
+        where: { id: build.id },
+        include: [Site],
+      });
+      stubStartSiteBuild.resolves(queuedBuild);
+
+      await build.enqueue();
+
+      await build.reload();
+
+      sinon.assert.calledOnceWithExactly(stubStartSiteBuild, queuedBuild, 6);
+      expect(build.completedAt).to.be.null;
+      expect(build.startedAt).to.be.null;
+
+      expect(queuedBuild.id).to.equal(build.id);
+      expect(build.state).to.equal('queued');
+
+      // The build should include the site
+      expect(queuedBuild.Site).to.be.an.instanceof(Site);
+      expect(queuedBuild.Site.id).to.eq(site.id);
     });
   });
 
@@ -424,7 +455,7 @@ describe('Build model', () => {
 
   describe('model hooks', () => {
     it('creates build tasks on afterCreate hook', async () => {
-      // prep
+      sinon.stub(BuildTask.prototype, 'enqueue').resolves();
       const site = factory.site();
       const buildTaskType = await factory.buildTaskType();
       await factory.siteBuildTask({
@@ -435,7 +466,7 @@ describe('Build model', () => {
       const build = await factory.build({ site });
 
       // now we should have a new build task
-      const buildTasks = await BuildTask.findAll({ where: { buildId: build.id } })
+      const buildTasks = await BuildTask.findAll({ where: { buildId: build.id } });
       expect(buildTasks).to.have.length(1);
 
       const task = buildTasks[0];
