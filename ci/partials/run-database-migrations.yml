@@ -4,8 +4,4 @@ outputs: [name: src]
 run:
   dir: src
   path: bash
-  args:
-    - -c
-    - |
-      node --env-file=.env ./ci/tasks/configure-database-migrations.js
-      node node_modules/.bin/db-migrate up --config database.json -e production
+  args: [-c, yarn migrate:up]
