@@ -1,3 +1,13 @@
+## 0.8.3 (2024-04-29)
+
+### Fixed
+
+- Send sandbox reminders to UAA email address (#4425)
+
+### Maintenance
+
+- Refactor site build queue and worker
+
 ## 0.8.2 (2024-04-24)
 
 ### Maintenance
