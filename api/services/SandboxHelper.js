@@ -5,7 +5,7 @@ const {
 const PromisePool = require('@supercharge/promise-pool');
 const Mailer = require('./mailer');
 const {
-  User, Organization, Site, Role,
+  User, Organization, Site, Role, UAAIdentity,
 } = require('../models');
 const SiteDestroyer = require('./SiteDestroyer');
 const { sandboxDays } = require('../../config').app;
@@ -29,6 +29,7 @@ const notifyOrganizations = async (cleaningDate) => {
             roleId: managerRole.id,
           },
         },
+        include: UAAIdentity,
       },
       {
         model: Site,

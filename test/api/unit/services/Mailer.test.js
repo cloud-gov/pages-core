@@ -4,7 +4,15 @@ const Mailer = require('../../../../api/services/mailer');
 const Templates = require('../../../../api/services/mailer/templates');
 const factory = require('../../support/factory');
 const { hostname } = require('../../../../config').app;
-const { Role, User, Site } = require('../../../../api/models');
+const { Role, User, Site, UAAIdentity } = require('../../../../api/models');
+
+function createUserWithUAAIdentity() {
+  return factory.user()
+    .then(async (user) => {
+      await factory.uaaIdentity({ userId: user.id });
+      return user.reload({ include: [UAAIdentity] });
+    });
+}
 
 describe('mailer', () => {
   context('when the Mailer has not been initialized', () => {
@@ -84,7 +92,7 @@ describe('mailer', () => {
         Role.findOne({ where: { name: 'user' } }),
         Role.findOne({ where: { name: 'manager' } }),
       ]);
-      user = await factory.user();
+      user = await createUserWithUAAIdentity();
     });
 
     const createSandboxOrg = async (sandboxNextCleaningAt) => {
@@ -98,6 +106,7 @@ describe('mailer', () => {
           {
             model: User,
             required: true,
+            include: UAAIdentity,
           },
           {
             model: Site,
@@ -113,19 +122,36 @@ describe('mailer', () => {
         const sandboxNextCleaningAt = moment().add(expiryDays, 'days');
         const dateStr = sandboxNextCleaningAt.format('MMMM DD, YYYY');
         const org = await createSandboxOrg(sandboxNextCleaningAt.toDate());
-        const newUser = await factory.user();
+        const newUser = await createUserWithUAAIdentity();
         await org.addUser(newUser, { through: { roleId: userRole.id } });
         Mailer.init();
+
         const jobs = await Mailer.sendSandboxReminder(org);
         jobs.forEach((job) => {
           expect(job.name).to.eq('sandbox-reminder');
-          expect(org.Users.find(u => job.data.to.includes(u.email))).to.not.be.null;
+          expect(org.Users.find(u => job.data.to.includes(u.UAAIdentity.email))).to.not.be.null;
           expect(job.data.subject).to.eq(`Your Pages sandbox organization\'s sites will be removed in ${expiryDays} days`);
           expect(job.data.html).to.eq(Templates.sandboxReminder({
             organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
           }));
         });
         expect(jobs.length).to.equal(org.Users.length);
+      });
+
+      it('`sandbox-reminder` throws an error if a user lacks UAAIdentity', async () => {
+        const expiryDays = 5;
+        const sandboxNextCleaningAt = moment().add(expiryDays, 'days');
+        const org = await createSandboxOrg(sandboxNextCleaningAt.toDate());
+        const nonUAAUser = await factory.user();
+        await org.addUser(nonUAAUser, { through: { roleId: userRole.id } });
+        await org.reload();
+        Mailer.init();
+
+        const error = await Mailer.sendSandboxReminder(org).catch(e => e);
+
+        expect(error).to.be.an('error');
+        expect(error.message).to.contain(`Failed to queue a sandbox reminder for organization@id=${org.id}`);
+        expect(error.message).to.contain(`user@id=${nonUAAUser.id}: User lacks UAA email`);
       });
     });
   });

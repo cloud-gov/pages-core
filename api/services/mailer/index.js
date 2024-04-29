@@ -56,21 +56,27 @@ async function sendSandboxReminder(organization) {
 
   const { results, errors } = await PromisePool
     .for(users)
-    .process(user => mailQueue.add('sandbox-reminder', {
-      to: [user.email],
-      subject,
-      html: Templates.sandboxReminder({
-        organizationName,
-        dateStr,
-        organizationId,
-        sites: sites.map(({ id, owner, repository }) => ({ id, owner, repository })),
-        hostname,
-      }),
-    }));
+    .process((user) => {
+      if (!user.UAAIdentity?.email) {
+        throw new Error('User lacks UAA email');
+      }
+      return mailQueue.add('sandbox-reminder', {
+        to: [user.UAAIdentity.email],
+        subject,
+        html: Templates.sandboxReminder({
+          organizationName,
+          dateStr,
+          organizationId,
+          sites: sites.map(({ id, owner, repository }) => ({ id, owner, repository })),
+          hostname,
+        }),
+      });
+    });
 
   if (errors.length) {
     const errMsg = [
-      `Failed to queue a sandbox reminders for organization@id=${organizationId} members:`,
+      `Failed to queue ${errors.length === 1 ? 'a sandbox reminder' : 'sandbox reminders'} `
+      + `for organization@id=${organizationId} members:\n`,
       errors.map(e => `  user@id=${e.item.id}: ${e.message}`).join('\n'),
     ].join();
     throw new Error(errMsg);
