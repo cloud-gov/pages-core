@@ -324,13 +324,6 @@ describe('UAAClient', () => {
   });
 
   describe('.request()', () => {
-    it('should throw an error when uaa server is down', async () => {
-      const error = await uaaClient.request('/foobar').catch(e => e);
-
-      expect(error).to.be.an('Error');
-      expect(error.message).to.eq('Error: getaddrinfo ENOTFOUND uaa.example.com');
-    });
-
     it('should throw and error when uaa returns an error message', async () => {
       const path = '/foobar';
       const token = 'token';

@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const IORedis = require('ioredis');
 const { Queue, QueueEvents } = require('bullmq');
 const QueueWorker = require('../../../../api/workers/QueueWorker');
 const {
@@ -13,23 +12,14 @@ const {
   BuildTasksQueue,
   BuildTasksQueueName,
 } = require('../../../../api/queues');
+const BuildTaskQueue = require('../../../../api/services/BuildTaskQueue');
 const jobProcessors = require('../../../../api/workers/jobProcessors');
 const { wait } = require('../../../../api/utils');
-const { redis: redisConfig } = require('../../../../config');
 const factory = require('../../support/factory');
+const { promisedQueueEvents } = require('../../support/queues');
+const { createQueueConnection } = require('../../../../api/utils/queues');
 
 const testJobOptions = { sleepNumber: 0, totalAttempts: 240 };
-
-const connection = new IORedis(redisConfig.url, {
-  tls: redisConfig.tls,
-  maxRetriesPerRequest: null,
-});
-
-function promisedQueueEvents(queueEvents, event) {
-  return new Promise((resolve) => {
-    queueEvents.on(event, resolve);
-  });
-}
 
 async function cleanDb() {
   return Promise.all([
@@ -45,6 +35,8 @@ describe('buildTaskRunner', () => {
   });
 
   describe('Expected Worker Output', () => {
+    const connection = createQueueConnection();
+    // eslint-disable-next-line no-unused-vars
     const worker = new QueueWorker(
       BuildTasksQueueName,
       connection,
@@ -55,12 +47,6 @@ describe('buildTaskRunner', () => {
     const queue = new BuildTasksQueue(connection, { attempts: 1 });
     const queueEvents = new QueueEvents(BuildTasksQueueName, { connection });
 
-    after(async () => {
-      await worker.close();
-      await queueEvents.close();
-      await queue.close();
-    });
-
     afterEach(async () => {
       await queue.obliterate({ force: true });
       await cleanDb();
@@ -69,6 +55,7 @@ describe('buildTaskRunner', () => {
 
     it('should fail the job with no task record', async () => {
       sinon.stub(BuildTask, 'findByPk').rejects();
+      sinon.stub(BuildTaskQueue, 'setupTaskEnv').rejects();
       const job = await queue.add('sendTaskMessage', {});
       const result = await promisedQueueEvents(queueEvents, 'failed');
       const expectedReason = 'Error';
@@ -84,7 +71,13 @@ describe('buildTaskRunner', () => {
         .rejects(cfTaskError);
 
       const task = await factory.buildTask();
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const setupTaskEnvBuildTask = await BuildTask.forRunner().findByPk(
+        task.id
+      );
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: setupTaskEnvBuildTask, data: {} });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
       expect(task.status).to.equal(BuildTask.Statuses.Created);
 
       const result = await promisedQueueEvents(queueEvents, 'failed');
@@ -109,7 +102,13 @@ describe('buildTaskRunner', () => {
         .rejects(cfTaskError);
 
       const task = await factory.buildTask();
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const setupTaskEnvBuildTask = await BuildTask.forRunner().findByPk(
+        task.id
+      );
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: setupTaskEnvBuildTask, data: {} });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id, data: {} });
 
       expect(task.status).to.equal(BuildTask.Statuses.Created);
 
@@ -128,15 +127,11 @@ describe('buildTaskRunner', () => {
       const task = await factory.buildTask();
       const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
       const taskWithUnknownRunner = { ...taskWithIncludes, BuildTaskType: { runner } };
-
       sinon
-        .stub(BuildTask, 'findByPk')
-        .onFirstCall()
-        .resolves(taskWithUnknownRunner)
-        .onSecondCall()
-        .resolves(task);
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: taskWithUnknownRunner, data: {} });
 
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id, data: {} });
 
       expect(task.status).to.equal(BuildTask.Statuses.Created);
 
@@ -159,6 +154,12 @@ describe('buildTaskRunner', () => {
         .resolves({ guid, state: 'PENDING', result: 'Good' });
 
       const task = await factory.buildTask();
+      const setupTaskEnvBuildTask = await BuildTask.forRunner().findByPk(
+        task.id
+      );
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: setupTaskEnvBuildTask, data: {} });
       const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'fetchTaskByGuid');
       stubStatus.resolves({ state: taskState });
 
@@ -167,7 +168,7 @@ describe('buildTaskRunner', () => {
 
       expect(task.status).to.equal(BuildTask.Statuses.Created);
 
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
       const result = await promisedQueueEvents(queueEvents, 'failed');
       const expectedReason = 'Task timed out after 0 minutes';
       await task.reload();
@@ -192,17 +193,52 @@ describe('buildTaskRunner', () => {
 
       const task = await factory.buildTask();
       const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
-
-      const stubBuildTask = sinon.stub(BuildTask, 'findByPk');
-      stubBuildTask.resolves(taskWithIncludes);
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: taskWithIncludes, data: {} });
 
       const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'pollTaskStatus');
       stubStatus.resolves({ state: taskState });
 
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
       const result = await promisedQueueEvents(queueEvents, 'completed');
       expect(result.jobId).to.equal(job.id);
-      sinon.assert.calledOnceWithExactly(stubBuildTask, task.id);
+      sinon.assert.calledWith(stubStatus, guid);
+    });
+
+    it('should have a successfull CF task with a custom domains', async () => {
+      const guid = 'task-guid';
+      const taskState = 'SUCCEEDED';
+      const jobData = { data: {} };
+
+      const stubStartBuildTask = sinon
+        .stub(CloudFoundryAPIClient.prototype, 'startBuildTask');
+
+      stubStartBuildTask.resolves({ guid, state: 'PENDING' });
+
+      const site = await factory.site();
+      const siteBranchConfig = site.SiteBranchConfigs[0];
+      const build = await factory.build({ site: site.id, branch: siteBranchConfig.branch });
+      const task = await factory.buildTask({ build });
+      const domain = await factory.domain.create({
+        siteId: site.id,
+        siteBranchConfigId: siteBranchConfig.id,
+        state: 'provisioned',
+      });
+      const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
+      const rawTask = taskWithIncludes.get({ plain: true });
+      rawTask.Build.url = `https://${domain.names.split(',')[0]}`;
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: taskWithIncludes, ...jobData });
+
+      const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'pollTaskStatus');
+      stubStatus.resolves({ state: taskState });
+
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
+      const result = await promisedQueueEvents(queueEvents, 'completed');
+      expect(result.jobId).to.equal(job.id);
+      sinon.assert.calledWith(stubStartBuildTask, rawTask, jobData);
       sinon.assert.calledWith(stubStatus, guid);
     });
 
@@ -226,18 +262,17 @@ describe('buildTaskRunner', () => {
 
       const task = await factory.buildTask();
       const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
-
-      const stubBuildTask = sinon.stub(BuildTask, 'findByPk');
-      stubBuildTask.resolves(taskWithIncludes);
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: taskWithIncludes, data: {} });
 
       const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'pollTaskStatus');
       stubStatus.resolves({ state: taskState });
 
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
       const result = await promisedQueueEvents(queueEvents, 'completed');
       expect(cfTaskStub.callCount).to.equal(3);
       expect(result.jobId).to.equal(job.id);
-      sinon.assert.calledOnceWithExactly(stubBuildTask, task.id);
       sinon.assert.calledWith(stubStatus, guid);
     });
 
@@ -251,33 +286,28 @@ describe('buildTaskRunner', () => {
 
       const task = await factory.buildTask();
       const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
-
-      const stubBuildTask = sinon.stub(BuildTask, 'findByPk');
-      stubBuildTask
-        .onFirstCall()
-        .resolves(taskWithIncludes)
-        .onSecondCall()
-        .resolves(task);
-
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: taskWithIncludes, data: {} });
 
       const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'pollTaskStatus');
       stubStatus
         .onFirstCall()
         .resolves(stateSucceeded);
 
-      const job = await queue.add('sendTaskMessage', { TASK_ID: task.id });
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
       expect(task.status).to.equal(BuildTask.Statuses.Created);
       const result = await promisedQueueEvents(queueEvents, 'completed');
       await task.reload();
       expect(result.jobId).to.equal(job.id);
       expect(task.status).to.equal(BuildTask.Statuses.Error);
-      expect(stubBuildTask.callCount).to.equal(2);
-      sinon.assert.calledWith(stubBuildTask, task.id);
       sinon.assert.calledWith(stubStatus, guid);
     });
   });
 
   describe('Expected Worker Concurrency', () => {
+    const connection = createQueueConnection();
+
     context('Use default concurrency of 5', () => {
       const queueName = 'test-concurrency-5-queue';
       const queue = new Queue(queueName, {
@@ -320,14 +350,18 @@ describe('buildTaskRunner', () => {
     });
 
     context('Set concurrency to 1', () => {
+      const queueName = 'test-concurrency-1-queue';
       const worker = new QueueWorker(
-        BuildTasksQueueName,
+        queueName,
         connection,
         job => jobProcessors.buildTaskRunner(job, testJobOptions),
         { concurrency: 1 }
       );
 
-      const queue = new BuildTasksQueue(connection, { attempts: 1 });
+      const queue = new Queue(queueName, {
+        connection,
+        defaultJobOptions: { attempts: 1 },
+      });
 
       after(async () => {
         await worker.close();

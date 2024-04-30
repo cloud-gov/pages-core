@@ -4,10 +4,14 @@ const {
   Event, Organization, OrganizationRole, User,
 } = require('../models');
 const EventCreator = require('../services/EventCreator');
-const Mailer = require('../services/mailer');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
 const { fetchModelById } = require('../utils/queryDatabase');
+const QueueJobs = require('../queue-jobs');
+const { createQueueConnection } = require('../utils/queues');
+
+const connection = createQueueConnection();
+const queueJob = new QueueJobs(connection);
 
 module.exports = wrapHandlers({
   async findAllForUser({ user }, res) {
@@ -58,7 +62,7 @@ module.exports = wrapHandlers({
       .findOne({ where: { userId: newUser.id } });
 
     if (link) {
-      await Mailer.sendUAAInvite(email, link, origin, org.name);
+      await queueJob.sendUAAInvite(email, link, origin, org.name);
     }
 
     const json = {

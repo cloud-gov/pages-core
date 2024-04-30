@@ -1,10 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { DatabaseError, ValidationError } = require('sequelize');
-const BuildTaskQueue = require('../../../../api/services/BuildTaskQueue');
+const QueueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
-const { Build, Site, BuildTask } = require('../../../../api/models');
-const config = require('../../../../config');
+const { Site, BuildTask } = require('../../../../api/models');
 
 describe('Build Task model', () => {
   afterEach(() => {
@@ -13,20 +11,20 @@ describe('Build Task model', () => {
 
   describe('enqueue', () => {
     it('should send a new build task message', async () => {
-      const sendMessageStub = sinon.stub(BuildTaskQueue, 'sendTaskMessage');
-      sendMessageStub.resolves();
+      const startBuildTaskStub = sinon.stub(QueueJobs.prototype, 'startBuildTask');
+      startBuildTaskStub.resolves();
 
       const site = await factory.site();
       const build = await factory.build({ site });
       const buildTaskType = await factory.buildTaskType();
-      const buildTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id})
+      const buildTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
       await buildTask.enqueue();
       await buildTask.reload();
 
-      const [queuedTask, priority] = sendMessageStub.getCall(0).args;
+      const [queuedTask, priority] = startBuildTaskStub.getCall(0).args;
 
       // called with the right things
-      expect(sendMessageStub.called).to.be.true;
+      expect(startBuildTaskStub.called).to.be.true;
       expect(queuedTask.id).to.equal(buildTask.id);
       expect(priority).to.equal(1);
 
@@ -39,13 +37,13 @@ describe('Build Task model', () => {
     });
 
     it('can receive a higher priority', async () => {
-      const sendMessageStub = sinon.stub(BuildTaskQueue, 'sendTaskMessage');
-      sendMessageStub.resolves();
+      const startBuildTaskStub = sinon.stub(QueueJobs.prototype, 'startBuildTask');
+      startBuildTaskStub.resolves();
 
       const site = await factory.site();
       let build = await factory.build({ site });
       const buildTaskType = await factory.buildTaskType();
-      const buildTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id})
+      const buildTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
 
       // add N extra for the same site
       const N = 5;
@@ -67,10 +65,10 @@ describe('Build Task model', () => {
       await buildTask.enqueue();
       await buildTask.reload();
 
-      const [queuedTask, priority] = sendMessageStub.getCall(0).args;
+      const [queuedTask, priority] = startBuildTaskStub.getCall(0).args;
 
       // called with higher priority
-      expect(sendMessageStub.called).to.be.true;
+      expect(startBuildTaskStub.called).to.be.true;
       expect(queuedTask.id).to.equal(buildTask.id);
       expect(priority).to.equal(N + 1);
     });

@@ -27,16 +27,15 @@ const {
 } = require('../../../api/models');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
 const siteErrors = require('../../../api/responses/siteErrors');
-const queueJobs = require('../../../api/queue-jobs');
+const QueueJobs = require('../../../api/queue-jobs');
 const EventCreator = require('../../../api/services/EventCreator');
 const DomainService = require('../../../api/services/Domain');
 
-const authErrorMessage =
-  'You are not permitted to perform this action. Are you sure you are logged in?';
+const authErrorMessage = 'You are not permitted to perform this action. Are you sure you are logged in?';
 
 describe('Site API', () => {
   beforeEach(() => {
-    sinon.stub(queueJobs, 'startSiteBuild').resolves();
+    sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
     sinon.stub(EventCreator, 'error').resolves();
 
     return factory.organization.truncate();

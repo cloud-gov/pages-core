@@ -1,6 +1,7 @@
 const {
   BuildTask, BuildTaskType,
 } = require('../../models');
+const BuildTaskQueue = require('../../services/BuildTaskQueue');
 const { createJobLogger } = require('./utils');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
 
@@ -13,43 +14,45 @@ async function buildTaskRunner(
   { sleepNumber = 15000, totalAttempts = 240 } = {}
 ) {
   const logger = createJobLogger(job);
-  const taskId = job.data.TASK_ID;
+  const { buildTaskId } = job.data;
 
-  logger.log(`Running build task id: ${taskId}`);
+  logger.log(`Running build task id: ${buildTaskId}`);
   try {
-    const task = await BuildTask.forRunner().findByPk(taskId);
-    const taskTypeRunner = task.BuildTaskType.runner;
-    const { branch, Site: site } = task.Build;
+    const { buildTask, data } = await BuildTaskQueue.setupTaskEnv(buildTaskId);
+    const taskTypeRunner = buildTask.BuildTaskType.runner;
+    const { branch, Site: site } = buildTask.Build;
     const { owner, repository } = site;
     const apiClient = new CloudFoundryAPIClient();
 
     let cfResponse;
 
     // TODO: rewrite; some tasks rely on scanning the final build url:
-    // for non-production sites, this is task.Build.url
+    // for non-production sites, this is buildTaskId.Build.url
     // for production sites, we overwrite that value with the production domain
     const siteBranchConfig = site.SiteBranchConfigs
-      .find(sbc => sbc.branch === task.Build.branch);
+      .find(sbc => sbc.branch === buildTask.Build.branch);
 
     if (taskTypeRunner === BuildTaskType.Runners.Cf_task) {
       try {
         logger.log(`Starting ${taskTypeRunner} for ${owner}/${repository} on branch ${branch}`);
 
-        const rawTask = task.get({ plain: true });
+        const rawTask = buildTask.get({ plain: true });
+
         if (siteBranchConfig?.Domains?.length) {
           const domain = siteBranchConfig.Domains[0]; // TODO: always the first domain
           rawTask.Build.url = `https://${domain.names.split(',')[0]}`;
         }
-        cfResponse = await apiClient.startBuildTask(rawTask, job, { sleepInterval });
+
+        cfResponse = await apiClient.startBuildTask(rawTask, { data }, { sleepInterval });
 
         if (cfResponse.state === 'FAILED') {
-          logger.log(`CF task failed for ${taskTypeRunner} ${taskId}`);
-          throw new Error(`CF task failed for ${taskTypeRunner} ${taskId}`);
+          logger.log(`CF task failed for ${taskTypeRunner} ${buildTaskId}`);
+          throw new Error(`CF task failed for ${taskTypeRunner} ${buildTaskId}`);
         }
 
         logger.log(`The ${taskTypeRunner} started successfully.`);
       } catch (error) {
-        const message = `Error build task ${taskTypeRunner} ${taskId}: ${error}`;
+        const message = `Error build task ${taskTypeRunner} ${buildTaskId}: ${error}`;
 
         logger.log(message);
         throw new Error(message);
@@ -63,7 +66,7 @@ async function buildTaskRunner(
 
       if (hasCompleted.state === 'FAILED') {
         // Make sure to error task if CF Task failed
-        const failedTask = await BuildTask.findByPk(taskId);
+        const failedTask = await BuildTask.findByPk(buildTaskId);
 
         // Check for any status that hasn't completed
         if (
@@ -80,8 +83,8 @@ async function buildTaskRunner(
       logger.log(
         JSON.stringify({
           state: hasCompleted.state,
-          id: task.id,
-          type: task.BuildTaskType.name,
+          id: buildTask.id,
+          type: buildTask.BuildTaskType.name,
         })
       );
 
@@ -93,12 +96,12 @@ async function buildTaskRunner(
       return true;
     }
 
-    logger.log(`Unknown task runner ${taskId}: ${taskTypeRunner}`);
-    throw new Error(`Unknown task runner ${taskId}: ${taskTypeRunner}`);
+    logger.log(`Unknown task runner ${buildTaskId}: ${taskTypeRunner}`);
+    throw new Error(`Unknown task runner ${buildTaskId}: ${taskTypeRunner}`);
   } catch (err) {
     // TODO: should this hit the update endpoint instead?
     logger.log(`An error occured: ${err?.message}`);
-    const errorTask = await BuildTask.findByPk(taskId);
+    const errorTask = await BuildTask.findByPk(buildTaskId);
     await errorTask.update({ status: BuildTask.Statuses.Error, message: err?.message });
     throw err;
   }

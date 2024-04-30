@@ -8,13 +8,13 @@ const {
   User,
 } = require('../../../../api/models');
 const NightlyBuildsHelper = require('../../../../api/services/NightlyBuildsHelper');
-const queueJobs = require('../../../../api/queue-jobs');
+const QueueJobs = require('../../../../api/queue-jobs');
 
 describe('NightlyBuildsHelper', () => {
   const nightlyConfig = { schedule: 'nightly' };
 
   before(async () => {
-    sinon.stub(queueJobs, 'startSiteBuild').resolves();
+    sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
     await factory.user({ username: process.env.USER_AUDITOR });
   });
 

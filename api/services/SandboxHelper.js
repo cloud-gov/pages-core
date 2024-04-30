@@ -3,12 +3,16 @@ const {
   Op, fn, col, where: whereClause,
 } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
-const Mailer = require('./mailer');
 const {
   User, Organization, Site, Role, UAAIdentity,
 } = require('../models');
 const SiteDestroyer = require('./SiteDestroyer');
 const { sandboxDays } = require('../../config').app;
+const QueueJobs = require('../queue-jobs');
+const { createQueueConnection } = require('../utils/queues');
+
+const connection = createQueueConnection();
+const queueJob = new QueueJobs(connection);
 
 const notifyOrganizations = async (cleaningDate) => {
   const dateStr = moment(cleaningDate).format('YYYY-MM-DD');
@@ -37,7 +41,7 @@ const notifyOrganizations = async (cleaningDate) => {
       },
     ],
   });
-  return Promise.allSettled(orgsToNotify.map(org => Mailer.sendSandboxReminder(org)));
+  return Promise.allSettled(orgsToNotify.map(org => queueJob.sendSandboxReminder(org)));
 };
 
 const destroySites = async (organization) => {

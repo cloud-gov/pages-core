@@ -3,7 +3,7 @@ const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
 const app = require('../../../app');
-const queueJobs = require('../../../api/queue-jobs');
+const QueueJobs = require('../../../api/queue-jobs');
 const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 const EventCreator = require('../../../api/services/EventCreator');
 const factory = require('../support/factory');
@@ -18,7 +18,7 @@ const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
 
 describe('Build API', () => {
   beforeEach(() => {
-    sinon.stub(queueJobs, 'startSiteBuild').resolves();
+    sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
     sinon.stub(EventCreator, 'audit').resolves();
     sinon.stub(EventCreator, 'error').resolves();
   });

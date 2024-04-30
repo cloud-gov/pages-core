@@ -1,6 +1,9 @@
 const SiteDestroyer = require('../../services/SiteDestroyer');
-const Mailer = require('../../services/mailer');
-const Slacker = require('../../services/slacker');
+const QueueJobs = require('../../queue-jobs');
+const { createQueueConnection } = require('../../utils/queues');
+
+const connection = createQueueConnection();
+const queueJob = new QueueJobs(connection);
 
 const { logger } = require('../../../winston');
 
@@ -12,10 +15,7 @@ async function destroySiteInfra({ site, user }) {
 
   if (errors.length > 0) {
     const reason = `Site deletion failed for id: ${site.id} - ${site.owner}/${site.repository}`;
-    Mailer.init();
-    Slacker.init();
-    Mailer.sendAlert(reason, errors);
-    Slacker.sendAlert(reason, errors);
+    queueJob.sendAlert(reason, errors);
     throw new Error(reason);
   }
 

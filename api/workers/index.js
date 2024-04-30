@@ -2,9 +2,6 @@ const path = require('path');
 const IORedis = require('ioredis');
 
 const {
-  app: {
-    appEnv,
-  },
   redis: redisConfig,
   queues: queuesConfig,
 } = require('../../config');
@@ -25,7 +22,6 @@ const {
   NightlyBuildsQueueName,
   ScheduledQueue,
   ScheduledQueueName,
-  SlackQueueName,
   SiteBuildsQueue,
   SiteBuildsQueueName,
   SiteDeletionQueueName,
@@ -36,7 +32,6 @@ const {
 const Processors = require('./jobProcessors');
 const Mailer = require('./Mailer');
 const QueueWorker = require('./QueueWorker');
-const Slack = require('./Slack');
 
 const EVERY_TEN_MINUTES_CRON = '0,10,20,30,40,50 * * * *';
 const NIGHTLY_CRON = '0 5 * * *';
@@ -66,12 +61,8 @@ function pagesWorker(connection) {
   const buildTasksProcessor = job => Processors.buildTaskRunner(job);
   const siteBuildProcessor = job => Processors.siteBuildRunner(job);
   const failBuildsProcessor = job => Processors.failStuckBuilds(job);
-
   const siteDeletionProcessor = job => Processors.destroySiteInfra(job.data);
-
-  const mailJobProcessor = appEnv === 'development'
-    ? job => logger.info(job.data)
-    : job => (new Mailer()).send(job.data);
+  const mailJobProcessor = job => (new Mailer()).send(job.data);
 
   const nightlyBuildsProcessor = () => Processors.nightlyBuilds();
 
@@ -79,8 +70,6 @@ function pagesWorker(connection) {
     sandboxNotifications: Processors.sandboxNotifications,
     cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
   });
-
-  const slackJobProcessor = job => (new Slack()).send(job.data);
 
   const timeoutBuildsProcessor = () => Processors.timeoutBuilds();
 
@@ -105,7 +94,6 @@ function pagesWorker(connection) {
       { concurrency: queuesConfig.siteBuildsConcurrency }
     ),
     new QueueWorker(SiteDeletionQueueName, connection, siteDeletionProcessor),
-    new QueueWorker(SlackQueueName, connection, slackJobProcessor),
     new QueueWorker(TimeoutBuildTasksQueueName, connection, timeoutBuildsProcessor),
   ];
 

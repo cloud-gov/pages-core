@@ -4,10 +4,11 @@ const sinon = require('sinon');
 
 const factory = require('../../support/factory');
 const { notifyOrganizations, cleanSandboxes } = require('../../../../api/services/SandboxHelper');
-const Mailer = require('../../../../api/services/mailer');
+const QueueJobs = require('../../../../api/queue-jobs');
 const { Organization, User, Site, Role, OrganizationRole } = require('../../../../api/models');
 const { sandboxDays } = require('../../../../config').app;
 const SiteDestroyer = require('../../../../api/services/SiteDestroyer');
+
 
 const createSandboxOrgDaysRemaining = async (daysAway = 0, createdAt = new Date()) => {
   const managerRole = await Role.findOne({ where: { name: 'manager' } });
@@ -34,7 +35,7 @@ describe('notifyOrganizations', () => {
   beforeEach(async () => {
     userRole = await Role.findOne({ where: { name: 'user' } });
     managerRole = await Role.findOne({ where: { name: 'manager' } });
-    mailerSpy = sinon.spy(Mailer, 'sendSandboxReminder');
+    mailerSpy = sinon.spy(QueueJobs.prototype, 'sendSandboxReminder');
   });
   afterEach(async () => {
     Organization.truncate();

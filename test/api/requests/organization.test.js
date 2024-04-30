@@ -10,8 +10,8 @@ const csrfToken = require('../support/csrfToken');
 const {
   Organization, OrganizationRole, Role, User,
 } = require('../../../api/models');
-const Mailer = require('../../../api/services/mailer');
 const OrganizationService = require('../../../api/services/organization');
+const QueueJobs = require('../../../api/queue-jobs');
 
 const { requiresAuthentication } = require('./shared');
 
@@ -157,7 +157,7 @@ describe('Organization API', () => {
     it('returns the member and the invitation details for cloud.gov origin upon invitation', async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
-      const origin = 'cloud.gov'
+      const origin = 'cloud.gov';
 
       const [targetUser, org] = await Promise.all([
         factory.user(),
@@ -180,7 +180,7 @@ describe('Organization API', () => {
         origin,
       });
 
-      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+      sinon.stub(QueueJobs.prototype, 'sendUAAInvite').resolves();
 
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
@@ -193,7 +193,7 @@ describe('Organization API', () => {
       expect(member.Role.id).to.eq(roleId);
       expect(member.User.id).to.eq(targetUser.id);
       sinon.assert.calledOnceWithExactly(
-        Mailer.sendUAAInvite,
+        QueueJobs.prototype.sendUAAInvite,
         uaaEmail,
         inviteLink,
         origin,
@@ -228,7 +228,7 @@ describe('Organization API', () => {
         origin,
       });
 
-      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+      sinon.stub(QueueJobs.prototype, 'sendUAAInvite').resolves();
 
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
@@ -239,7 +239,7 @@ describe('Organization API', () => {
       const { invite } = response.body;
       expect(invite.email).to.eq(uaaEmail);
       sinon.assert.calledOnceWithExactly(
-        Mailer.sendUAAInvite,
+        QueueJobs.prototype.sendUAAInvite,
         uaaEmail,
         inviteLink,
         origin,
@@ -272,7 +272,7 @@ describe('Organization API', () => {
         inviteLink,
       });
 
-      sinon.stub(Mailer, 'sendUAAInvite').resolves();
+      sinon.stub(QueueJobs.prototype, 'sendUAAInvite').resolves();
 
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
