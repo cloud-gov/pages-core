@@ -654,4 +654,73 @@ describe('Build API', () => {
         .catch(done);
     });
   });
+
+  describe('POST /v0/build/:id/metrics/:token', () => {
+    const postBuildMetrics = (options) => {
+      const buildToken = options.buildToken || options.build.token;
+
+      return request(app)
+        .post(`/v0/build/${options.build.id}/metrics/${buildToken}`)
+        .type('json')
+        .send(options.metrics);
+    };
+
+    beforeEach(() => {
+      nock.cleanAll();
+    });
+
+    it('should respond with a 404 for an id that is NaN', (done) => {
+      postBuildMetrics({
+        build: { id: 'invalid-build-id', token: 'invalid-token' },
+        metrics: { cpu: 100 },
+      }).expect(404, done);
+    });
+
+    it('should respond with a 404 for a build that does not exist', (done) => {
+      const build = { id: -1, token: 'good-token' };
+      postBuildMetrics({
+        build,
+        metrics: { cpu: 100 },
+      }).expect(404, done);
+    });
+
+    it('should respond with a 403 and not modify the build for an invalid build token', (done) => {
+      let build;
+
+      factory.build()
+        .then((model) => {
+          build = model;
+        })
+        .then(() => postBuildMetrics({
+          build,
+          buildToken: 'invalid-token',
+          metrics: { cpu: 100 },
+        }).expect(403))
+        .then(() => Build.findByPk(build.id))
+        .then((unmodifiedBuild) => {
+          expect(unmodifiedBuild.metrics).to.be.null;
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should respond with a 200 and modify the build for a correct build token', (done) => {
+      let build;
+
+      factory.build()
+        .then((model) => {
+          build = model;
+        })
+        .then(() => postBuildMetrics({
+          build,
+          metrics: { cpu: 100 },
+        }).expect(200))
+        .then(() => Build.findByPk(build.id))
+        .then((modifiedBuild) => {
+          expect(modifiedBuild.metrics.cpu).to.equal(100);
+          done();
+        })
+        .catch(done);
+    });
+  });
 });
