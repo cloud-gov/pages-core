@@ -1,3 +1,5 @@
+const merge = require('lodash.merge');
+
 const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
 const GithubBuildHelper = require('../services/GithubBuildHelper');
@@ -176,8 +178,8 @@ module.exports = wrapHandlers({
       return res.forbidden();
     }
 
-    // use the full body to update the metrics, leave existing properties
-    const metrics = { ...build.metrics, ...body };
+    // use the full body to update the metrics, requires merge for nested metrics
+    const metrics = merge({}, build.metrics, body);
     await build.update({ metrics });
 
     return res.ok();
