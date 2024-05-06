@@ -38,6 +38,7 @@
     "js-yaml": "^4.1.0",
     "json-templates": "^5.0.0",
     "jsonwebtoken": "^9.0.2",
+    "lodash.merge": "^4.6.2",
     "moment": "^2.29.2",
     "node-schedule": "^2.1.1",
     "nunjucks": "^3.2.4",
