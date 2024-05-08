@@ -8,7 +8,6 @@ const { ScheduledQueue, ScheduledQueueName } = require('./ScheduledQueue');
 const { SiteBuildQueue, SiteBuildQueueName } = require('./SiteBuildQueue');
 const { SiteBuildsQueue, SiteBuildsQueueName } = require('./SiteBuildsQueue');
 const { SiteDeletionQueue, SiteDeletionQueueName } = require('./SiteDeletionQueue');
-const { SlackQueue, SlackQueueName } = require('./SlackQueue');
 const { TimeoutBuildTasksQueue, TimeoutBuildTasksQueueName } = require('./TimeoutBuildTasksQueue');
 
 module.exports = {
@@ -32,8 +31,6 @@ module.exports = {
   SiteBuildsQueueName,
   SiteDeletionQueue,
   SiteDeletionQueueName,
-  SlackQueue,
-  SlackQueueName,
   TimeoutBuildTasksQueue,
   TimeoutBuildTasksQueueName,
 };

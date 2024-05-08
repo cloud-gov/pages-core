@@ -5,6 +5,10 @@ const QueueJobs = require('../queue-jobs');
 const { isEmptyOrBranch, isEmptyOrUrl, shaRegex } = require('../utils/validators');
 const { buildUrl } = require('../utils/build');
 const { buildEnum } = require('../utils');
+const { createQueueConnection } = require('../utils/queues');
+
+const connection = createQueueConnection();
+const queue = new QueueJobs(connection);
 
 const States = buildEnum([
   'created',
@@ -213,7 +217,7 @@ async function enqueue() {
   });
 
   try {
-    await QueueJobs.startSiteBuild(foundBuild, priority);
+    await queue.startSiteBuild(foundBuild, priority);
     await build.updateJobStatus({ status: States.Queued });
   } catch (err) {
     const errMsg = `There was an error, adding the job to SiteBuildQueue: ${err}`;

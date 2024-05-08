@@ -1,8 +1,9 @@
 const { expect } = require('chai');
 const moment = require('moment');
-const Mailer = require('../../../../api/services/mailer');
+const QueueJobs = require('../../../../api/queue-jobs');
 const Templates = require('../../../../api/services/mailer/templates');
 const factory = require('../../support/factory');
+const { connection } = require('../../support/queues');
 const { hostname } = require('../../../../config').app;
 const { Role, User, Site, UAAIdentity } = require('../../../../api/models');
 
@@ -14,22 +15,10 @@ function createUserWithUAAIdentity() {
     });
 }
 
+const queue = new QueueJobs(connection);
+
 describe('mailer', () => {
-  context('when the Mailer has not been initialized', () => {
-    // This test can only be run once since Mailer is a singleton
-    it('throws an error', async () => {
-      const error = await Mailer.sendUAAInvite().catch(e => e);
-
-      expect(error).to.be.an('error');
-      expect(error.message).to.eq('Mail Queue is not initialized, did you forget to call `init()`?');
-    });
-  });
-
   context('when the Mailer has been initialized', () => {
-    before(() => {
-      Mailer.init();
-    });
-
     describe('.sendUAAInvite()', () => {
       const email = 'foo@bar.gov';
       const link = 'https://foobar.gov';
@@ -38,7 +27,7 @@ describe('mailer', () => {
       it('adds a `uaa-invite` job to the mail queue for cloud.gov IDP users', async () => {
         const origin = 'cloud.gov';
 
-        const job = await Mailer.sendUAAInvite(email, link, origin, orgName);
+        const job = await queue.sendUAAInvite(email, link, origin, orgName);
 
         expect(job.name).to.eq('uaa-invite');
         expect(job.data.to).to.deep.eq([email]);
@@ -48,7 +37,7 @@ describe('mailer', () => {
       it('adds a `uaa-invite` job to the mail queue for uaa IDP users', async () => {
         const origin = 'uaa';
 
-        const job = await Mailer.sendUAAInvite(email, link, origin, orgName);
+        const job = await queue.sendUAAInvite(email, link, origin, orgName);
 
         expect(job.name).to.eq('uaa-invite');
         expect(job.data.to).to.deep.eq([email]);
@@ -58,7 +47,7 @@ describe('mailer', () => {
       it('adds a `uaa-invite` job to the mail queue for agency IDP users', async () => {
         const origin = 'agency.gov';
 
-        const job = await Mailer.sendUAAInvite(email, link, origin, orgName);
+        const job = await queue.sendUAAInvite(email, link, origin, orgName);
 
         expect(job.name).to.eq('uaa-invite');
         expect(job.data.to).to.deep.eq([email]);
@@ -73,7 +62,7 @@ describe('mailer', () => {
         const errors = ['some error message'];
         const reason = 'something bad happened';
 
-        const job = await Mailer.sendAlert(reason, errors);
+        const job = await queue.sendAlert(reason, errors);
 
         expect(job.name).to.eq('alert');
         expect(job.data.to).to.deep.eq(['federalist-alerts@gsa.gov']);
@@ -124,9 +113,8 @@ describe('mailer', () => {
         const org = await createSandboxOrg(sandboxNextCleaningAt.toDate());
         const newUser = await createUserWithUAAIdentity();
         await org.addUser(newUser, { through: { roleId: userRole.id } });
-        Mailer.init();
 
-        const jobs = await Mailer.sendSandboxReminder(org);
+        const jobs = await queue.sendSandboxReminder(org);
         jobs.forEach((job) => {
           expect(job.name).to.eq('sandbox-reminder');
           expect(org.Users.find(u => job.data.to.includes(u.UAAIdentity.email))).to.not.be.null;
@@ -145,9 +133,8 @@ describe('mailer', () => {
         const nonUAAUser = await factory.user();
         await org.addUser(nonUAAUser, { through: { roleId: userRole.id } });
         await org.reload();
-        Mailer.init();
 
-        const error = await Mailer.sendSandboxReminder(org).catch(e => e);
+        const error = await queue.sendSandboxReminder(org).catch(e => e);
 
         expect(error).to.be.an('error');
         expect(error.message).to.contain(`Failed to queue a sandbox reminder for organization@id=${org.id}`);

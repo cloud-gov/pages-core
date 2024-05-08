@@ -3,9 +3,12 @@ const { Op } = require('sequelize');
 const PromisePool = require('@supercharge/promise-pool');
 const BuildLogs = require('../../services/build-logs');
 const { Build } = require('../../models');
-const Mailer = require('../../services/mailer');
-const Slacker = require('../../services/slacker');
 const { createJobLogger } = require('./utils');
+const QueueJobs = require('../../queue-jobs');
+const { createQueueConnection } = require('../../utils/queues');
+
+const connection = createQueueConnection();
+const queueJob = new QueueJobs(connection);
 
 async function archiveBuildLogsDaily(job) {
   const logger = createJobLogger(job);
@@ -42,10 +45,7 @@ async function archiveBuildLogsDaily(job) {
   logger.log(errMsg);
   await logger.flush();
 
-  Mailer.init();
-  Slacker.init();
-  Mailer.sendAlert(errMsg, errors);
-  Slacker.sendAlert(errMsg, errors);
+  queueJob.sendAlert(errMsg, errors);
 
   throw new Error(errMsg);
 }

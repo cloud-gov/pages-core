@@ -8,10 +8,6 @@ class BuildTasksQueue extends Queue {
       connection,
       defaultJobOptions: {
         attempts,
-        backoff: {
-          type: 'exponential',
-          delay: 3000,
-        },
       },
     });
   }

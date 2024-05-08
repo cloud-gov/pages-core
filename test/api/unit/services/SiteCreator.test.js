@@ -15,11 +15,11 @@ const {
   User,
   SiteBranchConfig,
 } = require('../../../../api/models');
-const queueJobs = require('../../../../api/queue-jobs');
+const QueueJobs = require('../../../../api/queue-jobs');
 
 describe('SiteCreator', () => {
   beforeEach(() => {
-    sinon.stub(queueJobs, 'startSiteBuild').resolves();
+    sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
   });
 
   afterEach(() => {

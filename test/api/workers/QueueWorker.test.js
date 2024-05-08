@@ -1,8 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 const { expect } = require('chai');
-const IORedis = require('ioredis');
-
-const { redis: redisConfig } = require('../../../config');
+const { connection } = require('../support/queues');
 
 const QueueWorker = require('../../../api/workers/QueueWorker');
 
@@ -14,10 +12,6 @@ describe('QueueWorker', () => {
     let queueWorker;
 
     before(() => {
-      const connection = new IORedis(redisConfig.url, {
-        tls: redisConfig.tls,
-        maxRetriesPerRequest: null
-      });
       queueWorker = new QueueWorker(queueName, connection, processor);
     });
 

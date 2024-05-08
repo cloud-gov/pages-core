@@ -8,9 +8,13 @@ const {
 const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
-const Mailer = require('../../services/mailer');
 const EventCreator = require('../../services/EventCreator');
 const OrganizationService = require('../../services/organization');
+const QueueJobs = require('../../queue-jobs');
+const { createQueueConnection } = require('../../utils/queues');
+
+const connection = createQueueConnection();
+const queueJob = new QueueJobs(connection);
 
 async function listForUsersReportHelper(req, res, scopes) {
   const { limit, page } = req.query;
@@ -175,7 +179,7 @@ module.exports = wrapHandlers({
       link,
     });
     if (link) {
-      await Mailer.sendUAAInvite(email, link, origin, org.name);
+      await queueJob.sendUAAInvite(email, link, origin, org.name);
       EventCreator.audit(
         Event.labels.ADMIN_ACTION,
         req.user,
@@ -208,7 +212,7 @@ module.exports = wrapHandlers({
       { user: { email }, link }
     );
     if (link) {
-      await Mailer.sendUAAInvite(email, link, origin);
+      await queueJob.sendUAAInvite(email, link, origin);
     }
 
     const json = {

@@ -1,10 +1,12 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize');
-
 const URLSafeBase64 = require('urlsafe-base64');
-
 const { buildEnum } = require('../utils');
-const BuildTaskQueue = require('../services/BuildTaskQueue');
+const QueueJobs = require('../queue-jobs');
+const { createQueueConnection } = require('../utils/queues');
+
+const connection = createQueueConnection();
+const queue = new QueueJobs(connection);
 
 const Statuses = buildEnum([
   'created',
@@ -112,7 +114,7 @@ async function enqueue() {
     include: { model: Build, required: true },
   });
 
-  await BuildTaskQueue.sendTaskMessage(fullBuildTask, priority);
+  await queue.startBuildTask(fullBuildTask, priority);
   await this.update({ status: Statuses.Queued });
 }
 

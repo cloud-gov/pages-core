@@ -1,16 +1,12 @@
 const path = require('path');
-const IORedis = require('ioredis');
+const {
+  BuildTask,
+} = require('../models');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const { BuildTasksQueue } = require('../queues');
 const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
-
-const connection = new IORedis(config.redis.url, {
-  tls: config.redis.tls,
-  maxRetriesPerRequest: null,
-});
 
 const statusCallbackURL = buildTask => new URL(
   path.join('/v0/tasks', String(buildTask.id), buildTask.token),
@@ -62,16 +58,20 @@ const setupBucket = async (build) => {
 };
 
 const BuildTaskQueue = {
-  bullClient: new BuildTasksQueue(connection),
-};
+  messageBodyForBuild: async buildTask => buildContainerEnvironment(buildTask),
 
-BuildTaskQueue.messageBodyForBuild = buildTask => buildContainerEnvironment(buildTask);
+  setupTaskEnv: async (buildTaskId) => {
+    const buildTask = await BuildTask.forRunner().findByPk(buildTaskId);
 
-BuildTaskQueue.sendTaskMessage = async (buildTask, priority) => {
-  const message = await BuildTaskQueue.messageBodyForBuild(buildTask);
-  await setupBucket(buildTask.Build);
+    await setupBucket(buildTask.Build);
 
-  return BuildTaskQueue.bullClient.add(buildTask.BuildTaskType.name, message, { priority });
+    const data = await BuildTaskQueue.messageBodyForBuild(buildTask);
+
+    return {
+      buildTask,
+      data,
+    };
+  },
 };
 
 module.exports = BuildTaskQueue;

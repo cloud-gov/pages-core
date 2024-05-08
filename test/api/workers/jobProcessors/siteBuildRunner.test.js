@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const IORedis = require('ioredis');
-const { QueueEvents } = require('bullmq');
+const { QueueEvents, Queue } = require('bullmq');
 const QueueWorker = require('../../../../api/workers/QueueWorker');
 const {
   Build,
@@ -19,9 +18,9 @@ const {
 } = require('../../../../api/queues');
 const jobProcessors = require('../../../../api/workers/jobProcessors');
 const SiteBuildQueueService = require('../../../../api/services/SiteBuildQueue');
-const { redis: redisConfig } = require('../../../../config');
 const factory = require('../../support/factory');
 const { promisedQueueEvents } = require('../../support/queues');
+const { createQueueConnection } = require('../../../../api/utils/queues');
 
 const buildIncludeOptions = {
   include: [
@@ -50,11 +49,6 @@ const taskMessage = buildId => ({
 
 const testJobOptions = { sleepNumber: 0, totalAttempts: 240 };
 
-const connection = new IORedis(redisConfig.url, {
-  tls: redisConfig.tls,
-  maxRetriesPerRequest: null,
-});
-
 async function cleanDb() {
   return Promise.all([
     BuildTask.truncate(),
@@ -69,21 +63,22 @@ describe('siteBuildRunner', () => {
   });
 
   describe('Expected Worker Output', () => {
+    const connection = createQueueConnection();
+    const queueName = 'test-site-build-queue';
+    // eslint-disable-next-line no-unused-vars
     const worker = new QueueWorker(
-      SiteBuildsQueueName,
+      queueName,
       connection,
       job => jobProcessors.siteBuildRunner(job, testJobOptions)
     );
+    const queue = new Queue(queueName, {
+      connection,
+      defaultJobOptions: { attempts: 1 },
+    });
 
     // Set the queue to only attempt jobs once for testing
-    const queue = new SiteBuildsQueue(connection);
-    const queueEvents = new QueueEvents(SiteBuildsQueueName, { connection });
-
-    after(async () => {
-      await worker.close();
-      await queueEvents.close();
-      await queue.close();
-    });
+    // const queue = new SiteBuildsQueue(connection);
+    const queueEvents = new QueueEvents(queueName, { connection });
 
     afterEach(async () => {
       await queue.obliterate({ force: true });

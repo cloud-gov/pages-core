@@ -2,10 +2,14 @@ const json2csv = require('@json2csv/plainjs');
 const { serialize, serializeMany } = require('../../serializers/organization');
 const { paginate, wrapHandlers } = require('../../utils');
 const { Organization, Event } = require('../../models');
-const Mailer = require('../../services/mailer');
 const OrganizationService = require('../../services/organization');
 const EventCreator = require('../../services/EventCreator');
 const { fetchModelById } = require('../../utils/queryDatabase');
+const QueueJobs = require('../../queue-jobs');
+const { createQueueConnection } = require('../../utils/queues');
+
+const connection = createQueueConnection();
+const queueJob = new QueueJobs(connection);
 
 // An experimental, more generic hook
 function organizationAuditHook(instance, { user, event }) {
@@ -112,7 +116,7 @@ module.exports = wrapHandlers({
     );
 
     if (link) {
-      await Mailer.sendUAAInvite(email, link, origin, org.name);
+      await queueJob.sendUAAInvite(email, link, origin, org.name);
     }
 
     const json = {

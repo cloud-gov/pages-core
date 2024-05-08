@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
-const queueJobs = require('../../../../api/queue-jobs');
+const QueueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
 const { Build, Site, BuildTask } = require('../../../../api/models');
 const config = require('../../../../config');
@@ -33,7 +33,7 @@ describe('Build model', () => {
 
   describe('enqueue', () => {
     it('should send a build new build message', async () => {
-      const stubStartSiteBuild = sinon.stub(queueJobs, 'startSiteBuild');
+      const stubStartSiteBuild = sinon.stub(QueueJobs.prototype, 'startSiteBuild');
 
       const site = await factory.site();
       const build = await factory.build({ site });
@@ -60,7 +60,7 @@ describe('Build model', () => {
     });
 
     it('should send a build new build message', async () => {
-      const stubStartSiteBuild = sinon.stub(queueJobs, 'startSiteBuild');
+      const stubStartSiteBuild = sinon.stub(QueueJobs.prototype, 'startSiteBuild');
 
       const site = await factory.site();
       const build = await factory.build({ site });

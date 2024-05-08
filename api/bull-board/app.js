@@ -18,7 +18,6 @@ const {
   SiteBuildQueue,
   SiteDeletionQueue,
   ScheduledQueue,
-  SlackQueue,
   TimeoutBuildTasksQueue,
 } = require('../queues');
 
@@ -46,7 +45,6 @@ createBullBoard({
     new BullMQAdapter(new MailQueue(connection)),
     new BullMQAdapter(new NightlyBuildsQueue(connection)),
     new BullMQAdapter(new SiteDeletionQueue(connection)),
-    new BullMQAdapter(new SlackQueue(connection)),
     new BullMQAdapter(new ScheduledQueue(connection)),
     new BullMQAdapter(new TimeoutBuildTasksQueue(connection)),
   ],
