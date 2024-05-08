@@ -561,13 +561,19 @@ The frontend UI should be structured to improve consistency and developer experi
 
 Queues are the different event streams that accept jobs, process them, and are kept in the [./api/queues](../api/queues) directory.
 
+#### Concurrency
+
+Bullmq allows us to define the number of concurrent jobs that can be in an `active` state. The `concurrency` property can be assigned when defining a new queue. This setting allows the queue to self manage the number of jobs being processed at one time and manage resource load that may be required to process a job. To enforce queue concurrency when using CF tasks or an external resource to run a process, the worker's job is left running to poll the CF task status so the job completes once the downstream resource/CF task completes. This is a limitation of bullmq's built-in queue concurrency.
+
+When a queue is processing the maximum number of jobs, all new jobs will be placed into either a `waiting` or a `prioritized` state. All jobs in the `waiting` state will be ordered in a first in first out (FIFO) arrangement. If the `priority` property is included with the add job request, bullmq will order the `prioritized` jobs to be processed based on the number provided. The lower the number, the higher priority. Priority is used to distribute customer jobs equitably so a single customer cannot exhaust resources and disrupt other customer needs.
+
 ### Queue Jobs
 
-Queue jobs are actions that add a job to a queue and are kept in the [./api/queue-jobs](../api/queue-jobs) directory.
+Queue jobs are actions that add a job to a queue and are kept in the [./api/queue-jobs](../api/queue-jobs) directory. The `QueueJobs` class provides methods to add jobs to a variety of queues. These methods should normally take two arguments. The first argument should be the message/data the worker will recieve to process the job. The second argument should be the job priority number.
 
 ### Workers
 
-Workers are the processors that handle a job in a queue and are kept in the [./api/workers](../api/workers) directory.
+Workers are the processors that handle a job in a queue and are kept in the [./api/workers](../api/workers) directory. Workers are the functions that process the job added to a queue. They run in a separate worker application deployed along side the app and can either process the job on the worker itself or launch a CF task in an external application and listen to the CF task status until the status completes.
 
 ## Architecture Notes
 
