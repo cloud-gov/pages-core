@@ -34,6 +34,10 @@ module.exports = {
   build: {
     token: '123abc',
   },
+  encryption: {
+    algorithm: 'aes-256-gcm',
+    key: 'a-secret-test-key',
+  },
   s3: {
     accessKeyId: '123abc',
     secretAccessKey: '456def',
@@ -55,9 +59,7 @@ module.exports = {
         callbackURL: 'http://localhost:1337/external/auth/github/callback',
         scope: ['user', 'repo'],
       },
-      organizations: [
-        123456,
-      ],
+      organizations: [123456],
     },
     uaa: {
       host: 'https://uaa.example.com',

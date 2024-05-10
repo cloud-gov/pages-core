@@ -25,8 +25,22 @@ if (rdsCreds) {
   throw new Error('No database credentials found.');
 }
 
+// Encryption Config
+const encryptCreds = appEnv.getServiceCreds(`pages-${APP_ENV}-encryption`);
+
+if (encryptCreds) {
+  module.exports.encryption = {
+    key: encryptCreds.key,
+    algorithm: encryptCreds.algorithm,
+  };
+} else {
+  throw new Error('No encryption key found');
+}
+
 // S3 Configs for Build Logs
-const s3BuildLogsCreds = appEnv.getServiceCreds(`${servicePrefix}-s3-build-logs`);
+const s3BuildLogsCreds = appEnv.getServiceCreds(
+  `${servicePrefix}-s3-build-logs`
+);
 if (s3BuildLogsCreds) {
   module.exports.s3BuildLogs = {
     accessKeyId: s3BuildLogsCreds.access_key_id,

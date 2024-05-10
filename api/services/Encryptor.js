@@ -32,4 +32,18 @@ function encrypt(value, key, { hintSize = 4 } = {}) {
   return { ciphertext, hint };
 }
 
-module.exports = { ALGORITHM, encrypt };
+function decrypt(ciphertext, key) {
+  const hashedKey = Crypto.createHash('sha256').update(key).digest();
+  const [authTagHex, ivHex, encrypted] = ciphertext.split(':');
+
+  const iv = Buffer.from(ivHex, 'hex');
+  const authTag = Buffer.from(authTagHex, 'hex');
+
+  const decipher = Crypto.createDecipheriv(ALGORITHM, hashedKey, iv);
+
+  decipher.setAuthTag(authTag);
+
+  return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+}
+
+module.exports = { ALGORITHM, encrypt, decrypt };

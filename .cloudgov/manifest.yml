@@ -22,6 +22,7 @@ applications:
       - pages-((env))-redis
       - pages-((env))-proxy
       - pages-((env))-domain
+      - pages-((env))-encryption
       - federalist-((env))-uev-key
       - federalist-deploy-user
       - federalist-site-wide-error
