@@ -12,7 +12,6 @@ env-cf: &env-cf
 test-api: &test-api
   - in_parallel:
     - get: redis
-      params: {save: true}
     - get: postgres
     - get: node
 
@@ -429,10 +428,13 @@ resources:
       interval: 5m
 
   - name: redis
-    type: docker-image
+    type: registry-image
     source:
-      repository: redis
-      tag: 5-alpine
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: pages-redis-v7.2
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: postgres
     type: registry-image
@@ -443,8 +445,11 @@ resources:
   - name: node
     type: registry-image
     source:
-      repository: node
-      tag: 20.9-bullseye
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: pages-node-v20
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: slack
     type: slack-notification
@@ -490,7 +495,11 @@ resource_types:
   - name: github-release
     type: registry-image
     source:
-      repository: concourse/github-release-resource
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: github-release-resource
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: slack-notification
     type: registry-image
@@ -509,7 +518,7 @@ resource_types:
       repository: registry-image-resource
       aws_region: us-gov-west-1
       tag: latest
-      
+
   - name: time
     type: registry-image
     source:
