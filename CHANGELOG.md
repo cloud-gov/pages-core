@@ -1,3 +1,22 @@
+## 0.9.0 (2024-05-13)
+
+### Added
+
+- build metrics API (#4328)
+
+### Fixed
+
+- use nested merge for build metrics
+- Send sandbox reminders to UAA email address (#4425)
+
+### Maintenance
+
+- release build scans in production
+- container hardening
+- **docs**: Add documentation for working with and creating queues
+- Refactor build task queue job processor
+- Refactor site build queue and worker
+
 ## 0.8.2 (2024-04-24)
 
 ### Maintenance
