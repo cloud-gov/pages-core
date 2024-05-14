@@ -1,3 +1,9 @@
+## 0.9.1 (2024-05-14)
+
+### Maintenance
+
+- update the memory and disk settings for large containers
+
 ## 0.9.0 (2024-05-13)
 
 ### Added
