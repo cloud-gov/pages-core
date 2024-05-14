@@ -492,8 +492,11 @@ resources:
   - name: postgres
     type: registry-image
     source:
-      repository: postgres
-      tag: 15-alpine
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: pages-postgres-v15
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: node
     type: registry-image
