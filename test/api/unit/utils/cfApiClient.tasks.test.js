@@ -67,8 +67,8 @@ describe('CloudFoundryAPIClient', () => {
       const path = `/v3/apps/${guid}/tasks`;
       const commandParam = message.environment[0];
       const taskParams = {
-        disk_in_mb: 6 * 1024,
-        memory_in_mb: 2 * 1024,
+        disk_in_mb: 7 * 1024,
+        memory_in_mb: 8 * 1024,
         name: `build-${jobId}`,
         command: `cd app && python main.py -p '${JSON.stringify({
           [commandParam.name]: commandParam.value,

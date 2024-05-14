@@ -232,8 +232,8 @@ class CloudFoundryAPIClient {
         memory_in_mb: 2 * 1024,
       },
       large: {
-        disk_in_mb: 6 * 1024,
-        memory_in_mb: 2 * 1024,
+        disk_in_mb: 7 * 1024,
+        memory_in_mb: 8 * 1024,
       },
     };
 
