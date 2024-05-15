@@ -15,7 +15,6 @@ const {
   MailQueue,
   NightlyBuildsQueue,
   SiteBuildsQueue,
-  SiteBuildQueue,
   SiteDeletionQueue,
   ScheduledQueue,
   TimeoutBuildTasksQueue,
@@ -36,7 +35,6 @@ const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
   queues: [
-    new BullMQAdapter(new SiteBuildQueue(connection)),
     new BullMQAdapter(new SiteBuildsQueue(connection)),
     new BullMQAdapter(new ArchiveBuildLogsQueue(connection)),
     new BullMQAdapter(new BuildTasksQueue(connection)),
