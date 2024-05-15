@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
+const Encryptor = require('../../../../api/services/Encryptor');
 
 describe('CloudFoundryAPIClient', () => {
   afterEach(() => {
@@ -26,13 +27,16 @@ describe('CloudFoundryAPIClient', () => {
       const method = 'POST';
       const path = `/v3/apps/${guid}/tasks`;
       const commandParam = message.environment[0];
+      const ciphertext = JSON.stringify({
+        [commandParam.name]: commandParam.value,
+      });
+      sinon.stub(Encryptor, 'encrypt')
+        .returns({ ciphertext });
       const taskParams = {
         disk_in_mb: 4 * 1024,
         memory_in_mb: 2 * 1024,
         name: `build-${jobId}`,
-        command: `cd app && python main.py -p '${JSON.stringify({
-          [commandParam.name]: commandParam.value,
-        })}'`,
+        command: `cd app && python main.py -p '${ciphertext}'`,
         metadata: { labels: { type: 'build-task' } },
       };
 
@@ -66,13 +70,16 @@ describe('CloudFoundryAPIClient', () => {
       const method = 'POST';
       const path = `/v3/apps/${guid}/tasks`;
       const commandParam = message.environment[0];
+      const ciphertext = JSON.stringify({
+        [commandParam.name]: commandParam.value,
+      });
+      sinon.stub(Encryptor, 'encrypt')
+        .returns({ ciphertext });
       const taskParams = {
         disk_in_mb: 7 * 1024,
         memory_in_mb: 8 * 1024,
         name: `build-${jobId}`,
-        command: `cd app && python main.py -p '${JSON.stringify({
-          [commandParam.name]: commandParam.value,
-        })}'`,
+        command: `cd app && python main.py -p '${ciphertext}'`,
         metadata: { labels: { type: 'build-task' } },
       };
 
@@ -105,13 +112,16 @@ describe('CloudFoundryAPIClient', () => {
       const method = 'POST';
       const path = `/v3/apps/${guid}/tasks`;
       const commandParam = message.environment[0];
+      const ciphertext = JSON.stringify({
+        [commandParam.name]: commandParam.value,
+      });
+      sinon.stub(Encryptor, 'encrypt')
+        .returns({ ciphertext });
       const taskParams = {
         disk_in_mb: 4 * 1024,
         memory_in_mb: 2 * 1024,
         name: `build-${jobId}`,
-        command: `cd app && python main.py -p '${JSON.stringify({
-          [commandParam.name]: commandParam.value,
-        })}'`,
+        command: `cd app && python main.py -p '${ciphertext}'`,
         metadata: { labels: { type: 'build-task' } },
       };
 

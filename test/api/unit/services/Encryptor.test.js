@@ -1,17 +1,5 @@
 const { expect } = require('chai');
-const Crypto = require('crypto');
 const Encryptor = require('../../../../api/services/Encryptor');
-
-function decrypt(ciphertext, key) {
-  const hashedKey = Crypto.createHash('sha256').update(key).digest();
-  const [authTagHex, ivHex, encrypted] = ciphertext.split(':');
-  const iv = Buffer.from(ivHex, 'hex');
-  const authTag = Buffer.from(authTagHex, 'hex');
-  const decipher = Crypto.createDecipheriv(Encryptor.ALGORITHM, hashedKey, iv);
-  decipher.setAuthTag(authTag);
-  const decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
-  return decrypted;
-}
 
 describe('Encryptor', () => {
   describe('.encrypt', () => {
@@ -20,7 +8,7 @@ describe('Encryptor', () => {
 
     it('encrypts the value', () => {
       const { ciphertext } = Encryptor.encrypt(value, key);
-      const decrypted = decrypt(ciphertext, key);
+      const decrypted = Encryptor.decrypt(ciphertext, key);
 
       expect(decrypted).to.eq(value);
     });

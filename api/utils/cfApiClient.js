@@ -1,7 +1,8 @@
 const _ = require('underscore');
 const parse = require('json-templates');
-const { app: { appEnv } } = require('../../config');
+const { app: { appEnv }, encryption } = require('../../config');
 const CloudFoundryAuthClient = require('./cfAuthClient');
+const Encryptor = require('../services/Encryptor');
 const HttpClient = require('./httpClient');
 const { wait } = require('.');
 
@@ -244,7 +245,11 @@ class CloudFoundryAPIClient {
       (acc, current) => ({ ...acc, [current.name]: current.value }),
       {}
     );
-    const command = `cd app && python main.py -p '${JSON.stringify(commandParams)}'`;
+    const encryptedParams = Encryptor.encrypt(
+      JSON.stringify(commandParams),
+      encryption.key
+    );
+    const command = `cd app && python main.py -p '${encryptedParams.ciphertext}'`;
 
     const taskParams = {
       ...containerSettings,

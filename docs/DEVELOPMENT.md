@@ -160,6 +160,9 @@ The app expects the following user provided services to be provided:
   - `tokenURL`: The UAA url to get a user's token
   - `userURL`: The UAA url to get a user's info
   - `logoutURL`: The UAA url to logout a user
+- `pages-<environment>-encryption`: The credentials used to encrypt data sent to other platform components
+  - `key`: The secret key to be shared across components
+  - `algorithm`: The algorithm used to encrypt the data
 
 #### Deploy in CloudFoundry
 To deploy to CloudFoundry submit the following:
@@ -570,6 +573,8 @@ When a queue is processing the maximum number of jobs, all new jobs will be plac
 ### Queue Jobs
 
 Queue jobs are actions that add a job to a queue and are kept in the [./api/queue-jobs](../api/queue-jobs) directory. The `QueueJobs` class provides methods to add jobs to a variety of queues. These methods should normally take two arguments. The first argument should be the message/data the worker will recieve to process the job. The second argument should be the job priority number.
+
+Site build jobs use the CF Task functionality to remotely execute the command on the independently deployed pages-build-container app. To successfully build a site, the site build job passes the build params when executing a new site build. The command and params are sent via the CF API using the [startSiteBuildTask](../api/utils/cfApiClient.js) method where the method also encrypts the params sent to the CF Tasks via the [Encryptor](../api/services/Encryptor.js). When the site build is executed on the pages-build-container app, it decrypts the site params and starts the build process. The pages-core and pages-build-container apps share the user-provided service `pages-<env>-encryption` to encrypt and decrypt the params with a shared key.
 
 ### Workers
 
