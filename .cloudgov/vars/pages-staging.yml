@@ -14,5 +14,5 @@ new_relic_app_name: web-pages-staging
 proxy_domain: sites.pages-staging.cloud.gov
 cf_cdn_space_name: sites-staging
 node_env: production
-queues_build_tasks_concurrency: 10
-queues_site_builds_concurrency: 10
+queues_build_tasks_concurrency: 4
+queues_site_builds_concurrency: 4
