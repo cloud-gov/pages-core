@@ -1,3 +1,14 @@
+## 0.9.2 (2024-05-21)
+
+### Maintenance
+
+- update release script
+- Update metrics app dependencies (#4419)
+- Increase prod queue concurrencies to max 10
+- Remove decommissioned site build queue related to pages-builder
+- Encrypt site build params #4464
+- use hardened postgres
+
 ## 0.9.1 (2024-05-14)
 
 ### Maintenance
