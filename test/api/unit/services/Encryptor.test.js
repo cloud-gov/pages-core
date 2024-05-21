@@ -35,4 +35,76 @@ describe('Encryptor', () => {
       expect(hint).to.eq('');
     });
   });
+
+  describe('.encryptObjectValues', () => {
+    it('should only encrypt string and number values', () => {
+      const key = 'encrypt-key';
+      const data = {
+        id: 123,
+        name: 'this-is-a-data-object',
+        numberlist: [1, 2, 3],
+        stringList: ['a', 'b', 'c'],
+        getFunction: () => {},
+      };
+
+      const output = Encryptor.encryptObjectValues(data, key);
+      const decryptedId = Encryptor.decrypt(output.id, key);
+      const decryptedName = Encryptor.decrypt(output.name, key);
+
+      expect(decryptedId).to.equal(data.id.toString());
+      expect(decryptedName).to.equal(data.name);
+      expect(output.numberlist).to.equal(data.numberlist);
+      expect(output.stringList).to.equal(data.stringList);
+      expect(typeof output.getFunction).to.equal('function');
+    });
+
+    it('should only encrypt nested string and number values', () => {
+      const key = 'encrypt-key';
+      const data = {
+        id: 123,
+        name: 'this-is-a-data-object',
+        metadata: {
+          name: 'The metadata',
+          type: 'level 1',
+          meta: {
+            name: 'Meta metadata',
+            list: [1, 2, 3],
+          },
+        },
+        attributes: {
+          total: 1,
+        },
+      };
+
+      const output = Encryptor.encryptObjectValues(data, key);
+      const decryptedId = Encryptor.decrypt(output.id, key);
+      const decryptedName = Encryptor.decrypt(output.name, key);
+      const decryptedMetadataName = Encryptor.decrypt(
+        output.metadata.name,
+        key
+      );
+      const decryptedMetadataType = Encryptor.decrypt(
+        output.metadata.type,
+        key
+      );
+      const decryptedMetadataMetaName = Encryptor.decrypt(
+        output.metadata.meta.name,
+        key
+      );
+      const decryptedAttributesTotal = Encryptor.decrypt(
+        output.attributes.total,
+        key
+      );
+
+      expect(decryptedId).to.equal(data.id.toString());
+      expect(decryptedName).to.equal(data.name);
+      expect(decryptedMetadataName).to.equal(data.metadata.name);
+      expect(decryptedMetadataType).to.equal(data.metadata.type);
+      expect(decryptedMetadataMetaName).to.equal(data.metadata.meta.name);
+      expect(output.metadata.meta.list).to.equal(data.metadata.meta.list);
+      expect(decryptedAttributesTotal).to.equal(
+        data.attributes.total.toString()
+      );
+    });
+  });
 });
