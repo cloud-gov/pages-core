@@ -11,6 +11,7 @@ inputs:
   - name: src
   - name: redis
   - name: postgres
+  - name: node-oci
 run:
   dir: src
   path: ci/docker/entrypoint.sh
@@ -18,6 +19,14 @@ run:
     - bash
     - -ceux
     - |
+      pushd ..
+        docker load -i redis/image.tar
+        docker tag "$(cat redis/repository):$(cat redis/tag)" redis:ci
+        docker load -i postgres/image.tar
+        docker tag "$(cat postgres/repository):$(cat postgres/tag)" postgres:ci
+        docker load -i node-oci/image.tar
+        docker tag "$(cat node-oci/repository):$(cat node-oci/tag)" node:ci
+      popd
       docker network prune -f
       docker-compose -f ci/docker/docker-compose.yml run app app/ci/tasks/test-api.sh
       docker-compose -f ci/docker/docker-compose.yml down
