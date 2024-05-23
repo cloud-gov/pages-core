@@ -160,10 +160,24 @@ describe('Authentication requests', () => {
               .expect(302);
 
             const session = await sessionForCookie(cookie);
-
             expect(session.flash.error.length).to.equal(1);
             expect(session.flash.error[0]).to.equal(flashMessage);
             expect(eventAuditStub.called).to.equal(true);
+          });
+        });
+
+        context('when the callback code does not match', () => {
+          it('should return 401', async () => {
+            const oauthState = 'state-123abc';
+            const code = 'code';
+            cfUAANocks.mockFailedExchange(code)
+
+            const cookie = await unauthenticatedSession({ oauthState });
+
+            await request(app)
+              .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
+              .set('Cookie', cookie)
+              .expect(401);
           });
         });
       });
