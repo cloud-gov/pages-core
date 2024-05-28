@@ -1,4 +1,5 @@
 const Crypto = require('crypto');
+const _ = require('underscore');
 
 const ALGORITHM = 'aes-256-gcm';
 
@@ -32,6 +33,28 @@ function encrypt(value, key, { hintSize = 4 } = {}) {
   return { ciphertext, hint };
 }
 
+function encryptObjectValues(obj, key, { hintSize = 4 } = {}) {
+  return _.mapObject(obj, (value) => {
+    if (_.isArray(value) || _.isFunction(value)) {
+      return value;
+    }
+
+    if (_.isObject(value)) {
+      return encryptObjectValues(value, key, { hintSize });
+    }
+
+    if (_.isString(value)) {
+      return encrypt(value, key, { hintSize }).ciphertext;
+    }
+
+    if (_.isNumber(value)) {
+      return encrypt(value.toString(), key, { hintSize }).ciphertext;
+    }
+
+    return value;
+  });
+}
+
 function decrypt(ciphertext, key) {
   const hashedKey = Crypto.createHash('sha256').update(key).digest();
   const [authTagHex, ivHex, encrypted] = ciphertext.split(':');
@@ -46,4 +69,9 @@ function decrypt(ciphertext, key) {
   return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
 }
 
-module.exports = { ALGORITHM, encrypt, decrypt };
+module.exports = {
+  ALGORITHM,
+  encrypt,
+  encryptObjectValues,
+  decrypt,
+};

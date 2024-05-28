@@ -181,7 +181,9 @@ class CloudFoundryAPIClient {
     // TODO: link to template documentation
     const template = parse(task.BuildTaskType.metadata.template);
 
-    const taskParams = template({ task, job });
+    const encryptedTask = Encryptor.encryptObjectValues(task, encryption.key);
+    const encryptedJob = Encryptor.encryptObjectValues(job, encryption.key);
+    const taskParams = template({ task: encryptedTask, job: encryptedJob });
 
     const appGUID = await this.fetchTaskAppGUID(
       task.BuildTaskType.metadata.appName
