@@ -48,8 +48,16 @@ jobs:
       - in_parallel:
         - get: cf-image
         - get: redis
+          params:
+            format: oci
         - get: postgres
+          params:
+            format: oci
         - get: node
+        - get: node-oci
+          resource: node
+          params:
+            format: oci
       - task: install-deps-api
         file: src/ci/partials/install-deps-api.yml
         image: node

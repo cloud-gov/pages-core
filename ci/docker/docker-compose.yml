@@ -2,9 +2,9 @@ version: '3'
 
 services:
   app:
-    image: node:20.9-bullseye
+    image: node:ci
     volumes:
-      - ../..:/app
+      - ../..:/opt/concourse-ci/task/app
     depends_on:
       - db
       - redis
@@ -20,8 +20,8 @@ services:
       CF_API_PASSWORD: deploy_pass
       PROXY_DOMAIN: localhost:1337
   db:
-    image: postgres:15-alpine
+    image: postgres:ci
     environment:
       POSTGRES_PASSWORD: password
   redis:
-    image: redis:5-alpine
+    image: redis:ci
