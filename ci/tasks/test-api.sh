@@ -3,6 +3,6 @@ set -euo pipefail
 
 cd app
 
-yarn test:cover; status=$?
+./scripts/wait-for-it.sh db:5432 -- yarn test:cover; status=$?
 
 exit $status
