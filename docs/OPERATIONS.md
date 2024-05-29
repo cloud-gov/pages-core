@@ -63,3 +63,59 @@ This is a CI task that runs nightly in order to rotate a subset of site bucket k
 Task name: `nightly-site-bucket-key-rotator`
 Task script: [`rotate-bucket-keys.js`](./ci/tasks/rotate-bucket-keys.js)
 Task partial: [`rotate-bucket-keys.yml`](./ci/partials/rotate-bucket-keys.yml)
+
+## Querying
+
+### Build metrics
+
+It may be useful to query the database directly to identify sites that are outliers in build resource usage, or those which rely on engines close to the end of their lives. Here are some examples:
+
+#### Find all builds consuming more than 2GB of disk space
+```sql
+SELECT build.id          AS "build id",
+       build."createdAt" AS "build date",
+       repository,
+       owner,
+       agency,
+       to_char((metrics->'machine'->'disk')::numeric,'999G999G999G999') AS disk
+FROM build, site, organization
+WHERE site.id = build.site
+  AND site."organizationId" = organization.id
+  AND (metrics->'machine'->'disk')::numeric > 2000000000
+ORDER BY metrics->'machine'->'disk' DESC;
+```
+
+#### Find all sites using Ruby 3.1, aggregating by site
+```sql
+SELECT site.id AS "site id",
+       repository,
+       organization.name AS "organization",
+       agency
+FROM site, organization, build
+WHERE site.id = build.site
+  AND site."organizationId" = organization.id
+  AND metrics->'engines'->'ruby' IS NOT NULL
+  AND metrics->'engines'->'ruby'->>'version' LIKE 'ruby 3.1%'
+GROUP BY site.id, organization.name, agency;
+```
+
+#### Find all organization manager email addresses for sites using Node v18
+```sql
+SELECT uaa_identity.email AS "uaa email",
+       site.id AS "site id",
+       repository,
+       organization.name AS "organization",
+       organization.agency
+FROM "user", organization_role, organization, role, uaa_identity, site, build
+WHERE "user".id = organization_role."userId"
+  AND organization.id = organization_role."organizationId"
+  AND role.id = organization_role."roleId"
+  AND role.name = 'manager'
+  AND "user".id = uaa_identity."userId"
+  AND site.id = build.site
+  AND organization.id = site."organizationId"
+  AND metrics->'engines'->'node' IS NOT NULL
+  AND metrics->'engines'->'node'->>'version' LIKE 'v18%'
+GROUP BY uaa_identity.email, site.id, organization.name, agency
+ORDER BY uaa_identity.email, site.id;
+```
