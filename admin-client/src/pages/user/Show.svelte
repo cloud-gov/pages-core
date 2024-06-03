@@ -85,7 +85,7 @@
     <div class="grid-row">
       {#if user.UAAIdentity}
         <div class="tablet:grid-col-fill padding-bottom-1">
-          <LabeledItem label="uaa user id" value={user.UAAIdentity.userId} />
+          <LabeledItem label="uaa identity id" value={user.UAAIdentity.id} />
           <LabeledItem label="uaa id" value={user.UAAIdentity.uaaId} />
           <LabeledItem label="uaa origin" value={user.UAAIdentity.origin} />
           <LabeledItem label="uaa email" value={user.UAAIdentity.email} />

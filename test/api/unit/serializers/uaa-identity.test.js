@@ -15,6 +15,7 @@ describe('UAAIdentitySerializer', () => {
       const result = validateJSONSchema(uaaIdentityJson, uaaIdentitySchema);
       expect(result.errors).to.be.empty;
 
+      expect(uaaIdentityJson.id).to.be.undefined;
       expect(uaaIdentityJson.uaaId).to.be.undefined;
     });
 
@@ -26,6 +27,7 @@ describe('UAAIdentitySerializer', () => {
       const result = validateJSONSchema(uaaIdentityJson, uaaIdentitySchema);
       expect(result.errors).to.be.empty;
 
+      expect(uaaIdentityJson.id).to.eq(uaaIdentity.id);
       expect(uaaIdentityJson.uaaId).to.eq(uaaIdentity.uaaId);
     });
   });
