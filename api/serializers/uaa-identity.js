@@ -7,6 +7,7 @@ const attributes = {
 };
 
 const adminAttributes = {
+  id: '',
   uaaId: '',
   userId: '',
   origin: '',
