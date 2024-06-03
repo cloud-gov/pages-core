@@ -7,17 +7,16 @@ module.exports = function sessionAuth(req, res, next) {
   req.session.authRedirectPath = undefined;
   if (req.session.authenticated) {
     const lastAuthenticatedAt = req.session.authenticatedAt;
-    if (!lastAuthenticatedAt || utils.isPastAuthThreshold(lastAuthenticatedAt)) {
-      req.logout((logoutError) => {
-        if (logoutError) {
-          EventCreator.error(Event.labels.AUTHENTICATION, logoutError, { user: req.user });
-        }
-
-        return res.redirect(config.app.hostname);
-      });
+    if (lastAuthenticatedAt && !utils.isPastAuthThreshold(lastAuthenticatedAt)) {
+      return next();
     }
-    // else
-    return next();
+    return req.logout((logoutError) => {
+      if (logoutError) {
+        EventCreator.error(Event.labels.AUTHENTICATION, logoutError, { user: req.user });
+      }
+      EventCreator.error(Event.labels.AUTHENTICATION, 'session timed logout', { user: req.user });
+      return res.redirect(config.app.hostname);
+    });
   }
   // else
   return res.forbidden({

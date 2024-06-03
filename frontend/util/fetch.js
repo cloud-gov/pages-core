@@ -37,6 +37,11 @@ function checkStatus(response) {
 }
 
 function parseJSON(response) {
+  if (response.redirected) {
+    window.location.href = response.url;
+    return {};
+  }
+
   if (response.status === 204) {
     return response;
   }
