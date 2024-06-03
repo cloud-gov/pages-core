@@ -3,14 +3,25 @@ const { Event, User } = require('../models');
 const passport = require('../services/passport');
 const EventCreator = require('../services/EventCreator');
 
-const opts = {
-  failureRedirect: '/',
-  failureFlash: true,
-};
-
 function redirectIfAuthenticated(req, res, next) {
   // eslint-disable-next-line no-unused-expressions
   req.session.authenticated ? res.redirect('/') : next();
+}
+
+function uaaCallback(req, res, next) {
+  // provide this interior callback in place of the default passport.authenticate behavior:
+  // https://github.com/jaredhanson/passport/blob/master/lib/middleware/authenticate.js#L34
+  passport.authenticate('uaa', (err, user, info) => {
+    if (err) {
+      return res.unauthorized();
+    }
+    if (user) {
+      return req.logIn(user, next);
+    }
+    // no user, no error
+    req.session.flash = { error: [info.message] };
+    return res.redirect('/');
+  })(req, res, next);
 }
 
 function onSuccess(req, res) {
@@ -24,7 +35,7 @@ function onSuccess(req, res) {
 // Callbacks need to be registered with CF UAA service
 router.get('/logout', passport.logout());
 router.get('/login', redirectIfAuthenticated, passport.authenticate('uaa'));
-router.get('/auth/uaa/callback', passport.authenticate('uaa', opts), onSuccess);
+router.get('/auth/uaa/callback', uaaCallback, onSuccess);
 router.get('/auth/uaa/logout', (_req, res) => res.redirect('/'));
 
 // New Github authorization only routes

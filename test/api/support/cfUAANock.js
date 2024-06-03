@@ -176,6 +176,22 @@ function mockExchangeToken(code, accessToken) {
     });
 }
 
+function mockFailedExchange(code) {
+  const url = new URL(uaaConfig.tokenURL);
+
+  return nock(url.origin)
+    .post(url.pathname, body => (
+      body.code === code
+      && body.grant_type === 'authorization_code'
+      && body.client_id === uaaConfig.clientID
+      && body.client_secret === uaaConfig.clientSecret
+    ))
+    .reply(401, {
+      error: 'unauthorized',
+      error_description: 'An Authentication object was not found in the SecurityContext'
+    });
+}
+
 /**
  *
  * Flows that require multiple mocks
@@ -233,6 +249,7 @@ function mockServerErrorStatus(status, path, message, accessToken, method = 'get
 module.exports = {
   mockAddUserToGroup,
   mockUAAAuth,
+  mockFailedExchange,
   mockFetchClientToken,
   mockFetchGroupId,
   mockFetchGroupMembers,

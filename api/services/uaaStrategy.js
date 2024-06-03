@@ -39,7 +39,6 @@ function createUAAStrategy(options, verify) {
 
 async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
   const { user_id: uaaId, email } = profile;
-
   const client = new UAAClient();
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
