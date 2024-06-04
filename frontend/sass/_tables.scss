@@ -324,3 +324,67 @@
     vertical-align: middle;
   }
 }
+
+.scan-config-table {
+  margin-bottom: .5em;
+  &,
+  input,
+  select {
+    width: 100%;
+    font-size: 14px;
+  }
+  input,
+  select {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin: .7em 0;
+    height: 2.7em;
+  }
+  td {
+    padding: .5em;
+    p {
+      margin: 0 .5em;
+    }
+  }
+  tr th {
+    padding: 1em .5em;
+  }
+  td:first-child {
+    padding-left: 0;
+    max-width: 50ch;
+  }
+  td:last-child {
+    padding-right: 0;
+    padding-left: 0;
+    width: 10ch;
+    text-align: center;
+  }
+  .button-delete {
+    background-color: transparent;
+    padding: 0 1em;
+    margin: 0;
+    &:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+  }
+  .icon-delete {
+    width: 1.25em;
+    color: #323a45; 
+    &:active {
+      color: #112e51;
+    }
+    &:hover {
+      color: #205493;
+    }
+  }
+  input:disabled {
+    background: #f1f1f1;
+    box-shadow: 0 0 0 1px #aeb0b5;
+    border: none;
+    cursor: not-allowed;
+  }
+}
+.post-scan-config-table-info {
+  margin-top: 1em;
+}

@@ -15,6 +15,7 @@ import IconSpinner from '../../public/images/icons/icon-spinner-solid.svg';
 import IconView from '../../public/images/icons/icon-view.svg';
 import IconRebuild from '../../public/images/icons/icon-rebuild.svg';
 import IconX from '../../public/images/icons/icon-x.svg';
+import IconTrash from '../../public/images/icons/icon-trash.svg';
 
 export {
   IconBook,
@@ -34,4 +35,5 @@ export {
   IconSpinner,
   IconView,
   IconX,
+  IconTrash,
 };
