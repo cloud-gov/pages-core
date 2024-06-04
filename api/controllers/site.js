@@ -14,6 +14,8 @@ const {
   Event,
   Domain,
   SiteBranchConfig,
+  SiteBuildTask,
+  BuildTaskType,
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const {
@@ -21,7 +23,7 @@ const {
   validBasicAuthUsername,
   validBasicAuthPassword,
 } = require('../utils/validators');
-const { toInt, wrapHandlers } = require('../utils');
+const { toInt, wrapHandlers, appMatch } = require('../utils');
 const { fetchModelById } = require('../utils/queryDatabase');
 
 const stripCredentials = ({ username, password }) => {
@@ -263,5 +265,61 @@ module.exports = wrapHandlers({
 
     const siteJSON = domainSerializer.serializeMany(domains);
     return res.json(siteJSON);
+  },
+
+  async getSiteBuildTasks(req, res) {
+    const {
+      user,
+      params: { site_id: siteId },
+    } = req;
+
+    const site = await Site
+      .findByPk(siteId, { include: [{ model: SiteBuildTask, include: [BuildTaskType] }] });
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    await authorizer.findOne(user, site);
+
+    // add app shortname as id
+    const siteBuildTasks = site.SiteBuildTasks.map(sbt => ({
+      id: appMatch(sbt.BuildTaskType),
+      sbtId: sbt.id,
+      metadata: sbt.metadata,
+      branch: sbt.branch,
+      name: sbt.BuildTaskType.name,
+    }));
+
+    return res.json(siteBuildTasks);
+  },
+
+  async updateSiteBuildTask(req, res) {
+    const {
+      user,
+      params: { site_id: siteId, task_id: siteBuildTaskId },
+      body,
+    } = req;
+
+    const { metadata } = body;
+
+    // check Site for authorizer's sake
+    const site = await Site.findByPk(siteId);
+
+    if (!site) {
+      return res.notFound();
+    }
+
+    await authorizer.findOne(user, site);
+
+    const siteBuildTask = await SiteBuildTask.findByPk(siteBuildTaskId);
+
+    if (!siteBuildTask) {
+      return res.notFound();
+    }
+
+    await siteBuildTask.update({ metadata });
+
+    return res.ok({});
   },
 });

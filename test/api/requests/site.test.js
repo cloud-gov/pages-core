@@ -1836,6 +1836,29 @@ describe('Site API', () => {
         })
         .catch(done);
     });
+
+    it('should ignore non-engine params', async () => {
+      const user = await factory.user();
+      const site = await factory.site({
+        users: [user],
+        repository: 'original',
+      });
+      const cookie = await authenticatedSession(user);
+
+      const response = await request(app)
+        .put(`/v0/site/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          repository: 'updated',
+        })
+        .set('Cookie', cookie)
+        .expect(200);
+
+      validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
+      const foundSite = await Site.findByPk(site.id);
+
+      expect(foundSite).to.have.property('repository', 'original');
+    });
   });
 
   describe('Site basic authentication API', () => {

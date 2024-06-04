@@ -242,6 +242,41 @@ describe('buildTaskRunner', () => {
       sinon.assert.calledWith(stubStatus, guid);
     });
 
+    it('should have a successfull CF task with a custom rules', async () => {
+      const guid = 'task-guid';
+      const taskState = 'SUCCEEDED';
+      const jobData = { data: {} };
+
+      const stubStartBuildTask = sinon
+        .stub(CloudFoundryAPIClient.prototype, 'startBuildTask');
+
+      stubStartBuildTask.resolves({ guid, state: 'PENDING' });
+
+      const site = await factory.site();
+      const build = await factory.build({ site: site.id });
+      const siteBuildTask = await factory.siteBuildTask({
+        siteId: site.id,
+        metadata: { rules: ['a custom scan rule'] },
+      });
+      const task = await factory.buildTask({ build, siteBuildTaskId: siteBuildTask.id });
+
+      const taskWithIncludes = await BuildTask.forRunner().findByPk(task.id);
+      const rawTask = taskWithIncludes.get({ plain: true });
+
+      sinon
+        .stub(BuildTaskQueue, 'setupTaskEnv')
+        .resolves({ buildTask: taskWithIncludes, ...jobData });
+
+      const stubStatus = sinon.stub(CloudFoundryAPIClient.prototype, 'pollTaskStatus');
+      stubStatus.resolves({ state: taskState });
+
+      const job = await queue.add('sendTaskMessage', { buildTaskId: task.id });
+      const result = await promisedQueueEvents(queueEvents, 'completed');
+      expect(result.jobId).to.equal(job.id);
+      sinon.assert.calledWith(stubStartBuildTask, rawTask, jobData);
+      sinon.assert.calledWith(stubStatus, guid);
+    });
+
     it('should have a successfull CF task type with multiple startBuildTask calls', async () => {
       const guid = 'task-guid';
       const taskState = 'SUCCEEDED';

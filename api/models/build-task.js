@@ -24,6 +24,7 @@ const associate = ({
   Domain,
   Site,
   SiteBranchConfig,
+  SiteBuildTask,
 }) => {
   BuildTask.belongsTo(Build, {
     foreignKey: 'buildId',
@@ -32,6 +33,9 @@ const associate = ({
   BuildTask.belongsTo(BuildTaskType, {
     foreignKey: 'buildTaskTypeId',
     allowNull: false,
+  });
+  BuildTask.belongsTo(SiteBuildTask, {
+    foreignKey: 'siteBuildTaskId',
   });
   BuildTask.addScope('bySite', id => ({
     where: {
@@ -57,6 +61,7 @@ const associate = ({
   BuildTask.addScope('forRunner', () => ({
     include: [
       BuildTaskType,
+      SiteBuildTask,
       {
         model: Build,
         include: {

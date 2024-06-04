@@ -4,7 +4,7 @@ const { app: { appEnv }, encryption } = require('../../config');
 const CloudFoundryAuthClient = require('./cfAuthClient');
 const Encryptor = require('../services/Encryptor');
 const HttpClient = require('./httpClient');
-const { wait } = require('.');
+const { wait, DEFAULT_SCAN_RULES, appMatch } = require('.');
 
 const TASK_LABEL = 'build-task';
 
@@ -178,10 +178,26 @@ class CloudFoundryAPIClient {
     { attempt = 1, totalAttempts = 3, sleepInterval = 1000 } = {}
   ) {
     // construct the task parameter template by filling in values from the BuildTaskType metadata
-    // TODO: link to template documentation
+    // https://github.com/cloud-gov/pages-cf-build-tasks/?tab=readme-ov-file#docker-command
     const template = parse(task.BuildTaskType.metadata.template);
 
-    const encryptedTask = Encryptor.encryptObjectValues(task, encryption.key);
+    // prior to adding to the template, SiteBuildTask metadata needs to be combined
+    // with the global rules and stringified. we add this to a separate object to
+    // avoid parameter assignment on the task (in case of retries)
+    const taskToEncrypt = JSON.parse(JSON.stringify(task));
+    const rulesForType = DEFAULT_SCAN_RULES[appMatch(taskToEncrypt.BuildTaskType)];
+    if (taskToEncrypt.SiteBuildTask.metadata.rules) {
+      taskToEncrypt.SiteBuildTask.metadata.rules.push(...rulesForType);
+    } else {
+      // eslint-disable-next-line no-param-reassign
+      taskToEncrypt.SiteBuildTask.metadata.rules = rulesForType;
+    }
+    // eslint-disable-next-line no-param-reassign
+    taskToEncrypt.SiteBuildTask.metadata = JSON.stringify(
+      taskToEncrypt.SiteBuildTask.metadata
+    );
+
+    const encryptedTask = Encryptor.encryptObjectValues(taskToEncrypt, encryption.key);
     const encryptedJob = Encryptor.encryptObjectValues(job, encryption.key);
     const taskParams = template({ task: encryptedTask, job: encryptedJob });
 

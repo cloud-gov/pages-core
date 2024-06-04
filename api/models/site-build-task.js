@@ -1,12 +1,17 @@
 const { Op } = require('sequelize');
 
-const associate = ({ BuildTaskType, Site, SiteBuildTask }) => {
+const associate = ({
+  BuildTask, BuildTaskType, Site, SiteBuildTask,
+}) => {
   SiteBuildTask.belongsTo(BuildTaskType, {
     foreignKey: 'buildTaskTypeId',
     allowNull: false,
   });
   SiteBuildTask.belongsTo(Site, {
     foreignKey: 'siteId',
+  });
+  SiteBuildTask.hasMany(BuildTask, {
+    foreignKey: 'siteBuildTaskId',
   });
 };
 
@@ -34,6 +39,7 @@ async function createBuildTasks({ build }) {
   return Promise.all(siteBuildTasks.map(async siteBuildTask => BuildTask.create({
     buildTaskTypeId: siteBuildTask.buildTaskTypeId,
     buildId: build.id,
+    siteBuildTaskId: siteBuildTask.id,
     name: `build: ${build.id}, type: ${siteBuildTask.buildTaskTypeId}`,
   })));
 }

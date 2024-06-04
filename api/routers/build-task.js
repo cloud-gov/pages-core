@@ -6,6 +6,7 @@ const { sessionAuth } = require('../middlewares');
 router.get('/build/:build_id/tasks', sessionAuth, BuildTaskController.list);
 router.get('/build/:build_id/tasks/:build_task_id', sessionAuth, BuildTaskController.find);
 router.put('/tasks/:build_task_id/:token', BuildTaskController.update);
-router.get('/tasks/types', BuildTaskTypeController.list);
+router.get('/tasks/types', sessionAuth, BuildTaskTypeController.list);
+router.get('/tasks/default-rules', sessionAuth, BuildTaskTypeController.getDefaultRules);
 
 module.exports = router;

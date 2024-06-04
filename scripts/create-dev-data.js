@@ -519,7 +519,7 @@ async function createData() {
     name: 'OWASP ZAP Vulnerability Scan',
     description: 'This scan identifies potential website security issues like unintended exposure of sensitive data, SQL injection opportunities, cross-site scripting (XSS) flaws, and the use of components with known vulnerabilities.',
     metadata: {
-      foo: 'bar', // no metadata is real/used yet
+      appName: 'pages-owasp-zap-task-dev',
     },
     runner: 'cf_task',
     startsWhen: 'build',
@@ -574,7 +574,7 @@ async function createData() {
     name: 'WCAG 2.2 AA Accessibility Scan',
     description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG 2.2 Level A and AA requirements.',
     metadata: {
-      foo: 'bar', // no metadata is real/used yet
+      appName: 'pages-a11y-task-dev',
     },
     runner: 'cf_task',
     startsWhen: 'build',
