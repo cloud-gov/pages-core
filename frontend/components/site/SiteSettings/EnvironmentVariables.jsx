@@ -45,6 +45,7 @@ const warningContent = (
     <b>
       FISMA Moderate
     </b>
+    {' '}
     system, do NOT store variables for systems that are High, and
     only expose variables if it is safe to do so. You assume the risk if the
     values you add contain, or allow access to information that is not suitable
@@ -81,7 +82,7 @@ class EnvironmentVariables extends Component {
     return (
       <>
         <h3>Environment Variables</h3>
-        <div className="well">
+        <div>
           <AlertBanner
             status="info"
             message={infoContent}

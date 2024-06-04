@@ -324,3 +324,86 @@
     vertical-align: middle;
   }
 }
+
+.scan-config-table {
+  margin-bottom: .5em;
+  &,
+  input,
+  select {
+    width: 100%;
+    font-size: 14px;
+  }
+  input,
+  select {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin: .7em 0;
+    height: 2.7em;
+  }
+  select {
+    font-weight: bold;
+    cursor: pointer;
+    // unselected select box state
+    &[id^="select-temp-"],
+    &[id="select-"] {
+      color: #1b5982;
+      box-shadow: #0271bc 0px 0px 4px;
+    }
+  }
+  td {
+    padding: .5em;
+    font-size: 14px;
+    vertical-align: baseline;
+    & > p, & > span {
+      margin: 0 .5em;
+    }
+  }
+  .rule-source--Pages {
+    td {
+      vertical-align: middle;
+    }
+  }
+  tr th {
+    padding: 1em .5em;
+    font-size: 16px;
+  }
+  td:first-child {
+    padding-left: 0;
+    max-width: 50ch;
+  }
+  td:last-child {
+    padding-right: 0;
+    padding-left: 0;
+    width: 10ch;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .button-delete {
+    background-color: transparent;
+    padding: 0 1em;
+    margin: 0;
+    &:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+  }
+  .icon-delete {
+    width: 1.25em;
+    color: #323a45; 
+    &:active {
+      color: #112e51;
+    }
+    &:hover {
+      color: #205493;
+    }
+  }
+  input:disabled {
+    background: #f1f1f1;
+    box-shadow: 0 0 0 1px #aeb0b5;
+    border: none;
+    color: #757575;
+  }
+}
+.post-scan-config-table-info {
+  margin-top: 1em;
+}

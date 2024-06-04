@@ -1,4 +1,5 @@
 /* eslint-disable object-curly-newline */
+/* eslint-disable object-curly-newline */
 const fs = require('fs');
 const path = require('path');
 const inflection = require('inflection');
@@ -256,7 +257,6 @@ const DEFAULT_BUILD_TASK_PARAMS = "-p '{ \"STATUS_CALLBACK\": \"{{job.data.STATU
 
 const DEFAULT_SCAN_RULES = {
   'owasp-zap': [
-    { id: '10020', source: 'Pages' },
     { id: '10038', source: 'Pages' },
     { id: '10045', source: 'Pages' },
     { id: '10063', source: 'Pages' },
