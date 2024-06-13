@@ -16,6 +16,7 @@ import ScanConfig from './components/site/ScanConfig';
 import CustomDomains from './components/site/CustomDomains';
 import NewCustomDomain from './components/site/CustomDomains/New';
 import EditCustomDomain from './components/site/CustomDomains/Edit';
+import Scans from './components/site/Scans';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 import Error from './components/Error';
@@ -44,6 +45,7 @@ export default (
     <Route path="sites/new" element={<AddSite />} />
     <Route path="sites/:id" element={<SiteContainer />}>
       <Route path="" loader={() => redirect('builds')} />
+      <Route path="scans" element={<Scans />} />
       <Route path="settings" element={<SiteSettings />} />
       <Route path="published" element={<SitePublishedBranchesTable />} />
       <Route path="published/:name" element={<SitePublishedFilesTable />} />

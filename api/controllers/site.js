@@ -15,12 +15,9 @@ const {
   Event,
   Domain,
   SiteBranchConfig,
-<<<<<<< HEAD
   SiteBuildTask,
   BuildTaskType,
-=======
   BuildTask,
->>>>>>> d58b1c8e (add build task serializers)
 } = require('../models');
 const siteErrors = require('../responses/siteErrors');
 const {
@@ -329,7 +326,6 @@ module.exports = wrapHandlers({
   },
 
   async getSiteTasks(req, res) {
-
     const {
       user,
       params: { site_id: siteId },
@@ -343,9 +339,9 @@ module.exports = wrapHandlers({
 
     await authorizer.findOne(user, site);
 
-    const tasks = await BuildTask.siteScope(site.id).findAll();
-    const tasksJSON = buildTaskSerializer.serializeMany(tasks)
+    const tasks = await BuildTask.bySite(site.id).findAll();
+    const tasksJSON = buildTaskSerializer.serializeMany(tasks);
 
     return res.json(tasksJSON);
-  }
+  },
 });
