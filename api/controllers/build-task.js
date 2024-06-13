@@ -1,6 +1,7 @@
 const { wrapHandlers } = require('../utils');
 const { Build, BuildTask, BuildTaskType } = require('../models');
 const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
+const buildTaskSerializer = require('../serializers/build-task');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -16,7 +17,6 @@ module.exports = wrapHandlers({
 
     const task = await BuildTask.findOne({
       where: { buildId, id: buildTaskId },
-      attributes: { exclude: ['token', 'deletedAt'] },
       include: BuildTaskType,
     });
 
@@ -24,7 +24,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    return res.json(task);
+    const taskJSON = buildTaskSerializer.serialize(task);
+
+    return res.json(taskJSON);
   },
 
   list: async (req, res) => {
@@ -39,7 +41,6 @@ module.exports = wrapHandlers({
 
     const tasks = await BuildTask.findAll({
       where: { buildId },
-      attributes: { exclude: ['token', 'deletedAt', 'name'] },
       include: BuildTaskType,
     });
 
@@ -53,7 +54,9 @@ module.exports = wrapHandlers({
       return task;
     }));
 
-    return res.json(updatedTasks);
+    const tasksJSON = buildTaskSerializer.serializeMany(updatedTasks);
+
+    return res.json(tasksJSON);
   },
 
   update: async (req, res) => {

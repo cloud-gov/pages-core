@@ -59,8 +59,6 @@ describe('Build Task API', () => {
       expect(response.body).to.have.length(2);
       expect(response.body[0]).to.have.keys([
         'artifact',
-        'buildId',
-        'buildTaskTypeId',
         'BuildTaskType',
         'createdAt',
         'id',
@@ -109,19 +107,16 @@ describe('Build Task API', () => {
       expect(response.body).to.be.an('object');
       expect(response.body).to.have.keys([
         'artifact',
-        'buildId',
-        'buildTaskTypeId',
         'BuildTaskType',
         'createdAt',
         'id',
         'message',
         'count',
-        'name',
         'siteBuildTaskId',
         'status',
         'updatedAt',
       ]);
-      expect(response.body.buildId).to.be.equal(build.id);
+      expect(response.body.id).to.be.equal(task.id);
     });
 
     it('should not get build task if user is not associated to the build', async () => {
