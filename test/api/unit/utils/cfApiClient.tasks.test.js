@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const { randomBytes } = require('node:crypto');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const Encryptor = require('../../../../api/services/Encryptor');
 
@@ -143,6 +144,32 @@ describe('CloudFoundryAPIClient', () => {
       expect(stubAuthRequest.callCount).to.equal(3);
       sinon.assert.calledWithExactly(stubFetchTaskAppGUID, appName);
       sinon.assert.calledWithExactly(stubAuthRequest, method, path, taskParams);
+    });
+
+    it('should not start a task and return an error if the command is over 4096 characters', async () => {
+      const jobId = 456;
+      const value = randomBytes(2100).toString('hex');
+      const message = {
+        environment: [
+          {
+            name: 'BUILD',
+            value,
+          },
+        ],
+      };
+      const commandParam = message.environment[0];
+      const ciphertext = JSON.stringify({
+        [commandParam.name]: commandParam.value,
+      });
+      sinon.stub(Encryptor, 'encrypt').returns({ ciphertext });
+
+      const res = await apiClient
+        .startSiteBuildTask(message, jobId)
+        .catch(error => error);
+
+      expect(res.message).to.equal(
+        `Command params for site build job ${jobId} are greater than 4096 characters.`
+      );
     });
   });
 });

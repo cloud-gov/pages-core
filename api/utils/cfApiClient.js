@@ -247,11 +247,26 @@ class CloudFoundryAPIClient {
       (acc, current) => ({ ...acc, [current.name]: current.value }),
       {}
     );
-    const encryptedParams = Encryptor.encrypt(
-      JSON.stringify(commandParams),
-      encryption.key
+    const encryptedParams = Encryptor.encryptObjectValues(
+      commandParams,
+      encryption.key,
+      {
+        onlyEncryptKeys: [
+          'STATUS_CALLBACK',
+          'GITHUB_TOKEN',
+          'AWS_ACCESS_KEY_ID',
+          'AWS_SECRET_ACCESS_KEY',
+          'BUCKET',
+        ],
+      }
     );
-    const command = `cd app && python main.py -p '${encryptedParams.ciphertext}'`;
+    const command = `cd app && python main.py -p '${JSON.stringify(encryptedParams)}'`;
+
+    if (command.length >= 4097) {
+      throw new Error(
+        `Command params for site build job ${jobId} are greater than 4096 characters.`
+      );
+    }
 
     const taskParams = {
       ...containerSettings,
