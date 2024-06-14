@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../../app');
 const factory = require('../support/factory');
@@ -33,7 +34,10 @@ describe('Build Task API', () => {
     await clean();
   });
 
-  afterEach(clean);
+  afterEach(async () => {
+    sinon.restore();
+    await clean();
+  });
 
   describe('GET /v0/build/:build_id/tasks', () => {
     it('should require authentication', (done) => {
@@ -142,6 +146,29 @@ describe('Build Task API', () => {
         .expect(404);
 
       validateAgainstJSONSchema('GET', '/build/{build_id}/tasks', 404, response.body);
+    });
+  });
+
+  describe('POST /v0/build/:build_id/task', () => {
+    it('should create build tasks for a build', async () => {
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+      const site = await factory.site({ users: [user] });
+      const buildTaskType = await factory.buildTaskType();
+      const build = await factory.build({ user, site });
+      await factory.siteBuildTask({
+        siteId: site.id,
+        buildTaskTypeId: buildTaskType.id,
+      });
+
+      const stub = sinon.stub(BuildTask.prototype, 'enqueue');
+
+      await request(app)
+        .post(`/v0/build/${build.id}/task`)
+        .set('Cookie', cookie)
+        .expect(200);
+
+      sinon.assert.calledOnce(stub);
     });
   });
 

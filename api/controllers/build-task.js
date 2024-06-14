@@ -1,5 +1,5 @@
 const { wrapHandlers } = require('../utils');
-const { Build, BuildTask, BuildTaskType, SiteBuildTasks } = require('../models');
+const { Build, BuildTask, BuildTaskType, SiteBuildTask } = require('../models');
 const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
 const buildTaskSerializer = require('../serializers/build-task');
 
@@ -88,16 +88,16 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const siteBuildTasks = await SiteBuildTasks.findAll({
+    const siteBuildTasks = await SiteBuildTask.findAll({
       where: {
         siteId: build.Site.id,
       },
     });
 
-    await Promise.all(siteBuildTasks.flatMap(siteBuildTask => (
+    await Promise.all(siteBuildTasks.map(siteBuildTask => (
       siteBuildTask
-        .createBuildTasks({ build })
-        .map(async task => task.enqueue())
+        .createBuildTask({ build })
+        .then(async task => task.enqueue())
     )));
 
     return res.ok();
