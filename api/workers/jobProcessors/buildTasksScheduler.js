@@ -7,7 +7,7 @@ const { createJobLogger } = require('./utils');
 async function buildTasksScheduler(job) {
   const logger = createJobLogger(job);
 
-  const dayOfTheMonth = moment.now().date();
+  const dayOfTheMonth = moment().date();
   logger.log(`Querying for all tasks which should run on this day of the month: ${dayOfTheMonth}`);
 
   const siteBuildTasks = await SiteBuildTask.findAll({
@@ -28,10 +28,8 @@ async function buildTasksScheduler(job) {
     // always use the branch config with site context
     const { branch } = siteBuildTask.Site.SiteBranchConfigs.find(sbc => sbc.context === 'site');
     // find the latest build matching this branch
-    const build = await Build.findOne({ site: siteBuildTask.Site.id, branch });
-
+    const build = await Build.findOne({ where: { site: siteBuildTask.Site.id, branch } });
     if (!build) return Promise.resolve(null);
-
     return siteBuildTask.createBuildTask({ build });
   })).filter(Boolean);
 
