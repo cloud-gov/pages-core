@@ -1,6 +1,6 @@
 const moment = require('moment');
 const {
-  SiteBuildTask, Site, Build, SiteBranchConfig, Domain,
+  SiteBuildTask, Site, Build, SiteBranchConfig,
 } = require('../../models');
 const { createJobLogger } = require('./utils');
 
@@ -18,10 +18,7 @@ async function buildTasksScheduler(job) {
     },
     include: {
       model: Site,
-      include: {
-        model: SiteBranchConfig,
-        include: Domain,
-      },
+      include: SiteBranchConfig,
     },
   });
 

@@ -79,7 +79,7 @@ module.exports = {
   },
   log: {
     level: 'error',
-    silent: true,
+    silent: process.env.CI,
   },
   s3BuildLogs: {
     accessKeyId: '123abc',
