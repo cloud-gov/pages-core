@@ -1,5 +1,3 @@
-const { Op } = require('sequelize');
-
 const associate = ({
   BuildTask, BuildTaskType, Site, SiteBuildTask,
 }) => {

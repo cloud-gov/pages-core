@@ -1,5 +1,7 @@
 const { wrapHandlers } = require('../utils');
-const { Build, BuildTask, BuildTaskType, SiteBuildTask } = require('../models');
+const {
+  Build, BuildTask, BuildTaskType, SiteBuildTask,
+} = require('../models');
 const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
 const buildTaskSerializer = require('../serializers/build-task');
 
