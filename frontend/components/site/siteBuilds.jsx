@@ -21,6 +21,7 @@ import {
 } from '../icons';
 import { getOrgById } from '../../selectors/organization';
 import { sandboxMsg } from '../../util';
+import api from '../../util/federalistApi'
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
@@ -206,6 +207,12 @@ function SiteBuilds() {
     };
   }, []);
 
+  function scan(build) {
+    return api.runScansForBuild(build.id).then(() => {
+      // TODO: optionally refresh or something?
+    });
+  }
+
   if (!builds.isLoading && !builds.data.length) {
     const header = 'This site does not yet have any builds.';
     const message = 'If this site was just added, the first build should be available within a few minutes.';
@@ -333,17 +340,20 @@ function SiteBuilds() {
                         </div>
                       </td>
                       <td data-title="Actions" className="table-actions">
+
+                        { previewBuilds[build.branch] === build.id && build.state === 'success'
+                        && (
                         <div>
-                          { previewBuilds[build.branch] === build.id && build.state === 'success'
-                          && (
                           <BranchViewLink
                             branchName={build.branch}
                             site={site}
                             showIcon
                             completedAt={build.completedAt}
                           />
-                          ) }
+                          <button onClick={() => scan(build)} type="button">Scan</button>
                         </div>
+                        ) }
+
                         <span>
                           {
                             ['error', 'success'].includes(build.state)

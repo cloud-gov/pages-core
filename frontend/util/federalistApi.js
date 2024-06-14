@@ -369,4 +369,8 @@ export default {
   fetchSiteTasks(siteId) {
     return request(`site/${siteId}/tasks`);
   },
+
+  runScansForBuild(buildId) {
+    return request(`/build/${buildId}/task`, { method: 'POST' });
+  },
 };

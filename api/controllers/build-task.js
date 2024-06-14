@@ -102,6 +102,6 @@ module.exports = wrapHandlers({
         .then(async task => task.enqueue())
     )));
 
-    return res.ok();
+    return res.ok({});
   },
 });
