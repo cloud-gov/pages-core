@@ -646,5 +646,3 @@ resource_types:
       repository: time-resource
       aws_region: us-gov-west-1
       tag: latest
-
-
