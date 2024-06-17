@@ -98,7 +98,7 @@ module.exports = wrapHandlers({
 
     await Promise.all(siteBuildTasks.map(siteBuildTask => (
       siteBuildTask
-        .createBuildTask({ build })
+        .createBuildTask(build)
         .then(async task => task.enqueue())
     )));
 

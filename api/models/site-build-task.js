@@ -13,7 +13,7 @@ const associate = ({
   });
 };
 
-async function createBuildTask({ build }) {
+async function createBuildTask(build) {
   const {
     BuildTask,
   } = this.sequelize.models;

@@ -8,6 +8,7 @@ async function buildTasksScheduler(job) {
   const logger = createJobLogger(job);
 
   const dayOfTheMonth = moment().date();
+
   logger.log(`Querying for all tasks which should run on this day of the month: ${dayOfTheMonth}`);
 
   const siteBuildTasks = await SiteBuildTask.findAll({
@@ -28,14 +29,20 @@ async function buildTasksScheduler(job) {
     // always use the branch config with site context
     const { branch } = siteBuildTask.Site.SiteBranchConfigs.find(sbc => sbc.context === 'site');
     // find the latest build matching this branch
-    const build = await Build.findOne({ where: { site: siteBuildTask.Site.id, branch } });
-    if (!build) return Promise.resolve(null);
-    return siteBuildTask.createBuildTask({ build });
-  })).filter(Boolean);
+    // https://github.com/sequelize/sequelize/issues/7665
+    const builds = await Build.findAll({
+      where: { site: siteBuildTask.Site.id, branch },
+      limit: 1,
+    });
+
+    if (!builds.length) return Promise.resolve(null);
+
+    return siteBuildTask.createBuildTask(builds[0]);
+  }));
 
   logger.log(`Attempting to queue ${tasksToQueue.length} tasks`);
 
-  await Promise.all(tasksToQueue.map(async (task) => {
+  await Promise.all(tasksToQueue.filter(Boolean).map(async (task) => {
     try {
       return task.enqueue();
     } catch (err) {
@@ -43,6 +50,8 @@ async function buildTasksScheduler(job) {
       return false;
     }
   }));
+
+  return true;
 }
 
 module.exports = buildTasksScheduler;

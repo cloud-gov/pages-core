@@ -1,21 +1,14 @@
 const sinon = require('sinon');
 const moment = require('moment');
-const QueueWorker = require('../../../../api/workers/QueueWorker');
 const {
   Build,
   BuildTask,
   Site,
   SiteBuildTask,
 } = require('../../../../api/models');
-const {
-  ScheduledQueue,
-  ScheduledQueueName,
-} = require('../../../../api/queues');
+
 const jobProcessors = require('../../../../api/workers/jobProcessors');
 const factory = require('../../support/factory');
-const { createQueueConnection } = require('../../../../api/utils/queues');
-
-const testJobOptions = { sleepNumber: 0, totalAttempts: 240 };
 
 async function cleanDb() {
   return Promise.all([
@@ -32,25 +25,13 @@ describe('buildTaskScheduler', () => {
   });
 
   describe('Expected Worker Output', () => {
-    const connection = createQueueConnection();
-    // eslint-disable-next-line no-unused-vars
-    const worker = new QueueWorker(
-      ScheduledQueueName,
-      connection,
-      job => jobProcessors.buildTasksScheduler(job, testJobOptions)
-    );
-
-    // Set the queue to only attempt jobs once for testing
-    const queue = new ScheduledQueue(connection, { attempts: 1 });
-
     afterEach(async () => {
-      await queue.obliterate({ force: true });
       await cleanDb();
       await sinon.restore();
     });
 
     it('should queue build tasks on this day of the month', async () => {
-      const stub = sinon.stub(SiteBuildTask.prototype, 'createBuildTask');
+      const stub = sinon.stub(BuildTask.prototype, 'enqueue');
 
       const site = await factory.site();
       const buildTaskType = await factory.buildTaskType();
@@ -65,7 +46,20 @@ describe('buildTaskScheduler', () => {
         branch: 'main',
       });
 
-      await queue.add('buildTasksScheduler', {});
+      // this one shouldn't run
+      const site2 = await factory.site();
+      await factory.siteBuildTask({
+        siteId: site2.id,
+        buildTaskTypeId: buildTaskType.id,
+        metadata: { runDay: moment().add(2, 'days').date() },
+        branch: 'main',
+      });
+      await factory.build({
+        site: site2.id,
+        branch: 'main',
+      });
+
+      await jobProcessors.buildTasksScheduler({ log: () => {} });
       sinon.assert.calledOnce(stub);
     });
   });
