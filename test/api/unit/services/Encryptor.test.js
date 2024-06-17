@@ -37,7 +37,7 @@ describe('Encryptor', () => {
   });
 
   describe('.encryptObjectValues', () => {
-    it('should only encrypt string and number values', () => {
+    it('should only encrypt string, numbers, and array values', () => {
       const key = 'encrypt-key';
       const data = {
         id: 123,
@@ -53,12 +53,49 @@ describe('Encryptor', () => {
 
       expect(decryptedId).to.equal(data.id.toString());
       expect(decryptedName).to.equal(data.name);
-      expect(output.numberlist).to.equal(data.numberlist);
-      expect(output.stringList).to.equal(data.stringList);
+      output.numberlist.map((enc, idx) => expect(
+        Encryptor.decrypt(enc, key)).to.equal(data.numberlist[idx].toString())
+      );
+      output.stringList.map((enc, idx) => expect(
+        Encryptor.decrypt(enc, key)).to.equal(data.stringList[idx])
+      );
       expect(typeof output.getFunction).to.equal('function');
     });
 
-    it('should only encrypt nested string and number values', () => {
+    it('should only encrypt key values when defined in options', () => {
+      const key = 'encrypt-key';
+      const id = 123;
+      const name = 'this-test-object';
+      const describe = 'The testing object';
+      const secret = 'A secret to encrypt';
+      const password = 'Apassword2encrypt';
+      const pin = 8772274669;
+      const onlyEncryptKeys = ['secret', 'password', 'pin'];
+      const data = {
+        id,
+        name,
+        describe,
+        secret,
+        password,
+        pin,
+      };
+
+      const output = Encryptor.encryptObjectValues(data, key, {
+        onlyEncryptKeys,
+      });
+      const decryptedSecret = Encryptor.decrypt(output.secret, key);
+      const decryptedPassword = Encryptor.decrypt(output.password, key);
+      const decryptedPin = Encryptor.decrypt(output.pin, key);
+
+      expect(decryptedSecret).to.equal(secret);
+      expect(decryptedPassword).to.equal(password);
+      expect(decryptedPin).to.equal(pin.toString());
+      expect(output.id).to.equal(id);
+      expect(output.name).to.equal(name);
+      expect(output.describe).to.equal(describe);
+    });
+
+    it('should only encrypt nested string, number, and array values', () => {
       const key = 'encrypt-key';
       const data = {
         id: 123,
@@ -101,7 +138,9 @@ describe('Encryptor', () => {
       expect(decryptedMetadataName).to.equal(data.metadata.name);
       expect(decryptedMetadataType).to.equal(data.metadata.type);
       expect(decryptedMetadataMetaName).to.equal(data.metadata.meta.name);
-      expect(output.metadata.meta.list).to.equal(data.metadata.meta.list);
+      output.metadata.meta.list.map((enc, idx) => expect(
+        Encryptor.decrypt(enc, key)).to.equal(data.metadata.meta.list[idx].toString())
+      );
       expect(decryptedAttributesTotal).to.equal(
         data.attributes.total.toString()
       );
