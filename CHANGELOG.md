@@ -1,3 +1,23 @@
+## 0.9.3 (2024-06-18)
+
+### Fixed
+
+- Only encrypt site build param values based on defined keys
+- reorder session auth logic, handle redirect to prevent unhandled 500 errors
+- **admin**: Show UAAIdentity ID in Admin User page (#4501)
+- send 401 response for bad auth callback (#4512)
+
+### Maintenance
+
+- remove metrics, update yarn.lock
+- **deps**: bump the npm_and_yarn group across 2 directories with 2 updates
+- **ci**: Add necessary pipeline OCI image resources to staging and prod
+- yarn.lock regeneration
+- wait for db port on ci tests
+- Add build metrics query examples (#4500)
+- harden docker in docker use
+- Encrypt build task CF task param values #4509
+
 ## 0.9.2 (2024-05-21)
 
 ### Maintenance
