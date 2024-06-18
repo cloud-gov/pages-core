@@ -21,7 +21,7 @@ import {
 } from '../icons';
 import { getOrgById } from '../../selectors/organization';
 import { sandboxMsg } from '../../util';
-import api from '../../util/federalistApi'
+import api from '../../util/federalistApi';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 
