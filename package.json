@@ -197,5 +197,10 @@
   "lint-staged": {
     "*.js": "eslint",
     "*.jsx": "eslint"
+  },
+  "resolutions": {
+    "socket.io-adapter": "2.5.5",
+    "socket.io": "4.7.5",
+    "socket.io-client": "4.7.5"
   }
 }

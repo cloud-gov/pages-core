@@ -34,5 +34,8 @@
     "svelecte": "^3.17.2",
     "svelte": "^3.0.0",
     "uswds": "^2.14.0"
+  },
+  "resolutions": {
+    "ws": "7.5.10"
   }
 }

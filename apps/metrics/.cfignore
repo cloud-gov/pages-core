@@ -1,7 +1,0 @@
-test
-.eslintrc.js
-npm-debug.log
-coverage
-.nyc_output
-.env
-.env.sample
