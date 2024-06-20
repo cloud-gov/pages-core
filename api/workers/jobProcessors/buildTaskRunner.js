@@ -99,7 +99,6 @@ async function buildTaskRunner(
     logger.log(`Unknown task runner ${buildTaskId}: ${taskTypeRunner}`);
     throw new Error(`Unknown task runner ${buildTaskId}: ${taskTypeRunner}`);
   } catch (err) {
-    // TODO: should this hit the update endpoint instead?
     logger.log(`An error occured: ${err?.message}`);
     const errorTask = await BuildTask.findByPk(buildTaskId);
     await errorTask.update({ status: BuildTask.Statuses.Error, message: err?.message });

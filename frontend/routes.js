@@ -12,6 +12,7 @@ import SiteBuildTasks from './components/site/siteBuildTasks';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
+import ScanConfig from './components/site/ScanConfig';
 import CustomDomains from './components/site/CustomDomains';
 import NewCustomDomain from './components/site/CustomDomains/New';
 import EditCustomDomain from './components/site/CustomDomains/Edit';
@@ -50,6 +51,7 @@ export default (
       <Route path="custom-domains" element={<CustomDomains />} />
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
+      <Route path="scan-config" element={<ScanConfig />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
       {(process.env.FEATURE_BUILD_TASKS === 'active') && (
         <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />

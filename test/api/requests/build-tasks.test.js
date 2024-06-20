@@ -66,7 +66,7 @@ describe('Build Task API', () => {
         'id',
         'message',
         'count',
-        // 'name',
+        'siteBuildTaskId',
         'status',
         'updatedAt',
       ]);
@@ -117,6 +117,7 @@ describe('Build Task API', () => {
         'message',
         'count',
         'name',
+        'siteBuildTaskId',
         'status',
         'updatedAt',
       ]);

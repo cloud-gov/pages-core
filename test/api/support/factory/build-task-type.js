@@ -6,7 +6,7 @@ const _attributes = ({
 } = {}) => ({
   name: name || 'build task type name',
   description: description || 'build task type description',
-  metadata: metadata || { some: 'metadata' },
+  metadata: metadata || { appName: 'a11y' }, // we need a default appName for matching scan rules
   runner: runner || 'cf_task',
   startsWhen: startsWhen || 'complete',
 });

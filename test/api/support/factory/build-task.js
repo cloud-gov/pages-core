@@ -1,11 +1,13 @@
 const buildFactory = require('./build');
 const buildTaskTypeFactory = require('./build-task-type');
+const siteBuildTaskFactory = require('./site-build-task');
 const { BuildTask } = require('../../../../api/models');
 
 // eslint-disable-next-line no-underscore-dangle
 const _attributes = ({
   build,
   buildTaskTypeId,
+  siteBuildTaskId,
   BuildTaskType = {},
   name,
   artifact,
@@ -14,6 +16,7 @@ const _attributes = ({
 } = {}) => ({
   buildId: build || buildFactory(),
   buildTaskTypeId: buildTaskTypeId || buildTaskTypeFactory(),
+  siteBuildTaskId: siteBuildTaskId || siteBuildTaskFactory(),
   BuildTaskType: BuildTaskType || buildTaskTypeFactory(),
   name: name || 'build task name',
   artifact: artifact || '',

@@ -1,3 +1,4 @@
+/* eslint-disable object-curly-newline */
 const fs = require('fs');
 const path = require('path');
 const inflection = require('inflection');
@@ -253,7 +254,28 @@ function truncateString(s, characters = 30) {
 
 const DEFAULT_BUILD_TASK_PARAMS = "-p '{ \"STATUS_CALLBACK\": \"{{job.data.STATUS_CALLBACK}}\", \"TASK_ID\": {{job.data.TASK_ID}}, \"AWS_DEFAULT_REGION\": \"{{job.data.AWS_DEFAULT_REGION}}\", \"AWS_ACCESS_KEY_ID\": \"{{job.data.AWS_ACCESS_KEY_ID}}\", \"AWS_SECRET_ACCESS_KEY\": \"{{job.data.AWS_SECRET_ACCESS_KEY}}\", \"BUCKET\": \"{{job.data.BUCKET}}\" }'";
 
+const DEFAULT_SCAN_RULES = {
+  'owasp-zap': [
+    { id: '10020', source: 'Pages' },
+    { id: '10038', source: 'Pages' },
+    { id: '10045', source: 'Pages' },
+    { id: '10063', source: 'Pages' },
+    { id: '10098', source: 'Pages' },
+    { id: '10099', source: 'Pages' },
+    { id: '90004', source: 'Pages' },
+    { id: '10202', match: ['search_form'], source: 'Pages' },
+    { id: '10097', match: ['/assets/styles'], source: 'Pages' },
+  ],
+  a11y: [],
+};
+
+function appMatch(type) {
+  // get a readable string from a BuildTaskType appName to match the scan rule types
+  return type.metadata.appName.replace(/pages-(.*)-task-.*/, '$1');
+}
+
 module.exports = {
+  appMatch,
   buildEnum,
   generateS3ServiceName,
   generateSubdomain,
@@ -277,4 +299,5 @@ module.exports = {
   wrapHandlers,
   defaultContext,
   DEFAULT_BUILD_TASK_PARAMS,
+  DEFAULT_SCAN_RULES,
 };
