@@ -75,7 +75,7 @@ module.exports = {
   },
   postgres: dbConfig(process.env),
   redis: {
-    url: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
+    url: 'redis://redis:6379',
   },
   log: {
     level: 'error',
