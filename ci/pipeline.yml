@@ -1,0 +1,520 @@
+---
+#@ load("funcs.lib.yml", "slack_hook", "pr_hook")
+#@ load("@ytt:data", "data")
+#@ load("@ytt:template", "template")
+
+#@ env = data.values.env
+
+#! BUILD & DEPLOY
+#@ def build_and_deploy():
+do:
+  - task: build-api
+    file: src/ci/partials/build-api.yml
+    image: node
+    params:
+      APP_HOSTNAME: https://((((deploy-env))-pages-domain))
+      PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
+      FEATURE_BUILD_TASKS: "active"
+
+  - task: deploy-api
+    file: src/ci/partials/deploy.yml
+    image: general-task
+    params:
+      _: #@ template.replace(data.values.env_cf)
+      CF_APP_NAME: pages-((deploy-env))
+      CF_MANIFEST: src/.cloudgov/manifest.yml
+      CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+      CF_PATH: src
+    on_failure:
+      try:
+        task: cancel-api-deployment
+        file: pipeline-tasks/tasks/cancel-deployment.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          CF_APP_NAME: pages-((deploy-env))
+
+  - task: get-app-env
+    file: src/ci/partials/get-app-env.yml
+    image: general-task
+    params:
+      _: #@ template.replace(data.values.env_cf)
+      APP_ENV: ((deploy-env))
+      CF_APP_NAME: pages-((deploy-env))
+
+  - task: run-database-migrations
+    file: src/ci/partials/run-database-migrations.yml
+    image: node
+    params:
+      _: #@ template.replace(data.values.env_cf)
+      APP_ENV: ((deploy-env))
+    on_failure: #@ slack_hook("failure", "to migrate database")
+  #@ end
+
+#!  JOBS
+
+jobs:
+  - name: set-pipeline
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        trigger: true
+      - get: pipeline-tasks
+      - get: general-task
+      - task: boot
+        image: general-task
+        file: pipeline-tasks/tasks/boot.yml
+        params:
+          ENV_OVERRIDE: ((deploy-env))
+      - set_pipeline: self
+        file: compiled/set-pipeline.yml
+        instance_vars:
+          deploy-env: ((deploy-env))
+
+  #@ if/end env == 'staging':
+  - name: update-release-branch
+    plan:
+      - get: src
+        trigger: true
+      - get: general-task
+      - get: pipeline-tasks
+      - task: update-release-branch
+        image: general-task
+        file: pipeline-tasks/tasks/update-release-branch.yml
+
+  - name: test-and-deploy-api-pages
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        trigger: true
+        passed: [set-pipeline]
+      - in_parallel:
+          - get: general-task
+          - get: redis
+            params:
+              format: oci
+          - get: postgres
+            params:
+              format: oci
+          - get: node
+          - get: node-oci
+            resource: node
+            params:
+              format: oci
+          - get: pipeline-tasks
+
+      #@ if/end env == 'dev':
+      -  #@ pr_hook("pending", "test-and-deploy-api-pages")
+      - task: install-deps-api
+        file: src/ci/partials/install-deps-api.yml
+        image: node
+
+      - in_parallel:
+          - task: lint-api
+            file: src/ci/partials/lint-api.yml
+            image: node
+
+          - task: test-api
+            privileged: true
+            file: src/ci/partials/test-api.yml
+          #! dev deploys in parallel with lint/test, staging and production wait for them to pass
+          #@ if/end env == 'dev':
+          - _: #@ template.replace(build_and_deploy())
+        #@ if/end env != 'dev':
+      - _: #@ template.replace(build_and_deploy())
+
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "api deployment")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "test-and-deploy-api-pages")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "api deployment")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "test-and-deploy-api-pages")
+
+  - name: test-and-deploy-admin-client-pages
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        passed: [set-pipeline]
+        trigger: true
+      - get: node
+      - get: pipeline-tasks
+      - get: general-task
+      #@ if/end env == 'dev':
+      -  #@ pr_hook("pending", "test-and-deploy-admin-client-pages")
+      - task: install-deps-admin-client
+        file: src/ci/partials/install-deps-admin-client.yml
+        image: node
+
+      - task: lint-admin-client
+        file: src/ci/partials/lint-admin-client.yml
+        image: node
+
+      - task: build-admin-client
+        file: src/ci/partials/build-admin-client.yml
+        image: node
+        params:
+          API_URL: https://((((deploy-env))-pages-domain))
+          NODE_ENV: production
+
+      - task: configure-nginx
+        file: src/ci/partials/configure-nginx.yml
+        image: general-task
+        params:
+          API_DOMAIN: ((((deploy-env))-pages-domain))
+
+      - task: deploy-admin-client
+        file: src/ci/partials/deploy.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          CF_APP_NAME: pages-admin-((deploy-env))
+          CF_MANIFEST: src/.cloudgov/manifest.yml
+          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src/admin-client
+        on_failure:
+          try:
+            task: cancel-admin-client-deployment
+            file: pipeline-tasks/tasks/cancel-deployment.yml
+            image: general-task
+            params:
+              _: #@ template.replace(data.values.env_cf)
+              CF_APP_NAME: pages-admin-((deploy-env))
+
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "admin client deployment")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "test-and-deploy-admin-client-pages")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "admin client deployment")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "test-and-deploy-admin-client-pages")
+
+  - name: deploy-queues-ui-pages
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        passed: [set-pipeline]
+        trigger: true
+      - get: general-task
+      - get: pipeline-tasks
+      #@ if/end env == 'dev':
+      -  #@ pr_hook("pending", "deploy-queues-ui-pages")
+      - task: deploy-queues-ui
+        file: src/ci/partials/deploy.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          CF_APP_NAME: pages-queues-ui-((deploy-env))
+          CF_MANIFEST: src/.cloudgov/manifest.yml
+          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src
+        on_failure:
+          try:
+            task: cancel-queues-ui-deployment
+            file: pipeline-tasks/tasks/cancel-deployment.yml
+            image: general-task
+            params:
+              _: #@ template.replace(data.values.env_cf)
+              CF_APP_NAME: pages-queues-ui-((deploy-env))
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "queues UI deployment")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "deploy-queues-ui-pages")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "queues UI deployment")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "deploy-queues-ui-pages")
+
+  - name: nightly-tasks-pages
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        passed: [set-pipeline]
+      - get: general-task
+      - get: pipeline-tasks
+      - get: nightly
+        trigger: true
+      - in_parallel:
+          - task: restage-api
+            file: pipeline-tasks/tasks/restage.yml
+            image: general-task
+            params:
+              _: #@ template.replace(data.values.env_cf)
+              CF_APP_NAME: pages-((deploy-env))
+          - task: restage-queues-ui
+            file: pipeline-tasks/tasks/restage.yml
+            image: general-task
+            params:
+              _: #@ template.replace(data.values.env_cf)
+              CF_APP_NAME: pages-queues-ui-((deploy-env))
+
+  #@ if/end env != 'dev':
+  - name: sites-builds-checks
+    plan:
+      - get: src
+        passed: [set-pipeline]
+        params: { depth: 1 }
+      - get: general-task
+      - get: five-minutes
+        trigger: true
+      - in_parallel:
+          - task: queued-builds-check
+            file: src/ci/partials/run-task.yml
+            image: general-task
+            params:
+              _: #@ template.replace(data.values.env_cf)
+              CF_APP_NAME: pages-((deploy-env))
+              CF_TASK_NAME: queued-builds-check
+              CF_TASK_COMMAND: yarn queued-builds-check ((support-email))
+        on_failure: #@ slack_hook("failure", "site builds checks")
+
+  - name: audit-dependencies
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        trigger: true
+        passed: [set-pipeline]
+      - get: node
+      #@ if/end env == 'dev':
+      -  #@ pr_hook("pending", "audit-dependencies")
+      - in_parallel:
+          - task: audit-app
+            file: src/ci/partials/audit.yml
+            image: node
+            params:
+              VULN_THRESHOLD: 8 #! errors on critical or high
+          - task: audit-admin
+            file: src/ci/partials/audit-admin.yml
+            image: node
+            params:
+              VULN_THRESHOLD: 8 #! errors on critical or high
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "dependency audit")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "audit-dependencies")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "dependency audit")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "audit-dependencies")
+
+  - name: nightly-site-bucket-key-rotator
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        passed: [set-pipeline]
+      - get: nightly
+        trigger: true
+      - get: node
+      - get: general-task
+      - task: install-deps-api
+        file: src/ci/partials/install-deps-api.yml
+        image: node
+      - task: get-app-env
+        file: src/ci/partials/get-app-env.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: rotate-keys
+        file: src/ci/partials/rotate-bucket-keys.yml
+        image: node
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+        on_failure: #@ slack_hook("success", "Rotate site bucket keys")
+        on_success: #@ slack_hook("success", ":arrows_counterclockwise: :key: Rotate site bucket keys")
+
+  #@ if/end env != 'production':
+  - name: e2e-test
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        trigger: true
+        passed:
+          - test-and-deploy-api-pages
+          - test-and-deploy-admin-client-pages
+          - deploy-queues-ui-pages
+      - get: general-task
+      - get: node
+      #@ if/end env == 'dev':
+      -  #@ pr_hook("pending", "e2e-test")
+      - task: get-app-env
+        file: src/ci/partials/get-app-env.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: create-test-users
+        file: src/ci/partials/create-test-users.yml
+        image: node
+        params:
+          DOMAIN: ((((deploy-env))-pages-domain))
+          APP_ENV: ((deploy-env))
+          PRODUCT: pages
+      - task: run-e2e-tests
+        file: src/ci/partials/e2e-test.yml
+        image: node
+        params:
+          APP_ENV: ((deploy-env))
+          APP_HOSTNAME: https://((((deploy-env))-pages-domain))
+          PRODUCT: pages
+        ensure:
+          do:
+            - task: remove-test-users
+              file: src/ci/partials/remove-test-users.yml
+              image: node
+              params:
+                APP_ENV: ((deploy-env))
+                PRODUCT: pages
+            - put: s3
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "e2e testing")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "e2e-test")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "e2e testing")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "e2e-test")
+
+#!  RESOURCES
+
+resources:
+  #@ if/end env == 'dev':
+  - name: src
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: ((pages-repository-path))
+      access_token: ((gh-access-token))
+      base_branch: main
+      disable_forks: true
+      ignore_drafts: false
+
+  #@ if/end env == 'staging':
+  - name: src
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:((pages-repository-path))
+      branch: main
+      commit_verification_keys: ((cloud-gov-pages-gpg-keys))
+      private_key: ((pages-gpg-operations-github-sshkey.private_key))
+
+  #@ if/end env == 'production':
+  - name: src
+    type: git
+    icon: github
+    source:
+      uri: ((git-base-url))/((pages-repository-path))
+      branch: main
+      commit_verification_keys: ((cloud-gov-pages-gpg-keys))
+      tag_filter: 0.*.*
+      fetch_tags: true
+
+  - name: nightly
+    type: time
+    source:
+      start: 12:00 AM
+      stop: 1:00 AM
+      location: America/New_York
+
+  #@ if/end env != 'dev':
+  - name: five-minutes
+    type: time
+    source:
+      interval: 5m
+
+  #@ if/end env != 'production':
+  - name: s3
+    type: s3-resource
+    source:
+      access_key_id: ((test-results-access-key-id))
+      secret_access_key: ((test-results-secret-access-key))
+      bucket: ((test-results-bucket))
+      region: us-gov-west-1
+      change_dir_to: src
+      options:
+        - "--exclude '*'"
+        - "--include 'playwright-report/*'"
+
+  #@ if env == 'production':
+  - name: slack-cg-pages
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url-cg-pages))
+
+  - name: pages-release
+    type: github-release
+    source:
+      owner: cloud-gov
+      repository: pages-core
+      access_token: ((gh-access-token))
+  #@ end
+
+  - name: redis
+  - name: postgres
+  - name: node
+  - name: slack
+  - name: general-task
+  - name: pipeline-tasks
+
+#!  RESOURCE TYPES
+
+resource_types:
+  - name: git
+  - name: slack-notification
+  - name: registry-image
+  - name: time
+  #@ if/end env == 'dev':
+  - name: pull-request
+  #@ if/end env != 'production':
+  - name: s3-resource
+  #@ if/end env == 'production':
+  - name: github-release
