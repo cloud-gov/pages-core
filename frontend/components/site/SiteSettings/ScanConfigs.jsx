@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, } from 'react';
 import PropTypes from 'prop-types';
 
 import api from '../../../util/federalistApi';
@@ -7,11 +7,14 @@ import { useDefaultScanRules } from '../../../hooks/useDefaultScanRules';
 import { useSiteBuildTasks } from '../../../hooks/useSiteBuildTasks';
 import notificationActions from '../../../actions/notificationActions';
 import ExpandableArea from '../../ExpandableArea';
-import { IconTrash } from '../../icons';
+import { IconTrash, IconExternalLink } from '../../icons';
 import LoadingIndicator from '../../LoadingIndicator';
 
 function getRuleName(rule) {
   return BUILD_SCAN_RULES.find(r => r.id === rule.id)?.name;
+}
+function getRuleLink(rule) {
+  return BUILD_SCAN_RULES.find(r => r.id === rule.id)?.url;
 }
 function ScanConfigs({ siteId: id }) {
   // TODO: maybe someday this needs to take siteBuildTask.branch into account
@@ -31,6 +34,7 @@ function ScanConfigs({ siteId: id }) {
   }, [siteBuildTasks]);
 
   function handleUpdate() {
+    // maybe checkk that every rule has a valid id?
     Promise.all(siteBuildTasks.map((siteBuildTask) => {
       const typeRules = customerRules.filter(rule => rule.type === siteBuildTask.id);
       return api.updateSiteBuildTask(id, siteBuildTask.sbtId, { rules: typeRules });
@@ -43,8 +47,10 @@ function ScanConfigs({ siteId: id }) {
   function addNewRule(index) {
     // start with pseudo-random ids to avoid key collisions
     // default to the first type
-    const newRule = { id: Math.random().toString(36).slice(2), type: siteBuildTasks[index].id };
+    const ruleUid = "temp-" + Math.random().toString(36).slice(2);
+    const newRule = { id: ruleUid, type: siteBuildTasks[index].id };
     setCustomerRules(customerRules.concat([newRule]));
+    // come back someday and set the newly added select to .focus() using refs
   }
 
   function updateRule(event, ruleId, prop) {
@@ -66,15 +72,16 @@ function ScanConfigs({ siteId: id }) {
       .filter(rule => !customerRules.map(r => r.id).includes(rule.id) || rule.id === checkRule.id);
   }
 
-  function selectRender(rule, options, prop, name) {
+  function selectRender(rule, options, prop, name,) {
     return (
       <select
         name={name}
-        id={`${name}-select`}
+        id={`select-${rule.id}`}
         value={rule[prop]}
         onChange={event => updateRule(event, rule.id, prop)}
         disabled={rule.source === 'Pages'}
       >
+        <option value="" default>— Choose a rule — </option>
         {options
           .map(o => (
             <option
@@ -83,43 +90,55 @@ function ScanConfigs({ siteId: id }) {
             >
               {o.name}
               {' '}
-              (#
+              (
               {o.id}
               )
             </option>
           ))}
       </select>
-    );
+    )
   }
 
   function ruleRender(rule) {
+    const isPagesRule = rule?.source === 'Pages';
+    const placeholder = (!!rule.match ? rule.match : '' ) + (isPagesRule ? ' (not editable - suppressed by Pages)' : '/assets class="ignore"' )
     return (
       (
-        <tr key={rule.id}>
+        <tr key={rule.id} aria-labelledby={'rule-' + rule.id}>
           <td>
             {rule.source !== 'Pages' ? (
               selectRender(rule, availableRules(rule), 'id', 'rules')
             ) : (
               <p>
-                <b>{getRuleName(rule)}</b>
+                <b id={'rule-' + rule.id}>{getRuleName(rule)}</b>
                 {' '}
-                (#
+                (
                 {rule.id}
                 )
-                <br />
-                Common false positive suppressed by Pages
               </p>
             )}
+            <span>
+              <a
+                className="external-link"
+                href={getRuleLink(rule)}
+                title={getRuleName(rule)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Learn more about this rule
+                <IconExternalLink />
+              </a>
+            </span>
           </td>
           <td>
             { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
             <label className="usa-sr-only" htmlFor={`${rule.id}-criteria`}>Criteria to match:</label>
-            <input id={`${rule.id}-criteria`} type="text" placeholder={rule.source !== 'Pages' ? '/assets, class="ignore"' : 'not editable'} disabled={rule.source === 'Pages'} onChange={event => updateRule(event, rule.id, 'match')} value={rule.match} />
+            <input id={`${rule.id}-criteria`} type="text" placeholder={placeholder} disabled={isPagesRule} onChange={event => updateRule(event, rule.id, 'match')} value={isPagesRule ? '' : rule.match} />
           </td>
           <td>
             { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
             <label className="usa-sr-only" htmlFor={`${rule.id}-delete`}>Delete this rule</label>
-            <button id={`${rule.id}-delete`} className="button-delete" disabled={rule.source === 'Pages'} aria-label={rule.source === 'Pages' ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
+            <button id={`${rule.id}-delete`} className="button-delete" disabled={isPagesRule} aria-label={isPagesRule ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
               <IconTrash className="icon-delete" aria-hidden />
             </button>
           </td>
@@ -132,6 +151,7 @@ function ScanConfigs({ siteId: id }) {
       <>
         <p>
           The
+          {' '}
           {sbt.name}
           {' '}
           reports produced by cloud.gov Pages will automatically suppress certain scan findings
@@ -146,7 +166,7 @@ function ScanConfigs({ siteId: id }) {
           </b>
         </p>
         <p>
-          Matching criteria will limit the suppression of findings to any partial string match in:
+          Specifying match criteria will limit the suppression of findings to any partial string match in:
         </p>
         <ul>
           <li>
@@ -163,7 +183,7 @@ function ScanConfigs({ siteId: id }) {
           {' '}
           <b>be as specific as possible</b>
           {' '}
-          when defining your matching criteria.
+          when defining your match criteria.
         </p>
       </>
     );
@@ -181,8 +201,8 @@ function ScanConfigs({ siteId: id }) {
           <table className="usa-table usa-table-borderless scan-config-table">
             <thead>
               <tr>
-                <th scope="col">Choose a rule from this scan to suppress in reports</th>
-                <th scope="col">Matching criteria (leave empty for all)</th>
+                <th scope="col">Rule to suppress</th>
+                <th scope="col">Match criteria (leave empty for all)</th>
                 <th scope="col">Remove</th>
               </tr>
             </thead>

@@ -6,6 +6,7 @@ import IconCloudUpload from '../../public/images/icons/icon-cloud_upload.svg';
 import IconEnvelope from '../../public/images/icons/icon-envelope.svg';
 import IconExclamationCircle from '../../public/images/icons/icon-exclamation-circle-solid.svg';
 import IconExperiment from '../../public/images/icons/icon-experiment.svg';
+import IconExternalLink from '../../public/images/icons/icon-external-link.svg';
 import IconGear from '../../public/images/icons/icon-gear.svg';
 import IconGitHub from '../../public/images/icons/icon-github.svg';
 import IconLink from '../../public/images/icons/icon-link.svg';
@@ -26,6 +27,7 @@ export {
   IconEnvelope,
   IconExclamationCircle,
   IconExperiment,
+  IconExternalLink,
   IconGear,
   IconGitHub,
   IconLink,

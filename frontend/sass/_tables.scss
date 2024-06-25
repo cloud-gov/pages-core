@@ -340,14 +340,27 @@
     margin: .7em 0;
     height: 2.7em;
   }
+  select {
+    font-weight: bold;
+    cursor: pointer;
+    // unselected select box state
+    &[id^="select-temp-"],
+    &[id="select-"] {
+      color: #1b5982;
+      box-shadow: #0271bc 0px 0px 4px;
+    }
+  }
   td {
     padding: .5em;
-    p {
+    font-size: 14px;
+    vertical-align: baseline;
+    & > p, & > span {
       margin: 0 .5em;
     }
   }
   tr th {
     padding: 1em .5em;
+    font-size: 16px;
   }
   td:first-child {
     padding-left: 0;
@@ -358,6 +371,7 @@
     padding-left: 0;
     width: 10ch;
     text-align: center;
+    vertical-align: middle;
   }
   .button-delete {
     background-color: transparent;
@@ -382,7 +396,7 @@
     background: #f1f1f1;
     box-shadow: 0 0 0 1px #aeb0b5;
     border: none;
-    cursor: not-allowed;
+    color: #757575;
   }
 }
 .post-scan-config-table-info {
