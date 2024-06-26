@@ -19,7 +19,7 @@ module.exports = wrapHandlers({
 
     const task = await BuildTask.findOne({
       where: { buildId, id: buildTaskId },
-      include: [ BuildTaskType, Build ]
+      include: BuildTaskType,
     });
 
     if (!task) {
@@ -43,7 +43,7 @@ module.exports = wrapHandlers({
 
     const tasks = await BuildTask.findAll({
       where: { buildId },
-      include: [BuildTaskType, Build]
+      include: BuildTaskType,
     });
 
     const updatedTasks = await Promise.all(tasks.map(async (task) => {
