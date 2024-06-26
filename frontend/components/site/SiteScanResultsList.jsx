@@ -59,7 +59,7 @@ const taskSummaryIcon = ({ status, count }) => {
   return { summary, icon, state };
 };
 
-const SiteBuildTasks = () => {
+const SiteScanResultsList = () => {
   const { buildId: buildIdStr } = useParams();
   const buildId = parseInt(buildIdStr, 10);
   const [buildTasks, setBuildTasks] = useState([]);
@@ -187,4 +187,4 @@ const SiteBuildTasks = () => {
   );
 };
 
-export default React.memo(SiteBuildTasks);
+export default React.memo(SiteScanResultsList);

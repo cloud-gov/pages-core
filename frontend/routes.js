@@ -8,7 +8,7 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
-import SiteBuildTasks from './components/site/siteBuildTasks';
+import SiteScanResultsList from './components/site/siteScanResultsList';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
@@ -16,7 +16,7 @@ import ScanConfig from './components/site/ScanConfig';
 import CustomDomains from './components/site/CustomDomains';
 import NewCustomDomain from './components/site/CustomDomains/New';
 import EditCustomDomain from './components/site/CustomDomains/Edit';
-import Scans from './components/site/Scans';
+import SiteScans from './components/site/SiteScans';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 import Error from './components/Error';
@@ -45,7 +45,7 @@ export default (
     <Route path="sites/new" element={<AddSite />} />
     <Route path="sites/:id" element={<SiteContainer />}>
       <Route path="" loader={() => redirect('builds')} />
-      <Route path="scans" element={<Scans />} />
+      <Route path="scans" element={<SiteScans />} />
       <Route path="settings" element={<SiteSettings />} />
       <Route path="published" element={<SitePublishedBranchesTable />} />
       <Route path="published/:name" element={<SitePublishedFilesTable />} />
@@ -56,7 +56,7 @@ export default (
       <Route path="scan-config" element={<ScanConfig />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
       {(process.env.FEATURE_BUILD_TASKS === 'active') && (
-        <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />
+        <Route path="builds/:buildId/scans" element={<SiteScanResultsList />} />
       )}
     </Route>
     <Route path="settings" element={<UserSettings />} />
