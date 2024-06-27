@@ -1,8 +1,8 @@
 const BaseSerializer = require('./base');
 const bttSerializer = require('./build-task-type');
 
-function miniBuildSerializer({ branch, requestedCommitSha }) {
-  return {branch, requestedCommitSha }
+function miniBuildSerializer({ branch, clonedCommitSha, requestedCommitSha, username, user, createdAt }) {
+  return {branch, clonedCommitSha, requestedCommitSha, username, user, createdAt }
 }
 const attributes = {
   id: '',

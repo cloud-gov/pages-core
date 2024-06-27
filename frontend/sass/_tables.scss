@@ -45,14 +45,17 @@
     line-height: 2rem;
     font-family: Consolas, "Lucida Console", Menlo, monospace;
   }
+  .scan-info-inline-icon,
   .build-info-inline-icon {
-    margin: auto .25em auto 0;
+    margin: auto .35em auto 0;
     line-height: 0;
     svg {
       width: auto;
       height: 20px;
     }
-  }  
+  }
+  .scan-info,  
+  .scan-results-status,
   .build-info-details {
     flex: 4;
     line-height: 1.4em;
@@ -71,6 +74,7 @@
     }
     h4 {
       display: flex;
+      align-items: center;
       font-weight: 600;
       font-size: 1.2em;
       line-height: 1.4em;
@@ -176,14 +180,17 @@
       
     }
   }
+  & + p { margin-top: 1em;}
 
 }
 
+.table-full-width.log-table__site-scans,
 .table-full-width.log-table__site-builds {
-  th {
-    white-space: nowrap;
+  @media screen and (min-width:770px) {
+    th {
+      white-space: nowrap;
+    }
   }
-
   td, tbody th {
     padding: 1.5rem 1rem;
   }
@@ -322,5 +329,23 @@
 .table-full-width.log-table__site-builds.org-member-table {
   td, tbody th {
     vertical-align: middle;
+  }
+}
+.log-table.log-table__site-scans {
+ .branch-info {
+    margin: auto 0;
+  }
+  .scan-info h3 {
+    margin: 0
+  }
+  .artifact-filesize {
+    color: $color-gray-dark;
+    white-space: nowrap;
+  }
+  .scan-results-status {
+    min-height: initial;
+    h4 {
+      margin: 0;
+    }
   }
 }

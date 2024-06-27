@@ -12,7 +12,12 @@ import {
   dateAndTime,
 } from '../../util/datetime';
 
+
 import { currentSite } from '../../selectors/site';
+
+import GitHubLink from '../GitHubLink';
+import { getOrgById } from '../../selectors/organization';
+import { sandboxMsg } from '../../util';
 import { useBuildTasksForSite } from '../../hooks/useBuildTasksForSite';
 
 export const REFRESH_INTERVAL = 15 * 10000;
@@ -20,6 +25,7 @@ export const REFRESH_INTERVAL = 15 * 10000;
 function SiteScans() {
   const { id } = useParams();
   const site = useSelector(state => currentSite(state.sites, id));
+  const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
   const { buildTasks: scans } = useBuildTasksForSite(id);
 
   // enable auto reload
@@ -41,66 +47,95 @@ function SiteScans() {
   //     clearInterval(intervalHandle);
   //   };
   // }, []);
-  
+    
+  function actualScans(scansList) {
+    return scansList.filter(scan => scan.status !== 'cancelled')
+  }
+
+  function shaLink(build) {
+    const { owner, repository } = site;
+    const sha = build.clonedCommitSha || build.requestedCommitSha;
+    if (sha) {
+      return (
+        <GitHubLink
+          owner={owner}
+          repository={repository}
+          sha={sha}
+          branch={null}
+          text={sha.slice(0, 7)}
+          icon="sha"
+        />
+      );
+    }
+    return null;
+  }
+
+  function branchLink(build) {
+    const { owner, repository } = site;
+
+    return (
+      <GitHubLink
+        owner={owner}
+        repository={repository}
+        sha={null}
+        branch={build.branch}
+        text={build.branch}
+        icon="branch"
+      />
+    );
+  }
+
   const scanSummaryIcon = ({ status, count, artifact = null }) => {
-    let summary;
     let icon;
-    let state;
+    let results;
     switch (status) {
       case 'error':
-        state = 'Failed';
-        summary = 'Scan failed before results could be found';
+        results = 'Scan failed';
         icon = IconX;
         break;
+      // this case should never happen, unless we want to show cancelled scans
       case 'cancelled':
-        state = 'Cancelled';
-        summary = 'Failed builds cannot be scanned';
+        results = 'Failed builds cannot be scanned';
         icon = IconX;
         break;
       case 'processing':
-        state = 'Processing';
-        summary = 'Scan in progress';
+        results = 'Scan in progress';
         icon = IconSpinner;
         break;
       case 'queued':
       case 'created':
-        state = 'Queued';
-        summary = 'Scan queued';
+        results = 'Scan queued';
         icon = IconClock;
         break;
       case 'success':
         if (count === 1) {
           icon = IconExclamationCircle;
-          state = '1 issue found';
+          results = '1 issue found';
           artifact = {
             url: "#",
             filesize: 12345
           };
         } else if (count > 1) {
           icon = IconExclamationCircle;
-          state = `${count} issues found`;
+          results = `${count} issues found`;
           artifact = {
             url: "#",
             size: 999
           };
         } else {
           icon = IconCheckCircle;
-          state = 'No issues found';
+          results = 'No issues found';
           artifact = {
             url: "#",
             size: 5432
           };
         }
-        summary = 'Full details available:';
         break;
       default:
-        summary = status;
         icon = null;
     }
-    return { summary, icon, state, artifact };
+    return { icon, results, artifact };
   };
-
-
 
   if (!site || !scans) {
     return null;
@@ -108,51 +143,124 @@ function SiteScans() {
 
   return (
     <div>
-      <ul>
-        {scans.map((scan) => {
-          const { summary, icon, state, artifact } = scanSummaryIcon(scan);
-          return (
-            <li key={scan.id}>
-              { icon && false &&  React.createElement(icon) }
-              Started <span title={dateAndTimeSimple(scan.createdAt)}>
-                { timeFrom(scan.createdAt) }
-              </span>
-              <br />
-              {state}
-              <br />
-              {scan.message} / {summary}
-              <br />
-              <b>{scan.BuildTaskType.name}</b>
-              <br />
-              {scan.BuildTaskType.description}
-              <br />
-              {artifact?.url && (
-                <>
-                  <Link
-                    to={artifact?.url}
-                    title={'Download scan results for ' && scan.BuildTaskType.name}
-                    className="artifact-filename"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download scan results
-                  </Link>
-                  <span className="artifact-filesize">
-                    &nbsp;({ prettyBytes(artifact?.size) })
-                  </span>
-                </>
-              )}
-              <Link to={`/sites/${site.id}/builds/${scan.buildId}/logs`}>
-                Go to build logs
-              </Link>
-              <br/>
-              Build: 
-              {JSON.stringify(scan.Build)}
-              <code>{JSON.stringify(scan)}</code>
-            </li>
+      <div className="well">
+        { organization?.isSandbox
+          && (
+          <AlertBanner
+            status="warning"
+            message={sandboxMsg(organization.daysUntilSandboxCleaning, 'site scans')}
+            alertRole={false}
+          />
           )}
+      </div>
+      {/* <div className="log-tools">
+        <div>
+          <a
+            href="#"
+            role="button"
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            data-test="toggle-auto-refresh"
+          >
+            Auto Refresh:
+            {' '}
+            <b>{autoRefresh ? 'ON' : 'OFF'}</b>
+          </a>
+          <RefreshBuildsButton site={site} />
+        </div>
+      </div> */}
+      { scans.isLoading
+        ? <LoadingIndicator />
+        : (
+          <div className="table-container">
+            <table
+              className="usa-table-borderless log-table log-table__site-scans table-full-width"
+            >
+              <thead>
+                <tr>
+                  <th scope="col">Scan</th>
+                  <th scope="col">Branch</th>
+                  <th scope="col">Results</th>
+                </tr>
+              </thead>
+              <tbody>
+                {actualScans(scans).map((scan) => {
+                  const { summary, icon, results, artifact } = scanSummaryIcon(scan);
+                  return (
+                    <tr key={scan.id}>
+                      <th scope="row" data-title="Scan">
+                        <div className="scan-info">
+                            <h3 className="scan-info-name">
+                              { scan.BuildTaskType.name }
+                            </h3>
+                            {scan.createdAt && (
+                              <p>
+                                Scanned at
+                                {' '}
+                                <span title={timeFrom(scan.createdAt)}>
+                                  { dateAndTimeSimple(scan.createdAt) }
+                                </span>
+                              </p>
+                            )}
+
+                        </div>
+
+                      </th>
+                      <td data-title="Branch">
+                        <div className="branch-info">
+                          { branchLink(scan.Build) }
+                          <div className="commit-info">
+                            { shaLink(scan.Build) }
+                            <span className="commit-user" title={scan.Build.user?.email}>
+                              { scan.Build.username }
+                            </span>
+                            <span className="commit-time" title={dateAndTime(scan.Build.createdAt)}>
+                              { timeFrom(scan.Build.createdAt) }
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td data-title="Results" className="scan-results">
+                        <div class="scan-results-status">
+                          <h4>
+                            { icon && (
+                              <span className="scan-info-inline-icon">
+                                { React.createElement(icon) }
+                              </span>
+                            )}
+                            <span className={ artifact?.url ? '' : 'unbold'}>{ results }</span>
+                          </h4>
+                          { artifact?.url && (
+                              <>
+                                <Link
+                                  to={artifact?.url}
+                                  title={'Download scan results for ' && scan.BuildTaskType.name}
+                                  className="artifact-filename"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Download results
+                                </Link>
+                                {' '}
+                                <span className="artifact-filesize">
+                                  ({ prettyBytes(artifact?.size) })
+                                </span>
+                              </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <p>
+              Showing { scans.length } most recent scan(s).
+            </p>
+            { scans.length >= 100
+              ? <p>List only displays 100 most recent scans from the last 180 days.</p>
+              : null }
+          </div>
         )}
-      </ul>
     </div>
   );
 }

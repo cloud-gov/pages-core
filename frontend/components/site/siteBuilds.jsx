@@ -385,8 +385,11 @@ function SiteBuilds() {
                 })}
               </tbody>
             </table>
+              <p>
+              Showing { builds.data.length } most recent build(s).
+            </p>
             { builds.data.length >= 100
-              ? <p>List only displays 100 most recent builds.</p>
+              ? <p>List only displays 100 most recent builds from the last 180 days.</p>
               : null }
           </div>
         )}
