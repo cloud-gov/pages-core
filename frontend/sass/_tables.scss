@@ -109,10 +109,16 @@
   }
   .commit-info {
     margin: 0.25em 0 0;
+    line-height: 1.3em;
     .commit-user {
       white-space: nowrap;
       font-weight: 600;
       margin-right: .5em;
+      max-width: 15ch;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
     }
     .commit-time {
       white-space: nowrap;
@@ -126,10 +132,8 @@
       text-overflow:clip;
       max-width: 7ch;
       display: inline-block;
-      vertical-align: top;
-      line-height: .85em;
-      height: 1.4em;
-      padding-top: 0.4em;
+      vertical-align: bottom;
+      line-height: 1.3em;
       text-decoration: none;
       margin-right: .5em;
       color: inherit;
@@ -333,7 +337,7 @@
 }
 .log-table.log-table__site-scans {
  .branch-info {
-    margin: auto 0;
+    margin: .5em 0 0;
   }
   .scan-info h3 {
     margin: 0
