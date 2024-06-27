@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import {
-  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX,
-} from '../icons';
 import prettyBytes from 'pretty-bytes';
+
+import { sandboxMsg } from '../../util';
 import {
   dateAndTimeSimple,
   duration,
@@ -12,41 +11,24 @@ import {
   dateAndTime,
 } from '../../util/datetime';
 
-
-import { currentSite } from '../../selectors/site';
-
+import {
+  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX,
+} from '../icons';
 import GitHubLink from '../GitHubLink';
-import { getOrgById } from '../../selectors/organization';
-import { sandboxMsg } from '../../util';
-import { useBuildTasksForSite } from '../../hooks/useBuildTasksForSite';
+import api from '../../util/federalistApi';
 
-export const REFRESH_INTERVAL = 15 * 10000;
+import { useBuildTasksForSite } from '../../hooks/useBuildTasksForSite';
+import { currentSite } from '../../selectors/site';
+import { getOrgById } from '../../selectors/organization';
+
+
 
 function SiteScans() {
   const { id } = useParams();
   const site = useSelector(state => currentSite(state.sites, id));
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
-  const { buildTasks: scans } = useBuildTasksForSite(id);
+  let { buildTasks: scans, isLoading } = useBuildTasksForSite(id);
 
-  // enable auto reload
-  // let intervalHandle;
-  // useEffect(() => {
-  //   function fetchTasks(thisBuildId) {
-  //     return api.fetchTasks(thisBuildId).then((tasks) => {
-  //       setBuildTasks([...tasks]);
-  //       return tasks;
-  //     });
-  //   }
-  //   fetchTasks(buildId);
-  //   // Really need to stop interval if all tasks are complete
-  //   intervalHandle = setInterval(() => {
-  //     fetchTasks(buildId);
-  //   }, REFRESH_INTERVAL);
-
-  //   return () => {
-  //     clearInterval(intervalHandle);
-  //   };
-  // }, []);
     
   function actualScans(scansList) {
     return scansList.filter(scan => scan.status !== 'cancelled')
@@ -153,22 +135,8 @@ function SiteScans() {
           />
           )}
       </div>
-      {/* <div className="log-tools">
-        <div>
-          <a
-            href="#"
-            role="button"
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            data-test="toggle-auto-refresh"
-          >
-            Auto Refresh:
-            {' '}
-            <b>{autoRefresh ? 'ON' : 'OFF'}</b>
-          </a>
-          <RefreshBuildsButton site={site} />
-        </div>
-      </div> */}
-      { scans.isLoading
+
+      { isLoading
         ? <LoadingIndicator />
         : (
           <div className="table-container">
@@ -220,7 +188,7 @@ function SiteScans() {
                         </div>
                       </td>
                       <td data-title="Results" className="scan-results">
-                        <div class="scan-results-status">
+                        <div className="scan-results-status">
                           <h4>
                             { icon && (
                               <span className="scan-info-inline-icon">
