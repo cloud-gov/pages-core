@@ -63,3 +63,15 @@
 		transform: rotate(-360deg);
   }
 }
+.external-link {
+  line-height: 1em;
+  svg {
+    fill: $link-color;
+    margin-left: 0.4rem;
+    stroke-width: 0;
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+    margin-bottom: 2px;
+  }
+}
