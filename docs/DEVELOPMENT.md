@@ -178,21 +178,12 @@ Our continuous integration pipeline is run on Concourse CI. To use Concourse, on
 2. Update local credential files (see ci/vars/example.yml)
 
 #### CI deployments
-This repository contains three distinct deployment pipelines for the core application and one for metrics:
-- [__Core Production__](./ci/pipeline-production.yml)
-- [__Core Staging__](./ci/pipeline-staging.yml)
-- [__Core Dev__](./ci/pipeline-dev.yml)
-- [__Metrics__](./apps/metrics/ci/pipeline.yml)
+This repository contains one deployment pipeline file which is used to deploy the application across three separate environments. This is acheived using the `boot` task from [`pages-pipeline-task`](https://github.com/cloud-gov/pages-pipeline-tasks/?tab=readme-ov-file#boot).
 
-__Core [Env]__ deploys the Pages app/api, the admin app, and the queues app for a given environment. __Metrics__ deploys concourse tasks to check our app/infrastructure health.
-
-__*&#8595; NOTICE &#8595;*__
-
-> __Core Production__ deploys the Pages app/api, the admin app, and the queues app when a new tag is added to the `main` branch. This uses a unique pipeline file: [./ci/pipeline-production.yml](./ci/pipeline-production.yml).
-
-> __Core Staging__ deploys the Pages app/api, the admin app, and the queues app when a new commit is added to the `main` branch. This also tests PRs against `main` and is responsible for creating and updating our release PRs. This uses a unique pipeline file: [./ci/pipeline-staging.yml](./ci/pipeline-staging.yml)
-
-> __Core Dev__ deploys the Pages app/api, the admin app, and the queues app when a PR is created into the `main` branch. This uses a unique pipeline file: [./ci/pipeline-dev.yml](./ci/pipeline-dev.yml)
+Each pipeline deploys the Pages app/api, the admin app, and the queues app for a given environment. Notable differences between the per-environment pipelines:
+- `dev`: This pipeline runs when a PR is created against the `main` branch. It will deploy the API without waiting for lint/tests to pass. It sends back information about various tasks as Github status checks. It runs integration testing post-deployment.
+- `staging`: This pipeline runs when a new commit is added to the `main` branch. It updates a separate `release` branch which is used for automating releases and updating our changeleog. It runs integration testing post-deployment.
+- `production`: This pipeline runs when a new tag is added to the `main` branch. It will create a new Github release matching the tag and post the changelog to Slack.
 
 #### Core deployment
 ##### Pipeline instance variables
@@ -222,11 +213,16 @@ Some credentials in this pipeline are "compound" credentials that use the pipeli
 |**`((gh-access-token))`**| The Github access token|:x:|
 
 ##### Setting up the pipeline for Core
-The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the default branch will automatically set the pipeline. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. Run the following command with the fly CLI to set a pipeline instance:
+The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the default branch will automatically set the pipeline. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. First, a compiled pipeline file needs to be created with [`ytt`](https://carvel.dev/ytt/):
+
+```sh
+$ ytt -f ci/pipeline.yml -f ../pages-pipeline-tasks/overlays -f ../pages-pipeline-tasks/common --data-value env=<env> > pipeline-<env>.yml
+```
+Then, the following command will use the fly CLI to set a pipeline instance:
 
 ```bash
 $ fly -t <Concourse CI Target Name> set-pipeline -p core \
-  -c ci/pipeline-<env>.yml \
+  -c pipeline-<env>.yml \
   -i deploy-env=<env>
 ```
 
@@ -245,57 +241,6 @@ $ fly -t <Concourse CI Target Name> destroy-pipeline \
 
 #### Pinned Versions
 Because our production deployments are triggered by git tags, they can be [pinned to specific version](https://concourse-ci.org/resource-versions.html#version-pinning) in the Concourse UI. The best practice is to navigate to the [`src-production-tagged` resource](https://ci.fr.cloud.gov/teams/pages/pipelines/core/resources/src-production-tagged?vars.deploy-env=%22production%22), pin the desired version, and restart any downstream Concourse jobs.
-
-#### Metrics deployment
-##### Pipeline instance variables
-Each instance of the pipeline has the following instance variables associated to it:
-
-|Instance Variable |Pages Staging| Pages Production| Federalist Production|
---- | --- | ---| ---|
-|**`deploy-env`**|`staging`|`production`|`production`|
-|**`git-branch`**|`staging`|`main`|`main`|
-
-##### Pipeline credentials
-The following parameters are used in the proxy pipeline:
-
-|Parameter|Description|Is Compound|
---- | --- | --- |
-|**`((deploy-env))-cf-username`**|The deployment environments CloudFoundry deployer username based on the instanced pipeline|:white_check_mark:|
-|**`((deploy-env))-cf-username`**|The deployment environments CloudFoundry deployer password based on the instanced pipeline|:white_check_mark:|
-|**`((cf-org-auditor-username))`**| CF Org auditor username to check memory and other infrastructure across the org and spaces| :x:|
-|**`((cf-org-auditor-password))`**| CF Org auditor password to check memory and other infrastructure across the org and spaces| :x:|
-|**`((new-relic-metrics-license-key))`**| New Relic license key for posting custom metrics| :x:|
-|**`((slack-channel))`**| Slack channel | :x:|
-|**`((slack-username))`**| Slack username | :x:|
-|**`((slack-icon-url))`**| Slack icon url | :x:|
-|**`((slack-webhook-url))`**| Slack webhook url | :x:|
-|**`((git-base-url))`**|The base url to the git server's HTTP endpoint|:x:|
-|**`((pages-repository-path))`**|The url path to the repository|:x:|
-|**`((gh-access-token))`**| The Github access token|:x:|
-
-##### Setting up the pipeline
-Run the following command with the fly CLI to set a pipeline instance:
-
-```bash
-$ fly -t <Concourse CI Target Name> set-pipeline -p metrics \
-  -c ci/pipeline.yml \
-  -i git-branch=main \
-  -i deploy-env=production
-  -i product=pages
-```
-
-##### Getting or deleting a pipeline instance from the CLI
-To get a pipeline instance's config or destroy a pipeline instance, Run the following command with the fly CLI to set a pipeline:
-
-```bash
-## Get a pipeline instance config
-$ fly -t <Concourse CI Target Name> get-pipeline \
-  -p metrics/deploy-env:production,git-branch:main,product:pages
-
-## Destroy a pipeline
-$ fly -t <Concourse CI Target Name> destroy-pipeline \
-  -p metrics/deploy-env:production,git-branch:main,product:pages
-```
 
 ### Accessing Concourse Jumpbox
 

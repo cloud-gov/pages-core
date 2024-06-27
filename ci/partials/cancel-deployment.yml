@@ -1,4 +1,0 @@
-platform: linux
-inputs: [name: src]
-run:
-  path: src/ci/tasks/cancel-deployment.sh
