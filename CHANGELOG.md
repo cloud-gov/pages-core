@@ -1,3 +1,13 @@
+## 0.10.0 (2024-06-27)
+
+### Added
+
+- add build scan config (#4261)
+
+### Maintenance
+
+- **ci**: ci update, use pipeline-tasks, boot, multi-env
+
 ## 0.9.3 (2024-06-18)
 
 ### Fixed
