@@ -107,37 +107,37 @@ Change Flow Process (Change to the application, adding/removing site)
 
 ### Change to CG-Pages application
 
-#### 1 Initiation
+#### 1. Initiation
 Changes are initiated and discussed following the steps in our Story Lifecycle.
 
-#### 2 Issue Creation 
+#### 2. Issue Creation 
 An issue is created describing the issue and outlining the acceptance criteria for completion.
 
-#### 3 PR Creation 
+#### 3.  PR Creation 
 In the appropriate GitHub repository for the component, a PR against the main branch is created that addresses the change. Note that sometimes this branch is called 'main'; other times, it is not, so be sure to check.
 
-#### 4 Automated Checks
+#### 4. Automated Checks
 If the repository contains cloud.gov-developed code, the PR must have automated checks in GitHub Actions or Concourse, which must pass before the PR can be merged.
 
-#### 5 Review and Approval
+#### 5. Review and Approval
 The PR is reviewed by someone other than the committer. Pairing via screen-sharing is encouraged and qualifies as a review. The review should include an assessment of architectural design, security, and code quality. The reviewer approves the PR via GitHub.
 
-#### 6 Merging
+#### 6. Merging
 The committer merges the approved PR. Further updates to an approved PR invalidate the approval. The committer may merge an approved PR if the changes made are time-sensitive.
 
-#### 7 Continuous Integration/Continuous Deployment (CI/CD)
+#### 7. Continuous Integration/Continuous Deployment (CI/CD)
 A continuous integration server handles automated tests and continuous deployment (CD) of the merged changes.
 
-#### 8 Testing Environment
+#### 8. Testing Environment
 All changes are deployed to two separate testing environments: development and staging.
 
-#### 9 Automated Tests
+#### 9. Automated Tests
 Any and all automated tests are run.
 
-#### 10 Dependency Audit
+#### 10. Dependency Audit
 Dependencies are audited for security vulnerabilities, no critical/high vulnerabilities are allowed to be merged. Other vulnerabilities are handled via a quarterly review process documented here: https://github.com/cloud-gov/internal-docs/blob/main/docs/runbooks/Pages/dependabot-security.md
 
-#### 11 Production Deployment
+#### 11. Production Deployment
 If all tests pass, changes can be promoted for deployment to production in the pipeline.
 
 ### Adding site to CG-Pages
