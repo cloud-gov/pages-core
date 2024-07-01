@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import prettyBytes from 'pretty-bytes';
@@ -6,7 +6,6 @@ import prettyBytes from 'pretty-bytes';
 import { sandboxMsg } from '../../util';
 import {
   dateAndTimeSimple,
-  duration,
   timeFrom,
   dateAndTime,
 } from '../../util/datetime';
@@ -15,12 +14,10 @@ import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX,
 } from '../icons';
 import GitHubLink from '../GitHubLink';
-import api from '../../util/federalistApi';
 
 import { useBuildTasksForSite } from '../../hooks/useBuildTasksForSite';
 import { currentSite } from '../../selectors/site';
 import { getOrgById } from '../../selectors/organization';
-
 
 
 function SiteScans() {
@@ -29,7 +26,6 @@ function SiteScans() {
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
   let { buildTasks: scans, isLoading } = useBuildTasksForSite(id);
 
-    
   function actualScans(scansList) {
     return scansList.filter(scan => scan.status !== 'cancelled')
   }
@@ -67,7 +63,7 @@ function SiteScans() {
     );
   }
 
-  const scanSummaryIcon = ({ status, count, artifact = null }) => {
+  const scanResultsIcon = ({ status, count, artifact = null }) => {
     let icon;
     let results;
     switch (status) {
@@ -125,7 +121,7 @@ function SiteScans() {
 
   return (
     <div>
-      <div className="well">
+      <div>
         { organization?.isSandbox
           && (
           <AlertBanner
@@ -134,6 +130,29 @@ function SiteScans() {
             alertRole={false}
           />
           )}
+      </div>
+      <div>
+        <h3>Welcome to the Site Scans beta!</h3>
+          <p>Pages is now offering automated monthly scans of your site. These scans run on your live site (or if you haven’t <Link to={`/sites/${id}/settings`}>configured a branch for your live site</Link>, then your latest site preview). This new offering is part of our larger efforts to support our customers in their obligations to comply with OMB Memo 23-22 and ATO requirements.</p>
+        <p>Don’t want to wait? You can request an immediate scan of any site branch from the  <Link to={`/sites/${id}/builds`}>Build history page</Link>. You can also customize your report results in <Link to={`/sites/${id}/settings`}>Site settings</Link>. For more information on scans and rulesets, check out the
+          {' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Pages documentation on site scans"
+            href="https://cloud.gov/pages/documentation/build-scans/"
+          >
+            documentation
+          </a>
+          .
+        </p>
+        <p>
+          We welcome your feedback on this experimental feature. Email
+          {' '}
+          <a href="mailto:pages-support@cloud.gov?subject=Site%20scans%20feedback" target="_blank" rel="noreferrer">pages-support@cloud.gov</a>
+          {' '}
+          with the subject line “Site Scans feedback” to let us know what you think!
+        </p>
       </div>
 
       { isLoading
@@ -152,13 +171,13 @@ function SiteScans() {
               </thead>
               <tbody>
                 {actualScans(scans).map((scan) => {
-                  const { summary, icon, results, artifact } = scanSummaryIcon(scan);
+                  const { icon, results, artifact } = scanResultsIcon(scan);
                   return (
                     <tr key={scan.id}>
                       <th scope="row" data-title="Scan">
                         <div className="scan-info">
                             <h3 className="scan-info-name">
-                              { scan.BuildTaskType.name }
+                              { scan.BuildTaskType?.name || 'Scan name not available' }
                             </h3>
                             {scan.createdAt && (
                               <p>
@@ -169,7 +188,7 @@ function SiteScans() {
                                 </span>
                               </p>
                             )}
-
+                          
                         </div>
 
                       </th>
@@ -221,6 +240,9 @@ function SiteScans() {
                 })}
               </tbody>
             </table>
+             { !scans.length && (
+              <p>Looks like you don’t have any scans yet. </p>
+             ) }
             <p>
               Showing { scans.length } most recent scan(s).
             </p>
