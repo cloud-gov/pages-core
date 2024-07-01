@@ -15,6 +15,7 @@ import {
 } from '../../util/datetime';
 import AlertBanner from '../alertBanner';
 import CreateBuildLink from '../CreateBuildLink';
+import CreateScanLink from '../CreateScanLink';
 import BranchViewLink from '../branchViewLink';
 import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconExperiment, IconSpinner, IconX,
@@ -340,24 +341,21 @@ function SiteBuilds() {
                         </div>
                       </td>
                       <td data-title="Actions" className="table-actions">
-
                         { previewBuilds[build.branch] === build.id && build.state === 'success'
-                        && (
-                        <div>
-                          <BranchViewLink
-                            branchName={build.branch}
-                            site={site}
-                            showIcon
-                            completedAt={build.completedAt}
-                          />
-                          <button onClick={() => scan(build)} type="button">Scan</button>
-                        </div>
-                        ) }
-
-                        <span>
-                          {
-                            ['error', 'success'].includes(build.state)
-                            && (
+                          && (
+                            <span class="table-actions_buttons">
+                              <BranchViewLink
+                                branchName={build.branch}
+                                site={site}
+                                showIcon
+                                completedAt={build.completedAt}
+                              />
+                            </span>
+                          )
+                        }
+                        { ['error', 'success'].includes(build.state)
+                          && (
+                            <span class="table-actions_buttons">
                               <CreateBuildLink
                                 handlerParams={{ buildId: build.id, siteId: site.id }}
                                 handleClick={buildActions.restartBuild}
@@ -365,9 +363,22 @@ function SiteBuilds() {
                               >
                                 Rebuild
                               </CreateBuildLink>
-                            )
-                          }
-                        </span>
+                            </span>
+                          )
+                        }
+                        { previewBuilds[build.branch] === build.id && build.state === 'success'
+                          && (
+                            <span class="table-actions_buttons">
+                              <CreateScanLink
+                                handlerParams={build}
+                                handleClick={() => scan(build)}
+                                className="usa-button usa-button-secondary small-button"
+                              >
+                                Scan site
+                              </CreateScanLink>
+                            </span>
+                          ) 
+                        }
                       </td>
                       { siteHasBuildTasks(builds) && (
                         buildHasBuildTasks(build)
