@@ -9,7 +9,7 @@ import globals from '../globals';
 // This function determines the link for a built branch
 const getViewLink = (branch, site) => {
   const {
-    awsBucketName, owner, repository, domains, siteBranchConfigs,
+    awsBucketName, owner, repository, domains = [], siteBranchConfigs = [],
   } = site;
   const origin = `https://${awsBucketName}.${globals.PROXY_DOMAIN}`;
   const branchConfig = siteBranchConfigs.find(s => s.branch === branch);

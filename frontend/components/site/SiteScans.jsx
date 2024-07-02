@@ -2,7 +2,6 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import prettyBytes from 'pretty-bytes';
-
 import { sandboxMsg } from '../../util';
 import {
   dateAndTimeSimple,
@@ -10,14 +9,13 @@ import {
   dateAndTime,
 } from '../../util/datetime';
 
-import {
-  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX,
-} from '../icons';
+
 import GitHubLink from '../GitHubLink';
 
 import { useBuildTasksForSite } from '../../hooks/useBuildTasksForSite';
 import { currentSite } from '../../selectors/site';
 import { getOrgById } from '../../selectors/organization';
+import ScanResultsSummary from '../ScanResultsSummary';
 
 
 function SiteScans() {
@@ -26,9 +24,13 @@ function SiteScans() {
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
   let { buildTasks: scans, isLoading } = useBuildTasksForSite(id);
 
-  function actualScans(scansList) {
-    return scansList.filter(scan => scan.status !== 'cancelled')
+  const filteredScans = (scansList = scans) => {
+    return scansList
+      // fake adding artifacts, delete next line before merge
+      .map(scan => Number.isInteger(scan.count) ? { ...scan, artifact: { url: '#foo', size: 12345} } : scan)
+      .filter(scan => scan.status !== 'cancelled')
   }
+  
 
   function shaLink(build) {
     const { owner, repository } = site;
@@ -63,57 +65,6 @@ function SiteScans() {
     );
   }
 
-  const scanResultsIcon = ({ status, count, artifact = null }) => {
-    let icon;
-    let results;
-    switch (status) {
-      case 'error':
-        results = 'Scan failed';
-        icon = IconX;
-        break;
-      // this case should never happen, unless we want to show cancelled scans
-      case 'cancelled':
-        results = 'Failed builds cannot be scanned';
-        icon = IconX;
-        break;
-      case 'processing':
-        results = 'Scan in progress';
-        icon = IconSpinner;
-        break;
-      case 'queued':
-      case 'created':
-        results = 'Scan queued';
-        icon = IconClock;
-        break;
-      case 'success':
-        if (count === 1) {
-          icon = IconExclamationCircle;
-          results = '1 issue found';
-          artifact = {
-            url: "#",
-            filesize: 12345
-          };
-        } else if (count > 1) {
-          icon = IconExclamationCircle;
-          results = `${count} issues found`;
-          artifact = {
-            url: "#",
-            size: 999
-          };
-        } else {
-          icon = IconCheckCircle;
-          results = 'No issues found';
-          artifact = {
-            url: "#",
-            size: 5432
-          };
-        }
-        break;
-      default:
-        icon = null;
-    }
-    return { icon, results, artifact };
-  };
 
   if (!site || !scans) {
     return null;
@@ -170,8 +121,7 @@ function SiteScans() {
                 </tr>
               </thead>
               <tbody>
-                {actualScans(scans).map((scan) => {
-                  const { icon, results, artifact } = scanResultsIcon(scan);
+                {scans && filteredScans().map((scan) => {
                   return (
                     <tr key={scan.id}>
                       <th scope="row" data-title="Scan">
@@ -207,33 +157,25 @@ function SiteScans() {
                         </div>
                       </td>
                       <td data-title="Results" className="scan-results">
-                        <div className="scan-results-status">
-                          <h4>
-                            { icon && (
-                              <span className="scan-info-inline-icon">
-                                { React.createElement(icon) }
+                        <ScanResultsSummary status={scan.status} count={scan.count}>
+                          { scan.artifact?.url && (
+                            <>
+                              <Link
+                                to={scan.artifact?.url}
+                                title={'Download scan results for ' && scan.BuildTaskType.name}
+                                className="artifact-filename"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Download results
+                              </Link>
+                              {' '}
+                              <span className="artifact-filesize">
+                                ({ prettyBytes(scan.artifact?.size) })
                               </span>
-                            )}
-                            <span className={ artifact?.url ? '' : 'unbold'}>{ results }</span>
-                          </h4>
-                          { artifact?.url && (
-                              <>
-                                <Link
-                                  to={artifact?.url}
-                                  title={'Download scan results for ' && scan.BuildTaskType.name}
-                                  className="artifact-filename"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  Download results
-                                </Link>
-                                {' '}
-                                <span className="artifact-filesize">
-                                  ({ prettyBytes(artifact?.size) })
-                                </span>
-                              </>
-                          )}
-                        </div>
+                            </>
+                        )}
+                        </ScanResultsSummary>
                       </td>
                     </tr>
                   );

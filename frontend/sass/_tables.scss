@@ -45,8 +45,7 @@
     line-height: 2rem;
     font-family: Consolas, "Lucida Console", Menlo, monospace;
   }
-  .scan-info-inline-icon,
-  .build-info-inline-icon {
+  .status-info-inline-icon {
     margin: auto .35em auto 0;
     line-height: 0;
     svg {
@@ -54,12 +53,14 @@
       height: 20px;
     }
   }
-  .scan-info,  
-  .scan-results-status,
-  .build-info-details {
+  .status-info{
     flex: 4;
     line-height: 1.4em;
-    min-height: 3em;
+  }
+  .status-info,
+  .scan-info,  
+  .build-info-details  {
+
     p {
       font-size: 1.45rem;
       margin: 0;
@@ -81,6 +82,7 @@
       color: #112e51;
     }
   }
+  .build-info-details 
   .build-info-logs-link {
     font-size: 1.45rem;
     margin: .25em 0;
@@ -103,7 +105,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 36ch;
+    max-width: 34ch;
     margin: 1em 0 0;
     line-height: 1.3em;
   }
@@ -201,12 +203,7 @@
   td, tbody th {
     padding: 1.5rem 1rem;
   }
-  .scan-results-pseudo-row {
-    background: #112e510f;
-    &::before {
-      background: #112e510f;
-    }
-  }
+
   .no-scan-results {
     height: 0;
     margin-top: -2px;
@@ -215,37 +212,24 @@
     }
   }
   @media screen and (min-width: 990px) {
-    tr.build-has-scans {
-      position: relative;
-      th, td {
-        padding-bottom: 5.5rem;
-      }
-    }
-    .build-info {
+    // tr.build-has-scans {
+    //   position: relative;
+    //   th, td {
+    //     padding-bottom: 5.5rem;
+    //   }
+    // }
+    .status-info {
       flex-direction: row;
-      .build-info-prefix {
+      .status-info-title {
         margin-right: 0.75em;
         line-height: 3rem;
         text-align: right;
         min-width: 7ch;
       }
     }
-    .scan-results-pseudo-row {
-      padding:0;
-      width: 0;
-      div {
-        line-height: 2.75rem;
-        display: block;
-        position: absolute;
-        background: #112e510f; 
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        padding: 0.5em 2rem .5em 1em;
-        &.label-warning {
-          background-color: #fdb81e40;
-        }
-      }
+    .build-info-details {
+      padding-left: 2em;
+      min-width: 30ch;
     }
   }
 
@@ -349,10 +333,46 @@
     color: $color-gray-dark;
     white-space: nowrap;
   }
-  .scan-results-status {
-    min-height: initial;
-    h4 {
-      margin: 0;
-    }
+  
+}
+
+
+
+
+// scans results display
+.scan-status {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  grid-template-rows: 24px 1fr;
+  align-items: center;
+}
+.scan-status_title {
+  font-weight: 600;
+  font-size: 1.2em;
+  line-height: 1.4em;
+  color: #112e51;
+  margin: 0;
+  &.scan-status_title-no-results {
+    font-weight: 400;
+    font-size: 1.1em;
+  }
+}
+.scan-status_icon {
+  margin: auto 6px auto 0;
+  line-height: 0;
+  svg {
+    width: auto;
+    height: 18px;
+  }
+}
+
+.scan-status_details {
+  grid-row-start:    2;
+  grid-column-start: 2;
+  p {
+    font-size: 1.45rem;
+    margin: 0;
+    white-space: initial;
+    line-height: 1.4em;
   }
 }
