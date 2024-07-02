@@ -75,11 +75,11 @@ module.exports = {
   },
   postgres: dbConfig(process.env),
   redis: {
-    url: process.env.CI ? 'redis://localhost:6379' : 'redis://redis:6379',
+    url: 'redis://redis:6379',
   },
   log: {
     level: 'error',
-    silent: true,
+    silent: process.env.CI,
   },
   s3BuildLogs: {
     accessKeyId: '123abc',

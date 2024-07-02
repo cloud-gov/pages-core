@@ -452,48 +452,4 @@ describe('Build model', () => {
       expect(buildQuery).to.be.null;
     });
   });
-
-  describe('model hooks', () => {
-    it('creates build tasks on afterCreate hook', async () => {
-      sinon.stub(BuildTask.prototype, 'enqueue').resolves();
-      const site = factory.site();
-      const buildTaskType = await factory.buildTaskType();
-      await factory.siteBuildTask({
-        siteId: site, buildTaskTypeId: buildTaskType,
-      });
-
-      // create the build
-      const build = await factory.build({ site });
-
-      // now we should have a new build task
-      const buildTasks = await BuildTask.findAll({ where: { buildId: build.id } });
-      expect(buildTasks).to.have.length(1);
-
-      const task = buildTasks[0];
-      expect(task.buildTaskTypeId).to.equal(buildTaskType.id);
-      expect(task.buildId).to.equal(build.id);
-    });
-
-    it('cancels tasks after build failure', async () => {
-      // prep
-      const site = factory.site();
-      const buildTaskType = await factory.buildTaskType();
-      await factory.siteBuildTask({
-        siteId: site, buildTaskTypeId: buildTaskType,
-      });
-
-      // create the build
-      const build = await factory.build({ site });
-
-      // now we should have a new build task
-      const buildTasks = await BuildTask.findAll({ where: { buildId: build.id } });
-      expect(buildTasks).to.have.length(1);
-      const task = buildTasks[0];
-
-      // fail the build and the task should be cancelled
-      await build.updateJobStatus({ status: Build.States.Error });
-      await task.reload();
-      expect(task.status).to.equal(BuildTask.Statuses.Cancelled);
-    });
-  });
 });

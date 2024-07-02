@@ -174,6 +174,7 @@ module.exports = (sequelize, DataTypes) => {
   BuildTask.associate = associate;
   BuildTask.Statuses = Statuses;
   BuildTask.siteScope = id => ({ method: ['bySite', id] });
+  BuildTask.bySite = id => BuildTask.scope({ method: ['bySite', id] });
   BuildTask.byStartsWhen = startsWhen => BuildTask.scope({ method: ['byStartsWhen', startsWhen] });
   BuildTask.forRunner = () => BuildTask.scope({ method: ['forRunner'] });
   BuildTask.prototype.enqueue = enqueue;

@@ -1246,6 +1246,31 @@ paths:
           description: The site of the user environment variable is to be added to cannot be found
           schema:
             $ref: 'Error.json'
+  /site/{site_id}/tasks:
+    parameters:
+      - name: site_id
+        in: path
+        description: The id of the site
+        type: integer
+        required: true
+    get:
+      summary: Fetch the list of build tasks for the given site
+      responses:
+        200:
+          description: A list of build tasks for the given site
+          schema:
+            type: array
+            items:
+              $ref: 'BuildTask.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+
   /me:
     get:
       summary: Fetch data for the current user

@@ -2198,5 +2198,33 @@ describe('Site API', () => {
         expect(response.body).to.have.length(0);
       });
     });
+
+    describe('GET /v0/site/:site_id/tasks', () => {
+      it('should return tasks for a site', async () => {
+        const user = await factory.user();
+        const site = await factory.site({ users: [user.id] });
+        const build = await factory.build({ site });
+        const buildTaskType = await factory.buildTaskType();
+        const buildTask = await factory.buildTask({ buildTaskType, build });
+
+        const cookie = await authenticatedSession(user);
+        const response = await request(app)
+          .get(`/v0/site/${site.id}/tasks`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        // TODO: update this validation for artifact (model is string, response is obj)
+        // validateAgainstJSONSchema(
+        //   'GET',
+        //   '/site/{site_id}/tasks',
+        //   200,
+        //   response.body
+        // );
+
+        expect(response.body).to.be.a('array');
+        expect(response.body).to.have.length(1);
+        expect(response.body[0]).to.have.property('id', buildTask.id)
+      })
+    })
   });
 });

@@ -18,5 +18,5 @@ router.post('/site/:site_id/basic-auth', sessionAuth, SiteController.addBasicAut
 router.delete('/site/:site_id/basic-auth', sessionAuth, SiteController.removeBasicAuth);
 router.get('/site/:site_id/task', sessionAuth, SiteController.getSiteBuildTasks);
 router.put('/site/:site_id/task/:task_id', sessionAuth, SiteController.updateSiteBuildTask);
-
+router.get('/site/:site_id/tasks', sessionAuth, SiteController.getSiteTasks);
 module.exports = router;

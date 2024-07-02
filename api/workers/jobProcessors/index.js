@@ -1,5 +1,6 @@
 const archiveBuildLogsDaily = require('./archiveBuildLogsDaily');
 const buildTaskRunner = require('./buildTaskRunner');
+const buildTasksScheduler = require('./buildTasksScheduler');
 const cleanSandboxOrganizations = require('./cleanSandboxOrganizations');
 const destroySiteInfra = require('./destroySiteInfra');
 const failStuckBuilds = require('./failStuckBuilds');
@@ -12,6 +13,7 @@ const timeoutBuilds = require('./timeoutBuilds');
 module.exports = {
   archiveBuildLogsDaily,
   buildTaskRunner,
+  buildTasksScheduler,
   cleanSandboxOrganizations,
   destroySiteInfra,
   failStuckBuilds,
