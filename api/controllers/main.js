@@ -22,7 +22,10 @@ module.exports = {
 
   app(req, res) {
     if (!req.session.authenticated) {
-      req.flash('error', 'You are not permitted to perform this action. Are you sure you are logged in?');
+      req.flash(
+        'error',
+        'You are not permitted to perform this action. Are you sure you are logged in?'
+      );
       return res.redirect('/');
     }
 
@@ -42,6 +45,33 @@ module.exports = {
     context.frontendConfig = frontendConfig;
 
     return res.render('app.njk', context);
+  },
+
+  report(req, res) {
+    if (!req.session.authenticated) {
+      req.flash(
+        'error',
+        'You are not permitted to perform this action. Are you sure you are logged in?'
+      );
+      return res.redirect('/');
+    }
+
+    const context = defaultContext(req, res);
+    const hasUAAIdentity = !!req.user.UAAIdentity;
+
+    context.isAuthenticated = true;
+    context.username = req.user.username;
+    context.siteWideError = SiteWideErrorLoader.loadSiteWideError();
+    context.csrfToken = req.csrfToken();
+    context.hasUAAIdentity = !!hasUAAIdentity;
+
+    const frontendConfig = {
+      TEMPLATES: config.templates,
+    };
+
+    context.frontendConfig = frontendConfig;
+
+    return res.render('report.njk', context);
   },
 
   robots(req, res) {
