@@ -361,7 +361,7 @@ jobs:
           _: #@ template.replace(data.values.env_cf)
           APP_ENV: ((deploy-env))
           CF_APP_NAME: pages-((deploy-env))
-        on_failure: #@ slack_hook("success", "Rotate site bucket keys")
+        on_failure: #@ slack_hook("failure", "Rotate site bucket keys")
         on_success: #@ slack_hook("success", ":arrows_counterclockwise: :key: Rotate site bucket keys")
 
   #@ if/end env != 'production':
@@ -422,6 +422,21 @@ jobs:
         -  #@ slack_hook("success", "e2e testing")
         #@ if/end env == 'dev':
         -  #@ pr_hook("success", "e2e-test")
+
+  #@ if/end env == 'production':
+  - name: release
+    plan:
+      - get: src
+        params: { depth: 1 }
+        trigger: true
+        passed: [set-pipeline]
+      -  #@ template.replace(data.values.release_steps)
+      - put: slack-cg-pages
+        params:
+          text_file: src/slackrelease.md
+          channel: ((slack-channel))
+          username: ((slack-username))
+          icon_url: ((slack-icon-url))
 
 #!  RESOURCES
 
