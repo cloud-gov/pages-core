@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { IconRebuild } from './icons';
 
-function CreateBuildLink(props) {
-  const {
-    children, className, handleClick, handlerParams,
-  } = props;
+function CreateBuildLink({
+  children,
+  handleClick,
+  className = 'usa-button',
+  handlerParams = {},
+}) {
   function localHandleClick(event) {
     event.preventDefault();
     const args = Object.keys(handlerParams).map(key => handlerParams[key]);
@@ -31,11 +33,6 @@ CreateBuildLink.propTypes = {
   handleClick: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-};
-
-CreateBuildLink.defaultProps = {
-  handlerParams: {},
-  className: 'usa-button',
 };
 
 export default CreateBuildLink;

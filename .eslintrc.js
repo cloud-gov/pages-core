@@ -38,6 +38,7 @@ const finalRules = {
       allowAsProps: true,
     },
   ],
+  'react/require-default-props': [0],
   'default-param-last': [0],
   'function-call-argument-newline': [0],
   'function-paren-newline': [0],
@@ -64,9 +65,7 @@ const overrides = [
     },
     plugins: ['jest'],
     extends: ['airbnb', 'plugin:sonarjs/recommended'],
-    rules: {
-      'react/jsx-props-no-spreading': 0,
-    }
+    rules: { ...finalRules, 'react/jsx-props-no-spreading': 0 },
   },
 ];
 

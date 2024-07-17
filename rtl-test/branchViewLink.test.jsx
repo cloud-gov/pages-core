@@ -4,17 +4,60 @@ import '@testing-library/jest-dom';
 
 import { BranchViewLink } from '../frontend/components/branchViewLink';
 
+const proxyDomain = process.env.PROXY_DOMAIN;
+
 describe('<BranchViewLink/>', () => {
+  const awsBucketName = 'test-bucket';
+  const siteDomain = 'prod-url.com';
+  const demoDomain = 'demo-url.com';
+  const proxyOrigin = `https://${awsBucketName}.${proxyDomain}`;
+  const unprovisionedS3Key = '/this/is/unprovisoned/branch';
+
+  const defaultBranch = 'default-branch';
+  const demoBranch = 'demo-branch';
+  const VIEW_BUILD = 'View build';
+
   const testSite = {
-    defaultBranch: 'default-branch',
-    demoBranch: 'demo-branch',
-    domain: 'https://prod-url.com',
-    demoDomain: 'https://demo-url.com',
+    defaultBranch,
+    demoBranch,
+    domain: `https://${siteDomain}`,
+    demoDomain: `https://${demoDomain}`,
     owner: 'test-owner',
     repository: 'test-repo',
-    awsBucketName: 'test-bucket',
+    awsBucketName,
     s3ServiceName: 'federalist-production-s3',
-    siteBranchConfigs: [],
+    domains: [
+      {
+        names: siteDomain,
+        siteBranchConfigId: 123,
+        state: 'provisioned',
+      },
+      {
+        names: demoDomain,
+        siteBranchConfigId: 256,
+        state: 'provisioned',
+      },
+      {
+        names: 'unprovisioned.gov',
+        siteBranchConfigId: 411,
+        state: 'pending',
+      },
+    ],
+    siteBranchConfigs: [
+      {
+        branch: defaultBranch,
+        id: 123,
+      },
+      {
+        branch: demoBranch,
+        id: 256,
+      },
+      {
+        s3Key: unprovisionedS3Key,
+        branch: 'unprovisioned-branch',
+        id: 411,
+      },
+    ],
   };
 
   let props;
@@ -26,47 +69,39 @@ describe('<BranchViewLink/>', () => {
     };
   });
 
-  test('it renders a link to the default branch\'s site', () => {
+  it("renders a link to the default branch's site", () => {
     props.branchName = 'default-branch';
-    props.viewLink = 'https://some-domain.gov/';
     render(<BranchViewLink {...props} />);
-
-    const link = screen.getByRole('link');
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://some-domain.gov/');
-    expect(link).toHaveTextContent('View site');
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveAttribute('href', `https://${siteDomain}`);
+    expect(anchor).toHaveTextContent(VIEW_BUILD);
   });
 
-  test('it renders a link to the demo branch\'s site', () => {
+  it("renders a link to the demo branch's site", () => {
     props.branchName = 'demo-branch';
-    props.viewLink = 'https://some-other-domain.gov/';
     render(<BranchViewLink {...props} />);
-
-    const link = screen.getByRole('link');
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://some-other-domain.gov/');
-    expect(link).toHaveTextContent('View demo');
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveAttribute('href', `https://${demoDomain}`);
+    expect(anchor).toHaveTextContent(VIEW_BUILD);
   });
 
-  test('it renders a preview link to the other branches', () => {
-    props.branchName = 'some-other-branch';
-    props.viewLink = 'https://random-url.com/';
+  it('renders the preview link to site branch when the domain is not provisioned', () => {
+    props.branchName = 'unprovisioned-branch';
     render(<BranchViewLink {...props} />);
-
-    const link = screen.getByRole('link');
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://random-url.com/');
-    expect(link).toHaveTextContent('Preview site');
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveAttribute('href', `${proxyOrigin}${unprovisionedS3Key}`);
+    expect(anchor).toHaveTextContent(VIEW_BUILD);
   });
 
-  test('it allows some special characters', () => {
-    props.branchName = 'release_1.2.3';
-    props.viewLink = 'https://release_1.2.3.gov/';
-    render(<BranchViewLink {...props} />);
-
-    const link = screen.getByRole('link');
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://release_1.2.3.gov/');
-    expect(link).toHaveTextContent('Preview site');
+  it('renders a preview link to the other branches', () => {
+    const branchName = 'some-other-branch';
+    const updatedProps = { ...props, branchName };
+    render(<BranchViewLink {...updatedProps} />);
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveAttribute(
+      'href',
+      `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchName}`
+    );
+    expect(anchor).toHaveTextContent(VIEW_BUILD);
   });
 });

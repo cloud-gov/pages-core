@@ -23,6 +23,6 @@ describe('<CreateBuildLink />', () => {
 
     fireEvent.click(screen.getByRole('button'));
     expect(handler.calledOnce).toBeTruthy();
-    expect(handler.calledWith(...Object.keys(params).map((key) => params[key]))).toBeTruthy();
+    expect(handler.calledWith(...Object.keys(params).map(key => params[key]))).toBeTruthy();
   });
 });

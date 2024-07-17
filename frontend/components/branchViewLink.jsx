@@ -34,7 +34,7 @@ const getViewLink = (branch, site) => {
   return `https://${domain.names.split(',')[0]}`;
 };
 
-export const BranchViewLink = ({ branchName, site, showIcon }) => {
+export const BranchViewLink = ({ branchName, site, showIcon = false }) => {
   const domain = getViewLink(branchName, site);
 
   return (
@@ -54,10 +54,6 @@ BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
   site: SITE.isRequired,
   showIcon: PropTypes.bool,
-};
-
-BranchViewLink.defaultProps = {
-  showIcon: false,
 };
 
 export default connect()(BranchViewLink);

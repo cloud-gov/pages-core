@@ -6,12 +6,12 @@ import { IconGitHub, IconBranch } from './icons';
 const BASE = 'https://github.com';
 
 const GitHubLink = ({
-  owner, repository, text, branch, sha, icon, ...props
+  owner, repository, text, branch = null, sha = null, icon = 'repo',
 }) => {
   const baseHref = `${BASE}/${owner}/${repository}`;
 
-  let { title } = props;
   let href = baseHref;
+  let title = 'View repository on GitHub';
 
   if (branch) {
     href = `${baseHref}/tree/${encodeURIComponent(branch)}`;
@@ -59,15 +59,7 @@ GitHubLink.propTypes = {
   text: PropTypes.string.isRequired,
   branch: PropTypes.string,
   sha: PropTypes.string,
-  title: PropTypes.string,
   icon: PropTypes.string,
-};
-
-GitHubLink.defaultProps = {
-  branch: null,
-  sha: null,
-  icon: 'repo',
-  title: 'View repository on GitHub',
 };
 
 export default GitHubLink;
