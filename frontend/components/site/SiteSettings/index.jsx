@@ -1,8 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import {
+  useParams, useNavigate, useLocation,
+} from 'react-router-dom';
 
 import BranchConfigs from './BranchConfigs';
+import ScanConfigs from './ScanConfigs';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import EnvironmentVariables from './EnvironmentVariables';
 import siteActions from '../../../actions/siteActions';
@@ -77,6 +80,7 @@ function SiteSettings() {
       />
 
       <EnvironmentVariables siteId={site.id} />
+      <ScanConfigs siteId={site.id} />
     </div>
   );
 }

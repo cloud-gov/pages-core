@@ -11,10 +11,13 @@ export const useSiteBuildTasks = (id) => {
   const [results, setResults] = useState(initResultsState);
 
   useEffect(() => {
-    api.getSiteBuildTasks(id).then(data => setResults({
-      isLoading: false,
-      siteBuildTasks: data,
-    }));
+    api.getSiteBuildTasks(id).then((data) => {
+      data.sort((a, b) => b.id - a.id);
+      setResults({
+        isLoading: false,
+        siteBuildTasks: data,
+      });
+    });
   }, [id]);
 
   return results;
