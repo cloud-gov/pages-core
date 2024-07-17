@@ -1,14 +1,12 @@
-// import React from 'react';
-// import { shallow } from 'enzyme';
-// import { expect } from 'chai';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
-// import LoadingIndicator from '../../../frontend/components/LoadingIndicator';
+import LoadingIndicator from '../frontend/components/LoadingIndicator';
 
-// describe('<LoadingIndicator/>', () => {
-//   it('renders', () => {
-//     const wrapper = shallow(<LoadingIndicator />);
-//     expect(wrapper).not.to.be.undefined;
-//     expect(wrapper.find('.main-loader')).to.have.length(1);
-//     expect(wrapper.text()).to.equal('Loading...');
-//   });
-// });
+describe('<LoadingIndicator/>', () => {
+  it('renders', () => {
+    render(<LoadingIndicator />);
+    screen.getByText('Loading...');
+  });
+});

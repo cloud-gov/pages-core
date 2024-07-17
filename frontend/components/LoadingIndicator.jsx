@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const LoadingIndicator = ({ text, size = 'main' }) => (
+const LoadingIndicator = ({ text = 'Loading...', size = 'main' }) => (
   <div className={`loader loader--${size}`} id="main-loader">
     <div className="uil-ring-css">
       <div />
@@ -13,11 +13,6 @@ const LoadingIndicator = ({ text, size = 'main' }) => (
 LoadingIndicator.propTypes = {
   text: PropTypes.string,
   size: PropTypes.string,
-};
-
-LoadingIndicator.defaultProps = {
-  text: 'Loading...',
-  size: 'main',
 };
 
 export default LoadingIndicator;

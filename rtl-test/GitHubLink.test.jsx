@@ -16,47 +16,47 @@ describe('<GitHubLink/>', () => {
     expect(anchor).toHaveAttribute('title', 'View repository on GitHub');
     expect(anchor).toHaveTextContent('link text');
 
-    const icon = screen.getByTitle('icon-github');
-    expect(icon).toBeInTheDocument();
+    // TODO: actually render svg with https://react-svgr.com/docs/node-api/ in tests
+    // const icon = screen.getByTitle('icon-github');
+    // expect(icon).toBeInTheDocument();
   });
 
-  // it('can link to a branch', () => {
-  //   const props = {
-  //    text: 'link text', owner: 'pumpkin-pie', repository: 'candle', branch: 'the-branch'
-  // };
-  //   const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
-  //   expect(wrapper.exists()).to.be.true;
+  it('can link to a branch', () => {
+    const props = {
+      text: 'link text', owner: 'pumpkin-pie', repository: 'candle', branch: 'the-branch',
+    };
 
-  //   const anchor = wrapper.find('a.repo-link');
-  //   expect(anchor.exists()).to.be.true;
-  //   expect(anchor.prop('href')).to.equal('https://github.com/pumpkin-pie/candle/tree/the-branch');
-  //   expect(anchor.prop('title')).to.equal('View branch');
-  // });
+    render(<GitHubLink {...props} />);
 
-  // it('encodes the branch name', () => {
-  //   const props = { text: 'boop', owner: 'spam', repository: 'potato', branch: '#-hash-#' };
-  //   const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveClass('repo-link');
+    expect(anchor).toHaveAttribute('href', 'https://github.com/pumpkin-pie/candle/tree/the-branch');
+    expect(anchor).toHaveAttribute('title', 'View branch on GitHub');
+  });
 
-  //   const anchor = wrapper.find('a.repo-link');
-  //   expect(anchor.exists()).to.be.true;
-  //   expect(anchor.prop('href')).to.equal('https://github.com/spam/potato/tree/%23-hash-%23');
-  // });
+  it('encodes the branch name', () => {
+    const props = {
+      text: 'boop', owner: 'spam', repository: 'potato', branch: '#-hash-#',
+    };
+    render(<GitHubLink {...props} />);
 
-  // it('links to a specific commit', () => {
-  //   const props = { text: 'boop', owner: 'zookeeni', repository: 'veggies', sha: '123A' };
-  //   const wrapper = shallow(<GitHubLink {...props} />).first().shallow();
-  //   const commitUrl = `https://github.com/${props.owner}/${props.repository}/commit/${props.sha}`;
-  //   const anchor = wrapper.find('a');
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveClass('repo-link');
+    expect(anchor).toHaveAttribute('href', 'https://github.com/spam/potato/tree/%23-hash-%23');
+  });
 
-  //   expect(anchor.prop('href')).to.equal(commitUrl);
-  // });
+  it('links to a specific commit', () => {
+    const props = {
+      text: 'boop', owner: 'zookeeni', repository: 'veggies', sha: '123A',
+    };
 
-  // it('uses overrided title attribute if provided', () => {
-  //   const props = {
-  //   text: 'boop', owner: 'owner', repository: 'a-repo', title: 'handy explanation'
-  // };
-  //   const wrapper = shallow(<GitHubLink {...props} />);
+    render(<GitHubLink {...props} />);
 
-  //   expect(wrapper.prop('title')).to.equal(props.title);
-  // });
+    const anchor = screen.getByRole('link');
+    expect(anchor).toHaveClass('repo-link');
+
+    const commitUrl = `https://github.com/${props.owner}/${props.repository}/commit/${props.sha}`;
+
+    expect(anchor).toHaveAttribute('href', commitUrl);
+  });
 });
