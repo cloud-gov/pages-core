@@ -21,8 +21,8 @@ describe('<CreateBuildLink />', () => {
     const handler = props.handleClick;
     const params = props.handlerParams;
 
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button'));
     expect(handler.calledOnce).toBeTruthy();
-    expect(handler.calledWith(...Object.keys(params).map(key => params[key]))).toBeTruthy();
+    expect(handler.calledWith(...Object.keys(params).map((key) => params[key]))).toBeTruthy();
   });
 });

@@ -64,6 +64,9 @@ const overrides = [
     },
     plugins: ['jest'],
     extends: ['airbnb', 'plugin:sonarjs/recommended'],
+    rules: {
+      'react/jsx-props-no-spreading': 0,
+    }
   },
 ];
 

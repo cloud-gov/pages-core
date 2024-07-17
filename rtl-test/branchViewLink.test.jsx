@@ -14,6 +14,7 @@ describe('<BranchViewLink/>', () => {
     repository: 'test-repo',
     awsBucketName: 'test-bucket',
     s3ServiceName: 'federalist-production-s3',
+    siteBranchConfigs: [],
   };
 
   let props;
