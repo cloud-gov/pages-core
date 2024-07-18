@@ -65,12 +65,6 @@ module.exports = {
     context.csrfToken = req.csrfToken();
     context.hasUAAIdentity = !!hasUAAIdentity;
 
-    const frontendConfig = {
-      TEMPLATES: config.templates,
-    };
-
-    context.frontendConfig = frontendConfig;
-
     return res.render('report.njk', context);
   },
 

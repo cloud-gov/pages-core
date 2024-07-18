@@ -9,7 +9,7 @@ import {
 
 import routes from './reportRoutes';
 
-const mainEl = document.querySelector('#js-report');
+const mainEl = document.querySelector('#report-app');
 const root = createRoot(mainEl);
 
 const router = createBrowserRouter(createRoutesFromElements(routes));
