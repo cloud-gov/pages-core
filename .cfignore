@@ -40,7 +40,9 @@ lib-cov
 *.out
 *.pid
 npm-debug.log
-# node_modules is purposefully kept for vendoring: https://docs.cloudfoundry.org/buildpacks/node/index.html#vendoring
+node_modules
+# https://docs.cloudfoundry.org/buildpacks/node/index.html#vendoring
+# Vendoring is suggested during the build but empirically slows down deployment
 
 
 ################################################
