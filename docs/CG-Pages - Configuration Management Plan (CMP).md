@@ -4,7 +4,7 @@
                                                                         
 | Date | Version | Description | Author |
 | -------- | -------- | -------- | -------- |
-| 06/17/2024 | 1.0 | Initial Document | Pages Compliance Lead |
+| July 2024 | 1.1 | Move document to GitHub and update where required | Pages Compliance Lead |
 
 ## Overview
 Cloud.gov Pages utilizes agile development methodologies. This Configuration Management Plan (CMP) outlines the configuration management process for the application and its related documentation, managed by the CG-Pages team. It serves as a guideline, describing the procedures for making changes to the application, and the system's functional attributes in relation to requirements, design, and operational maintenance throughout its lifecycle.
