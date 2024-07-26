@@ -23,6 +23,7 @@ export default (
     errorElement={<NotFound />}
   >
     <Route path=":type/:id" element={<ShowReport />} />
+    <Route path=":type/:id/:subpage" element={<ShowReport />} />
     <Route path="*" element={<NotFound />} />
   </Route>
 );
