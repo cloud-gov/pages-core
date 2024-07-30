@@ -1,9 +1,9 @@
 /* eslint-disable react/forbid-prop-types */
 
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
-import { useBuildLogs, useBuildDetails, useBuildTasks } from '../../hooks';
+import { useBuildLogs, useBuildDetails } from '../../hooks';
 import LoadingIndicator from '../LoadingIndicator';
 import SiteBuildLogTable from './siteBuildLogTable';
 import DownloadBuildLogsButton from './downloadBuildLogsButton';
@@ -42,7 +42,6 @@ const SiteBuildLogs = () => {
   const { buildId: buildIdStr } = useParams();
   const buildId = parseInt(buildIdStr, 10);
   const { buildDetails, isLoading: isLoadingBuildDetails } = useBuildDetails(buildId);
-  const { buildTasks, hasBuildTasks, isLoading: isLoadingBuildTasks } = useBuildTasks(buildId);
   const { logs, state, isLoading: isLoadingBuildLogs } = useBuildLogs(buildId);
 
   if (isLoadingBuildDetails || isLoadingBuildLogs) {
@@ -54,15 +53,6 @@ const SiteBuildLogs = () => {
       <CommitSummary buildDetails={buildDetails} />
       <div className="log-tools">
         <ul className="usa-unstyled-list">
-          {hasBuildTasks && !isLoadingBuildTasks && (
-            <li>
-              <Link className="usa-button usa-button-secondary" to="./../scans">
-                View scan results (
-                {buildTasks.length}
-                )
-              </Link>
-            </li>
-          )}
           <li>
             <DownloadBuildLogsButton buildId={buildId} buildLogsData={logs} />
           </li>

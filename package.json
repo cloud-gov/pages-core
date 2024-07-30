@@ -5,8 +5,8 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.451.0",
-    "@aws-sdk/s3-request-presigner": "^3.456.0",
+    "@aws-sdk/client-s3": "^3.620.1",
+    "@aws-sdk/s3-request-presigner": "^3.620.1",
     "@bull-board/express": "^5.15.3",
     "@json2csv/plainjs": "^7.0.1",
     "@octokit/request": "^6.2.2",
@@ -47,7 +47,7 @@
     "passport-oauth2": "^1.8.0",
     "pg": "^8.11.3",
     "pg-native": "^3.0.0",
-    "pretty-bytes": "^6.1.1",
+    "pretty-bytes": "5.6.0",
     "rc": "^1.2.8",
     "react-router": "6.18.0",
     "react-router-dom": "^6.18.0",
@@ -202,6 +202,7 @@
     "ws": "8.17.1",
     "socket.io-adapter": "2.5.5",
     "socket.io": "4.7.5",
-    "socket.io-client": "4.7.5"
+    "socket.io-client": "4.7.5",
+    "fast-xml-parser": "4.4.1"
   }
 }

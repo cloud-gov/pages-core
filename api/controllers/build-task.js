@@ -1,6 +1,9 @@
 const { wrapHandlers } = require('../utils');
-const { Build, BuildTask, BuildTaskType } = require('../models');
+const {
+  Build, BuildTask, BuildTaskType, SiteBuildTask,
+} = require('../models');
 const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
+const buildTaskSerializer = require('../serializers/build-task');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -16,7 +19,6 @@ module.exports = wrapHandlers({
 
     const task = await BuildTask.findOne({
       where: { buildId, id: buildTaskId },
-      attributes: { exclude: ['token', 'deletedAt'] },
       include: BuildTaskType,
     });
 
@@ -24,7 +26,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    return res.json(task);
+    const taskJSON = buildTaskSerializer.serialize(task);
+
+    return res.json(taskJSON);
   },
 
   list: async (req, res) => {
@@ -39,7 +43,6 @@ module.exports = wrapHandlers({
 
     const tasks = await BuildTask.findAll({
       where: { buildId },
-      attributes: { exclude: ['token', 'deletedAt', 'name'] },
       include: BuildTaskType,
     });
 
@@ -53,7 +56,9 @@ module.exports = wrapHandlers({
       return task;
     }));
 
-    return res.json(updatedTasks);
+    const tasksJSON = buildTaskSerializer.serializeMany(updatedTasks);
+
+    return res.json(tasksJSON);
   },
 
   update: async (req, res) => {
@@ -73,5 +78,30 @@ module.exports = wrapHandlers({
     await task.update(body);
 
     return res.ok();
+  },
+
+  createTasksForBuild: async (req, res) => {
+    const { params, user } = req;
+    const { build_id: buildId } = params;
+
+    const build = await Build.forSiteUser(user).findByPk(buildId);
+
+    if (!build) {
+      return res.notFound();
+    }
+
+    const siteBuildTasks = await SiteBuildTask.findAll({
+      where: {
+        siteId: build.Site.id,
+      },
+    });
+
+    await Promise.all(siteBuildTasks.map(siteBuildTask => (
+      siteBuildTask
+        .createBuildTask(build)
+        .then(async task => task.enqueue())
+    )));
+
+    return res.ok({});
   },
 });

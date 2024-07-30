@@ -12,6 +12,7 @@ describe('<BranchViewLink/>', () => {
   const demoDomain = 'demo-url.com';
   const proxyOrigin = `https://${awsBucketName}.${proxyDomain}`;
   const unprovisionedS3Key = '/this/is/unprovisoned/branch';
+  const viewSiteBuildCTA = 'View site preview';
 
   const testSite = {
     defaultBranch: 'default-branch',
@@ -71,7 +72,7 @@ describe('<BranchViewLink/>', () => {
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
     expect(anchor.prop('href')).to.equal(`https://${siteDomain}`);
-    expect(anchor.text()).equal('View build');
+    expect(anchor.text()).equal(viewSiteBuildCTA);
   });
 
   it("renders a link to the demo branch's site", () => {
@@ -80,7 +81,7 @@ describe('<BranchViewLink/>', () => {
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
     expect(anchor.prop('href')).to.equal(`https://${demoDomain}`);
-    expect(anchor.text()).equal('View build');
+    expect(anchor.text()).equal(viewSiteBuildCTA);
   });
 
   it('renders the preview link to site branch when the domain is not provisioned', () => {
@@ -89,7 +90,7 @@ describe('<BranchViewLink/>', () => {
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
     expect(anchor.prop('href')).to.equal(`${proxyOrigin}${unprovisionedS3Key}`);
-    expect(anchor.text()).equal('View build');
+    expect(anchor.text()).equal(viewSiteBuildCTA);
   });
 
   it('renders a preview link to the other branches', () => {
@@ -101,6 +102,6 @@ describe('<BranchViewLink/>', () => {
     expect(anchor.prop('href')).to.equal(
       `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchName}`
     );
-    expect(anchor.text()).equal('View build');
+    expect(anchor.text()).equal(viewSiteBuildCTA);
   });
 });

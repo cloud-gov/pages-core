@@ -1,15 +1,17 @@
-a {
+.usa-link, a {
   text-decoration-skip: ink;
-
+  text-decoration: underline;
+  color: $link-color;
   &:hover {
-    color: $link-color;
-    text-decoration: none;
+    color: $link-color-active;
+    cursor: pointer;
   }
 
   &:active {
     color: $button-color-active;
   }
 }
+
 
 button,
 .usa-button,

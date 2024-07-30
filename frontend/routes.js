@@ -8,13 +8,13 @@ import SiteList from './components/siteList/siteList';
 import SiteContainer from './components/siteContainer';
 import SiteBuilds from './components/site/siteBuilds';
 import SiteBuildLogs from './components/site/siteBuildLogs';
-import SiteBuildTasks from './components/site/siteBuildTasks';
 import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
 import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
 import SiteSettings from './components/site/SiteSettings';
 import CustomDomains from './components/site/CustomDomains';
 import NewCustomDomain from './components/site/CustomDomains/New';
 import EditCustomDomain from './components/site/CustomDomains/Edit';
+import SiteScans from './components/site/SiteScans';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 import Error from './components/Error';
@@ -52,7 +52,7 @@ export default (
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
       {(process.env.FEATURE_BUILD_TASKS === 'active') && (
-        <Route path="builds/:buildId/scans" element={<SiteBuildTasks />} />
+        <Route path="scans" element={<SiteScans />} />
       )}
     </Route>
     <Route path="settings" element={<UserSettings />} />

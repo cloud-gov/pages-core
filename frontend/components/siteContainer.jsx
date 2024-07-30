@@ -24,6 +24,11 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'IconBook',
   },
   {
+    display: 'Scan history',
+    route: 'scans',
+    icon: 'IconExperiment',
+  },
+  {
     display: 'Site settings',
     route: 'settings',
     icon: 'IconGear',

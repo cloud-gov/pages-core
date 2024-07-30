@@ -2,8 +2,10 @@
   a {
     svg {
       width: 1em;
-      height: 1em;
+      max-height: 1em;
       margin-right: .4rem;
+      margin-bottom: .2em;
+      vertical-align: middle;
 
       g {
         fill: black;

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 22 22" color="#7c848d">
+  <path fill="currentColor" d="M11,21.5C5.2,21.5.5,16.8.5,11S5.2.5,11,.5s10.5,4.7,10.5,10.5-4.7,10.5-10.5,10.5ZM11,19.5c4.7,0,8.5-3.8,8.5-8.5S15.7,2.5,11,2.5,2.5,6.3,2.5,11s3.8,8.5,8.5,8.5Z"/>
+  <rect fill="currentColor"  x="4.5" y="9.8" width="13" height="2.5" rx="1.2" ry="1.2"/>
+
+</svg>

@@ -170,7 +170,7 @@ function Edit({ actions }) {
             }
           }
         />
-        <table className="usa-table-borderless log-table log-table__site-builds org-member-table table-full-width">
+        <table className="usa-table-borderless log-table  org-member-table table-full-width">
           <thead>
             <tr>
               <th scope="col">Email</th>
