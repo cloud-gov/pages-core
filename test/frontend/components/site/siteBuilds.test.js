@@ -15,15 +15,7 @@ const buildActions = {
 }
 
 const { SiteBuilds, REFRESH_INTERVAL } = proxyquire('../../../../frontend/components/site/siteBuilds', {
-  '../icons': {
-    IconCheckCircle: () => <span />,
-    IconClock: () => <span />,
-    IconExclamationCircle: () => <span />,
-    IconSpinner: () => <span />,
-  },
-  '../branchViewLink': () => <span className="view-site-link">View build</span>,
-  '../GitHubLink': () => <span className='GitHubLinkMock' />,
-  '../CreateBuildLink': () => <span className="build-link" />,
+  './siteBuildsBuild': () => <tr />,
   '../../actions/buildActions': buildActions,
 });
 
@@ -89,82 +81,13 @@ describe('<SiteBuilds/>', () => {
     fetchBuildMock.resetHistory();
   });
 
-  describe("should render the branch name and commit details for a build", () => {
-    it("should render a username", () => {
-      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
-      const commitUserName = branchCell.find('.commit-user');
-      expect(commitUserName).to.exist;
-      expect(commitUserName.text()).to.equal(defaultBuild.username);
-    });
-    it("should render a commit timestamp", () => {
-      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
-      const commitTime = branchCell.find('.commit-time');
-      expect(commitTime).to.exist;
-      expect(commitTime.text()).to.include('ago');
-    });
-    it("should render a link to the branch on GitHub using <GitHubLink>", () => {
-      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
-      const branchLink = branchCell.find('.branch-info .GitHubLinkMock');
-      expect(branchLink).to.exist;
-    });
-    it("should render a link to the sha on GitHub using <GitHubLink>", () => {
-      const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-      const branchCell = wrapper.find('tr').at(1).find('td[data-title="Branch"]');
-      const commitSha = branchCell.find('.commit-info .GitHubLinkMock');
-      expect(commitSha).to.exist;
-    });
-  });
-
-  it('should render an empty string for the username for builds where there is no user', () => {
-    state.builds.data[0].username = undefined;
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-
-    const userNameSpan = wrapper.find('.commit-user');
-    expect(userNameSpan.text()).to.equal('');
-  });
-
-  it('should render a `-` if the commit SHA is absent', () => {
-    const siteBuild = state.builds.data[0];
-    siteBuild.requestedCommitSha = null;
-    siteBuild.state = 'processing';
-
-    const { owner, repository } = siteBuild.site;
-
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-
-    expect(wrapper.find({ owner, repository, branch: siteBuild.branch })).to.have.length(1);
-  });
-
-
-  it('should render a `BranchViewLink` component if state is successful', () => {
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    const actionsCell = wrapper.find('tr').at(1).find('td[data-title="Actions"]');
-    const viewBuildLink = actionsCell.find('.view-site-link');
-    expect(actionsCell).to.exist;
-    expect(viewBuildLink).to.exist;
-    expect(viewBuildLink.text()).to.equal('View build');
-  });
-
-  it('should not render a `GitHubLinkMock` component if state is not successful', () => {
-    state.builds.data[0].state = 'error';
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
-  });
-
-  it('should not render a `BranchViewLink` component if state is queued', () => {
-    state.builds.data[0].state = 'queued';
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
-  });
 
   it('should not error if state is unkown/unexpected', () => {
     state.builds.data[0].state = 'unexpected';
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
     expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
   });
+
 
   it('should render a button to refresh builds', () => {
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
@@ -183,14 +106,27 @@ describe('<SiteBuilds/>', () => {
     expect(wrapper.find('RefreshBuildsButton')).to.have.length(1);
   });
 
+  it('should render as many rows as there are builds, plus one for the table header', () => {
+    state.builds.data = Array(4)
+      .fill(1)
+      .map((val, index) => ({ ...defaultBuild, id: index }));
+
+    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+    expect(wrapper.find('table tr')).to.have.length(5);
+    expect(wrapper.find('table + p')).to.have.length(1);
+    expect(wrapper.find('table + p').text()).to.contain('Showing 4 most recent build(s).');
+
+  });
+
   it('should render a paragraph about truncation if 100 or more builds are present', () => {
     state.builds.data = Array(100)
       .fill(1)
       .map((val, index) => ({ ...defaultBuild, id: index }));
 
     const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find('table + p')).to.have.length(1);
-    expect(wrapper.find('table + p').contains('List only displays 100 most recent builds.')).to.be.true;
+    expect(wrapper.find('table tr')).to.have.length(101); // front end does not actually truncate the list
+    expect(wrapper.find('table + p + p')).to.have.length(1);
+    expect(wrapper.find('table + p + p').contains('List only displays 100 most recent builds from the last 180 days.')).to.be.true;
   });
 
   it('should render a loading state if the builds are loading', () => {

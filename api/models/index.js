@@ -17,6 +17,7 @@ const sequelize = new Sequelize(database, username, password, {
 
 // Add a permanent global hook to prevent unknowingly hitting this Sequelize bug:
 //   https://github.com/sequelize/sequelize/issues/10557#issuecomment-481399247
+// eslint-disable-next-line func-names
 sequelize.addHook('beforeCount', function (options) {
   /* eslint-disable no-underscore-dangle, no-param-reassign */
   if (this._scope.include && this._scope.include.length > 0) {

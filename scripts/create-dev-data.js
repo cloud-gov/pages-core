@@ -497,6 +497,22 @@ async function createData() {
       clonedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
       requestedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
     })),
+    // completed even earlier on default branch
+    Build.create({
+      branch: nodeSite.defaultBranch,
+      completedAt: addMinutes(new Date(), -610),
+      startedAt: addMinutes(new Date(), -600),
+      createdAt: addMinutes(new Date(), -600),
+      source: 'fake-build',
+      state: 'success',
+      site: nodeSite.id,
+      user: managerWithGithub.id,
+      username: managerWithGithub.username,
+      token: 'fake-token',
+    }).then(build => build.update({
+      clonedCommitSha: 'bd40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+      requestedCommitSha: 'bd40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+    })),
     // completed on another branch
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
@@ -631,7 +647,7 @@ async function createData() {
     buildTaskTypeId: taskType1.id,
     branch: 'test',
     metadata: {
-      nightly: true, // no metadata is real/used yet
+      runDay: 27, // should be a day of the month
     },
   });
   // task "hook" for each site
@@ -640,7 +656,7 @@ async function createData() {
     buildTaskTypeId: taskType2.id,
     branch: 'test',
     metadata: {
-      nightly: true, // no metadata is real/used yet
+      runDay: 1, // should be a day of the month
     },
   });
 

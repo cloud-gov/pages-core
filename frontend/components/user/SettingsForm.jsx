@@ -23,7 +23,7 @@ function SettingsForm(props) {
         <span className="usa-input-error-message" id="input-error-message" role="alert">
           {errorMessage}
         </span>
-        <table className="usa-table-borderless log-table log-table__site-builds org-member-table table-full-width">
+        <table className="usa-table-borderless log-table log-table__site-settings org-member-table table-full-width">
           <thead>
             <tr>
               <th scope="col">Repository</th>

@@ -9,6 +9,7 @@ import IconExperiment from '../../public/images/icons/icon-experiment.svg';
 import IconExternalLink from '../../public/images/icons/icon-external-link.svg';
 import IconGear from '../../public/images/icons/icon-gear.svg';
 import IconGitHub from '../../public/images/icons/icon-github.svg';
+import IconIgnore from '../../public/images/icons/icon-ignore.svg';
 import IconLink from '../../public/images/icons/icon-link.svg';
 import IconPeople from '../../public/images/icons/icon-people.svg';
 import IconPlus from '../../public/images/icons/icon-plus.svg';
@@ -30,6 +31,7 @@ export {
   IconExternalLink,
   IconGear,
   IconGitHub,
+  IconIgnore,
   IconLink,
   IconPeople,
   IconPlus,

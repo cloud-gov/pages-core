@@ -69,6 +69,7 @@ function pagesWorker(connection) {
   const scheduledJobProcessor = Processors.multiJobProcessor({
     sandboxNotifications: Processors.sandboxNotifications,
     cleanSandboxOrganizations: Processors.cleanSandboxOrganizations,
+    buildTasksScheduler: Processors.buildTasksScheduler,
   });
 
   const timeoutBuildsProcessor = () => Processors.timeoutBuilds();
@@ -120,6 +121,7 @@ function pagesWorker(connection) {
     nightlyBuildsQueue.add('nightlyBuilds', {}, nightlyJobConfig),
     scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
     scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig),
+    scheduledQueue.add('buildTasksScheduler', {}, nightlyJobConfig),
     timeoutBuildTasksQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
   ]);
 

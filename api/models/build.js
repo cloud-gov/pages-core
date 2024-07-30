@@ -153,42 +153,6 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   return build.update(atts);
 };
 
-const afterCreate = async (build) => {
-  // create relevant build tasks on build create
-  // start some of them
-  const { SiteBuildTask, BuildTask, BuildTaskType } = build.sequelize.models;
-  try {
-    await SiteBuildTask.createBuildTasks({ build });
-    const buildTasks = await BuildTask
-      .byStartsWhen(BuildTaskType.StartsWhens.Build)
-      .findAll({ where: { buildId: build.id } });
-    await Promise.all(buildTasks.map(async task => task.enqueue()));
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const afterUpdate = async (build) => {
-  // we start certain build tasks on build completion
-  const { BuildTask, BuildTaskType } = build.sequelize.models;
-  try {
-    if (build.state === States.Success) {
-      const buildTasks = await BuildTask
-        .byStartsWhen(BuildTaskType.StartsWhens.Complete)
-        .findAll({ where: { buildId: build.id, status: BuildTask.Statuses.Created } });
-      await Promise.all(buildTasks.map(async task => task.enqueue()));
-    } else if (build.state === States.Error) {
-      const buildTasks = await BuildTask
-        .findAll({ where: { buildId: build.id } });
-      await Promise.all(buildTasks.map(async task => (
-        task.update({ status: BuildTask.Statuses.Cancelled })
-      )));
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
-
 async function enqueue() {
   const build = this;
 
@@ -341,8 +305,6 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'build',
       hooks: {
         beforeValidate,
-        afterCreate,
-        afterUpdate,
       },
       paranoid: true,
     }

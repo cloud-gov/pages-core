@@ -23,19 +23,18 @@
     // min-width: 124px;
     padding: 1.5rem 1rem;
     line-height: 1.4em;    
-    vertical-align: middle;
+    vertical-align: top;
   }
+
 
   th:first-child {
     padding-left: 1rem;
   }
 
-
   .build-info {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: space-between;
     align-items: flex-start;
   }
   .build-info-prefix {
@@ -45,45 +44,49 @@
     line-height: 2rem;
     font-family: Consolas, "Lucida Console", Menlo, monospace;
   }
-  .build-info-inline-icon {
-    margin: auto .25em auto 0;
+  .status-info-inline-icon {
+    margin: auto .35em auto 0;
     line-height: 0;
     svg {
       width: auto;
       height: 20px;
     }
-  }  
-  .build-info-details {
+  }
+  .status-info{
     flex: 4;
     line-height: 1.4em;
-    min-height: 3em;
+  }
+  .status-info,
+  .scan-info,  
+  .build-info-details, 
+  .scan-status-details {
     p {
       font-size: 1.45rem;
       margin: 0;
       white-space: initial;
       line-height: 1.4em;
     }
-    h3{
+    h3 {
       display: flex;
-      margin: 0 0 .25em;
+      margin: 0 0;
       font-size: 1.4em;
       line-height: 1.4em;
     }
-    h4 {
-      display: flex;
-      font-weight: 600;
-      font-size: 1.2em;
-      line-height: 1.4em;
-      color: #112e51;
-    }
   }
-  .build-info-logs-link {
+  .logs-link {
     font-size: 1.45rem;
-    margin: .25em 0;
+    margin: .5em 0 0;
     font-weight: normal;
   }
-  .repo-link, .view-site-link, .result-link, .branch-link, .commit-link {
+  .scan-link, 
+  .repo-link, 
+  .view-site-link, 
+  .result-link,
+  .branch-link, 
+  .commit-link {
+    font-size: 1.45rem;
     // font-weight: 600;
+    white-space: nowrap;
     svg {
       fill: $link-color;
       width: 12px;
@@ -95,20 +98,27 @@
   .result-link {
     font-weight: bold;
   }
+
   .branch-info {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 36ch;
-    margin: 1em 0 0;
+    max-width: 30ch;
     line-height: 1.3em;
+    margin: 0;
   }
   .commit-info {
     margin: 0.25em 0 0;
+    line-height: 1.3em;
     .commit-user {
       white-space: nowrap;
       font-weight: 600;
       margin-right: .5em;
+      max-width: 33%;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
     }
     .commit-time {
       white-space: nowrap;
@@ -122,10 +132,8 @@
       text-overflow:clip;
       max-width: 7ch;
       display: inline-block;
-      vertical-align: top;
-      line-height: .85em;
-      height: 1.4em;
-      padding-top: 0.4em;
+      vertical-align: bottom;
+      line-height: 1.3em;
       text-decoration: none;
       margin-right: .5em;
       color: inherit;
@@ -139,59 +147,89 @@
     padding: 0;
     margin: 0;
   }
-  .results-list {
-    li {
-      margin: .25em 0;
-      line-height: 1.4em;
-      white-space: nowrap;
-    }
-  }
-  .table-actions {
-    
-    a {
-      margin: 0;
-    }
-    form {
-      & + form {
-        margin-top: .5em;
-      }
-    }
   
-    .small-button {
-      margin-bottom: 0;
-      padding: 0.4em 0.6em;
-      font-size: 1.1em;
-      border-radius: 4px;
-      white-space: nowrap;
-    
-      svg {
-        margin-right: .4em;
-        height: 1em;
-        width: auto;
-        vertical-align: bottom;
-        .envelope-icon {
-          fill: currentColor
-        }
-      }
-      
+  a {
+    margin: 0;
+  }
+  form {
+    & + form {
+      margin-top: .5em;
     }
   }
+
+  .small-button {
+    padding: 0.4em 0.6em;
+    font-size: 1.1em;
+    border-radius: 4px;
+    white-space: nowrap;
+  
+    svg {
+      fill: currentColor;
+      margin-right: .4em;
+      height: 1em;
+      width: auto;
+      vertical-align: bottom;
+      .envelope-icon {
+        fill: currentColor
+      }
+    }
+    
+  }
+
+  & + p { margin-top: 1em;}
 
 }
 
+.table-full-width.log-table__site-scans,
 .table-full-width.log-table__site-builds {
-  th {
+  @media screen and (min-width:770px) {
+    th {
+      white-space: nowrap;
+    }
+  }
+  .scan-status {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: 24px 1fr;
+    align-items: center;
+  }
+  .scan-status-title {
+    font-weight: 600;
+    font-size: 1.2em;
+    line-height: 1.4em;
+    color: #112e51;
+    margin: 0;
     white-space: nowrap;
+    &.scan-status-title-no-results {
+      font-weight: 400;
+      font-size: 1.1em;
+    }
+  }
+  .scan-status-icon {
+    margin: auto 6px auto 0;
+    line-height: 0;
+    svg {
+      width: auto;
+      height: 18px;
+    }
+  }
+
+  .scan-status-details {
+    grid-row-start:    2;
+    grid-column-start: 2;
+    p {
+      font-size: 1.45rem;
+      margin: 0;
+      white-space: initial;
+      line-height: 1.4em;
+    }
   }
 
   td, tbody th {
-    padding: 1.5rem 1rem;
+    padding: 2.5rem 1rem 1.5rem;
   }
-  .scan-results-pseudo-row {
-    background: #112e510f;
-    &::before {
-      background: #112e510f;
-    }
+  tbody th {
+    padding-top: 1.5rem;
   }
   .no-scan-results {
     height: 0;
@@ -201,37 +239,34 @@
     }
   }
   @media screen and (min-width: 990px) {
-    tr.build-has-scans {
-      position: relative;
-      th, td {
-        padding-bottom: 5.5rem;
+    .table-actions {
+      text-align: right;
+      .small-button {
+        margin-right: 0;
       }
     }
     .build-info {
       flex-direction: row;
-      .build-info-prefix {
+    }
+    .status-info {
+      flex-direction: row;
+      .status-info-title {
         margin-right: 0.75em;
         line-height: 3rem;
         text-align: right;
         min-width: 7ch;
       }
     }
-    .scan-results-pseudo-row {
-      padding:0;
-      width: 0;
-      div {
-        line-height: 2.75rem;
-        display: block;
-        position: absolute;
-        background: #112e510f; 
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        padding: 0.5em 2rem .5em 1em;
-        &.label-warning {
-          background-color: #fdb81e40;
-        }
-      }
+    .build-info-details {
+    }
+    .build-info-prefix {
+      line-height: 3rem;
+      text-align: right;
+      min-width: 7ch;
+    }
+    .site-link,
+    .scan-link {
+      margin: 0;
     }
   }
 
@@ -265,16 +300,6 @@
         max-width: fit-content;
       }
       .commit-info {
-      }
-      .results-list {
-        margin: 1em auto;         
-        .unstyled-list {
-          padding: 0;
-          li {
-            display: inline-block;
-            margin-right: .5em;
-          }
-        }
       }
       th, td {
         display: flex;
@@ -324,7 +349,16 @@
     vertical-align: middle;
   }
 }
-
+.log-table.log-table__site-scans {
+  .scan-info h3 {
+    margin: 0
+  }
+  .artifact-filesize {
+    color: $color-gray-dark;
+    white-space: nowrap;
+  }
+  
+}
 .scan-config-table {
   margin-bottom: .5em;
   &,
@@ -407,3 +441,4 @@
 .post-scan-config-table-info {
   margin-top: 1em;
 }
+
