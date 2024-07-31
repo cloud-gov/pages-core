@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import About from './about';
 
 export default function A11y({ data }) {
   return (
     <div>
-      <span>{JSON.stringify(data)}</span>
+      <About scanType='a11y'/>
+      <pre>{JSON.stringify(data, null, "  ")}</pre>
     </div>
   );
 }

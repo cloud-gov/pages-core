@@ -62,18 +62,10 @@
     <meta name="msapplication-TileImage" content="/images/favicons/mstile-144x144.png">
     <meta name="msapplication-config" content="/images/favicons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
+    
     <meta charset="utf-8">
     <link rel="stylesheet" href="/uswds3/dist/css/uswds.min.css">
-    <meta
-    name="viewport" content="width=device-width, initial-scale=1"> <!-- For Facebook -->
-    <meta property="og:title" content="{{ appName }} compliantly hosts federal government websites."/>
-    <meta property="og:type" content="article"/>
-    <meta property="og:image" content="https://pages.cloud.gov/images/social-cards/facebook-1200x627.png"/>
-    <meta property="og:url" content="https://pages.cloud.gov"/>
-    <meta
-    property="og:description" content="{{ appName }} expertly manages the backend work of deploying secure, compliant, and scalable government websites, allowing federal offices to focus on their content."/> <!-- For Twitter -->
-    <meta name="twitter:card" content="summary"/>
-    <meta name="twitter:image" content="https://pages.cloud.gov/images/social-cards/twitter-1024x512.png"/>
+
     <script src="/uswds3/dist/js/uswds-init.min.js" type="text/javascript"></script>
     <script src="/uswds3/dist/js/uswds.min.js" type="text/javascript"></script>
     <title>
@@ -81,11 +73,12 @@
       {% if siteDisplayEnv %}
         | {{ siteDisplayEnv }}
       {% endif %}
-      report
+      Scan Reports 
+      <!-- TODO: figure out how to change this from router -->
     </title>
     {% block head_extra %}{% endblock %}
   </head>
-  <body class="body {{ productName }}">
+  <body class="body {{ productName }} scan-reports">
       <div id="report-app" class="usa-grid"></div>
   <script nonce="{{ nonce }}">
     window.CSRF_TOKEN = "{{ csrfToken }}";
