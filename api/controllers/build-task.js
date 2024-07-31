@@ -2,7 +2,6 @@ const { wrapHandlers } = require('../utils');
 const {
   Build, BuildTask, BuildTaskType, SiteBuildTask,
 } = require('../models');
-const { getSignedTaskUrl, getTaskArtifactSize } = require('../services/S3BuildTask');
 const buildTaskSerializer = require('../serializers/build-task');
 
 module.exports = wrapHandlers({
@@ -46,17 +45,7 @@ module.exports = wrapHandlers({
       include: BuildTaskType,
     });
 
-    const updatedTasks = await Promise.all(tasks.map(async (task) => {
-      if (task.artifact) {
-        const size = await getTaskArtifactSize(build.Site, task.artifact);
-        const url = await getSignedTaskUrl(build.Site, task.artifact);
-        // eslint-disable-next-line no-param-reassign
-        task.artifact = { size, url };
-      }
-      return task;
-    }));
-
-    const tasksJSON = buildTaskSerializer.serializeMany(updatedTasks);
+    const tasksJSON = buildTaskSerializer.serializeMany(tasks);
 
     return res.json(tasksJSON);
   },
