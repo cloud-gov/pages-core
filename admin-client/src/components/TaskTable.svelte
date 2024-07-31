@@ -22,7 +22,6 @@
       <th>Build</th>
       {#if showSite}<th>Site</th>{/if}
       <th>Task Type</th>
-      <th>Artifact</th>
       <th>Created</th>
       <th>Updated</th>
       <th>Message</th>
@@ -35,13 +34,6 @@
       <td><a href="/builds/{task.buildId}">{task.buildId}</a></td>
       {#if showSite}<td><a href="/sites/{task.Build.site}">{task.Build.Site.owner}/{task.Build.Site.repository}</a></td>{/if}
       <td>{task.BuildTaskType.name}</td>
-      <td>
-        {#if task.artifact}
-          <a href={task.artifact.url}>Artifact ({prettyBytes(task.artifact.size)})</a>
-        {:else}
-          null
-        {/if}
-      </td>
       <td title={formatDateTime(task.createdAt)}>{formatDateTime(task.createdAt, true)}</td>
       <td title={formatDateTime(task.updatedAt)}>{formatDateTime(task.updatedAt, true)}</td>
       <td><JSONTreeView data={task.message}/></td>
