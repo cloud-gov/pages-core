@@ -24,7 +24,10 @@ const svgoConfig = {
 
 module.exports = {
   mode: 'development',
-  entry: './frontend/main.jsx',
+  entry: {
+    bundle: './frontend/main.jsx',
+    report: './frontend/mainReport.jsx',
+  },
   devtool: 'inline-source-map',
   devServer: {
     static: {
@@ -33,7 +36,7 @@ module.exports = {
   },
   stats: 'minimal',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
   },
