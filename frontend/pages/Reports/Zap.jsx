@@ -8,9 +8,9 @@ export default function Zap({ data }) {
     return {
       site: {...data.site},
       buildId: data.buildId || 'missing build id',
-      generated: data.default.generated || 'on unknown date',
-      alerts: data.default.site.alerts || [],
-      groupedAlerts: data.default.site.groupedAlerts || {}
+      generated: data.site.generated || 'on unknown date',
+      alerts: data.site.alerts || [],
+      groupedAlerts: data.site.groupedAlerts || {}
     }
   }
 
