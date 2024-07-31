@@ -1,4 +1,4 @@
-const { wrapHandlers } = require('../utils');
+const { wrapHandlers, appMatch } = require('../utils');
 const {
   Build, BuildTask, BuildTaskType, SiteBuildTask, Site,
 } = require('../models');
@@ -127,10 +127,12 @@ module.exports = wrapHandlers({
       const reportString = await reportReponse.Body.transformToString();
       report = JSON.parse(reportString);
     } catch (err) {
-      console.err(err)
+      console.err(err);
     }
 
-    const fullJSON = { ...taskJSON, report };
+    const type = appMatch(task.BuildTaskType);
+
+    const fullJSON = { ...taskJSON, report, type };
 
     return res.json(fullJSON);
   },
