@@ -26,7 +26,8 @@ import { useReportData } from '../../hooks/useReportData';
 export default function Report() {
   const { id, subpage } = useParams();
 
-  const data = useReportData(id, subpage);
+  const { data, isLoading } = useReportData(id, subpage);
+  if (isLoading) return 'loading';
   if (!data) return <TypeNotFound />;
 
   switch (data.type) {

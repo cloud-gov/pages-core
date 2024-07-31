@@ -9,6 +9,6 @@ router.post('/build/:build_id/task', sessionAuth, BuildTaskController.createTask
 router.put('/tasks/:build_task_id/:token', BuildTaskController.update);
 router.get('/tasks/types', sessionAuth, BuildTaskTypeController.list);
 router.get('/tasks/default-rules', sessionAuth, BuildTaskTypeController.getDefaultRules);
-router.get('/tasks/:task_id/report/:sub_page', sessionAuth, BuildTaskController.report);
+router.get('/tasks/:task_id/report/:sub_page?', sessionAuth, BuildTaskController.report);
 
 module.exports = router;
