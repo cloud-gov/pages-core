@@ -1,8 +1,9 @@
 const { wrapHandlers } = require('../utils');
 const {
-  Build, BuildTask, BuildTaskType, SiteBuildTask,
+  Build, BuildTask, BuildTaskType, SiteBuildTask, Site,
 } = require('../models');
 const buildTaskSerializer = require('../serializers/build-task');
+const { getObject } = require('../services/S3BuildTask');
 
 module.exports = wrapHandlers({
   find: async (req, res) => {
@@ -92,5 +93,45 @@ module.exports = wrapHandlers({
     )));
 
     return res.ok({});
+  },
+
+  report: async (req, res) => {
+    const { params, user } = req;
+    const { task_id: taskId, sub_page: subPage } = params;
+
+    const task = await BuildTask.findOne({
+      where: { id: taskId },
+      include: [
+        BuildTaskType,
+        {
+          model: Build,
+          include: Site,
+        }],
+    });
+
+    // the build check again serves as an authorizer
+    const build = await Build.forSiteUser(user).findByPk(task?.Build?.id);
+
+    if (!build || !task) {
+      // return identical responses for missing tasks and unauthorized tasks
+      return res.notFound();
+    }
+
+    const taskJSON = buildTaskSerializer.serialize(task);
+
+    // add report data to the task
+    let report = null;
+    try {
+      const key = `${task.artifact}${subPage || 'index.json'}`;
+      const reportReponse = await getObject(task.Build.Site, key);
+      const reportString = await reportReponse.Body.transformToString();
+      report = JSON.parse(reportString);
+    } catch (err) {
+      console.err(err)
+    }
+
+    const fullJSON = { ...taskJSON, report };
+
+    return res.json(fullJSON);
   },
 });
