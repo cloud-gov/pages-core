@@ -14,7 +14,7 @@ function useReportData(type, id, subpage) {
     case 'zap':
       return zapData;                 // http://localhost:1337/report/zap/zap
     case 'a11y': 
-      if (subpage) return a11ySingle; // http://localhost:1337/report/a11y/a11y/cnn_wcag22aa
+      if (subpage) return a11ySingle; // http://localhost:1337/report/a11y/a11y/a11y-child
       return a11yIndex;               // http://localhost:1337/report/a11y/a11y
     default:
       return null;
