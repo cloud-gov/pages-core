@@ -1,5 +1,4 @@
 <script>
-    import prettyBytes from 'pretty-bytes';
     import { formatDateTime } from '../helpers/formatter';
     import DataTable from './DataTable.svelte';
     import JSONTreeView from './JSONTreeView.svelte';
