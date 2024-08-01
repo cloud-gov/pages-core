@@ -111,7 +111,7 @@ module.exports = wrapHandlers({
 
     // the build check again serves as an authorizer
     const build = await Build.forSiteUser(user).findByPk(task?.Build?.id);
-    console.log({user}, {task}, {build})
+
     if (!build || !task) {
       // return identical responses for missing tasks and unauthorized tasks
       return res.notFound();
@@ -132,7 +132,9 @@ module.exports = wrapHandlers({
 
     const type = appMatch(task.BuildTaskType);
 
-    const fullJSON = { ...taskJSON, report, type };
+    const fullJSON = {
+      ...taskJSON, report, type, siteId: task.Build.Site.id
+    };
 
     return res.json(fullJSON);
   },
