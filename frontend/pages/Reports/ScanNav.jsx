@@ -40,15 +40,15 @@ const ScanNav = ({ alerts, groupedAlerts, site, generated, buildId }) => {
             ))
           }
           <tr className="height-5">
-            <th scope="col"><b>All warnings</b></th>
+            <th scope="col">Total number of results</th>
             <td scope="col" className="font-mono-sm text-tabular text-right line-height-body-3">
-              <b>{site.issueCount}</b>
+              {alerts.length}
             </td>
           </tr>
           <tr className="height-5">
-            <th scope="col">Total findings</th>
+            <th scope="col"><b>All unresolved warnings</b></th>{/* not suppressed */}
             <td scope="col" className="font-mono-sm text-tabular text-right line-height-body-3">
-              {alerts.length}
+              <b>{site.issueCount}</b>
             </td>
           </tr>
         </tbody>

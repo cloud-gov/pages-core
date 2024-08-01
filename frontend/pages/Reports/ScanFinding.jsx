@@ -3,12 +3,11 @@ import React from 'react';
 import * as utils from './utils.js';
 import Highlight from 'react-highlight'
 
-const ScanFinding = ({ riskCode, alert, color, number }) => {
+const ScanFinding = ({ riskCode, alert, color }) => {
   return (
     <div id={`alert-${alert.alertRef}`} className="margin-bottom-5">
       <div className="bg-white padding-top-05 sticky">
         <h3 className="font-heading-lg margin-y-105">
-           <span className="text-tabular">#{number}: </span>
            {alert.name}
         </h3>
         <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
@@ -17,12 +16,17 @@ const ScanFinding = ({ riskCode, alert, color, number }) => {
              {riskCode > 0 && ' risk'}
           </span> 
           {'  '}
-          finding identified in <b>{alert.count} {utils.plural(alert.count, 'location')}</b>.
+          finding identified in <b>{alert.count} {utils.plural(alert.count, 'location')}</b>. 
+          {alert.ignore && (
+            <i className="text-no-wrap">
+              {' (Note: This finding has been suppressed by '}
+              {alert.ignoreSource}
+              {'.)'}
+            </i>
+          )}
         </p>
       </div>
-      <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
-        <div dangerouslySetInnerHTML={{ __html: alert.description }} />
-      </div>
+      <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3" dangerouslySetInnerHTML={{ __html: alert.description }} />
 
       <FindingLocations alert={alert} />
 
@@ -32,7 +36,7 @@ const ScanFinding = ({ riskCode, alert, color, number }) => {
         aria-labelledby={`alert-${alert.alertRef}-solution`}
       >
         <h4 className="usa-summary-box__heading" id={`alert-${alert.alertRef}-solution`}>
-          Recommendation(s) for finding #{number}:
+          Recommendation(s):
         </h4>
         <div className="usa-summary-box__body margin-bottom-neg-2">
           <div dangerouslySetInnerHTML={{ __html: alert.solution }} />

@@ -1,6 +1,6 @@
 
 html {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 pre {
@@ -36,7 +36,9 @@ h5 {
   top: 0;
   z-index: 100
 }
-
+a {
+  line-break: anywhere;
+}
 hr {
   height: 3px;
   width: 6em;
@@ -55,11 +57,20 @@ hr {
     bottom: 0;
   }
 }
-/* fix contrast to cyan 50v */
-.bg-info-dark, 
-.hover\:bg-info-dark:hover {
-  background-color: #0081a1;
 
+@media (min-width: 64em) {
+  .usa-alert .usa-alert__body {
+    max-width: 72em;
+  }
+  .grid-container {
+    max-width: 76em;
+  }
+}
+
+/* fix contrast to gold 40v */
+.bg-gold,
+.hover\:bg-gold:hover {
+  background-color: #e5a000;
 }
 
 
@@ -214,4 +225,9 @@ hr {
 .hljs .hljs-tag .hljs-string {
   color: #510438;
   font-style: italic;
+}
+@media (max-width: 30em) {
+  code {
+    line-break: anywhere;
+  }
 }

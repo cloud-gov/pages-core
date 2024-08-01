@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import About from './about';
@@ -10,12 +10,19 @@ import * as utils from './utils'
 
 
 
-const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = '', buildId = '' }) => {
+const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = '', buildId = '', scanType = null }) => {
+const scanTitle = scanType === "zap" ? "Vulnerability" : "Accessibility";
+const pageTitle = `Pages | ${scanTitle} scan report for ${site['@name']} on ${generated} for build id ${buildId}`;
+  useEffect(() => {
+    document.title = pageTitle;
+  }, []);
+
   return (
-    <main className="grid-container">
+    <>
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
-          Vulnerability scan results for{' '}
+          {scanTitle} 
+          {' scan results for '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
             {site['@name']}
@@ -38,7 +45,7 @@ const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = ''
         </span>
       </div>
       <div className="grid-row border-top-1px padding-top-1">
-        <section className="desktop:grid-col-auto">
+        <section className="tablet:grid-col-auto">
           <ScanNav
             alerts={alerts}
             groupedAlerts={groupedAlerts}
@@ -48,7 +55,7 @@ const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = ''
             buildId={buildId}
           />
         </section>
-        <div className="desktop:grid-col desktop:margin-left-4">
+        <div className="tablet:grid-col tablet:margin-left-4">
           <div>
             <ScanFindingsSummary alerts={alerts} />
             <ScanFindings
@@ -57,11 +64,11 @@ const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = ''
               site={site}
             />
           </div>
-          <About scanType='zap'/>
+          <About scanType={scanType} />
         </div>
       </div>
       <BackToTopButton />
-    </main>
+    </>
   );
 };
 
@@ -72,4 +79,5 @@ ScanLayout.propTypes = {
   site: PropTypes.object.isRequired,
   generated: PropTypes.string.isRequired,
   buildId: PropTypes.string.isRequired,
+  scanType: PropTypes.string.isRequired,
 };

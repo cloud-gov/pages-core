@@ -9,10 +9,10 @@ const ScanFindings = ({ alerts, groupedAlerts }) => {
       {(alerts.length && groupedAlerts) ? (
         utils.severity.map(({ riskCode, name, color }, groupIndex) => (
           <React.Fragment key={riskCode}>
-            <a id={`${name}-findings`}></a>
+            <a className="margin-1px" id={`${name}-findings`}></a>
             {groupedAlerts[riskCode] && groupedAlerts[riskCode].length > 0 && (
               <>
-              <h2 className="font-heading-xl margin-bottom-1 margin-top-3">
+              <h2 className="font-heading-xl margin-bottom-1 margin-top-0">
                 {name} {riskCode < 1 && ' or unknown'} risk findings <span className="font-body-xl text-secondary-vivid">({groupedAlerts[riskCode].length})</span>
               </h2>
 
@@ -21,7 +21,6 @@ const ScanFindings = ({ alerts, groupedAlerts }) => {
                     !!alert?.alertRef && (
                         <ScanFinding
                         key={alertIndex}
-                        number={[groupIndex+1,alertIndex+1].join('.')}
                         color={color}
                         alert={alert}
                         riskCode={riskCode}

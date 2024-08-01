@@ -8,12 +8,12 @@ export default function Report() {
   const onReportIndex = pathname === '/report' || pathname === '/report/';
 
   return (
-    <main className="grid-container">
-      <a name="top"></a>
+    <>
       <AlertBanner />
-      <div>
+      <a name="top"></a>
+      <main className="grid-container">
         {onReportIndex ? <TypeNotFound /> : <Outlet/>}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

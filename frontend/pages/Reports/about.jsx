@@ -10,6 +10,11 @@ export default function About({scanType}) {
         About this scan
       </h2>
       { scanType === "zap" ? <ZapAbout /> : <A11yAbout /> }
+      <p>Pages will automatically suppress certain findings
+          which are irrelevant for statically hosted websites or frequently produce ‘false
+          positive’ findings for our customers.  While still visible in the report, the suppressed 
+          findings don’t count towards your total issue count. Customers can specify additional 
+          findings to be suppressed in future scans for this site in your Pages Site Settings.</p>
       <hr />
       <p className="font-body-xs">This scan is a service of <a href="https://cloud.gov/pages" target="_blank"
           className="usa-link">cloud.gov Pages</a>, powered by {poweredBy}. Check out the <a href="https://cloud.gov/pages/documentation/build-scans/" target="_blank" className="usa-link">documentation</a> for
