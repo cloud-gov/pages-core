@@ -12,7 +12,7 @@ import * as utils from './utils'
 
 const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = '', buildId = '' }) => {
   return (
-    <main className="grid-container" id="top">
+    <main className="grid-container">
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
           Vulnerability scan results for{' '}
@@ -30,7 +30,7 @@ const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = ''
             title="link to Pages homepage"
           >
             <img
-              src="https://cloud.gov/assets/images/pages/pages-logo-blue.svg"
+              src="/images/logos/pages-logo-blue.svg"
               className="width-15"
               alt="Pages logo"
             />

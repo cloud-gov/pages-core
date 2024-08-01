@@ -22,12 +22,13 @@ const ScanNav = ({ alerts, groupedAlerts, site, generated, buildId }) => {
                   <th scope="col">
                     <a
                       href={`#${name}-findings`}
-                      title={`Jump to ${name} alerts`}
+                      title={`Jump to ${name} findings`}
                       className={`usa-tag--big usa-tag text-uppercase usa-button radius-pill bg-${color}`}
                     >
                       {name}
+                      {riskCode > 0 && ' risk'}
                       <span className="usa-sr-only">
-                        {utils.plural(groupedAlerts[riskCode].length, 'alert')},
+                        {utils.plural(groupedAlerts[riskCode].length, 'findings')},
                       </span>
                     </a>
                   </th>

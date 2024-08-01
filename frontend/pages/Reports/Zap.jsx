@@ -8,17 +8,19 @@ export default function Zap({ data }) {
     return {
       site: {...data.site},
       buildId: data.buildId || 'missing build id',
-      generated: data.default.generated || 'on unknown date',
-      alerts: data.default.site.alerts || [],
-      groupedAlerts: data.default.site.groupedAlerts || {}
+      generated: data.generated || 'on unknown date',
+      alerts: data.site.alerts || [],
+      groupedAlerts: data.site.groupedAlerts || {}
     }
   }
 
   return (
     <div>
       <ScanLayout {...prepareProps(data)} />
-      <hr />
-      <pre>{JSON.stringify(data, null, "  ")}</pre>
+      <details>
+        <summary>View JSON</summary>
+        <pre>{JSON.stringify(data, null, "  ")}</pre>
+      </details>
     </div>
   );
 }

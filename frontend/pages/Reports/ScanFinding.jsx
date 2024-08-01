@@ -1,50 +1,58 @@
 
 import React from 'react';
 import * as utils from './utils.js';
+import Highlight from 'react-highlight'
 
-const ScanFinding = ({ riskCode, alert, color }) => {
+const ScanFinding = ({ riskCode, alert, color, number }) => {
   return (
-    <div id={`alert-${alert.alertRef}`}>
+    <div id={`alert-${alert.alertRef}`} className="margin-bottom-5">
       <div className="bg-white padding-top-05 sticky">
         <h3 className="font-heading-lg margin-y-105">
-          {alert.name}
-          <span className={`usa-tag bg-${color} radius-pill text-middle`}>
-            {alert.riskLabel}
-          </span>
+           <span className="text-tabular">#{number}: </span>
+           {alert.name}
         </h3>
-        <p className="font-body-md padding-bottom-2 border-bottom-1px">
-          Identified in <b>{alert.count} {utils.plural(alert.count, 'location')}</b>.
+        <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
+          <span className={`usa-tag bg-${color} radius-pill`}>
+            {alert.riskLabel}
+             {riskCode > 0 && ' risk'}
+          </span> 
+          {'  '}
+          finding identified in <b>{alert.count} {utils.plural(alert.count, 'location')}</b>.
         </p>
       </div>
       <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
         <div dangerouslySetInnerHTML={{ __html: alert.description }} />
-
-        {alert.referenceURLs && alert.referenceURLs.length > 0 && (
-          <div>
-            <h4>References</h4>
-            <ul>
-              {alert.referenceURLs.map((url, index) => (
-                <li className="font-body-2xs" key={index}>
-                  <a className="usa-link" href={url}>{url}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <div
-          className="usa-summary-box maxw-tablet margin-y-4"
-          role="region"
-          aria-labelledby={`alert-${alert.alertRef}-solution`}
-        >
-          <h4 className="usa-summary-box__heading" id={`alert-${alert.alertRef}-solution`}>
-            Recommendation(s)
-          </h4>
-          <div className="usa-summary-box__body margin-bottom-neg-2">
-            <div dangerouslySetInnerHTML={{ __html: alert.solution }} />
-          </div>
-        </div>
-        <FindingLocations alert={alert} />
       </div>
+
+      <FindingLocations alert={alert} />
+
+      <div
+        className="usa-summary-box maxw-tablet margin-y-4"
+        role="region"
+        aria-labelledby={`alert-${alert.alertRef}-solution`}
+      >
+        <h4 className="usa-summary-box__heading" id={`alert-${alert.alertRef}-solution`}>
+          Recommendation(s) for finding #{number}:
+        </h4>
+        <div className="usa-summary-box__body margin-bottom-neg-2">
+          <div dangerouslySetInnerHTML={{ __html: alert.solution }} />
+        </div>
+      </div>
+
+      {alert.referenceURLs && alert.referenceURLs.length > 0 && (
+        <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
+          <h4 className="margin-bottom-05">References</h4>
+          <ul className="margin-top-05">
+            {alert.referenceURLs.map((url, index) => (
+              <li className="font-body-2xs" key={index}>
+                <a className="usa-link" href={url}>{url}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <hr />
     </div>
   );
 };
@@ -52,12 +60,12 @@ const ScanFinding = ({ riskCode, alert, color }) => {
 const FindingLocations = ({ alert }) => {
   return (
     <>
-      <h3 className="font-body-lg margin-y-2">Location(s) to investigate:</h3>
-      <ol className="margin-top-4">
+      <h3 className="font-body-md margin-y-2">Evidence for this finding was identified in the following location(s):</h3>
+      <ol className="margin-top-1">
         {alert.instances.map((instance, instanceIndex) => (
-          <li className="margin-bottom-4 margin-left-2 font-mono-md" key={instanceIndex}>
+          <li className="margin-bottom-5 margin-left-2 font-mono-md" key={instanceIndex}>
             <a id={`alert-${alert.alertRef}-instance-${instanceIndex + 1}`} />
-            <h4 className="font-body-md margin-bottom-0">
+            <h4 className="font-body-md text-normal margin-bottom-0">
               {instance.uri ? (
                 <>
                   On <a href={instance.uri} className="usa-link" target="_blank" rel="noopener noreferrer">
@@ -69,7 +77,7 @@ const FindingLocations = ({ alert }) => {
                 </>
               ) : 'Finding'}
             </h4>
-            {instance.param && (
+            {/* {instance.param && (
               <>
                 <h5 className="margin-bottom-0 font-body-sm">Parameter:</h5>
                 <p>
@@ -78,15 +86,13 @@ const FindingLocations = ({ alert }) => {
                   </code>
                 </p>
               </>
-            )}
+            )} */}
             {instance.evidence && (
               <>
-                <h5 className="margin-bottom-0 font-body-sm">Location:</h5>
-                <pre>
-                  <code className="html text-wrap maxw-tablet font-mono-xs line-height-mono-4 narrow-mono">
-                    {instance.evidence}
-                  </code>
-                </pre>
+                {/* <h5 className="margin-bottom-0 margin-top-1 font-body-sm">Look for:</h5> */}
+                <Highlight className="html text-wrap maxw-tablet font-mono-xs line-height-mono-4 narrow-mono padding-y-2px padding-x-1 border-1px border-solid border-secondary-light display-inline-block">
+                  {instance.evidence}
+                </Highlight>
               </>
             )}
             {instance.otherInfo && (
