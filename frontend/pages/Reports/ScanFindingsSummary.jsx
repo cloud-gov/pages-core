@@ -12,7 +12,7 @@ const ScanFindingsSummary = ({ alerts }) => {
         <thead>
           <tr>
             <th scope="col">Unresolved warnings</th>
-            <th scope="col" className="width-card tablet:width-auto">Risk level</th>
+            <th scope="col">Risk level</th>
             <th scope="col" className="mobile-lg:text-right text-no-wrap width-10">Locations</th>
           </tr>
         </thead>

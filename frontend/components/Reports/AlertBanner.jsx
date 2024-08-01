@@ -8,13 +8,14 @@ export default function AlterBanner() {
           Please remember that
           {' '}
           <b>
-            automated testing tools are limited and can only detect
-            {' '}
-            <i>some</i>
-            {' '}
-            accessibility issues
+            automated testing tools are limited 
           </b>
-          .
+          {' '}
+          and can only detect
+          {' '}
+          <i>some</i>
+          {' '}
+          issues.
         </p>
       </div>
     </section>

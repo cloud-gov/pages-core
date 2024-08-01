@@ -10,7 +10,7 @@ import * as utils from './utils'
 
 
 
-const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = '', buildId = '', scanType = null }) => {
+const ScanLayout = ({ alerts = [], groupedAlerts = {}, site = {}, generated = '', buildId = '', scanType = null, siteId = '' }) => {
 const scanTitle = scanType === "zap" ? "Vulnerability" : "Accessibility";
 const pageTitle = `Pages | ${scanTitle} scan report for ${site['@name']} on ${generated} for build id ${buildId}`;
   useEffect(() => {
@@ -64,7 +64,7 @@ const pageTitle = `Pages | ${scanTitle} scan report for ${site['@name']} on ${ge
               site={site}
             />
           </div>
-          <About scanType={scanType} />
+          <About scanType={scanType} siteId={siteId} />
         </div>
       </div>
       <BackToTopButton />
@@ -79,5 +79,6 @@ ScanLayout.propTypes = {
   site: PropTypes.object.isRequired,
   generated: PropTypes.string.isRequired,
   buildId: PropTypes.string.isRequired,
+  siteId: PropTypes.string.isRequired,
   scanType: PropTypes.string.isRequired,
 };

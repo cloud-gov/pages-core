@@ -15,7 +15,7 @@ const ScanFinding = ({ riskCode, alert, color }) => {
             {alert.riskLabel}
              {riskCode > 0 && ' risk'}
           </span> 
-          {'  '}
+          {' '}
           finding identified in <b>{alert.count} {utils.plural(alert.count, 'location')}</b>. 
           {alert.ignore && (
             <i className="text-no-wrap">

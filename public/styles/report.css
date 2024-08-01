@@ -67,10 +67,52 @@ hr {
   }
 }
 
-/* fix contrast to gold 40v */
-.bg-gold,
-.hover\:bg-gold:hover {
-  background-color: #e5a000;
+p .usa-tag:only-of-type {
+    margin-right: .25em;
+}
+
+/* SOLID TAGS ONLY */
+/* 
+.bg-risk-high   { background: #e41d3d} 
+.bg-risk-medium { background: #cf4900} 
+.bg-risk-low    { background: #9D6D0B} 
+.bg-risk-info   { background: #0081a1} 
+.bg-risk-other  { background: #71767a} 
+
+a.bg-risk-high:hover   { background: #b21d38}
+a.bg-risk-medium:hover { background: #a72f10} 
+a.bg-risk-low:hover    { background: #7a591a} 
+a.bg-risk-info:hover   { background: #00687d} 
+a.bg-risk-other:hover  { background: #565c65}  
+
+*/
+
+
+/* SOLID AND OUTLINED TAGS */
+
+.bg-risk-high   { background: #e41d3d} /* red-cool-50v */
+.bg-risk-medium { background: #cf4900} /* orange-warm-50v */
+.bg-risk-low    { background: #fef0c8; border-color: #e5a000; color: #3b2b15 !important} /* gold-5v, 30v, 80v */
+.bg-risk-info   { background: #e5faff; border-color: #00bde3; color: #0e4f5c !important} /* cyan-5v, 30v, 80v */
+.bg-risk-other  { background: #edeff0; border-color: #a9aeb1; color: #2d2e2f !important} /* gray-cool-5, 30, 80 */
+
+a.bg-risk-high:hover   { background: #b21d38} /* red-cool-60v */
+a.bg-risk-medium:hover { background: #a72f10} /* orange-warm-60v */
+a.bg-risk-low:hover    { background: #ffe396; border-color: #c2850c} /* gold-10v */
+a.bg-risk-info:hover   { background: #a8f2ff; border-color: #009ec1} /* cyan-10v */
+a.bg-risk-other:hover  { background: #dfe1e2; border-color: #8d9297} /* gray-cool-10 */
+
+.bg-risk-low,
+.bg-risk-info,
+.bg-risk-other {
+  border-width: 1px;
+  border-style: solid;
+}
+a.bg-risk-low:hover,
+a.bg-risk-info:hover,
+a.bg-risk-other:hover {
+  border-bottom-width: 1px !important;
+  border-bottom-style: solid;
 }
 
 

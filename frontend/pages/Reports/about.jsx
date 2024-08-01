@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-export default function About({scanType}) {
+import { Link } from 'react-router-dom';
+export default function About({scanType = '', siteId = ''}) {
   const poweredBy = scanType === "zap" ? 'ZAP' : 'axe-core';
 
   return (
@@ -14,7 +14,7 @@ export default function About({scanType}) {
           which are irrelevant for statically hosted websites or frequently produce ‘false
           positive’ findings for our customers.  While still visible in the report, the suppressed 
           findings don’t count towards your total issue count. Customers can specify additional 
-          findings to be suppressed in future scans for this site in your Pages Site Settings.</p>
+          findings to be suppressed in future scans for this site in your Pages <Link to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>.</p>
       <hr />
       <p className="font-body-xs">This scan is a service of <a href="https://cloud.gov/pages" target="_blank"
           className="usa-link">cloud.gov Pages</a>, powered by {poweredBy}. Check out the <a href="https://cloud.gov/pages/documentation/build-scans/" target="_blank" className="usa-link">documentation</a> for
@@ -75,4 +75,5 @@ const A11yAbout = () => {
 }
 About.propTypes = {
   scanType: PropTypes.string.isRequired,
+  siteId: PropTypes.string.isRequired,
 };

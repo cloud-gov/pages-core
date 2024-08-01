@@ -5,7 +5,7 @@ import About from './about';
 export default function A11y({ data }) {
   return (
     <div>
-      <About scanType='a11y'/>
+      <About scanType='a11y' siteId="0"/>
       <pre>{JSON.stringify(data, null, "  ")}</pre>
     </div>
   );
