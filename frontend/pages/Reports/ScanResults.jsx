@@ -1,13 +1,13 @@
 
 import React from 'react';
-import ScanFinding from './ScanFinding';
+import ScanFinding from './ScanResult.jsx';
 import * as utils from './utils.js';
 
 const ScanFindings = ({ alerts, groupedAlerts }) => {
   return (
     <>
       {(alerts.length && groupedAlerts) ? (
-        utils.severity.map(({ riskCode, name, color }, groupIndex) => (
+        utils.severity['zap'].map(({ riskCode, name, color }, groupIndex) => (
           <React.Fragment key={riskCode}>
             <a className="margin-1px" id={`${name}-findings`}></a>
             {groupedAlerts[riskCode] && groupedAlerts[riskCode].length > 0 && (
