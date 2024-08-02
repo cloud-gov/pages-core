@@ -47,7 +47,7 @@ export default function A11yScanIndex({ data }) {
         </span>
       </div>
       <div className="grid-row">
-        <div className="grid-col">
+        <div className="grid-col border-top-1px">
           <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
           <ScanAlert totalFound={data.violatedRules.length} totalLocations={data.totalViolationsCount} totalUrls={data.totalPageCount}> View each scan results page for specific details.</ScanAlert>
         </div>
