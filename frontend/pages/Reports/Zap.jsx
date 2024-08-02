@@ -27,11 +27,27 @@ export default function Zap({ data }) {
       count: data.site.alerts?.length
     },
     {
-      label: 'All unresolved warnings',
+      label: 'All Unresolved findings',
       count: data.site?.issueCount,
       boldMe: true
     }
   )
+
+function splitSuppressedResults(array, isValid) {
+  return array.reduce(([pass, fail], elem) => {
+      return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
+    }, [[], []]);
+  }
+
+  let summarizedResults = [...data.site.alerts].map(result => ({
+    ...result,
+    ref: result.alertRef,
+    severity: utils.getSeverityThemeToken(result.riskcode, 'zap'),
+    count: result.instances.length
+  })
+);
+
+const [ suppressed, unsuppressed ] = splitSuppressedResults(summarizedResults, finding => finding.ignore || finding?.riskcode < 1);
 
   useEffect(() => {
     document.title = pageTitle;
@@ -75,7 +91,20 @@ export default function Zap({ data }) {
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
           <div>
-            <ScanFindingsSummary findings={data.site.alerts} />
+            <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
+              <section
+                className={`usa-alert usa-alert--${summarizedResults.length > 0 ? 'error' : 'success' }`}>
+                <div className="usa-alert__body">
+                  <p className="usa-alert__text">We’ve found 
+                    <b>
+                      {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'issue' )} `}
+                      </b>
+                    across this site.
+                  </p>
+                </div>
+              </section>
+            <ScanFindingsSummary 
+            scanType={'zap'} suppressedFindings={suppressed} unsuppressedFindings={unsuppressed} />
             <ScanFindings
               alerts={data.site.alerts}
               groupedAlerts={data.site.groupedAlerts}

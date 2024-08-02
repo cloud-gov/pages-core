@@ -7,13 +7,12 @@ import A11yViolationsSection from './A11yViolationsSection';
 import A11yPassedChecksSection from './A11yPassedChecksSection';
 import ScanNav from './ScanNav';
 import ScanFindings from './ScanResults';
-import ScanFindingsSummary from './ScanResultsSummary';
+// import ScanFindingsSummary from './ScanResultsSummary';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
 
-export default function A11yScanIndex({ data }) {
+export default function A11yScanChild({ data }) {
   console.log(data)
-
 
 
   let navGroups = [...utils.severity['a11y']].map(group => ({
@@ -42,7 +41,7 @@ export default function A11yScanIndex({ data }) {
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
           Accessibility scan results for <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">{data.baseurl}</span>
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">{data.url}</span> 
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage">
@@ -60,7 +59,20 @@ export default function A11yScanIndex({ data }) {
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
           <div>
-            <ScanFindingsSummary findings={[]} />
+            <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
+            <section
+              className={`usa-alert usa-alert--${data.violationsCount > 0 ? 'error' : 'success' }`}>
+              <div className="usa-alert__body">
+                <p className="usa-alert__text">We’ve found 
+                  <b>
+                    {`
+                      ${data.violationsCount} ${utils.plural(data.violationsCount, 'issue' )}
+                    `}
+                    </b>
+                  on this page.
+                </p>
+              </div>
+            </section>
             <ScanFindings
               alerts={[]}
               groupedAlerts={{}}
@@ -82,7 +94,7 @@ export default function A11yScanIndex({ data }) {
   // );
 }
 
-A11yScanIndex.propTypes = {
+A11yScanChild.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.object.isRequired,
 };

@@ -10,19 +10,35 @@ import ScanFindings from './ScanResults';
 import ScanFindingsSummary from './ScanResultsSummary';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
+import ScanAlert from './ScanAlert';
 
 export default function A11yScanIndex({ data }) {
   console.log(data)
 
+  function splitSuppressedResults(array, isValid) {
+    return array.reduce(([pass, fail], elem) => {
+        return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
+      }, [[], []]);
+    }
 
-  let navGroups = [...utils.severity.a11y];
+  let summarizedResults = [...data.violatedRules].map(result => ({
+      ...result,
+      name: result.description,
+      ref: result.helpUrl,
+      severity: utils.getSeverityThemeToken(result.impact, 'a11y'),
+      count: result.total || result.nodes.length
+    })
+  );
+
+  const [ suppressed, unsuppressed ] = splitSuppressedResults(summarizedResults, finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null) );
+
 
   return (
     <>
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
-          Accessibility scan results index for <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">{data.baseurl}</span>
+          Accessibility scan results for <br />
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">{data.baseurl}/* <span className="text-italic font-sans-lg text-normal">(all pages)</span></span> 
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage">
@@ -30,20 +46,17 @@ export default function A11yScanIndex({ data }) {
           </a>
         </span>
       </div>
-      <div className="grid-row border-top-1px padding-top-1">
-        <section className="tablet:grid-col-auto">
-          <ScanNav
-            alerts={data.violatedRules}
-            groupedAlerts={{}}
-            site={{}}
-            generated={''}
-            buildId={''}
-            scanType='a11y'
-          />
-        </section>
-        <div className="tablet:grid-col tablet:margin-left-4">
+
+
+
+      <div className="grid-row ">
+        <div className="grid-col">
           <div>
-            <ScanFindingsSummary findings={[]} />
+            <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
+            <ScanAlert totalFound={data.violatedRules.length} totalLocations={data.totalViolationsCount} totalUrls={data.totalPageCount}> {unsuppressed.length} View each scan results page for specific details.</ScanAlert>
+            <ScanFindingsSummary scanType={'a11y'} suppressedFindings={suppressed} unsuppressedFindings={unsuppressed} >
+
+            </ScanFindingsSummary>
             <ScanFindings
               alerts={[]}
               groupedAlerts={{}}

@@ -33,11 +33,7 @@ const ScanFindings = ({ alerts, groupedAlerts }) => {
           </React.Fragment>
         ))
       ) : (
-        <section className="usa-alert usa-alert--success maxw-tablet margin-y-3">
-          <div className="usa-alert__body">
-            <p className="usa-alert__text">No vulnerabilities found.</p>
-          </div>
-        </section>
+        <></>
       )}
     </>
   );

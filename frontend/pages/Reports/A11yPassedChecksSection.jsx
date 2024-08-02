@@ -13,7 +13,7 @@ const A11yPassedChecksSection = ({ passes, url, timestamp, accumulator }) => (
         <thead>
           <tr>
             <th>Description</th>
-            <th>Locations</th>
+            <th>Instances</th>
           </tr>
         </thead>
         <tbody>

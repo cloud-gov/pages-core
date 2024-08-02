@@ -1,5 +1,5 @@
 {
-  "baseurl": "test",
+  "baseurl": "https://federalist-test-site.18f.gov",
   "totalPageCount": 1,
   "totalViolationsCount": 1,
   "violatedRules": [
@@ -66,8 +66,8 @@
   "currentPage": 1,
   "reportPages": [
     {
-      "path": "cnn_wcag22aa",
-      "absoluteURL": "https://www.cnn.com/",
+      "path": "a11y-child",
+      "absoluteURL": "https://federalist-test-site.18f.gov/child-page",
       "timestamp": "2024-03-18T15:49:02.048Z",
       "violationsCount": 1,
       "groupedViolationsCounts": [
