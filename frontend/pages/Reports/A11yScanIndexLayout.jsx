@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-//import About from './about';
 import * as utils from './utils'
+
 import ScanFindingsSummary from './ScanResultsSummary';
 import About from './about';
 import ScanAlert from './ScanAlert';
@@ -54,7 +54,7 @@ export default function A11yScanIndex({ data }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-3">
+          <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-4">
             All issues found
             &nbsp;<span className="font-body-lg text-secondary-vivid">({data.violatedRules.length})</span></h3>
         </div>

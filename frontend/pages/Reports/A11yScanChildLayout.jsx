@@ -1,13 +1,8 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-//import About from './about';
 import * as utils from './utils'
-import A11ySummaryTable from './A11ySummaryTable';
-import A11yViolationsSection from './A11yViolationsSection';
-import A11yPassedChecksSection from './A11yPassedChecksSection';
 import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
-// import ScanFindingsSummary from './ScanResultsSummary';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
 
@@ -23,7 +18,7 @@ export default function A11yScanChild({ data }) {
 
   let navGroups = [...utils.severity['a11y']].map(group => ({
       ...group, 
-      label: group.name,
+      label: group.label,
       usePill: true,
       count: data.groupedViolations[group?.name]?.length || 0
     })
@@ -67,7 +62,7 @@ export default function A11yScanChild({ data }) {
           />
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
-          <div>
+          <div className="margin-bottom-2">
             <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
             <section
               className={`usa-alert usa-alert--${data.violationsCount > 0 ? 'error' : 'success' }`}>
@@ -82,14 +77,15 @@ export default function A11yScanChild({ data }) {
                 </p>
               </div>
             </section>
+          </div>
+          <div>
             <ScanFindings
-              alerts={[]}
-              groupedAlerts={{}}
-              site={{}}
+              scanType={'a11y'} 
+              count={data.violationsCount}
+              groupedFindings={data.groupedViolations}
             />
           </div>
           <div>
-          < hr/>
           <A11yPassed passes={data.passes}/>
           < hr/>
           <About scanType={'a11y'} siteId={siteId}>

@@ -15,32 +15,32 @@ const ScanNav = ({ groups, generated, buildId }) => {
           </tr>
         </thead>
         <tbody>
-          {groups.map(({ label, name, color, count = 0, usePill = false, boldMe = false }, index) => (
-                <tr className="height-5" key={index}>
-                  <th scope="col">
-                    { usePill ? <>
-                      <a
-                        href={`#${name}-findings`}
-                        title={`Jump to ${name} findings`}
-                        className={`usa-tag--big usa-tag text-uppercase usa-button radius-pill bg-${color}`}
-                      >
-                        { label }
-                      </a>
-                    </> : <>
-                      <span className={boldMe ? 'text-bold' : undefined}>
-                        { label }
-                      </span>
-                    </> }
-                    <span className="usa-sr-only">
-                      {utils.plural(count, 'findings')},
-                    </span>
-                  </th>
-                  <td scope="col" className="font-mono-sm text-tabular text-right line-height-body-3">
-                      <span className={boldMe ? 'text-bold' : undefined}>
-                        { count }
-                      </span>
-                  </td>
-                </tr>
+          {groups.map(({ label, color, count = 0, usePill = false, boldMe = false }, index) => (
+            <tr className="height-5" key={index}>
+              <th scope="col">
+                { usePill ? <>
+                  <a
+                    href={`#${label}-findings`}
+                    title={`Jump to ${label} findings`}
+                    className={`usa-tag--big usa-tag text-uppercase usa-button radius-pill bg-${color}`}
+                  >
+                    { label }
+                  </a>
+                </> : <>
+                  <span className={boldMe ? 'text-bold' : undefined}>
+                    { label }
+                  </span>
+                </> }
+                <span className="usa-sr-only">
+                  {utils.plural(count, 'findings')},
+                </span>
+              </th>
+              <td scope="col" className="font-mono-sm text-tabular text-right line-height-body-3">
+                  <span className={boldMe ? 'text-bold' : undefined}>
+                    { count }
+                  </span>
+              </td>
+            </tr>
             ))
           }
         </tbody>

@@ -91,7 +91,7 @@ const [ suppressed, unsuppressed ] = splitSuppressedResults(summarizedResults, f
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
           <div>
-            <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
+            <h2 className="font-heading-xl margin-bottom-2 margin-top-3">Scan results summary</h2>
               <section
                 className={`usa-alert usa-alert--${summarizedResults.length > 0 ? 'error' : 'success' }`}>
                 <div className="usa-alert__body">
@@ -112,7 +112,6 @@ const [ suppressed, unsuppressed ] = splitSuppressedResults(summarizedResults, f
               scanType={'zap'} 
               count={data.site.alerts.length}
               groupedFindings={data.site.groupedAlerts}
-              site={data.site}
             />
           </div>
           <About scanType={'zap'} siteId={siteId} />

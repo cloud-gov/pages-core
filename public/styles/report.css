@@ -36,7 +36,10 @@ h5 {
   top: 0;
   z-index: 100
 }
-a {
+.usa-list li, .usa-prose>ol li, .usa-prose>ul li {
+  max-width: 100%;
+}
+.usa-prose ul li a {
   line-break: anywhere;
 }
 hr {
@@ -72,7 +75,7 @@ p .usa-tag:only-of-type {
 }
 
 /* SOLID TAGS ONLY */
-/* 
+
 .bg-risk-high   { background: #e41d3d} 
 .bg-risk-medium { background: #cf4900} 
 .bg-risk-low    { background: #9D6D0B} 
@@ -85,50 +88,11 @@ a.bg-risk-low:hover    { background: #7a591a}
 a.bg-risk-info:hover   { background: #00687d} 
 a.bg-risk-other:hover  { background: #565c65}  
 
-*/
 
-
-/* SOLID AND OUTLINED TAGS */
-
-.bg-risk-high   { background: #e41d3d} /* red-cool-50v */
-.bg-risk-medium { background: #cf4900} /* orange-warm-50v */
-.bg-risk-low    { background: #fef0c8; border-color: #e5a000; color: #3b2b15 !important} /* gold-5v, 30v, 80v */
-.bg-risk-info   { background: #e5faff; border-color: #00bde3; color: #0e4f5c !important} /* cyan-5v, 30v, 80v */
-.bg-risk-other  { background: #edeff0; border-color: #a9aeb1; color: #2d2e2f !important} /* gray-cool-5, 30, 80 */
-
-a.bg-risk-high:hover   { background: #b21d38} /* red-cool-60v */
-a.bg-risk-medium:hover { background: #a72f10} /* orange-warm-60v */
-a.bg-risk-low:hover    { background: #ffe396; border-color: #c2850c} /* gold-10v */
-a.bg-risk-info:hover   { background: #a8f2ff; border-color: #009ec1} /* cyan-10v */
-a.bg-risk-other:hover  { background: #dfe1e2; border-color: #8d9297} /* gray-cool-10 */
-
-.bg-risk-low,
-.bg-risk-info,
-.bg-risk-other {
-  border-width: 1px;
-  border-style: solid;
-}
-a.bg-risk-low:hover,
-a.bg-risk-info:hover,
-a.bg-risk-other:hover {
-  border-bottom-width: 1px !important;
-  border-bottom-style: solid;
-}
 
 
 /* https://github.com/highlightjs/highlight.js/tree/main/src/styles */
 
-
-/*!
-  Theme: GitHub
-  Description: Light theme as seen on github.com
-  Author: github.com
-  Maintainer: @Hirse
-  Updated: 2021-05-15
-
-  Outdated base version: https://github.com/primer/github-syntax-light
-  Current colors taken from GitHub's CSS
-*/
 
 .hljs {
   color: #24292e;
@@ -247,8 +211,9 @@ a.bg-risk-other:hover {
 
 .hljs {
   overflow-x: auto;
-  background: #f3e1e4 !important;
+  background: #f2f4f5 !important;
   color: black !important;
+  border: 1px solid #dfe2e3;
 }
 
 .hljs .hljs-punctuation,
