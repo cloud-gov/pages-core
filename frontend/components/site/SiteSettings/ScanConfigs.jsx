@@ -19,8 +19,7 @@ function getRuleLink(rule) {
 function ScanConfigs({ siteId: id }) {
   // TODO: maybe someday this needs to take siteBuildTask.branch into account
 
-  const { siteBuildTasks } = useSiteBuildTasks(id);
-  const [isLoading, setIsLoading] = useState(false);
+  const { siteBuildTasks, isLoading } = useSiteBuildTasks(id);
 
   // we use default scan rules
   // and customer scan rules from siteBuildTasks
@@ -45,8 +44,7 @@ function ScanConfigs({ siteId: id }) {
 
     return api.updateSiteBuildTask(id, siteBuildTask.sbtId, { rules: typeRules })
       .then(() => notificationActions.success('Successfully saved scan configuration.'))
-      .catch(() => notificationActions.success('Error saving scan configuration.'))
-      .finally(() => setIsLoading(false));
+      .catch(() => notificationActions.success('Error saving scan configuration.'));
   }
 
   function addNewRule(index) {
@@ -62,7 +60,9 @@ function ScanConfigs({ siteId: id }) {
     const { value } = event.target;
     const newRules = customerRules.slice(0);
     const rule = newRules.find(r => r.id === ruleId);
-    rule[prop] = value;
+    rule[prop] = prop === 'match'
+      ? value.split(',').map(v => v.trim())
+      : value;
     setRulesSynced(false);
     setCustomerRules(newRules);
   }
@@ -108,7 +108,7 @@ function ScanConfigs({ siteId: id }) {
 
   function ruleRender(rule) {
     const isPagesRule = rule?.source === 'Pages';
-    const placeholder = (rule.match || '') + (isPagesRule ? ' (not editable - suppressed by Pages)' : '/assets class="ignore"');
+    const placeholder = (rule.match?.join(', ') || '') + (isPagesRule ? ' (not editable - suppressed by Pages)' : '/assets class="ignore"');
     return (
       (
         <tr key={rule.id} aria-labelledby={`rule-${rule.id}`} className={`rule-source--${rule.source}`}>
@@ -144,7 +144,14 @@ function ScanConfigs({ siteId: id }) {
           <td>
             { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
             <label className="usa-sr-only" htmlFor={`${rule.id}-criteria`}>Criteria to match:</label>
-            <input id={`${rule.id}-criteria`} type="text" placeholder={placeholder} disabled={isPagesRule} onChange={event => updateRule(event, rule.id, 'match')} value={isPagesRule ? '' : rule.match} />
+            <input
+              id={`${rule.id}-criteria`}
+              type="text"
+              placeholder={placeholder}
+              disabled={isPagesRule}
+              onChange={event => updateRule(event, rule.id, 'match')}
+              value={isPagesRule ? '' : rule.match?.join(', ')}
+            />
           </td>
           <td>
             { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
@@ -283,3 +290,4 @@ ScanConfigs.propTypes = {
 };
 
 export default ScanConfigs;
+export { ScanConfigs };
