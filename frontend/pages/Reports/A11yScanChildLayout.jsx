@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 //import About from './about';
 import * as utils from './utils'
@@ -6,12 +6,18 @@ import A11ySummaryTable from './A11ySummaryTable';
 import A11yViolationsSection from './A11yViolationsSection';
 import A11yPassedChecksSection from './A11yPassedChecksSection';
 import ScanNav from './ScanNav';
-import ScanFindings from './ScanResults';
+import ScanFindings from './ScanFindings';
 // import ScanFindingsSummary from './ScanResultsSummary';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
 
+const buildId = 'buildId'
+const siteId = 'siteId';
+const currentPage = 0;
+const totalPageCount = 0;
 export default function A11yScanChild({ data }) {
+  const scanTitle = "Accessibility";
+  const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${data.timestamp} for build id ${buildId}`;
   console.log(data)
 
 
@@ -35,6 +41,9 @@ export default function A11yScanChild({ data }) {
     }
   )
 
+  useEffect(() => {
+    document.title = pageTitle;
+  }, []);
 
   return (
     <>
@@ -79,20 +88,55 @@ export default function A11yScanChild({ data }) {
               site={{}}
             />
           </div>
-          <About scanType={'a11y'} siteId={'000'} />
+          <div>
+          < hr/>
+          <A11yPassed passes={data.passes}/>
+          < hr/>
+          <About scanType={'a11y'} siteId={siteId}>
+            <p className="font-body-xs">Page {currentPage} of {totalPageCount} total pages scanned on {utils.timestampReadable(data.timestamp)}
+            </p>
+            <p className="font-body-xs">URL scanned: <code className="narrow-mono">{data.url}</code></p>
+          </About>
+          </div>
         </div>
       </div>
       <BackToTopButton />
     </>
   );
-
-  // return (
-  //   <div>
-  //     <About scanType='a11y' siteId="0"/>
-  //     <pre>{JSON.stringify(data, null, "  ")}</pre>
-  //   </div>
-  // );
 }
+
+
+const A11yPassed = ({ passes}) => (
+  <div>
+    <h3 className="font-heading-lg">
+      Passed checks &nbsp;
+      <span className="font-body-lg text-accent-cool-darker">({passes.length})</span>
+    </h3>
+    <details className="margin-y-3">
+      <summary>
+        This page passed <b>{passes.length}</b> WCAG accessibility {utils.plural(passes.length, 'check')}.
+      </summary>
+      <table className="usa-table usa-table--striped usa-table--compact usa-table--borderless font-body-xs width-full">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th className="text-right">Instances</th>
+          </tr>
+        </thead>
+        <tbody>
+          {passes.map((check, index) => (
+            <tr key={index}>
+              <td>{check.help}.</td>
+              <td className="font-mono-sm text-tabular text-right">{check.nodes.length}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+
+  </div>
+);
+
 
 A11yScanChild.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types

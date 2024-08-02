@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-export default function About({scanType = '', siteId = ''}) {
+export default function About({scanType = '', siteId = '', children}) {
   const poweredBy = scanType === "zap" ? 'ZAP' : 'axe-core';
 
   return (
@@ -20,6 +20,7 @@ export default function About({scanType = '', siteId = ''}) {
           className="usa-link">cloud.gov Pages</a>, powered by {poweredBy}. Check out the <a href="https://cloud.gov/pages/documentation/build-scans/" target="_blank" className="usa-link">documentation</a> for
         more information.
       </p>
+      {children}
     </section>
   );
 }

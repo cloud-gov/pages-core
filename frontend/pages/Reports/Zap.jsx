@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import About from './about';
 import ScanNav from './ScanNav';
-import ScanFindings from './ScanResults';
-import ScanFindingsSummary from './ScanResultsSummary';
+import ScanFindings from './ScanFindings';
+import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
 import * as utils from './utils'
 
@@ -41,7 +41,7 @@ function splitSuppressedResults(array, isValid) {
 
   let summarizedResults = [...data.site.alerts].map(result => ({
     ...result,
-    ref: result.alertRef,
+    anchor: result.alertRef,
     severity: utils.getSeverityThemeToken(result.riskcode, 'zap'),
     count: result.instances.length
   })
@@ -104,10 +104,14 @@ const [ suppressed, unsuppressed ] = splitSuppressedResults(summarizedResults, f
                 </div>
               </section>
             <ScanFindingsSummary 
-            scanType={'zap'} suppressedFindings={suppressed} unsuppressedFindings={unsuppressed} />
+              scanType={'zap'} 
+              suppressedFindings={suppressed} 
+              unsuppressedFindings={unsuppressed} 
+            />
             <ScanFindings
-              alerts={data.site.alerts}
-              groupedAlerts={data.site.groupedAlerts}
+              scanType={'zap'} 
+              count={data.site.alerts.length}
+              groupedFindings={data.site.groupedAlerts}
               site={data.site}
             />
           </div>

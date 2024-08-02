@@ -24,7 +24,17 @@ const ScanFindingsSummaryTable = ({ title, findings, hasSuppressColumn = false, 
             <th data-label="Result name" scope="row">
               <b className="usa-sr-only">Result name: <br /></b>
               {/* this findingRef is broken */}
-              <a className="usa-link" href={`#finding-${finding.ref}`}>{finding.name}</a>
+              {finding.ref && (
+                <a className="usa-link" href={finding.ref}>
+                  {finding.name}&nbsp;
+                  <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                    <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path>
+                  </svg>
+                </a>
+              )}
+              {finding.anchor && (
+                <a className="usa-link" href={`#finding-${finding.anchor}`}>{finding.name}</a>                
+              )}
             </th>
             {hasSuppressColumn && (
               <td data-label="Suppressed result" className="font-body-xs">

@@ -13,7 +13,7 @@ const ScanAlert = ({totalFound = 0, totalLocations = 0, totalUrls = 0, children}
               in ${totalLocations} ${utils.plural(totalLocations, 'location' )}
             `}
             </b>
-          {`across ${totalUrls} scanned ${utils.plural(totalUrls, 'URL' )} for this site. `}
+          {`across ${totalUrls} scanned ${utils.plural(totalUrls, 'page' )} for this site. `}
           {children}
         </p>
       </div>

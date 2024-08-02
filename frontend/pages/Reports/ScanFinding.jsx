@@ -3,51 +3,50 @@ import React from 'react';
 import * as utils from './utils.js';
 import Highlight from 'react-highlight'
 
-const ScanFinding = ({ riskCode, alert, color }) => {
+const ScanFinding = ({finding, groupColor, groupLabel }) => {
   return (
-    <div id={`alert-${alert.alertRef}`} className="margin-bottom-5">
+    <div id={`finding-${finding.anchor}`} className="margin-bottom-5">
       <div className="bg-white padding-top-05 sticky">
         <h3 className="font-heading-lg margin-y-105">
-           {alert.name}
+           {finding.name}
         </h3>
         <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
-          <span className={`usa-tag bg-${color} radius-pill`}>
-            {alert.riskLabel}
-             {riskCode > 0 && ' risk'}
+          <span className={`usa-tag bg-${groupColor} radius-pill`}>
+            {groupLabel}
           </span> 
           {' '}
-          finding identified in <b>{alert.count} {utils.plural(alert.count, 'location')}</b>. 
-          {alert.ignore && (
+          finding identified in <b>{finding.count} {utils.plural(finding.count, 'location')}</b>. 
+          {finding.ignore && (
             <i className="text-no-wrap">
               {' (Note: This finding has been suppressed by '}
-              {alert.ignoreSource}
+              {finding.ignoreSource}
               {'.)'}
             </i>
           )}
         </p>
       </div>
-      <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3" dangerouslySetInnerHTML={{ __html: alert.description }} />
+      <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3" dangerouslySetInnerHTML={{ __html: finding.description }} />
 
-      <FindingLocations alert={alert} />
+      <FindingLocations finding={finding} />
 
       <div
         className="usa-summary-box maxw-tablet margin-y-4"
         role="region"
-        aria-labelledby={`alert-${alert.alertRef}-solution`}
+        aria-labelledby={`finding-${finding.anchor}-solution`}
       >
-        <h4 className="usa-summary-box__heading" id={`alert-${alert.alertRef}-solution`}>
+        <h4 className="usa-summary-box__heading" id={`finding-${finding.anchor}-solution`}>
           Recommendation(s):
         </h4>
         <div className="usa-summary-box__body margin-bottom-neg-2">
-          <div dangerouslySetInnerHTML={{ __html: alert.solution }} />
+          <div dangerouslySetInnerHTML={{ __html: finding.solution }} />
         </div>
       </div>
 
-      {alert.referenceURLs && alert.referenceURLs.length > 0 && (
+      {finding.referenceURLs && finding.referenceURLs.length > 0 && (
         <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
           <h4 className="margin-bottom-05">References</h4>
           <ul className="margin-top-05">
-            {alert.referenceURLs.map((url, index) => (
+            {finding.referenceURLs.map((url, index) => (
               <li className="font-body-2xs" key={index}>
                 <a className="usa-link" href={url}>{url}</a>
               </li>
@@ -61,14 +60,14 @@ const ScanFinding = ({ riskCode, alert, color }) => {
   );
 };
 
-const FindingLocations = ({ alert }) => {
+const FindingLocations = ({ finding }) => {
   return (
     <>
       <h3 className="font-body-md margin-y-2">Evidence for this finding was identified in the following location(s):</h3>
       <ol className="margin-top-1">
-        {alert.instances.map((instance, instanceIndex) => (
+        {finding.instances.map((instance, instanceIndex) => (
           <li className="margin-bottom-5 margin-left-2 font-mono-md" key={instanceIndex}>
-            <a id={`alert-${alert.alertRef}-instance-${instanceIndex + 1}`} />
+            <a id={`finding-${finding.anchor}-instance-${instanceIndex + 1}`} />
             <h4 className="font-body-md text-normal margin-bottom-0">
               {instance.uri ? (
                 <>
