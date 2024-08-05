@@ -25,7 +25,7 @@ const { logger } = require('../../winston');
  * ```
  */
 function buildEnum(values) {
-  const lowerCaseValues = values.map((value) => value.toLowerCase());
+  const lowerCaseValues = values.map(value => value.toLowerCase());
 
   const constants = lowerCaseValues.reduce(
     (acc, value) => ({
@@ -44,7 +44,7 @@ function buildEnum(values) {
 function generateS3ServiceName(owner, repository) {
   if (!owner || !repository) return undefined;
 
-  const format = (str) => str.toString().toLowerCase().split(' ').join('-');
+  const format = str => str.toString().toLowerCase().split(' ').join('-');
 
   const serviceName = `o-${format(owner)}-r-${format(repository)}`;
 
@@ -81,8 +81,8 @@ function toSubdomainPart(str) {
   if (subdomain.length < 2) {
     // If we generate parts, make it longer
     while (subdomain.length < 5) {
-      subdomain +=
-        characters[Math.floor(Math.random() * Math.floor(characters.length))];
+      subdomain
+        += characters[Math.floor(Math.random() * Math.floor(characters.length))];
     }
   }
   return subdomain;
@@ -133,8 +133,7 @@ function loadDevelopmentManifest() {
 function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
-    const msg =
-      'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
+    const msg = 'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
     logger.error(msg);
     throw new Error(msg);
   }
@@ -185,7 +184,7 @@ function pick(keys, obj) {
 }
 
 function omit(keys, obj) {
-  const pickedKeys = Object.keys(obj).filter((key) => !keys.includes(key));
+  const pickedKeys = Object.keys(obj).filter(key => !keys.includes(key));
   return pick(pickedKeys, obj);
 }
 
@@ -195,11 +194,11 @@ function toInt(val) {
 }
 
 function wait(time = 500) {
-  return new Promise((r) => setTimeout(r, time));
+  return new Promise(r => setTimeout(r, time));
 }
 
 function omitBy(fn, obj) {
-  const pickedKeys = Object.keys(obj).filter((key) => !fn(obj[key], key));
+  const pickedKeys = Object.keys(obj).filter(key => !fn(obj[key], key));
 
   return pick(pickedKeys, obj);
 }
@@ -260,8 +259,7 @@ function truncateString(s, characters = 30) {
   return s;
 }
 
-const DEFAULT_BUILD_TASK_PARAMS =
-  '-p \'{ "STATUS_CALLBACK": "{{job.data.STATUS_CALLBACK}}", "TASK_ID": {{job.data.TASK_ID}}, "AWS_DEFAULT_REGION": "{{job.data.AWS_DEFAULT_REGION}}", "AWS_ACCESS_KEY_ID": "{{job.data.AWS_ACCESS_KEY_ID}}", "AWS_SECRET_ACCESS_KEY": "{{job.data.AWS_SECRET_ACCESS_KEY}}", "BUCKET": "{{job.data.BUCKET}}" }\'';
+const DEFAULT_BUILD_TASK_PARAMS = '-p \'{ "STATUS_CALLBACK": "{{job.data.STATUS_CALLBACK}}", "TASK_ID": {{job.data.TASK_ID}}, "AWS_DEFAULT_REGION": "{{job.data.AWS_DEFAULT_REGION}}", "AWS_ACCESS_KEY_ID": "{{job.data.AWS_ACCESS_KEY_ID}}", "AWS_SECRET_ACCESS_KEY": "{{job.data.AWS_SECRET_ACCESS_KEY}}", "BUCKET": "{{job.data.BUCKET}}" }\'';
 
 const DEFAULT_SCAN_RULES = {
   'owasp-zap': [

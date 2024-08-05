@@ -48,7 +48,6 @@ export default function Zap({ data }) {
     document.title = pageTitle;
   }, []);
 
-
   return (
     <>
       <div className="grid-row">
@@ -88,13 +87,13 @@ export default function Zap({ data }) {
           <div>
             <h2 className="font-heading-xl margin-bottom-2 margin-top-3">Scan results summary</h2>
             <section
-              className={`usa-alert usa-alert--${summarizedResults.length > 0 ? 'error' : 'success' }`}
+              className={`usa-alert usa-alert--${summarizedResults.length > 0 ? 'error' : 'success'}`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">
                   We’ve found
                   <b>
-                    {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'issue' )} `}
+                    {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'issue')} `}
                   </b>
                   across this site.
                 </p>

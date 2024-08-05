@@ -12,7 +12,7 @@ export default function TypeNotFound() {
         <ul className="usa-button-group">
           <li className="usa-button-group__item">
             <a href="/" className="usa-button">
-              Return to Pages 
+              Return to Pages
             </a>
           </li>
           <li className="usa-button-group__item">

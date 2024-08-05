@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ScanFinding from './ScanFinding.jsx';
 import * as utils from './utils.js';
@@ -13,7 +12,14 @@ const ScanFindings = ({ count, groupedFindings, scanType }) => {
             {groupedFindings[group] && groupedFindings[group].length > 0 && (
               <>
                 <h2 className="font-heading-xl margin-bottom-1 margin-top-4" id={`${label}-findings`}>
-                  {label} findings <span className="font-body-xl text-secondary-vivid">({groupedFindings[group].length})</span>
+                  {label}
+                  {' '}
+                  findings
+                  <span className="font-body-xl text-secondary-vivid">
+                    (
+                    {groupedFindings[group].length}
+                    )
+                  </span>
                 </h2>
 
                 <div className="margin-y-2">
@@ -37,6 +43,5 @@ const ScanFindings = ({ count, groupedFindings, scanType }) => {
     </>
   );
 };
-
 
 export default ScanFindings;

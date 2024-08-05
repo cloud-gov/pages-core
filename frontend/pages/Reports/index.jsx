@@ -11,9 +11,9 @@ export default function Report() {
   return (
     <>
       {!onReportIndex && <AlertBanner />}
-      <a name="top"></a>
+      <a name="top" />
       <main className="grid-container">
-        {onReportIndex ? <TypeNotFound /> : <Outlet/>}
+        {onReportIndex ? <TypeNotFound /> : <Outlet />}
       </main>
     </>
   );

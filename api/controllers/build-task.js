@@ -133,7 +133,7 @@ module.exports = wrapHandlers({
     const type = appMatch(task.BuildTaskType);
 
     const fullJSON = {
-      ...taskJSON, report, type, siteId: task.Build.Site.id
+      ...taskJSON, report, type, siteId: task.Build.Site.id,
     };
 
     return res.json(fullJSON);

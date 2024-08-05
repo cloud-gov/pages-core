@@ -8,7 +8,7 @@ export default function AlterBanner() {
           Please remember that
           {' '}
           <b>
-            automated testing tools are limited 
+            automated testing tools are limited
           </b>
           {' '}
           and can only detect

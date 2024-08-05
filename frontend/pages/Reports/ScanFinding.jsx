@@ -1,14 +1,14 @@
-
 import React from 'react';
+import Highlight from 'react-highlight';
 import * as utils from './utils.js';
-import Highlight from 'react-highlight'
 
-const ScanFinding = ({finding, groupColor, groupLabel, scanType = 'zap', index }) => {
-
+const ScanFinding = ({
+  finding, groupColor, groupLabel, scanType = 'zap', index,
+}) => {
   const defaultProps = {
-    scanType: scanType,
-    groupLabel: groupLabel,
-    groupColor: groupColor,
+    scanType,
+    groupLabel,
+    groupColor,
     ignore: finding.ignore,
     ignoreSource: finding.ignoreSource,
     title: '',
@@ -18,9 +18,9 @@ const ScanFinding = ({finding, groupColor, groupLabel, scanType = 'zap', index }
     descriptionHTML: '',
     solution: '',
     references: [],
-    locations: []
-  }
-  let scanProps = {...defaultProps};
+    locations: [],
+  };
+  let scanProps = { ...defaultProps };
 
   if (scanType === 'zap') {
     scanProps = {
@@ -31,73 +31,73 @@ const ScanFinding = ({finding, groupColor, groupLabel, scanType = 'zap', index }
       descriptionHTML: finding.description,
       solution: finding.solution,
       locations: finding.instances || [],
-      references: finding.referenceURLs || []
-    }
+      references: finding.referenceURLs || [],
+    };
   }
   if (scanType === 'a11y') {
     scanProps = {
       ...scanProps,
-      title: finding.help + '.',
+      title: `${finding.help}.`,
       anchor: `finding-${groupLabel}-${index}`,
       count: finding.nodes.length,
-      description: finding.description + '.',
+      description: `${finding.description}.`,
       locations: finding.nodes || [],
       solution: finding.nodes[0]?.failureSummary || [],
-      references: [finding.helpUrl]
-    }
+      references: [finding.helpUrl],
+    };
   }
   const findingTitleProps = (({
-    title, 
-    groupLabel, 
-    groupColor, 
-    count, 
-    ignore, 
+    title,
+    groupLabel,
+    groupColor,
+    count,
+    ignore,
     ignoreSource,
     references,
-    scanType
+    scanType,
   }) => ({
-    title, 
-    groupLabel, 
-    groupColor, 
-    count, 
-    ignore, 
+    title,
+    groupLabel,
+    groupColor,
+    count,
+    ignore,
     ignoreSource,
     references,
-    scanType
+    scanType,
   }))(scanProps);
 
   const findingDescProps = (({
-    description, 
-    descriptionHTML
+    description,
+    descriptionHTML,
   }) => ({
-    description, 
-    descriptionHTML
+    description,
+    descriptionHTML,
   }))(scanProps);
 
   const findingRecProps = (({
     solution,
     anchor,
-    scanType
+    scanType,
   }) => ({
     solution,
     anchor,
-    scanType
+    scanType,
   }))(scanProps);
 
   const findingRefProps = (({
-    references: [...references]
+    references: [...references],
   }) => ({
-    references: [...references]
+    references: [...references],
   }))(scanProps);
 
   const findingLocationProps = (({
     anchor,
     scanType,
-    locations: [...locations]
+    locations: [...locations],
   }) => ({
     anchor,
     scanType,
-    locations: [...locations]
+    locations: [...locations],
   }))(scanProps);
 
   return (
@@ -114,222 +114,209 @@ const ScanFinding = ({finding, groupColor, groupLabel, scanType = 'zap', index }
   );
 };
 
-const FindingTitle = ({title, groupLabel, groupColor, count, references = [], ignore = false, ignoreSource = null,     scanType = 'zap'}) => {
-  return (
-    <div className="bg-white padding-top-05 sticky">
-      <h3 className="font-heading-lg margin-y-105">
-          {title}
-      </h3>
-      <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
-        <span className={`usa-tag bg-${groupColor} radius-pill`}>
-          {groupLabel}
-        </span> 
+const FindingTitle = ({
+  title, groupLabel, groupColor, count, references = [], ignore = false, ignoreSource = null, scanType = 'zap',
+}) => (
+  <div className="bg-white padding-top-05 sticky">
+    <h3 className="font-heading-lg margin-y-105">
+      {title}
+    </h3>
+    <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
+      <span className={`usa-tag bg-${groupColor} radius-pill`}>
+        {groupLabel}
+      </span>
+      {' '}
+      finding identified in
+      {' '}
+      <b>
+        {count}
         {' '}
-        finding identified in <b>{count} {utils.plural(count, 'location')}</b>
-        {'. '}
-        {ignore && (
-          <i className="text-no-wrap">
-            {' (Note: This finding has been suppressed by '}
-            {ignoreSource}
-            {'.) '}
-          </i>
-        )}
-        {scanType == 'a11y' && references.length > 0 && (
-          <a href={references[0]} target="_blank" className="usa-link font-body-sm" aria-label="Learn more about this rule">
-            Learn more 
-            {' '}
-            <svg className="usa-icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-              <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path>
-            </svg>
-          </a>
-        )}
-            </p>
-    </div>
-  )
-}
-// could be a slot
-const FindingDescription = ({description, descriptionHTML}) => {
-  return (
-    <>
-      {descriptionHTML ? (
-        <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3" dangerouslySetInnerHTML={{ __html: descriptionHTML }} />
-      ) : (
-        <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">{description}</div>
+        {utils.plural(count, 'location')}
+      </b>
+      {'. '}
+      {ignore && (
+      <i className="text-no-wrap">
+        {' (Note: This finding has been suppressed by '}
+        {ignoreSource}
+        {'.) '}
+      </i>
       )}
-    </>
-  )
-}
-const FindingRecommendation = ({anchor, solution, scanType = 'zap' }) => {
-  return (
-    <>
-      <div
-        className="usa-summary-box margin-y-4"
-        role="region"
-        aria-labelledby={`${anchor}-solution`}
-      >
-        { (scanType === 'zap') && (
-          <>
-            <h4 className="usa-summary-box__heading" id={`${anchor}-solution`}>
-              Recommendation(s):
-            </h4>
-            <div className="usa-summary-box__body margin-bottom-neg-2">
-              <div dangerouslySetInnerHTML={{ __html: solution }} />
-            </div>
-          </>
-        )}
-        { (scanType === 'a11y') && (
-          <>
-            {solution.split('\n\n').map((fixList, listindex) => (
-              <div key={listindex}>
-                {fixList.split('\n').map((str, i) => (
-                  i === 0 ? (
-                    // <a id={`${group}-violation-${index + 1}-element-${nodeindex + 1}-fix-${listindex}`}>
-                    <h4 key={i} className="usa-summary-box__heading" id={`${anchor}-solution`}>
-                      {str}
-                    </h4>
-                  ) : (
-                    <div className="usa-summary-box__body">
-                      <ul key={i} className="usa-list margin-bottom-2">
-                        <li>{str}</li>
-                      </ul>
-                    </div>
-                  )
-                ))}
-              </div>
-            ))}
-          </>
-        )} 
-      </div>
-    </>
-  )
-}
-
-
-
-const FindingReferences = ({references}) => {
-  return (
-    <>
-      {references && references.length > 0 && (
-        <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
-          <h4 className="margin-bottom-05">References</h4>
-          <ul className="margin-top-05">
-            {references.map((ref, index) => (
-              <FindingReference url={ref} key={index} />
-            ))}
-          </ul>
-        </div>
-      )}
-    </>
-  )
-}
-const FindingReference = ({url, text = url}) => {
-  return (
-    <li className="font-body-2xs">
-      <a className="usa-link" href={url}>{text}</a>
-    </li>
-  )
-}
-const FindingLocations = ({ locations, anchor, scanType = "zap" }) => {
-  return (
-    <>
-      <h3 className="font-body-md margin-y-2">
-        Evidence for this finding was identified:
-      </h3>
-      <ol>
-        {locations.map((location, locationIndex) => {
-
-          let localProps = {
-            anchor: anchor,
-            url: null,
-            evidence: null,
-            target: null,
-            otherInfo: null,
-            index: locationIndex
-          }
-
-          if (scanType === 'zap') {
-            localProps = {
-              ...localProps,
-              anchor: anchor,
-              url: location.uri,
-              evidence: location.evidence,
-              target: location.param,
-              otherInfo: location.otherInfo,
-              index: locationIndex
-            }
-          }
-          if (scanType === 'a11y') {
-            localProps = {
-              ...localProps,
-              anchor: anchor,
-              // url: location.uri,
-              evidence: location.html,
-              target: location.target,
-              // otherInfo: location.otherInfo,
-              index: locationIndex
-            }
-          }
-
-          return (
-            <li className="margin-bottom-5 margin-left-2 font-mono-md">
-              <a id={`${localProps.anchor}-location-${locationIndex + 1}`} />
-              {localProps.url && (
-                <h4 className="font-body-md text-normal margin-bottom-0">
-                  <FindingLocationURL url={localProps.url} />
-                </h4>
-              )}
-              {localProps.target && (
-                <FindingLocationTarget target={localProps.target} />
-              )}
-              {localProps.evidence && <FindingLocationEvidence evidence={localProps.evidence} />}
-              {localProps.otherInfo && (
-                <p className="font-body-sm padding-bottom-2 border-bottom-1px">
-                  Additional info: {localProps.otherInfo}
-                </p>
-              )}
-            </li>
-          )
-        })}
-      </ol>
-    </>
-  );
-};
-
-
-const FindingLocationURL = ({url, text = url}) => {
-  return (
-    <>
-      On <a href={url} className="usa-link" target="_blank" rel="noopener noreferrer">
-        {text}
+      {scanType == 'a11y' && references.length > 0 && (
+      <a href={references[0]} target="_blank" className="usa-link font-body-sm" aria-label="Learn more about this rule" rel="noreferrer">
+        Learn more
+        {' '}
         <svg className="usa-icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
           <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
         </svg>
       </a>
-    </>
-  );
-};
-
-const FindingLocationTarget = ({ target }) => {
-  return (
+      )}
+    </p>
+  </div>
+);
+// could be a slot
+const FindingDescription = ({ description, descriptionHTML }) => (
+  <>
+    {descriptionHTML ? (
+      <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3" dangerouslySetInnerHTML={{ __html: descriptionHTML }} />
+    ) : (
+      <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">{description}</div>
+    )}
+  </>
+);
+const FindingRecommendation = ({ anchor, solution, scanType = 'zap' }) => (
+  <div
+    className="usa-summary-box margin-y-4"
+    role="region"
+    aria-labelledby={`${anchor}-solution`}
+  >
+    { (scanType === 'zap') && (
     <>
-      <h5 className="margin-bottom-2 font-body-sm text-normal">For this target:</h5>
-      <code className="css text-normal narrow-mono font-mono-sm line-height-mono-4 bg-accent-warm-lighter padding-05 break-anywhere">
-        {target}
-      </code>
+      <h4 className="usa-summary-box__heading" id={`${anchor}-solution`}>
+        Recommendation(s):
+      </h4>
+      <div className="usa-summary-box__body margin-bottom-neg-2">
+        <div dangerouslySetInnerHTML={{ __html: solution }} />
+      </div>
     </>
-  );
-};
-
-const FindingLocationEvidence = ({ evidence }) => {
-  return (
+    )}
+    { (scanType === 'a11y') && (
     <>
-      <h5 className="margin-bottom-0 margin-top-2 font-body-sm text-normal">Within this fragment:</h5>
-      <Highlight className="html text-wrap width-full font-mono-xs line-height-mono-4 narrow-mono padding-2 display-inline-block">
-        {evidence}
-      </Highlight>
+      {solution.split('\n\n').map((fixList, listindex) => (
+        <div key={listindex}>
+          {fixList.split('\n').map((str, i) => (
+            i === 0 ? (
+                    // <a id={`${group}-violation-${index + 1}-element-${nodeindex + 1}-fix-${listindex}`}>
+              <h4 key={i} className="usa-summary-box__heading" id={`${anchor}-solution`}>
+                      {str}
+                    </h4>
+            ) : (
+              <div className="usa-summary-box__body">
+                      <ul key={i} className="usa-list margin-bottom-2">
+                        <li>{str}</li>
+                      </ul>
+                    </div>
+            )
+          ))}
+        </div>
+      ))}
     </>
-  );
-};
+    )}
+  </div>
+);
 
+const FindingReferences = ({ references }) => (
+  <>
+    {references && references.length > 0 && (
+    <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
+      <h4 className="margin-bottom-05">References</h4>
+      <ul className="margin-top-05">
+        {references.map((ref, index) => (
+          <FindingReference url={ref} key={index} />
+        ))}
+      </ul>
+    </div>
+    )}
+  </>
+);
+const FindingReference = ({ url, text = url }) => (
+  <li className="font-body-2xs">
+    <a className="usa-link" href={url}>{text}</a>
+  </li>
+);
+const FindingLocations = ({ locations, anchor, scanType = 'zap' }) => (
+  <>
+    <h3 className="font-body-md margin-y-2">
+      Evidence for this finding was identified:
+    </h3>
+    <ol>
+      {locations.map((location, locationIndex) => {
+        let localProps = {
+          anchor,
+          url: null,
+          evidence: null,
+          target: null,
+          otherInfo: null,
+          index: locationIndex,
+        };
+
+        if (scanType === 'zap') {
+          localProps = {
+            ...localProps,
+            anchor,
+            url: location.uri,
+            evidence: location.evidence,
+            target: location.param,
+            otherInfo: location.otherInfo,
+            index: locationIndex,
+          };
+        }
+        if (scanType === 'a11y') {
+          localProps = {
+            ...localProps,
+            anchor,
+            // url: location.uri,
+            evidence: location.html,
+            target: location.target,
+            // otherInfo: location.otherInfo,
+            index: locationIndex,
+          };
+        }
+
+        return (
+          <li className="margin-bottom-5 margin-left-2 font-mono-md">
+            <a id={`${localProps.anchor}-location-${locationIndex + 1}`} />
+            {localProps.url && (
+            <h4 className="font-body-md text-normal margin-bottom-0">
+              <FindingLocationURL url={localProps.url} />
+            </h4>
+            )}
+            {localProps.target && (
+            <FindingLocationTarget target={localProps.target} />
+            )}
+            {localProps.evidence && <FindingLocationEvidence evidence={localProps.evidence} />}
+            {localProps.otherInfo && (
+            <p className="font-body-sm padding-bottom-2 border-bottom-1px">
+              Additional info:
+              {' '}
+              {localProps.otherInfo}
+            </p>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </>
+);
+
+const FindingLocationURL = ({ url, text = url }) => (
+  <>
+    On
+    {' '}
+    <a href={url} className="usa-link" target="_blank" rel="noopener noreferrer">
+      {text}
+      <svg className="usa-icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+        <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+      </svg>
+    </a>
+  </>
+);
+
+const FindingLocationTarget = ({ target }) => (
+  <>
+    <h5 className="margin-bottom-2 font-body-sm text-normal">For this target:</h5>
+    <code className="css text-normal narrow-mono font-mono-sm line-height-mono-4 bg-accent-warm-lighter padding-05 break-anywhere">
+      {target}
+    </code>
+  </>
+);
+
+const FindingLocationEvidence = ({ evidence }) => (
+  <>
+    <h5 className="margin-bottom-0 margin-top-2 font-body-sm text-normal">Within this fragment:</h5>
+    <Highlight className="html text-wrap width-full font-mono-xs line-height-mono-4 narrow-mono padding-2 display-inline-block">
+      {evidence}
+    </Highlight>
+  </>
+);
 
 export default ScanFinding;
