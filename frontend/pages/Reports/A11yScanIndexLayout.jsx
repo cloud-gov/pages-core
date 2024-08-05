@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as utils from './utils'
 
-import ScanFindingsSummary from './ScanResultsSummary';
+import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
 import ScanAlert from './ScanAlert';
 
@@ -38,7 +38,7 @@ export default function A11yScanIndex({ data }) {
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
           Accessibility scan results for <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">{data.baseurl}/* <span className="text-italic font-sans-lg text-normal">(all pages)</span></span> 
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">{data.baseurl}/* <span className="text-italic font-sans-lg text-normal">(all pages)</span></span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage">
@@ -67,7 +67,7 @@ export default function A11yScanIndex({ data }) {
         <div className="grid-row">
         <div className="grid-col">
           <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-1">
-            All pages scanned 
+            All pages scanned
             &nbsp;<span className="font-body-lg text-accent-cool-darker">({data.reportPages.length})</span></h3>
         </div>
       </div>
