@@ -62,11 +62,13 @@
     <meta name="msapplication-TileImage" content="/images/favicons/mstile-144x144.png">
     <meta name="msapplication-config" content="/images/favicons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <link rel="stylesheet" href="/uswds3/dist/css/uswds.min.css">
+    <link rel="stylesheet" href="/styles/report.css">
 
-    <script defer src="/uswds3/dist/js/uswds-init.min.js" type="text/javascript"></script>
+    <script src="/uswds3/dist/js/uswds-init.min.js" type="text/javascript"></script>
     <script defer src="/uswds3/dist/js/uswds.min.js" type="text/javascript"></script>
     <title>
       {{ appName }}
@@ -84,75 +86,7 @@
         window.CSRF_TOKEN = "{{ csrfToken }}";
       </script>
       <script src="/{{ webpackAssets['report.js'] }}"></script>
-      <style nonce="{{ nonce }}">>
-        html {
-          font-size: 18px;
-        }
-        pre {
-          white-space: normal;
-          max-width: 80rem;
-        }
-        h5 {
-          font-size: 20px;
-          margin: 1.5em 0 -.5em;
-        }
-        .usa-prose > p {
-          line-height: 1.8;
-          max-width: 80ex;
-        }
-        .narrow-mono {
-          letter-spacing: -.02em;
-        }
-        .hljs {
-          white-space: pre-wrap;
-          overflow-x: scroll;
-          width: 100%;
-          background: #f2f4f5 !important;
-          color: black !important;
-          line-break: anywhere;
-        }
-        .hljs .hljs-punctuation,
-        .hljs .hljs-tag {
-          color: #4b4b4b;
-        }
-        .hljs .hljs-tag .hljs-attr {
-          color: #05236c;
-        }
-        .hljs .hljs-tag .hljs-name {
-          color: #04363f;
-        }
-        .hljs .hljs-tag .hljs-string {
-          color: #510438;
-          font-style: italic;
-        }
-        .usa-tag {
-          font-weight: 600;
-          -webkit-font-smoothing: antialiased;
-          letter-spacing: 0.01em;
-        }
-        .usa-tag.usa-button {
-          padding: 6px 12px;
-        }
-        .sticky {
-          position: sticky;
-          top: 0;
-          z-index: 100
-        }
-        .break-anywhere {
-          line-break: anywhere;
-        }
-        @media (min-width: 40em) {
-          .back-to-top {
-            position: fixed;
-            bottom: 0;
-          }
-        }
-        /* fix contrast to cyan 50v */
-        .bg-info-dark, 
-        .hover\:bg-info-dark:hover {
-          background-color: #0081a1;
-        }
-      </style>
+      
     </body>
   </html>
   {% block post_footer %}{% endblock %}

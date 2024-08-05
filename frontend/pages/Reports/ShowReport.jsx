@@ -1,14 +1,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import A11y from './A11y';
+import A11yScanIndex from './A11yScanIndexLayout';
+import A11yScanChild from './A11yScanChildLayout';
 import Zap from './Zap';
 import TypeNotFound from './TypeNotFound';
 // import * as zapData from '../../data/zap.json';
 // import * as a11yIndex from '../../data/a11y-index.json';
 // import * as a11ySingle from '../../data/a11y-child.json';
 import { useReportData } from '../../hooks/useReportData';
-
 
 // fake function for now
 // function useReportData(type, id, subpage) {
@@ -34,7 +34,8 @@ export default function Report() {
     case 'owasp-zap':
       return <Zap data={data} />;
     case 'a11y':
-      return <A11y data={data} />;
+      if (subpage) return <A11yScanChild data={data} />;
+      return <A11yScanIndex data={data} />;
     default:
       return <TypeNotFound />;
   }

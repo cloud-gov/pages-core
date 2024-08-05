@@ -1,45 +1,42 @@
 
 import React from 'react';
-import ScanFinding from './ScanFinding';
+import ScanFinding from './ScanFinding.jsx';
 import * as utils from './utils.js';
 
-const ScanFindings = ({ alerts, groupedAlerts }) => {
+const ScanFindings = ({ count, groupedFindings, scanType }) => {
+  const groupKey = scanType === 'zap' ? 'riskCode' : 'name';
   return (
     <>
-      {(alerts.length && groupedAlerts) ? (
-        utils.severity.map(({ riskCode, name, color }) => (
-          <React.Fragment key={riskCode}>
-            <a id={`${name}-findings`}></a>
-            {groupedAlerts[riskCode] && groupedAlerts[riskCode].length > 0 && (
+      {(count && groupedFindings) && (
+        utils.severity[scanType].map(({ [groupKey]: group, label, color }, groupIndex) => (
+          <React.Fragment key={group}>
+            {groupedFindings[group] && groupedFindings[group].length > 0 && (
               <>
-              <h2 className="font-heading-xl margin-bottom-1 margin-top-3">
-                {name} {riskCode < 1 && ' or unknown'} risk findings <span className="font-body-xl text-secondary-vivid">({groupedAlerts[riskCode].length})</span>
-              </h2>
+                <h2 className="font-heading-xl margin-bottom-1 margin-top-4" id={`${label}-findings`}>
+                  {label} findings <span className="font-body-xl text-secondary-vivid">({groupedFindings[group].length})</span>
+                </h2>
 
-                <div className="margin-y-2 padding-bottom-2">
-                  {groupedAlerts[riskCode].map((alert, alertIndex) => (
-                    !!alert?.alertRef && (
-                        <ScanFinding
-                        key={alertIndex}
-                        color={color}
-                        alert={alert}
-                      />
-                    )
+                <div className="margin-y-2">
+                  {groupedFindings[group].map((finding, findingIndex) => (
+                    <ScanFinding
+                      key={findingIndex}
+                      index={findingIndex}
+                      finding={finding}
+                      groupColor={color}
+                      groupLabel={label}
+                      groupIndex={groupIndex}
+                      scanType={scanType}
+                    />
                   ))}
                 </div>
               </>
             )}
           </React.Fragment>
         ))
-      ) : (
-        <section className="usa-alert usa-alert--success maxw-tablet margin-y-3">
-          <div className="usa-alert__body">
-            <p className="usa-alert__text">No vulnerabilities found.</p>
-          </div>
-        </section>
       )}
     </>
   );
 };
+
 
 export default ScanFindings;
