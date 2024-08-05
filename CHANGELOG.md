@@ -1,3 +1,19 @@
+## 0.11.0 (2024-08-05)
+
+### Added
+
+- add build scans page (#4539)
+- style  build scan config (#4261)
+
+### Fixed
+
+- rule match should be an array
+
+### Maintenance
+
+- add test for previous bug
+- unvendor the node modules
+
 ## 0.10.0 (2024-07-03)
 
 ### Added
