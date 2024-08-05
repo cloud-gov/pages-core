@@ -20,21 +20,21 @@ const ScanNav = ({ groups, generated, buildId }) => (
             <th scope="col">
               { usePill ? (
                 <a
-                    href={`#${label}-findings`}
-                    title={`Jump to ${label} findings`}
-                    className={`usa-tag--big usa-tag text-uppercase usa-button radius-pill bg-${color}`}
-                  >
-                    { label }
-                  </a>
+                  href={`#${label}-findings`}
+                  title={`Jump to ${label} findings`}
+                  className={`usa-tag--big usa-tag text-uppercase usa-button radius-pill bg-${color}`}
+                >
+                  { label }
+                </a>
               ) : (
-                  <span className={boldMe ? 'text-bold' : undefined}>
-                    { label }
-                  </span>
+                <span className={boldMe ? 'text-bold' : undefined}>
+                  { label }
+                </span>
               ) }
               <span className="usa-sr-only">
                 {utils.plural(count, 'findings')}
                 ,
-                </span>
+              </span>
             </th>
             <td scope="col" className="font-mono-sm text-tabular text-right line-height-body-3">
               <span className={boldMe ? 'text-bold' : undefined}>

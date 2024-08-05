@@ -185,16 +185,16 @@ const FindingRecommendation = ({ anchor, solution, scanType = 'zap' }) => (
         <div key={listindex}>
           {fixList.split('\n').map((str, i) => (
             i === 0 ? (
-                    // <a id={`${group}-violation-${index + 1}-element-${nodeindex + 1}-fix-${listindex}`}>
+            // <a id={`${group}-violation-${index + 1}-element-${nodeindex + 1}-fix-${listindex}`}>
               <h4 key={i} className="usa-summary-box__heading" id={`${anchor}-solution`}>
-                      {str}
-                    </h4>
+                {str}
+              </h4>
             ) : (
               <div className="usa-summary-box__body">
-                      <ul key={i} className="usa-list margin-bottom-2">
-                        <li>{str}</li>
-                      </ul>
-                    </div>
+                <ul key={i} className="usa-list margin-bottom-2">
+                  <li>{str}</li>
+                </ul>
+              </div>
             )
           ))}
         </div>

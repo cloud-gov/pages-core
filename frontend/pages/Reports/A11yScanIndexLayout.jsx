@@ -8,13 +8,10 @@ import ScanAlert from './ScanAlert';
 
 const buildId = 'buildId';
 const siteId = 'siteId';
+
 export default function A11yScanIndex({ data }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.baseurl} on UNKNOWN DATE for build id ${buildId}`;
-
-  function splitSuppressedResults(array, isValid) {
-    return array.reduce(([pass, fail], elem) => (isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]]), [[], []]);
-  }
 
   const summarizedResults = [...data.violatedRules].map(result => ({
     ...result,
@@ -25,7 +22,9 @@ export default function A11yScanIndex({ data }) {
   })
   );
 
-  const [suppressed, unsuppressed] = splitSuppressedResults(summarizedResults, finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null));
+  const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
+  const suppressed = summarizedResults.filter(ignoreFn);
+  const unsuppressed = summarizedResults.filter(r => !ignoreFn(r));
 
   useEffect(() => {
     document.title = pageTitle;
@@ -54,7 +53,13 @@ export default function A11yScanIndex({ data }) {
       <div className="grid-row">
         <div className="grid-col border-top-1px">
           <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
-          <ScanAlert totalFound={data.violatedRules.length} totalLocations={data.totalViolationsCount} totalUrls={data.totalPageCount}> View each scan results page for specific details.</ScanAlert>
+          <ScanAlert
+            totalFound={data.violatedRules.length}
+            totalLocations={data.totalViolationsCount}
+            totalUrls={data.totalPageCount}
+          >
+            View each scan results page for specific details.
+          </ScanAlert>
         </div>
       </div>
       <div className="grid-row">
@@ -129,9 +134,9 @@ const ScanResultsChildPages = ({ pages }) => (
               <span className="font-mono-2xs narrow-mono break-anywhere" aria-label={`dot slash ${page.path},`}>
                 {page.absoluteURL && (page.absoluteURL)}
               </span>
-                // <span className="font-mono-2xs narrow-mono break-anywhere" aria-label={`dot ${guessRelativeURL(page.absoluteURL)},`}>
-                //   {guessRelativeURL(page.absoluteURL) && `.${guessRelativeURL(page.absoluteURL)}`}
-                // </span>
+              // <span className="font-mono-2xs narrow-mono break-anywhere" aria-label={`dot ${guessRelativeURL(page.absoluteURL)},`}>
+              //   {guessRelativeURL(page.absoluteURL) && `.${guessRelativeURL(page.absoluteURL)}`}
+              // </span>
             )}
           </th>
           <td data-label="Link to open URL">
@@ -139,8 +144,8 @@ const ScanResultsChildPages = ({ pages }) => (
             <a className="usa-link font-body-3xs text-no-wrap" target="_blank" aria-label="open scanned URL in a new window," title="open scanned URL in a new window" href={page.absoluteURL} rel="noreferrer">
               open URL
               <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                    <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
-                  </svg>
+                <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+              </svg>
             </a>
             )}
           </td>
@@ -156,11 +161,11 @@ const ScanResultsChildPages = ({ pages }) => (
             ) : (
               <>
                 {page.indexPills.map((pill, pillIndex) => (
-                    <span key={pillIndex} className={`usa-tag radius-pill bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color} margin-right-1`}>
-                      {pill.count}
-                      {pill.name}
-                    </span>
-                  ))}
+                  <span key={pillIndex} className={`usa-tag radius-pill bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color} margin-right-1`}>
+                    {pill.count}
+                    {pill.name}
+                  </span>
+                ))}
                 {page.moreCount > 0 && (
                   <b>
                     +
@@ -168,7 +173,7 @@ const ScanResultsChildPages = ({ pages }) => (
                     {' '}
                     more
                   </b>
-                  )}
+                )}
               </>
             )}
           </td>
@@ -178,7 +183,7 @@ const ScanResultsChildPages = ({ pages }) => (
             ) : (
               <a className="usa-link text-bold font-body-xs text-no-wrap" href={`./${page.path}`} title={`Full results for ${page.absoluteURL}`} aria-label={`Full results for dot slash ${page.path},`}>
                 View page results
-                </a>
+              </a>
             )}
           </td>
         </tr>

@@ -80,18 +80,19 @@ export const rulesets = {
 };
 
 export function getSevByRiskCode(n, set = 'zap') {
-  return severity[set].find(({ riskCode }) => riskCode == n ?? null);
+  return severity[set].find(({ riskCode }) => riskCode === n ?? null);
 }
 
 // export function getSeverityThemeToken(lookupKey, lookupValue, theme = 'zap') {
-//   return severity[theme].find((token) => Object.hasOwn( token, lookupKey ) && (token[lookupKey] == lookupValue))
+//   return severity[theme]
+//    .find((token) => Object.hasOwn( token, lookupKey ) && (token[lookupKey] == lookupValue))
 // }
 
 export function getSeverityThemeToken(lookup, theme = 'zap') {
   if (theme === 'a11y') {
-    return severity[theme].find(token => token.name == lookup);
+    return severity[theme].find(token => token.name === lookup);
   }
-  return severity[theme].find(token => token.riskCode == lookup);
+  return severity[theme].find(token => token.riskCode === lookup);
 }
 
 export function plural(count, name) {
