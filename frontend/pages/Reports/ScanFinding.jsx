@@ -96,7 +96,7 @@ const FindingTitle = ({
       {ignore && (
       <i className="text-no-wrap">
         {' (Note: This finding has been suppressed by '}
-        {ignoreSource}
+        {ignoreSource || 'your configuration'}
         {'.) '}
       </i>
       )}

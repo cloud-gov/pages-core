@@ -18,12 +18,14 @@ export default function About({ scanType, siteId, children }) {
           positive’ findings for our customers.  While still visible in the report, the suppressed
           findings don’t count towards your total issue count. Customers can specify additional
           findings to be suppressed in future scans for this site in your Pages
-          <Link to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
+          {' '}
+          <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
           .
         </p>
         <hr />
         <p className="font-body-xs">
           This scan is a service of
+          {' '}
           <a
             href="https://cloud.gov/pages"
             target="_blank"
@@ -33,8 +35,10 @@ export default function About({ scanType, siteId, children }) {
             cloud.gov Pages
           </a>
           , powered by
+          {' '}
           {poweredBy}
           . Check out the
+          {' '}
           <a href="https://cloud.gov/pages/documentation/build-scans/" target="_blank" className="usa-link" rel="noreferrer">documentation</a>
           {' '}
           for
@@ -101,7 +105,7 @@ const A11yAbout = () => {
         <a className="usa-link" href="https://www.section508.gov/" target="_blank" rel="noreferrer">Section 508</a>
         , agencies should apply the most current
         {' '}
-        <a className="usa-link" href="https://www.w3.org/WAI/standards-guidelines/" target="_blank" rel="noreferrer">Web ContentAccessibility Guidelines (WCAG)</a>
+        <a className="usa-link" href="https://www.w3.org/WAI/standards-guidelines/" target="_blank" rel="noreferrer">Web Content Accessibility Guidelines (WCAG)</a>
         {' '}
         published by the World Wide Web Consortium (W3C) to websites and web applications,
         where possible. This accessibility scan checks each webpage for violations of the latest

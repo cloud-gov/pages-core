@@ -111,6 +111,7 @@ const IssuesCount = ({ violationsCount, indexPills, moreCount }) => {
       {indexPills.map(pill => (
         <span key={pill.name} className={`usa-tag radius-pill bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color} margin-right-1`}>
           {pill.count}
+          {' '}
           {pill.name}
         </span>
       ))}
