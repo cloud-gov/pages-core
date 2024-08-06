@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ScanFinding from './ScanFinding';
-import { severity } from './utils';
+import { severity } from '../../util/reports';
 
 const ScanFindings = ({ count, groupedFindings, scanType }) => {
   const groupKey = scanType === 'zap' ? 'riskCode' : 'name';

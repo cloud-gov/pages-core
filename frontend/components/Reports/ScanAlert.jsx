@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { plural } from './utils';
+import { plural } from '../../util/reports';
 
 const ScanAlert = ({
   totalFound = 0, totalLocations = 0, totalUrls = 0, children,

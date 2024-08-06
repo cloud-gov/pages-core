@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import * as utils from './utils';
+import * as utils from '../../util/reports';
 
 import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';

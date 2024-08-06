@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
 
-import { plural } from './utils';
+import { plural } from '../../util/reports';
 
 const ScanFinding = ({
   finding, groupColor, groupLabel, scanType = 'zap', index,

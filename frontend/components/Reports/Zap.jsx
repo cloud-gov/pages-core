@@ -6,7 +6,7 @@ import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
-import { severity, getSeverityThemeToken, plural } from './utils';
+import { severity, getSeverityThemeToken, plural } from '../../util/reports';
 
 export default function Zap({ data, buildId, siteId }) {
   const scanTitle = 'Vulnerability';

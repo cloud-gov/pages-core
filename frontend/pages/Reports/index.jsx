@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import AlertBanner from '../../components/Reports/AlertBanner';
-import TypeNotFound from './TypeNotFound';
+import TypeNotFound from '../../components/Reports/TypeNotFound';
 
 export default function Report() {
   const { pathname } = useLocation();

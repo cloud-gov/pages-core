@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import A11yScanIndex from './A11yScanIndexLayout';
-import A11yScanChild from './A11yScanChildLayout';
-import Zap from './Zap';
-import TypeNotFound from './TypeNotFound';
+import A11yScanIndex from '../../components/Reports/A11yScanIndexLayout';
+import A11yScanChild from '../../components/Reports/A11yScanChildLayout';
+import Zap from '../../components/Reports/Zap';
+import TypeNotFound from '../../components/Reports/TypeNotFound';
 // import * as zapData from '../../data/zap.json';
 // import * as a11yIndex from '../../data/a11y-index.json';
 // import * as a11ySingle from '../../data/a11y-child.json';
