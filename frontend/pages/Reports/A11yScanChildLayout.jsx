@@ -53,7 +53,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
         <section className="tablet:grid-col-auto">
           <ScanNav
             generated={data.timestamp}
-            buildId="buildid"
+            buildId={buildId}
             groups={navGroups}
           />
         </section>

@@ -151,9 +151,11 @@ function SiteScans() {
                     <tr key={scan.id}>
                       <th scope="row" data-title="Scan">
                         <div className="scan-info">
-                          <h3 className="scan-info-name">
-                            { scan.BuildTaskType?.name || 'Scan name not available' }
-                          </h3>
+                          <Link reloadDocument to={`/report/${scan.id}`}>
+                            <h3 className="scan-info-name">
+                              { scan.BuildTaskType.name }
+                            </h3>
+                          </Link>
                           {scan.createdAt && (
                             <p>
                               For
