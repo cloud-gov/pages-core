@@ -6,13 +6,13 @@ import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
-import * as utils from './utils';
+import { severity, getSeverityThemeToken, plural } from './utils';
 
 export default function Zap({ data, buildId, siteId }) {
   const scanTitle = 'Vulnerability';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
 
-  const navGroups = [...utils.severity.zap].map(group => ({
+  const navGroups = [...severity.zap].map(group => ({
     ...group,
     usePill: true,
     count: data.site.groupedAlerts[group?.riskCode].length || 0,
@@ -33,7 +33,7 @@ export default function Zap({ data, buildId, siteId }) {
   const summarizedResults = [...data.site.alerts].map(result => ({
     ...result,
     anchor: result.alertRef,
-    severity: utils.getSeverityThemeToken(result.riskcode, 'zap'),
+    severity: getSeverityThemeToken(result.riskcode, 'zap'),
     count: result.instances.length,
   }));
 
@@ -90,7 +90,7 @@ export default function Zap({ data, buildId, siteId }) {
                 <p className="usa-alert__text">
                   We’ve found
                   <b>
-                    {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'issue')} `}
+                    {` ${summarizedResults.length} ${plural(summarizedResults.length, 'issue')} `}
                   </b>
                   across this site.
                 </p>

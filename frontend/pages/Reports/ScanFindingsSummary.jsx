@@ -47,7 +47,7 @@ function ScanFindingsSummaryTable({
                 {finding.ignore && (
                   <i className="text-no-wrap">
                     {' (Suppressed by '}
-                    {finding.ignoreSource}
+                    {finding.ignoreSource || 'your configuration'}
                     )
                   </i>
                 )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ScanFinding from './ScanFinding';
-import * as utils from './utils';
+import { severity } from './utils';
 
 const ScanFindings = ({ count, groupedFindings, scanType }) => {
   const groupKey = scanType === 'zap' ? 'riskCode' : 'name';
@@ -9,7 +9,7 @@ const ScanFindings = ({ count, groupedFindings, scanType }) => {
     return (
       <>
         {(
-          utils.severity[scanType].map(({ [groupKey]: group, label, color }, groupIndex) => (
+          severity[scanType].map(({ [groupKey]: group, label, color }, groupIndex) => (
             <React.Fragment key={group}>
               {groupedFindings[group] && groupedFindings[group].length > 0 && (
                 <>
