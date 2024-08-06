@@ -30,12 +30,14 @@ export default function Report() {
   if (isLoading) return 'loading';
   if (!data) return <TypeNotFound />;
 
+  const { report, siteId, buildId } = data;
+
   switch (data.type) {
     case 'owasp-zap':
-      return <Zap data={data} />;
+      return <Zap data={report} siteId={siteId} buildId={buildId} />;
     case 'a11y':
-      if (subpage) return <A11yScanChild data={data} />;
-      return <A11yScanIndex data={data} />;
+      if (subpage) return <A11yScanChild data={report} siteId={siteId} buildId={buildId} />;
+      return <A11yScanIndex data={report} siteId={siteId} buildId={buildId} />;
     default:
       return <TypeNotFound />;
   }

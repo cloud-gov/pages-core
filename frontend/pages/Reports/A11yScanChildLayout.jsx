@@ -6,11 +6,10 @@ import ScanFindings from './ScanFindings';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
 
-const buildId = 'buildId';
-const siteId = 'siteId';
 const currentPage = 0;
 const totalPageCount = 0;
-export default function A11yScanChild({ data }) {
+
+export default function A11yScanChild({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${data.timestamp} for build id ${buildId}`;
 
@@ -167,4 +166,6 @@ A11yPassed.propTypes = {
 A11yScanChild.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.object.isRequired,
+  siteId: PropTypes.number.isRequired,
+  buildId: PropTypes.number.isRequired,
 };

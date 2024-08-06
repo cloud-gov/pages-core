@@ -8,8 +8,7 @@ import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
 import * as utils from './utils';
 
-export default function Zap({ data }) {
-  const { siteId, buildId } = data;
+export default function Zap({ data, buildId, siteId }) {
   const scanTitle = 'Vulnerability';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
 
@@ -119,4 +118,6 @@ export default function Zap({ data }) {
 Zap.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.object.isRequired,
+  siteId: PropTypes.number.isRequired,
+  buildId: PropTypes.number.isRequired,
 };

@@ -6,8 +6,7 @@ import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
 import ScanAlert from './ScanAlert';
 
-export default function A11yScanIndex({ data }) {
-  const { siteId, buildId } = data;
+export default function A11yScanIndex({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.baseurl} on UNKNOWN DATE for build id ${buildId}`;
 
@@ -203,4 +202,6 @@ ScanResultsChildPages.propTypes = {
 A11yScanIndex.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.object.isRequired,
+  siteId: PropTypes.number.isRequired,
+  buildId: PropTypes.number.isRequired,
 };
