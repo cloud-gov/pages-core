@@ -6,9 +6,6 @@ import ScanFindings from './ScanFindings';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
 
-const currentPage = 0;
-const totalPageCount = 0;
-
 export default function A11yScanChild({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${data.timestamp} for build id ${buildId}`;
@@ -91,17 +88,13 @@ export default function A11yScanChild({ data, siteId, buildId }) {
             <hr />
             <About scanType="a11y" siteId={siteId}>
               <p className="font-body-xs">
-                Page
-                {currentPage}
+                Scanned on
                 {' '}
-                of
-                {totalPageCount}
-                {' '}
-                total pages scanned on
                 {utils.timestampReadable(data.timestamp)}
               </p>
               <p className="font-body-xs">
                 URL scanned:
+                {' '}
                 <code className="narrow-mono">{data.url}</code>
               </p>
             </About>
