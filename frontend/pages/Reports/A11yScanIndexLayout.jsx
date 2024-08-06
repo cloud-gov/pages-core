@@ -6,10 +6,8 @@ import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
 import ScanAlert from './ScanAlert';
 
-const buildId = 'buildId';
-const siteId = 'siteId';
-
 export default function A11yScanIndex({ data }) {
+  const { siteId, buildId } = data;
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.baseurl} on UNKNOWN DATE for build id ${buildId}`;
 
@@ -39,7 +37,6 @@ export default function A11yScanIndex({ data }) {
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">
             {data.baseurl}
-            /*
             {' '}
             <span className="text-italic font-sans-lg text-normal">(all pages)</span>
           </span>
@@ -100,12 +97,42 @@ export default function A11yScanIndex({ data }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <About scanType="a11y" siteId="000" />
+          <About scanType="a11y" siteId={siteId} />
         </div>
       </div>
     </>
   );
 }
+
+const IssuesCount = ({ violationsCount, indexPills, moreCount }) => {
+  if (violationsCount < 1) return 'None';
+  if (indexPills.length < 1) return violationsCount;
+  return (
+    <>
+      {indexPills.map(pill => (
+        <span key={pill.name} className={`usa-tag radius-pill bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color} margin-right-1`}>
+          {pill.count}
+          {pill.name}
+        </span>
+      ))}
+      {moreCount > 0 && (
+        <b>
+          +
+          {moreCount}
+          {' '}
+          more
+        </b>
+      )}
+    </>
+  );
+};
+
+IssuesCount.propTypes = {
+  violationsCount: PropTypes.number.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  indexPills: PropTypes.array.isRequired,
+  moreCount: PropTypes.number.isRequired,
+};
 
 const ScanResultsChildPages = ({ pages }) => (
   <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Scan results list with links to detailed reports">
@@ -118,8 +145,8 @@ const ScanResultsChildPages = ({ pages }) => (
       </tr>
     </thead>
     <tbody>
-      {pages.map((page, index) => (
-        <tr key={index}>
+      {pages.map(page => (
+        <tr key={pages.absoluteURL}>
           <th data-label="Scanned URL" scope="row">
             <b className="usa-sr-only">
               Scanned URL:
@@ -127,16 +154,13 @@ const ScanResultsChildPages = ({ pages }) => (
             </b>
             {page.failed ? (
               <span className="font-body-2xs narrow-body text-bold text-error-dark">
-                Couldn't process scan results. Please contact support.
+                Couldn&apos;t process scan results. Please contact support.
                 <br />
               </span>
             ) : (
               <span className="font-mono-2xs narrow-mono break-anywhere" aria-label={`dot slash ${page.path},`}>
-                {page.absoluteURL && (page.absoluteURL)}
+                {page.absoluteURL}
               </span>
-              // <span className="font-mono-2xs narrow-mono break-anywhere" aria-label={`dot ${guessRelativeURL(page.absoluteURL)},`}>
-              //   {guessRelativeURL(page.absoluteURL) && `.${guessRelativeURL(page.absoluteURL)}`}
-              // </span>
             )}
           </th>
           <td data-label="Link to open URL">
@@ -154,28 +178,7 @@ const ScanResultsChildPages = ({ pages }) => (
               Issues:
               <br />
             </b>
-            {page.violationsCount < 1 ? (
-              'None'
-            ) : page.indexPills.length < 1 ? (
-              page.violationsCount
-            ) : (
-              <>
-                {page.indexPills.map((pill, pillIndex) => (
-                  <span key={pillIndex} className={`usa-tag radius-pill bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color} margin-right-1`}>
-                    {pill.count}
-                    {pill.name}
-                  </span>
-                ))}
-                {page.moreCount > 0 && (
-                  <b>
-                    +
-                    {page.moreCount}
-                    {' '}
-                    more
-                  </b>
-                )}
-              </>
-            )}
+            <IssuesCount {...page} />
           </td>
           <td data-label="Scan results" className="text-right">
             {page.failed ? (
@@ -191,6 +194,11 @@ const ScanResultsChildPages = ({ pages }) => (
     </tbody>
   </table>
 );
+
+ScanResultsChildPages.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  pages: PropTypes.array.isRequired,
+};
 
 A11yScanIndex.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types

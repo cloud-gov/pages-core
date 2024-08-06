@@ -11,6 +11,7 @@ export default function Report() {
   return (
     <>
       {!onReportIndex && <AlertBanner />}
+      { /* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */ }
       <a name="top" />
       <main className="grid-container">
         {onReportIndex ? <TypeNotFound /> : <Outlet />}

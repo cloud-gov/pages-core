@@ -8,10 +8,8 @@ import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
 import * as utils from './utils';
 
-const buildId = 'buildId';
-const siteId = 'siteId';
-
 export default function Zap({ data }) {
+  const { siteId, buildId } = data;
   const scanTitle = 'Vulnerability';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
 

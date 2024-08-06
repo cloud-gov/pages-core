@@ -13,7 +13,6 @@ const totalPageCount = 0;
 export default function A11yScanChild({ data }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${data.timestamp} for build id ${buildId}`;
-  console.log(data);
 
   const navGroups = [...utils.severity.a11y].map(group => ({
     ...group,
@@ -144,8 +143,8 @@ const A11yPassed = ({ passes }) => (
           </tr>
         </thead>
         <tbody>
-          {passes.map((check, index) => (
-            <tr key={index}>
+          {passes.map(check => (
+            <tr key={check.help}>
               <td>
                 {check.help}
                 .
@@ -159,6 +158,11 @@ const A11yPassed = ({ passes }) => (
 
   </div>
 );
+
+A11yPassed.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  passes: PropTypes.array.isRequired,
+};
 
 A11yScanChild.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types

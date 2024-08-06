@@ -1,5 +1,6 @@
 import React from 'react';
-import * as utils from './utils';
+import PropTypes from 'prop-types';
+import { plural } from './utils';
 
 const ScanAlert = ({
   totalFound = 0, totalLocations = 0, totalUrls = 0, children,
@@ -12,14 +13,22 @@ const ScanAlert = ({
         We’ve found
         <b>
           {`
-              ${totalFound} ${utils.plural(totalFound, 'issue')}
-              in ${totalLocations} ${utils.plural(totalLocations, 'location')}
+              ${totalFound} ${plural(totalFound, 'issue')}
+              in ${totalLocations} ${plural(totalLocations, 'location')}
             `}
         </b>
-        {`across ${totalUrls} scanned ${utils.plural(totalUrls, 'page')} for this site. `}
+        {`across ${totalUrls} scanned ${plural(totalUrls, 'page')} for this site. `}
         {children}
       </p>
     </div>
   </section>
 );
+
+ScanAlert.propTypes = {
+  totalFound: PropTypes.number,
+  totalLocations: PropTypes.number,
+  totalUrls: PropTypes.number,
+  children: PropTypes.node,
+};
+
 export default ScanAlert;

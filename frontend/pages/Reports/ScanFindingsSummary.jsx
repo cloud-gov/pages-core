@@ -1,12 +1,13 @@
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import * as utils from './utils.js';
+import PropTypes from 'prop-types';
+import { plural } from './utils';
 
-const ScanFindingsSummaryTable = ({
-  title, findings, hasSuppressColumn = false, theme = 'zap',
-}) => {
-  if (findings.length < 1) return;
+function ScanFindingsSummaryTable({
+  title, findings, hasSuppressColumn = false,
+}) {
+  if (findings.length < 1) return null;
   return (
-
     <table
       className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full margin-bottom-4"
       aria-label=""
@@ -20,8 +21,8 @@ const ScanFindingsSummaryTable = ({
         </tr>
       </thead>
       <tbody>
-        {findings.map((finding, index) => (
-          <tr key={index}>
+        {findings.map(finding => (
+          <tr key={finding.ref}>
             <th data-label="Result name" scope="row">
               <b className="usa-sr-only">
                 Result name:
@@ -63,7 +64,7 @@ const ScanFindingsSummaryTable = ({
             </td>
             <td data-label="Instances count" className="text-right">
               <span className="usa-sr-only">
-                {utils.plural(finding.count, 'location')}
+                {plural(finding.count, 'location')}
                 :
               </span>
               {finding.count}
@@ -73,6 +74,12 @@ const ScanFindingsSummaryTable = ({
       </tbody>
     </table>
   );
+}
+
+ScanFindingsSummaryTable.propTypes = {
+  title: PropTypes.string.isRequired,
+  findings: PropTypes.array.isRequired,
+  hasSuppressColumn: PropTypes.bool,
 };
 
 const ScanFindingsSummary = ({ suppressedFindings, unsuppressedFindings, scanType }) => (
@@ -81,5 +88,11 @@ const ScanFindingsSummary = ({ suppressedFindings, unsuppressedFindings, scanTyp
     <ScanFindingsSummaryTable theme={scanType} title="Suppressed & informational results" findings={suppressedFindings} hasSuppressColumn />
   </>
 );
+
+ScanFindingsSummary.propTypes = {
+  suppressedFindings: PropTypes.array,
+  unsuppressedFindings: PropTypes.array,
+  scanType: PropTypes.string, // currently unused
+};
 
 export default ScanFindingsSummary;

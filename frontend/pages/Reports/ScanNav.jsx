@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import * as utils from './utils.js';
+import { plural } from './utils';
 
 const ScanNav = ({ groups, generated, buildId }) => (
   <nav className="sticky">
@@ -15,8 +15,8 @@ const ScanNav = ({ groups, generated, buildId }) => (
       <tbody>
         {groups.map(({
           label, color, count = 0, usePill = false, boldMe = false,
-        }, index) => (
-          <tr className="height-5" key={index}>
+        }) => (
+          <tr className="height-5" key={label}>
             <th scope="col">
               { usePill ? (
                 <a
@@ -32,11 +32,11 @@ const ScanNav = ({ groups, generated, buildId }) => (
                 </span>
               ) }
               <span className="usa-sr-only">
-                {utils.plural(count, 'findings')}
+                {plural(count, 'findings')}
                 ,
               </span>
             </th>
-            <td scope="col" className="font-mono-sm text-tabular text-right line-height-body-3">
+            <td className="font-mono-sm text-tabular text-right line-height-body-3">
               <span className={boldMe ? 'text-bold' : undefined}>
                 { count }
               </span>
@@ -61,6 +61,7 @@ const ScanNav = ({ groups, generated, buildId }) => (
 );
 
 ScanNav.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   groups: PropTypes.array.isRequired,
   generated: PropTypes.string.isRequired,
   buildId: PropTypes.string.isRequired,
