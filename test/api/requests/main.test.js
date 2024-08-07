@@ -110,7 +110,7 @@ describe('Main Site', () => {
           const stylesBundleRe = /<link rel="stylesheet" href="\/styles\/styles\.css">/;
           expect(response.text.search(stylesBundleRe)).to.be.above(-1);
 
-          const jsBundleRe = /<script src="\/js\/bundle\.js"><\/script>/;
+          const jsBundleRe = /<script src="\/dist\/js\/bundle\.js"><\/script>/;
 
           expect(response.text.search(jsBundleRe)).to.be.above(-1);
           done();

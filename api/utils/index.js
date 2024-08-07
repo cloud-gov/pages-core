@@ -117,7 +117,7 @@ function loadDevelopmentManifest() {
   // eslint-disable-next-line array-callback-return
   Object.keys(webpackConfig.entry).map((key) => {
     const file = `${key}.js`;
-    jsFiles[file] = `${publicPath.slice(1)}${file}`;
+    jsFiles[file] = `${publicPath}${file}`;
   });
 
   // This requires that MiniCssExtractPlugin be the first plugin in the
@@ -126,7 +126,7 @@ function loadDevelopmentManifest() {
 
   return {
     ...jsFiles,
-    'main.css': publicPath.slice(1) + cssFilename,
+    'bundle.css': `${publicPath}${cssFilename}`,
   };
 }
 
