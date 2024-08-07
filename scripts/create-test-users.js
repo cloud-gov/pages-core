@@ -4,7 +4,7 @@ const factory = require('../test/api/support/factory');
 const { authenticatedSession } = require('../e2e/auth-session');
 
 async function createUsers() {
-  const user = await factory.user({ username: 'test-e2e-user' });
+  const user = await factory.user({ username: process.env.PAGES_TEST_USER || 'generic-test-user' });
   const [name, value] = (await authenticatedSession(user)).split('=');
   const cookie = {
     name,
@@ -17,7 +17,7 @@ async function createUsers() {
     sameSite: 'Lax',
   };
 
-  fs.writeFileSync('playwright/.auth/user.json', JSON.stringify(
+  fs.writeFileSync('user.json', JSON.stringify(
     { cookies: [cookie] }
   ));
 }
