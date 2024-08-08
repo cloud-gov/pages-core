@@ -470,6 +470,7 @@ jobs:
           params:
             ZAP_AUTH_HEADER: cookie
             ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+            DOMAIN: ((((deploy-env))-pages-domain))
           run:
             dir: src
             path: ci/docker/entrypoint.sh
@@ -477,6 +478,7 @@ jobs:
               - bash
               - -ceux
               - |
+                sed -i s/DOMAIN/$DOMAIN/g ci/zap/zap.yaml
                 pushd ..
                   docker load -i zap/image.tar
                   docker tag "$(cat zap/repository):$(cat zap/tag)" zap-docker
