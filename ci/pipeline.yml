@@ -459,6 +459,7 @@ jobs:
       - load_var: cookie
         file: src/cookie
       - task: scan
+        privileged: true
         image: dind
         config:
           platform: linux
