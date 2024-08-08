@@ -471,8 +471,9 @@ jobs:
             ZAP_AUTH_HEADER_VALUE: ((.:cookie))
           run:
             dir: src
-            path: bash
+            path: ci/docker/entrypoint.sh
             args:
+              - bash
               - -ceux
               - |
                 pushd ..
