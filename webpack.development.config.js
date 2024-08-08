@@ -2,11 +2,12 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { getFeatureFlags } = require('./webpack-utils');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const RESOURCE_GENERATOR = {
   filename: 'images/[contenthash][ext]',
+  outputPath: './dist',
 };
 
 const svgoConfig = {
@@ -68,6 +69,9 @@ module.exports = {
                 plugins: [autoprefixer],
               },
             },
+          },
+          {
+            loader: 'resolve-url-loader',
           },
           {
             loader: 'sass-loader',

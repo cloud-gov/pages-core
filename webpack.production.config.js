@@ -7,7 +7,6 @@ const { getFeatureFlags } = require('./webpack-utils');
 
 const RESOURCE_GENERATOR = {
   filename: 'images/[contenthash][ext]',
-  publicPath: '/',
 };
 
 const svgoConfig = {

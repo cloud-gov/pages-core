@@ -1,35 +1,3 @@
-{# {% extends "base.njk" %}
-
-{% block head_extra %}
-  <script nonce="{{ nonce }}">
-    window.FRONTEND_CONFIG = {{ frontendConfig | dump | safe }};
-  </script>
-{% endblock %}
-
-{% block before_header %}
-  {% if siteWideError %}
-    <div class="usa-alert usa-alert-warning usa-alert-home" role="alert">
-      <div class="usa-alert-body">
-        <h3 class="usa-alert-heading">
-          {{ siteWideError.heading }}
-        </h3>
-        <p class="usa-alert-text">
-          {{ siteWideError.body | safe }}
-        </p>
-      </div>
-    </div>
-  {% endif %}
-{% endblock %}
- #}
-
-{# {% block report_app %}
-  <div id="js-app" class="usa-grid"></div>
-  <script nonce="{{ nonce }}">
-    window.CSRF_TOKEN = "{{ csrfToken }}";
-  </script>
-  <script src="/{{ webpackAssets['main.js'] }}"></script>
-{% endblock %} #}
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -75,7 +43,7 @@
       {% if siteDisplayEnv %}
         | {{ siteDisplayEnv }}
       {% endif %}
-      Scan Reports 
+      Scan Reports
       <!-- TODO: figure out how to change this from router -->
     </title>
     {% block head_extra %}{% endblock %}
@@ -85,8 +53,8 @@
       <script nonce="{{ nonce }}">
         window.CSRF_TOKEN = "{{ csrfToken }}";
       </script>
-      <script src="/{{ webpackAssets['report.js'] }}"></script>
-      
+      <script src="{{ webpackAssets['report.js'] }}"></script>
+
     </body>
   </html>
   {% block post_footer %}{% endblock %}
