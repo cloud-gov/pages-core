@@ -48,7 +48,6 @@ env:
     failOnError: true
     progressToStdout: true
 jobs:
-  - type: spiderAjax
   - type: spider
   - type: activeScan
   - type: report
