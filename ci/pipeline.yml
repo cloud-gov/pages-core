@@ -431,6 +431,7 @@ jobs:
         params:
           format: oci
       - get: pipeline-tasks
+      - get: dind
       - get: general-task
       - get: monthly
         trigger: true
@@ -458,7 +459,7 @@ jobs:
       - load_var: cookie
         file: src/cookie
       - task: scan
-        image: general-task
+        image: dind
         config:
           platform: linux
           inputs:
@@ -591,6 +592,7 @@ resources:
   - name: postgres
   - name: node
   - name: zap
+  - name: dind
   - name: slack
   - name: general-task
   - name: pipeline-tasks
