@@ -5,7 +5,7 @@ const { User } = require('../api/models');
 async function removeUsers() {
   await User.destroy({
     where: {
-      username: { [Op.like]: '%-e2e-%' },
+      username: { [Op.like]: '%-test-user' },
     },
     force: true,
   });
