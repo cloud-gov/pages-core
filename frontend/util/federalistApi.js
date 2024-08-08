@@ -377,4 +377,8 @@ export default {
       { handleHttpError: false }
     );
   },
+
+  fetchReportData(id, subPage) {
+    return request(`tasks/${id}/report/${subPage || ''}`);
+  },
 };

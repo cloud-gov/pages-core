@@ -2,11 +2,12 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { getFeatureFlags } = require('./webpack-utils');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const RESOURCE_GENERATOR = {
   filename: 'images/[contenthash][ext]',
+  outputPath: './dist',
 };
 
 const svgoConfig = {
@@ -24,7 +25,10 @@ const svgoConfig = {
 
 module.exports = {
   mode: 'development',
-  entry: './frontend/main.jsx',
+  entry: {
+    bundle: './frontend/main.jsx',
+    report: './frontend/mainReport.jsx',
+  },
   devtool: 'inline-source-map',
   devServer: {
     static: {
@@ -33,7 +37,7 @@ module.exports = {
   },
   stats: 'minimal',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
   },
@@ -65,6 +69,9 @@ module.exports = {
                 plugins: [autoprefixer],
               },
             },
+          },
+          {
+            loader: 'resolve-url-loader',
           },
           {
             loader: 'sass-loader',

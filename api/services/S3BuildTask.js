@@ -18,7 +18,7 @@ const handleInvalidAccessKeyError = (error) => {
   throw error;
 };
 
-async function getTaskArtifactSize(site, key) {
+async function getObject(site, key) {
   return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
     .then((credentials) => {
       const s3Client = new S3Helper.S3Client({
@@ -28,25 +28,9 @@ async function getTaskArtifactSize(site, key) {
         bucket: credentials.bucket,
       });
 
-      return s3Client.headObject(key)
-        .then(metadata => metadata.ContentLength)
+      return s3Client.getObject(key)
         .catch(handleInvalidAccessKeyError);
     });
 }
 
-async function getSignedTaskUrl(site, key) {
-  return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
-    .then((credentials) => {
-      const s3Client = new S3Helper.S3Client({
-        accessKeyId: credentials.access_key_id,
-        secretAccessKey: credentials.secret_access_key,
-        region: credentials.region,
-        bucket: credentials.bucket,
-      });
-
-      return s3Client.getSignedUrl(key)
-        .catch(handleInvalidAccessKeyError);
-    });
-}
-
-module.exports = { getTaskArtifactSize, getSignedTaskUrl };
+module.exports = { getObject };
