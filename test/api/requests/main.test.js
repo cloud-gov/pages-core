@@ -107,7 +107,7 @@ describe('Main Site', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          const stylesBundleRe = /<link rel="stylesheet" href="\/styles\/styles\.css">/;
+          const stylesBundleRe = /<link rel="stylesheet" href="\/dist\/styles\/styles\.css">/;
           expect(response.text.search(stylesBundleRe)).to.be.above(-1);
 
           const jsBundleRe = /<script src="\/dist\/js\/bundle\.js"><\/script>/;

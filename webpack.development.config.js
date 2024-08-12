@@ -6,8 +6,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { getFeatureFlags } = require('./webpack-utils');
 
 const RESOURCE_GENERATOR = {
-  filename: 'images/[contenthash][ext]',
-  outputPath: './dist',
+  filename: 'images/[name][ext]',
 };
 
 const svgoConfig = {
@@ -58,7 +57,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              url: { filter: (url) => !url.includes('images') },
+              url: { filter: url => !url.includes('images') },
             },
           },
           {
@@ -71,14 +70,11 @@ module.exports = {
             },
           },
           {
-            loader: 'resolve-url-loader',
-          },
-          {
             loader: 'sass-loader',
             options: {
               sassOptions: {
                 quietDeps: true,
-                loadPath: path.resolve(__dirname, 'node_modules/uswds/src/stylesheets/'),
+                loadPath: path.resolve(__dirname, '.'),
               },
             },
           },
@@ -122,7 +118,7 @@ module.exports = {
     ]),
     new BundleAnalyzerPlugin({
       analyzerHost: '0.0.0.0',
-      analyzerPort: '8888'
+      analyzerPort: '8888',
     }),
   ],
 };
