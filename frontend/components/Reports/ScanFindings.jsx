@@ -18,6 +18,7 @@ const ScanFindings = ({ count, groupedFindings, scanType }) => {
                     {' '}
                     findings
                     <span className="font-body-xl text-secondary-vivid">
+                      {' '}
                       (
                       {groupedFindings[group].length}
                       )

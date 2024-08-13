@@ -15,7 +15,7 @@ function ScanFindingsSummaryTable({
       <thead>
         <tr>
           <th scope="col">{title}</th>
-          {hasSuppressColumn && (<th scope="col" className="">Source</th>)}
+          {hasSuppressColumn && (<th scope="col" className="">Suppressed source</th>)}
           <th scope="col" className="width-card">Severity</th>
           <th scope="col" className="mobile-lg:text-right text-no-wrap width-10">Instances</th>
         </tr>
@@ -46,9 +46,8 @@ function ScanFindingsSummaryTable({
               <td data-label="Suppressed result" className="font-body-xs">
                 {finding.ignore && (
                   <i className="text-no-wrap">
-                    {' (Suppressed by '}
-                    {finding.ignoreSource || 'your configuration'}
-                    )
+                    {'Suppressed by '}
+                    {finding.ignoreSource || 'site configuration'}
                   </i>
                 )}
               </td>
@@ -59,7 +58,7 @@ function ScanFindingsSummaryTable({
                 <br />
               </b>
               <span className={`usa-tag radius-pill bg-${finding.severity?.color}`}>
-                {finding.severity?.name}
+                {finding.severity?.label}
               </span>
             </td>
             <td data-label="Instances count" className="text-right">
@@ -84,8 +83,8 @@ ScanFindingsSummaryTable.propTypes = {
 
 const ScanFindingsSummary = ({ suppressedFindings, unsuppressedFindings, scanType }) => (
   <>
-    <ScanFindingsSummaryTable theme={scanType} title="Unresolved findings" findings={unsuppressedFindings} />
-    <ScanFindingsSummaryTable theme={scanType} title="Suppressed & informational results" findings={suppressedFindings} hasSuppressColumn />
+    <ScanFindingsSummaryTable theme={scanType} title="Unresolved results" findings={unsuppressedFindings} />
+    <ScanFindingsSummaryTable theme={scanType} title="Resolved or informational results" findings={suppressedFindings} hasSuppressColumn />
   </>
 );
 

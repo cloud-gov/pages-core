@@ -151,6 +151,6 @@ const A11yAbout = () => {
 
 About.propTypes = {
   scanType: PropTypes.string.isRequired,
-  siteId: PropTypes.string.isRequired,
+  siteId: PropTypes.number.isRequired,
   children: PropTypes.node,
 };

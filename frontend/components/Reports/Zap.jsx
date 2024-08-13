@@ -24,7 +24,7 @@ export default function Zap({ data, buildId, siteId }) {
       count: data.site.alerts?.length,
     },
     {
-      label: 'All Unresolved findings',
+      label: 'All unresolved results',
       count: data.site?.issueCount,
       boldMe: true,
     }
@@ -55,6 +55,7 @@ export default function Zap({ data, buildId, siteId }) {
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
             {data.site['@name']}
           </span>
+          <span className="text-italic font-sans-lg text-normal margin-left-2">(all pages)</span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a
@@ -84,15 +85,29 @@ export default function Zap({ data, buildId, siteId }) {
           <div>
             <h2 className="font-heading-xl margin-bottom-2 margin-top-3">Scan results summary</h2>
             <section
-              className={`usa-alert usa-alert--${summarizedResults.length > 0 ? 'error' : 'success'}`}
+              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">
-                  We’ve found
-                  <b>
-                    {` ${summarizedResults.length} ${plural(summarizedResults.length, 'issue')} `}
-                  </b>
-                  across this site.
+                  {unsuppressed.length > 0 && (
+                    <>
+                      We’ve found
+                      <b>
+                        {` ${unsuppressed.length} ${plural(unsuppressed.length, 'unresolved issue')} `}
+                      </b>
+                      out of
+                      {` ${summarizedResults.length} ${plural(summarizedResults.length, 'total result')} for this site. `}
+                    </>
+                  )}
+                  { (unsuppressed.length < 1 || summarizedResults.length < 1) && (
+                    <>
+                      We’ve found
+                      <b>
+                        {` ${summarizedResults.length} ${plural(summarizedResults.length, 'resolved or informational result')} `}
+                      </b>
+                      for this site.
+                    </>
+                  )}
                 </p>
               </div>
             </section>

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import * as utils from '../../util/reports';
 
@@ -9,6 +10,8 @@ import ScanAlert from './ScanAlert';
 export default function A11yScanIndex({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.baseurl} on UNKNOWN DATE for build id ${buildId}`;
+  const { id } = useParams();
+  const reportId = parseInt(id, 10);
 
   const summarizedResults = [...data.violatedRules].map(result => ({
     ...result,
@@ -37,8 +40,8 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">
             {data.baseurl}
             {' '}
-            <span className="text-italic font-sans-lg text-normal">(all pages)</span>
           </span>
+          <span className="text-italic font-sans-lg text-normal margin-left-2">(all pages)</span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage" rel="noreferrer">
@@ -62,7 +65,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
         <div className="grid-col">
           <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-4">
             All issues found
-            &nbsp;
+            {' '}
             <span className="font-body-lg text-secondary-vivid">
               (
               {data.violatedRules.length}
@@ -80,7 +83,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
         <div className="grid-col">
           <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-1">
             All pages scanned
-            &nbsp;
+            {' '}
             <span className="font-body-lg text-accent-cool-darker">
               (
               {data.reportPages.length}
@@ -91,7 +94,11 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <ScanResultsChildPages pages={data.reportPages} baseurl={data.baseurl} />
+          <ScanResultsChildPages
+            pages={data.reportPages}
+            baseurl={data.baseurl}
+            reportId={reportId}
+          />
         </div>
       </div>
       <div className="grid-row">
@@ -134,7 +141,7 @@ IssuesCount.propTypes = {
   moreCount: PropTypes.number.isRequired,
 };
 
-const ScanResultsChildPages = ({ pages }) => (
+const ScanResultsChildPages = ({ pages, reportId }) => (
   <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Scan results list with links to detailed reports">
     <thead>
       <tr>
@@ -146,7 +153,7 @@ const ScanResultsChildPages = ({ pages }) => (
     </thead>
     <tbody>
       {pages.map(page => (
-        <tr key={pages.absoluteURL}>
+        <tr key={page.absoluteURL}>
           <th data-label="Scanned URL" scope="row">
             <b className="usa-sr-only">
               Scanned URL:
@@ -184,9 +191,9 @@ const ScanResultsChildPages = ({ pages }) => (
             {page.failed ? (
               <span className="text-bold text-error-dark">Scan failed</span>
             ) : (
-              <a className="usa-link text-bold font-body-xs text-no-wrap" href={`./${page.path}`} title={`Full results for ${page.absoluteURL}`} aria-label={`Full results for dot slash ${page.path},`}>
+              <Link className="usa-link text-bold font-body-xs text-no-wrap" to={`/report/${reportId}/${page.path}`} title={`Full results for ${page.absoluteURL}`} aria-label={`Full results for dot slash ${page.path},`}>
                 View page results
-              </a>
+              </Link>
             )}
           </td>
         </tr>
@@ -198,6 +205,7 @@ const ScanResultsChildPages = ({ pages }) => (
 ScanResultsChildPages.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   pages: PropTypes.array.isRequired,
+  reportId: PropTypes.number.isRequired,
 };
 
 A11yScanIndex.propTypes = {
