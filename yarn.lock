@@ -4288,22 +4288,18 @@ cheerio-select@^2.1.0:
     domhandler "^5.0.3"
     domutils "^3.0.1"
 
-cheerio@^1.0.0-rc.3:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-1.0.0.tgz#1ede4895a82f26e8af71009f961a9b8cb60d6a81"
-  integrity sha512-quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==
+cheerio@1.0.0-rc.12, cheerio@^1.0.0-rc.3:
+  version "1.0.0-rc.12"
+  resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-1.0.0-rc.12.tgz#788bf7466506b1c6bf5fae51d24a2c4d62e47683"
+  integrity sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==
   dependencies:
     cheerio-select "^2.1.0"
     dom-serializer "^2.0.0"
     domhandler "^5.0.3"
-    domutils "^3.1.0"
-    encoding-sniffer "^0.2.0"
-    htmlparser2 "^9.1.0"
-    parse5 "^7.1.2"
+    domutils "^3.0.1"
+    htmlparser2 "^8.0.1"
+    parse5 "^7.0.0"
     parse5-htmlparser2-tree-adapter "^7.0.0"
-    parse5-parser-stream "^7.1.2"
-    undici "^6.19.5"
-    whatwg-mimetype "^4.0.0"
 
 "chokidar@>=3.0.0 <4.0.0", chokidar@^3.5.2, chokidar@^3.5.3, chokidar@^3.6.0:
   version "3.6.0"
@@ -5307,7 +5303,7 @@ domready@^1.0.8:
   resolved "https://registry.yarnpkg.com/domready/-/domready-1.0.8.tgz#91f252e597b65af77e745ae24dd0185d5e26d58c"
   integrity sha512-uIzsOJUNk+AdGE9a6VDeessoMCzF8RrZvJCX/W8QtyfgdR6Uofn/MvRonih3OtCO79b2VDzDOymuiABrQ4z3XA==
 
-domutils@^3.0.1, domutils@^3.1.0:
+domutils@^3.0.1:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-3.1.0.tgz#c47f551278d3dc4b0b1ab8cbb42d751a6f0d824e"
   integrity sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==
@@ -5423,14 +5419,6 @@ encodeurl@~1.0.2:
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==
 
-encoding-sniffer@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/encoding-sniffer/-/encoding-sniffer-0.2.0.tgz#799569d66d443babe82af18c9f403498365ef1d5"
-  integrity sha512-ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==
-  dependencies:
-    iconv-lite "^0.6.3"
-    whatwg-encoding "^3.1.1"
-
 engine.io-client@~6.5.2:
   version "6.5.4"
   resolved "https://registry.yarnpkg.com/engine.io-client/-/engine.io-client-6.5.4.tgz#b8bc71ed3f25d0d51d587729262486b4b33bd0d0"
@@ -5471,7 +5459,7 @@ enhanced-resolve@^5.17.0:
     graceful-fs "^4.2.4"
     tapable "^2.2.0"
 
-entities@^4.2.0, entities@^4.4.0, entities@^4.5.0:
+entities@^4.2.0, entities@^4.4.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/entities/-/entities-4.5.0.tgz#5d268ea5e7113ec74c4d033b79ea5a35a488fb48"
   integrity sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==
@@ -6718,15 +6706,15 @@ htmlescape@^1.1.0:
   resolved "https://registry.yarnpkg.com/htmlescape/-/htmlescape-1.1.1.tgz#3a03edc2214bca3b66424a3e7959349509cb0351"
   integrity sha512-eVcrzgbR4tim7c7soKQKtxa/kQM4TzjnlU83rcZ9bHU6t31ehfV7SktN6McWgwPWg+JYMA/O3qpGxBvFq1z2Jg==
 
-htmlparser2@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-9.1.0.tgz#cdb498d8a75a51f739b61d3f718136c369bc8c23"
-  integrity sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==
+htmlparser2@^8.0.1:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-8.0.2.tgz#f002151705b383e62433b5cf466f5b716edaec21"
+  integrity sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==
   dependencies:
     domelementtype "^2.3.0"
     domhandler "^5.0.3"
-    domutils "^3.1.0"
-    entities "^4.5.0"
+    domutils "^3.0.1"
+    entities "^4.4.0"
 
 http-deceiver@^1.2.7:
   version "1.2.7"
@@ -6833,7 +6821,7 @@ iconv-lite@0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-iconv-lite@0.6.3, iconv-lite@^0.6.3:
+iconv-lite@0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.6.3.tgz#a52f80bf38da1952eb5c681790719871a1a72501"
   integrity sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==
@@ -8887,13 +8875,6 @@ parse5-htmlparser2-tree-adapter@^7.0.0:
   integrity sha512-B77tOZrqqfUfnVcOrUvfdLbz4pu4RopLD/4vmu3HUPswwTA8OH0EMW9BlWR2B0RCoiZRAHEUu7IxeP1Pd1UU+g==
   dependencies:
     domhandler "^5.0.2"
-    parse5 "^7.0.0"
-
-parse5-parser-stream@^7.1.2:
-  version "7.1.2"
-  resolved "https://registry.yarnpkg.com/parse5-parser-stream/-/parse5-parser-stream-7.1.2.tgz#d7c20eadc37968d272e2c02660fff92dd27e60e1"
-  integrity sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==
-  dependencies:
     parse5 "^7.0.0"
 
 parse5@^7.0.0, parse5@^7.1.2:
@@ -11235,11 +11216,6 @@ undici-types@~6.13.0:
   version "6.13.0"
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.13.0.tgz#e3e79220ab8c81ed1496b5812471afd7cf075ea5"
   integrity sha512-xtFJHudx8S2DSoujjMd1WeWvn7KKWFRESZTMeL1RptAYERu29D6jphMjjY+vn96jvN3kVPDNxU/E13VTaXj6jg==
-
-undici@^6.19.5:
-  version "6.19.7"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.19.7.tgz#7d4cf26dc689838aa8b6753a3c5c4288fc1e0216"
-  integrity sha512-HR3W/bMGPSr90i8AAp2C4DM3wChFdJPLrWYpIS++LxS8K+W535qftjt+4MyjNYHeWabMj1nvtmLIi7l++iq91A==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

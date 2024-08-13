@@ -205,6 +205,7 @@
     "socket.io-adapter": "2.5.5",
     "socket.io": "4.7.5",
     "socket.io-client": "4.7.5",
-    "fast-xml-parser": "4.4.1"
+    "fast-xml-parser": "4.4.1",
+    "**/cheerio": "1.0.0-rc.12"
   }
 }
