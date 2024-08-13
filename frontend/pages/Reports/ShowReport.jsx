@@ -27,7 +27,7 @@ export default function Report() {
   const { id, subpage } = useParams();
 
   const { data, isLoading } = useReportData(id, subpage);
-  if (isLoading) return 'loading';
+  if (isLoading) return 'Loading';
   if (!data) return <TypeNotFound />;
 
   const { report, siteId, buildId } = data;
