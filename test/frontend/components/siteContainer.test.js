@@ -102,7 +102,7 @@ describe('<SiteContainer/>', () => {
     expect(alert.prop('status')).to.equal('error');
   });
 
-  it.only('renders after sites have loaded but no matching org', () => {
+  it('renders after sites have loaded but no matching org', () => {
     state.sites.data[0].organizationId = 2;
 
     const wrapper = mountRouter(<SiteContainer {...props} />, path, defaultURL, state);
