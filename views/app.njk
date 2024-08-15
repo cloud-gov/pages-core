@@ -28,5 +28,5 @@
   <script nonce="{{ nonce }}">
     window.CSRF_TOKEN = "{{ csrfToken }}";
   </script>
-  <script src="{{ webpackAssets['bundle.js'] }}"></script>
+  <script src="/{{ webpackAssets['bundle.js'] }}"></script>
 {% endblock %}

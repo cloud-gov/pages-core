@@ -112,12 +112,13 @@ function getDirectoryFiles(dir, existingFileList) {
 function loadDevelopmentManifest() {
   const webpackConfig = require('../../webpack.development.config.js'); // eslint-disable-line global-require,import/extensions
   const { publicPath } = webpackConfig.output;
+  const cleanedPath = publicPath.slice(1);
   const jsFiles = {};
 
   // eslint-disable-next-line array-callback-return
   Object.keys(webpackConfig.entry).map((key) => {
     const file = `${key}.js`;
-    jsFiles[file] = `${publicPath}${file}`;
+    jsFiles[file] = `${cleanedPath}${file}`;
   });
 
   // This requires that MiniCssExtractPlugin be the first plugin in the
@@ -126,7 +127,7 @@ function loadDevelopmentManifest() {
 
   return {
     ...jsFiles,
-    'bundle.css': `${publicPath}${cssFilename}`,
+    'bundle.css': `${cleanedPath}${cssFilename}`,
   };
 }
 
