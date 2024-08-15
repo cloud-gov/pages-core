@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as utils from '../../util/reports';
+import * as datetime from '../../util/datetime';
 import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
 import BackToTopButton from './BackToTopButton';
@@ -8,7 +9,13 @@ import About from './about';
 
 export default function A11yScanChild({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${data.timestamp} for build id ${buildId}`;
+  const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${datetime.dateAndTimeSimple(data.timestamp)} for build id ${buildId}`;
+
+  const allResults = Object.values(data.groupedViolations).flat(1);
+  const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
+  // const suppressed = allResults.filter(ignoreFn);
+  const unsuppressed = allResults.filter(r => !ignoreFn(r));
+  const unsuppressedLocationCount = unsuppressed.map(i => i.total).reduce((a, b) => a + b, 0);
 
   const navGroups = [...utils.severity.a11y].map(group => ({
     ...group,
@@ -20,8 +27,12 @@ export default function A11yScanChild({ data, siteId, buildId }) {
   navGroups.push(
     // TODO: split into suppressed/unsuppressed items
     {
-      label: 'Total violations',
+      label: 'Total results',
       count: data?.violationsCount,
+    },
+    {
+      label: 'All unresolved results',
+      count: unsuppressed.length,
       boldMe: true,
     },
     {
@@ -38,7 +49,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
     <>
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
-          Accessibility scan results for
+          Accessibility scan report for
           {' '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">{data.url}</span>
@@ -52,32 +63,48 @@ export default function A11yScanChild({ data, siteId, buildId }) {
       <div className="grid-row border-top-1px padding-top-1">
         <section className="tablet:grid-col-auto">
           <ScanNav
-            generated={data.timestamp}
+            generated={datetime.dateAndTimeSimple(data.timestamp)}
             buildId={buildId}
+            siteId={siteId}
             groups={navGroups}
+            showBackButton
           />
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
-          <div className="margin-bottom-2">
-            <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
+          <div className="margin-bottom-2 margin-top-4">
             <section
               className={`usa-alert usa-alert--${data.violationsCount > 0 ? 'error' : 'success'}`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">
-                  We’ve found
-                  <b>
-                    {`
-                      ${data.violationsCount} ${utils.plural(data.violationsCount, 'issue')}
-                    `}
-                  </b>
-                  on this page.
+                  {unsuppressed.length > 0 && (
+                    <>
+                      We’ve found
+                      <b>
+                        {`
+                          ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unresolved issue')}
+                          in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')}
+                        `}
+                      </b>
+                      on this page.
+                    </>
+                  )}
+                  { (unsuppressed.length < 1 || allResults.length < 1) && (
+                    <>
+                      We’ve found
+                      <b>
+                        {` ${allResults.length} ${utils.plural(allResults.length, 'resolved result')} `}
+                      </b>
+                      for this site.
+                    </>
+                  )}
                 </p>
               </div>
             </section>
           </div>
           <div>
             <ScanFindings
+              siteId={siteId}
               scanType="a11y"
               count={data.violationsCount}
               groupedFindings={data.groupedViolations}
@@ -90,7 +117,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
               <p className="font-body-xs">
                 Scanned on
                 {' '}
-                {utils.timestampReadable(data.timestamp)}
+                {datetime.dateAndTimeSimple(data.timestamp)}
               </p>
               <p className="font-body-xs">
                 URL scanned:
@@ -131,7 +158,7 @@ const A11yPassed = ({ passes }) => (
         <thead>
           <tr>
             <th>Description</th>
-            <th className="text-right">Instances</th>
+            <th className="text-right">Places</th>
           </tr>
         </thead>
         <tbody>

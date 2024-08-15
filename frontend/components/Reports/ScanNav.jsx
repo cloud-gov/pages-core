@@ -1,8 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { plural } from '../../util/reports';
+import BackToIndexButton from './BackToIndexButton';
 
-const ScanNav = ({ groups, generated, buildId }) => (
+const ScanNav = ({
+  groups,
+  generated,
+  buildId,
+  siteId,
+  showBackButton = false,
+}) => (
   <nav className="sticky">
     <table className="width-full desktop:width-auto usa-table usa-table--compact usa-table--borderless summary-table">
       <caption className="usa-sr-only">Summary by severity</caption>
@@ -46,17 +54,18 @@ const ScanNav = ({ groups, generated, buildId }) => (
       </tbody>
     </table>
     <p className="font-body-3xs line-height-body-3 maxw-card-lg">
-      Scanned
+      Results for
+      {' '}
+      <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
+        build #
+        {buildId}
+      </Link>
+      {' '}
+      scanned on
       {' '}
       {generated}
-      {' '}
-      during Pages Build ID:
-      {' '}
-      <span className="font-mono-3xs">
-        #
-        {buildId}
-      </span>
     </p>
+    { showBackButton && <BackToIndexButton /> }
   </nav>
 );
 
@@ -64,7 +73,9 @@ ScanNav.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   groups: PropTypes.array.isRequired,
   generated: PropTypes.string.isRequired,
-  buildId: PropTypes.string.isRequired,
+  buildId: PropTypes.number.isRequired,
+  siteId: PropTypes.number.isRequired,
+  showBackButton: PropTypes.bool,
 };
 
 export default ScanNav;

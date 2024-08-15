@@ -54,6 +54,11 @@ hr {
   line-break: anywhere;
 }
 
+@media (max-width: 40em) {
+  td.text-right {
+    text-align: left;
+  }
+}
 @media (min-width: 40em) {
   .back-to-top {
     position: fixed;

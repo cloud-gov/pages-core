@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import ScanFinding from './ScanFinding';
 import { severity } from '../../util/reports';
 
-const ScanFindings = ({ count, groupedFindings, scanType }) => {
+const ScanFindings = ({
+  count,
+  groupedFindings,
+  scanType,
+  siteId,
+}) => {
   const groupKey = scanType === 'zap' ? 'riskCode' : 'name';
   if (count && groupedFindings) {
     return (
@@ -34,6 +39,7 @@ const ScanFindings = ({ count, groupedFindings, scanType }) => {
                         groupLabel={label}
                         groupIndex={groupIndex}
                         scanType={scanType}
+                        siteId={siteId}
                       />
                     ))}
                   </div>
@@ -51,8 +57,9 @@ const ScanFindings = ({ count, groupedFindings, scanType }) => {
 ScanFindings.propTypes = {
   count: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  groupedFindings: PropTypes.array.isRequired,
+  groupedFindings: PropTypes.object.isRequired,
   scanType: PropTypes.string.isRequired,
+  siteId: PropTypes.number.isRequired,
 };
 
 export default ScanFindings;

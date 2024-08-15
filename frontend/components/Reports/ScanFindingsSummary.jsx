@@ -14,25 +14,24 @@ function ScanFindingsSummaryTable({
     >
       <thead>
         <tr>
-          <th scope="col">{title}</th>
+          <th scope="col" className="width-full">{title}</th>
           {hasSuppressColumn && (<th scope="col" className="">Suppressed source</th>)}
-          <th scope="col" className="width-card">Severity</th>
-          <th scope="col" className="mobile-lg:text-right text-no-wrap width-10">Instances</th>
+          <th scope="col" className="text-no-wrap">Severity</th>
+          <th scope="col" className="text-right text-no-wrap">Places</th>
         </tr>
       </thead>
       <tbody>
         {findings.map(finding => (
-          <tr key={finding.ref}>
-            <th data-label="Result name" scope="row">
+          <tr key={finding.alertRef || finding.id}>
+            <th data-label={title} scope="row">
               <b className="usa-sr-only">
                 Result name:
                 <br />
               </b>
-              {/* this findingRef is broken */}
               {finding.ref && (
                 <a className="usa-link" href={finding.ref}>
                   {finding.name}
-&nbsp;
+                  &nbsp;
                   <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                     <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
                   </svg>
@@ -43,7 +42,7 @@ function ScanFindingsSummaryTable({
               )}
             </th>
             {hasSuppressColumn && (
-              <td data-label="Suppressed result" className="font-body-xs">
+              <td data-label="Suppressed source" className="font-body-xs">
                 {finding.ignore && (
                   <i className="text-no-wrap">
                     {'Suppressed by '}
@@ -52,7 +51,7 @@ function ScanFindingsSummaryTable({
                 )}
               </td>
             )}
-            <td data-label="Risk level" className="font-body-xs">
+            <td data-label="Severity Risk level" className="font-body-xs text-no-wrap">
               <b className="usa-sr-only">
                 Severity:
                 <br />
@@ -61,9 +60,9 @@ function ScanFindingsSummaryTable({
                 {finding.severity?.label}
               </span>
             </td>
-            <td data-label="Instances count" className="text-right">
+            <td data-label="Places count" className="text-right">
               <span className="usa-sr-only">
-                {plural(finding.count, 'location')}
+                {plural(finding.count, 'place')}
                 :
               </span>
               {finding.count}

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
+import { Link } from 'react-router-dom';
 
 import { plural } from '../../util/reports';
 
 const ScanFinding = ({
-  finding, groupColor, groupLabel, scanType = 'zap', index,
+  finding, groupColor, groupLabel, scanType = 'zap', index, siteId
 }) => {
   const { ignore, ignoreSource } = finding;
   let title = '';
@@ -18,9 +19,10 @@ const ScanFinding = ({
 
   if (scanType === 'zap') {
     ({
-      name: title, count, solution, descriptionHTML: description,
+      name: title, solution, description,
     } = finding);
     anchor = `finding-${finding.alertRef}`;
+    count = parseInt(finding.count, 10);
     locations = finding.instances || [];
     references = finding.referenceURLs || [];
   }
@@ -41,13 +43,17 @@ const ScanFinding = ({
         groupLabel={groupLabel}
         groupColor={groupColor}
         count={count}
-        ignore={ignore}
-        ignoreSource={ignoreSource}
         references={references}
         scanType={scanType}
       />
       <div className="maxw-tablet-lg">
-        <FindingDescription description={description} scanType={scanType} />
+        <FindingDescription
+          description={description}
+          scanType={scanType}
+          ignore={ignore}
+          ignoreSource={ignoreSource}
+          siteId={siteId}
+        />
         <FindingLocations anchor={anchor} scanType={scanType} locations={locations} />
         <FindingRecommendation solution={solution} anchor={anchor} scanType={scanType} />
         <FindingReferences references={references} />
@@ -64,6 +70,7 @@ ScanFinding.propTypes = {
   groupLabel: PropTypes.string,
   scanType: PropTypes.string,
   index: PropTypes.number,
+  siteId: PropTypes.number.isRequired,
 };
 
 const FindingTitle = ({
@@ -72,8 +79,6 @@ const FindingTitle = ({
   groupColor,
   count,
   references = [],
-  ignore = false,
-  ignoreSource = null,
   scanType,
 }) => (
   <div className="bg-white padding-top-05 sticky">
@@ -90,16 +95,9 @@ const FindingTitle = ({
       <b>
         {count}
         {' '}
-        {plural(count, 'location')}
+        {plural(count, 'place')}
       </b>
       {'. '}
-      {ignore && (
-      <i className="text-no-wrap">
-        {' (Note: This finding has been suppressed by '}
-        {ignoreSource || 'your configuration'}
-        {'.) '}
-      </i>
-      )}
       {scanType === 'a11y' && references.length > 0 && (
       <a href={references[0]} target="_blank" className="usa-link font-body-sm" aria-label="Learn more about this rule" rel="noreferrer">
         Learn more
@@ -120,23 +118,45 @@ FindingTitle.propTypes = {
   count: PropTypes.number,
   // eslint-disable-next-line react/forbid-prop-types
   references: PropTypes.array,
-  ignore: PropTypes.bool,
-  ignoreSource: PropTypes.string,
   scanType: PropTypes.string.isRequired,
 };
 
-// could be a slot
-const FindingDescription = ({ description, scanType }) => {
-  if (scanType === 'zap') {
-    // eslint-disable-next-line react/no-danger
-    <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3" dangerouslySetInnerHTML={{ __html: description }} />;
-  }
-  return <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">{description}</div>;
-};
+const FindingDescription = ({
+  description,
+  scanType,
+  siteId,
+  ignore = false,
+  ignoreSource = null,
+}) => (
+  <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
+    {ignore && (
+      <p className="text-no-wrap text-italic">
+        {' (Note: This finding has been suppressed by '}
+        {ignoreSource || 'your configuration'}
+        { !ignoreSource && (
+          <>
+            . Review the criteria you suppress for these reports in your
+            {' '}
+            <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
+          </>
+        )}
+        {'.) '}
+      </p>
+    )}
+    { scanType === 'zap' && (
+      // eslint-disable-next-line react/no-danger
+      <span dangerouslySetInnerHTML={{ __html: description }} />
+    )}
+    { scanType !== 'zap' && description }
+  </div>
+);
 
 FindingDescription.propTypes = {
   description: PropTypes.string.isRequired,
   scanType: PropTypes.string.isRequired,
+  ignore: PropTypes.bool,
+  ignoreSource: PropTypes.string,
+  siteId: PropTypes.number.isRequired,
 };
 
 const FindingRecommendation = ({ anchor, solution, scanType }) => (
@@ -160,7 +180,7 @@ const FindingRecommendation = ({ anchor, solution, scanType }) => (
     <>
       {solution.split('\n\n').map((fixList, listindex) => (
         // eslint-disable-next-line react/no-array-index-key
-        <div key={listindex}>
+        <div key={`${anchor}-location-${listindex}`}>
           {fixList.split('\n').map((str, i) => (
             i === 0 ? (
             // <a id={`${group}-violation-${index + 1}-element-${nodeindex + 1}-fix-${listindex}`}>
@@ -222,7 +242,7 @@ FindingReference.propTypes = { url: PropTypes.string.isRequired };
 const FindingLocations = ({ locations, anchor, scanType }) => (
   <>
     <h3 className="font-body-md margin-y-2">
-      Evidence for this finding was identified:
+      Evidence for this result was identified:
     </h3>
     <ol>
       {locations.map((location, locationIndex) => {
@@ -231,7 +251,7 @@ const FindingLocations = ({ locations, anchor, scanType }) => (
         const target = scanType === 'zap' ? location.param : location.target;
         const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
         return (
-          <li className="margin-bottom-5 margin-left-2 font-mono-md">
+          <li key={locationAnchor} className="margin-bottom-5 margin-left-2 font-mono-md">
             {/* TODO: Review this one */}
             {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
             <a id={locationAnchor} href={`#${locationAnchor}`} label="anchor" />

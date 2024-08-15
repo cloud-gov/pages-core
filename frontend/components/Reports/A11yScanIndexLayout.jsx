@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import * as utils from '../../util/reports';
+import * as datetime from '../../util/datetime';
 
 import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
-import ScanAlert from './ScanAlert';
 
 export default function A11yScanIndex({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages | ${scanTitle} scan report for ${data.baseurl} on UNKNOWN DATE for build id ${buildId}`;
+  const pageTitle = `Pages | ${scanTitle} scans report index for ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)} for build id #${buildId}`;
   const { id } = useParams();
   const reportId = parseInt(id, 10);
 
@@ -34,7 +34,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
     <>
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
-          Accessibility scan results for
+          Accessibility scan reports for
           {' '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-05 narrow-mono display-inline-block">
@@ -51,14 +51,35 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col border-top-1px">
-          <h2 className="font-heading-xl margin-bottom-1 margin-top-3">Scan results summary</h2>
-          <ScanAlert
-            totalFound={data.violatedRules.length}
-            totalLocations={data.totalViolationsCount}
-            totalUrls={data.totalPageCount}
+          <section
+            className={`margin-top-4 usa-alert usa-alert--${data.violatedRules.length > 0 ? 'error' : 'success'}`}
           >
-            View each scan results page for specific details.
-          </ScanAlert>
+            <div className="usa-alert__body">
+              <p className="usa-alert__text">
+                {unsuppressed.length > 0 && (
+                  <>
+                    We’ve found
+                    <b>
+                      {`
+                        ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unresolved issue')}
+                        in ${data.totalViolationsCount} ${utils.plural(data.totalViolationsCount, 'place')}
+                      `}
+                    </b>
+                    for this site.  View each page report below for specific details.
+                  </>
+                )}
+                { (unsuppressed.length < 1 || summarizedResults.length < 1) && (
+                  <>
+                    We’ve found
+                    <b>
+                      {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'resolved or informational result')} `}
+                    </b>
+                    for this site.
+                  </>
+                )}
+              </p>
+            </div>
+          </section>
         </div>
       </div>
       <div className="grid-row">
@@ -99,6 +120,19 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
             baseurl={data.baseurl}
             reportId={reportId}
           />
+          <p className="font-body-2xs line-height-body-3">
+            Results for
+            {' '}
+            <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
+              build #
+              {buildId}
+            </Link>
+            {' '}
+            scanned on
+            {' '}
+            {datetime.dateAndTimeSimple(data.reportPages[0].timestamp)}
+            .
+          </p>
         </div>
       </div>
       <div className="grid-row">
@@ -142,13 +176,13 @@ IssuesCount.propTypes = {
 };
 
 const ScanResultsChildPages = ({ pages, reportId }) => (
-  <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Scan results list with links to detailed reports">
+  <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Scan reports list with links to detailed reports">
     <thead>
       <tr>
-        <th scope="col">Scanned URL</th>
+        <th scope="col" className="width-full">Scanned URL</th>
         <th scope="col" className="text-no-wrap width-10"><span className="usa-sr-only">Open URL in new window</span></th>
-        <th scope="col" className="text-no-wrap width-15 desktop:width-card-lg">Issues found</th>
-        <th scope="col" className="text-right text-no-wrap width-10">Scan results</th>
+        <th scope="col" className="text-no-wrap">Issues found</th>
+        <th scope="col" className="text-right text-no-wrap">Scan results</th>
       </tr>
     </thead>
     <tbody>
@@ -191,8 +225,8 @@ const ScanResultsChildPages = ({ pages, reportId }) => (
             {page.failed ? (
               <span className="text-bold text-error-dark">Scan failed</span>
             ) : (
-              <Link className="usa-link text-bold font-body-xs text-no-wrap" to={`/report/${reportId}/${page.path}`} title={`Full results for ${page.absoluteURL}`} aria-label={`Full results for dot slash ${page.path},`}>
-                View page results
+              <Link className="usa-link text-bold font-body-xs text-no-wrap" to={`/report/${reportId}/${page.path}/`} title={`Full results for ${page.absoluteURL}`} aria-label={`Full results for dot slash ${page.path},`}>
+                View page report
               </Link>
             )}
           </td>

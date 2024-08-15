@@ -87,9 +87,3 @@ export function getSeverityThemeToken(lookup, theme = 'zap') {
 export function plural(count, name) {
   return `${name}${count > 1 ? 's' : ''}`;
 }
-export function timestampReadable(timestamp) {
-  return new Intl.DateTimeFormat('en-us', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-  }).format(new Date(timestamp));
-}

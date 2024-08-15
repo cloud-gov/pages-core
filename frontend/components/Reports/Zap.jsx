@@ -41,6 +41,8 @@ export default function Zap({ data, buildId, siteId }) {
   const suppressed = summarizedResults.filter(ignoreFn);
   const unsuppressed = summarizedResults.filter(r => !ignoreFn(r));
 
+  const unsuppressedLocationCount = unsuppressed.map(i => i.count).reduce((a, b) => a + b, 0);
+
   useEffect(() => {
     document.title = pageTitle;
   }, []);
@@ -50,7 +52,7 @@ export default function Zap({ data, buildId, siteId }) {
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
           {scanTitle}
-          {' scan results for '}
+          {' scan report for '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
             {data.site['@name']}
@@ -78,12 +80,12 @@ export default function Zap({ data, buildId, siteId }) {
           <ScanNav
             generated={data.generated}
             buildId={buildId}
+            siteId={siteId}
             groups={navGroups}
           />
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
-          <div>
-            <h2 className="font-heading-xl margin-bottom-2 margin-top-3">Scan results summary</h2>
+          <div className="margin-top-4">
             <section
               className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
             >
@@ -93,10 +95,9 @@ export default function Zap({ data, buildId, siteId }) {
                     <>
                       We’ve found
                       <b>
-                        {` ${unsuppressed.length} ${plural(unsuppressed.length, 'unresolved issue')} `}
+                        {` ${unsuppressed.length} ${plural(unsuppressed.length, 'unresolved issue')} in ${unsuppressedLocationCount} ${plural(unsuppressedLocationCount, 'place')} `}
                       </b>
-                      out of
-                      {` ${summarizedResults.length} ${plural(summarizedResults.length, 'total result')} for this site. `}
+                      across this site.
                     </>
                   )}
                   { (unsuppressed.length < 1 || summarizedResults.length < 1) && (
@@ -117,6 +118,7 @@ export default function Zap({ data, buildId, siteId }) {
               unsuppressedFindings={unsuppressed}
             />
             <ScanFindings
+              siteId={siteId}
               scanType="zap"
               count={data.site.alerts.length}
               groupedFindings={data.site.groupedAlerts}

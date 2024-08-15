@@ -13,11 +13,11 @@ export default function About({ scanType, siteId, children }) {
       <div className="font-body-md line-height-body-5">
         { scanType === 'zap' ? <ZapAbout /> : <A11yAbout /> }
         <p>
-          Pages will automatically suppress certain findings
-          which are irrelevant for statically hosted websites or frequently produce ‘false
-          positive’ findings for our customers.  While still visible in the report, the suppressed
-          findings don’t count towards your total issue count. Customers can specify additional
-          findings to be suppressed in future scans for this site in your Pages
+          Pages will automatically suppress certain results
+          which are irrelevant for statically hosted websites or frequently produce “false
+          positives” for our customers.  While still visible in the report, the suppressed
+          results don’t count towards your total issue count. Customers can specify additional
+          criteria to be suppressed in future scans for this site in your Pages
           {' '}
           <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
           .
