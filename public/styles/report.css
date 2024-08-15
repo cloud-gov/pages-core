@@ -243,3 +243,20 @@ a.bg-risk-other:hover  { background: #565c65}
     line-break: anywhere;
   }
 }
+
+
+@media print {
+  html {
+    font-size: 10px;
+  }
+  .grid-container, .usa-alert__body {
+    max-width: unset !important;
+  }
+  @page {
+    margin: 1cm;
+  }
+  .sticky {
+    position: unset !important;
+  }
+
+}
