@@ -128,18 +128,11 @@ const FindingDescription = ({
   ignore = false,
   ignoreSource = null,
 }) => (
-  <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
+  <div className="usa-prose font-serif-xs margin-y-3">
     {ignore && (
-      <p className="text-no-wrap text-italic">
-        {' (Note: This finding has been suppressed by '}
-        {ignoreSource || 'your configuration'}
-        { !ignoreSource && (
-          <>
-            . Review the criteria you suppress for these reports in your
-            {' '}
-            <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
-          </>
-        )}
+      <p className="text-italic">
+        {`(Note: This finding has been suppressed by ${ignoreSource || 'an existing scan configuration'}. This is common for results that have been previously identified as a false positive. You can review the scan rules and criteria that are suppressed during report generation in your `}
+        <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Scan Configuration</Link>
         {'.) '}
       </p>
     )}

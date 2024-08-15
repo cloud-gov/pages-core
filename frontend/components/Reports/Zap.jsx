@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import About from './about';
 import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
-import { severity, getSeverityThemeToken, plural } from '../../util/reports';
+import * as utils from '../../util/reports';
 
 export default function Zap({ data, buildId, siteId }) {
   const scanTitle = 'Vulnerability';
   const pageTitle = `Pages | ${scanTitle} scan report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
 
-  const navGroups = [...severity.zap].map(group => ({
+  const navGroups = [...utils.severity.zap].map(group => ({
     ...group,
     usePill: true,
     count: data.site.groupedAlerts[group?.riskCode].length || 0,
@@ -24,7 +25,7 @@ export default function Zap({ data, buildId, siteId }) {
       count: data.site.alerts?.length,
     },
     {
-      label: 'All unresolved results',
+      label: 'All unsuppressed results',
       count: data.site?.issueCount,
       boldMe: true,
     }
@@ -33,7 +34,7 @@ export default function Zap({ data, buildId, siteId }) {
   const summarizedResults = [...data.site.alerts].map(result => ({
     ...result,
     anchor: result.alertRef,
-    severity: getSeverityThemeToken(result.riskcode, 'zap'),
+    severity: utils.getSeverityThemeToken(result.riskcode, 'zap'),
     count: result.instances.length,
   }));
 
@@ -95,7 +96,7 @@ export default function Zap({ data, buildId, siteId }) {
                     <>
                       We’ve found
                       <b>
-                        {` ${unsuppressed.length} ${plural(unsuppressed.length, 'unresolved issue')} in ${unsuppressedLocationCount} ${plural(unsuppressedLocationCount, 'place')} `}
+                        {` ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed results')} in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')} `}
                       </b>
                       across this site.
                     </>
@@ -104,7 +105,7 @@ export default function Zap({ data, buildId, siteId }) {
                     <>
                       We’ve found
                       <b>
-                        {` ${summarizedResults.length} ${plural(summarizedResults.length, 'resolved or informational result')} `}
+                        {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'suppressed or informational result')} `}
                       </b>
                       for this site.
                     </>
@@ -124,7 +125,22 @@ export default function Zap({ data, buildId, siteId }) {
               groupedFindings={data.site.groupedAlerts}
             />
           </div>
-          <About scanType="zap" siteId={siteId} />
+          <About scanType="zap" siteId={siteId}>
+            <p className="font-body-xs line-height-body-3">
+              This report was generated for
+              {' '}
+              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.site['@name']}</code>
+              {' from '}
+              <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
+                build #
+                {buildId}
+              </Link>
+              {' '}
+              scanned on
+              {' '}
+              {data.generated}
+            </p>
+          </About>
         </div>
       </div>
       <BackToTopButton />

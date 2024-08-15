@@ -82,8 +82,8 @@ ScanFindingsSummaryTable.propTypes = {
 
 const ScanFindingsSummary = ({ suppressedFindings, unsuppressedFindings, scanType }) => (
   <>
-    <ScanFindingsSummaryTable theme={scanType} title="Unresolved results" findings={unsuppressedFindings} />
-    <ScanFindingsSummaryTable theme={scanType} title="Resolved or informational results" findings={suppressedFindings} hasSuppressColumn />
+    <ScanFindingsSummaryTable theme={scanType} title="Unsuppressed results" findings={unsuppressedFindings} />
+    <ScanFindingsSummaryTable theme={scanType} title="Suppressed or informational results" findings={suppressedFindings} hasSuppressColumn />
   </>
 );
 

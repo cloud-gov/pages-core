@@ -52,31 +52,21 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col border-top-1px">
           <section
-            className={`margin-top-4 usa-alert usa-alert--${data.violatedRules.length > 0 ? 'error' : 'success'}`}
+            className={`margin-top-4 usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
           >
             <div className="usa-alert__body">
               <p className="usa-alert__text">
-                {unsuppressed.length > 0 && (
-                  <>
-                    We’ve found
-                    <b>
-                      {`
-                        ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unresolved issue')}
-                        in ${data.totalViolationsCount} ${utils.plural(data.totalViolationsCount, 'place')}
-                      `}
-                    </b>
-                    for this site.  View each page report below for specific details.
-                  </>
-                )}
-                { (unsuppressed.length < 1 || summarizedResults.length < 1) && (
-                  <>
-                    We’ve found
-                    <b>
-                      {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'resolved or informational result')} `}
-                    </b>
-                    for this site.
-                  </>
-                )}
+                We’ve found
+                <b>
+                  {`
+                    ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')}
+                  `}
+                </b>
+                and
+                <b>
+                  {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'suppressed or informational result')} `}
+                </b>
+                for this site.  View each page report below for specific details.
               </p>
             </div>
           </section>
@@ -85,7 +75,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col">
           <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-4">
-            All issues found
+            All results
             {' '}
             <span className="font-body-lg text-secondary-vivid">
               (
@@ -103,7 +93,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col">
           <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-1">
-            All pages scanned
+            All reports
             {' '}
             <span className="font-body-lg text-accent-cool-darker">
               (
@@ -121,7 +111,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
             reportId={reportId}
           />
           <p className="font-body-2xs line-height-body-3">
-            Results for
+            This report was generated for
             {' '}
             <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
               build #
@@ -137,7 +127,22 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <About scanType="a11y" siteId={siteId} />
+          <About scanType="a11y" siteId={siteId}>
+            <p className="font-body-xs line-height-body-3">
+              This report was generated for
+              {' '}
+              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.baseurl}</code>
+              {' from '}
+              <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
+                build #
+                {buildId}
+              </Link>
+              {' '}
+              scanned on
+              {' '}
+              {datetime.dateAndTimeSimple(data.reportPages[0].timestamp)}
+            </p>
+          </About>
         </div>
       </div>
     </>
@@ -181,8 +186,8 @@ const ScanResultsChildPages = ({ pages, reportId }) => (
       <tr>
         <th scope="col" className="width-full">Scanned URL</th>
         <th scope="col" className="text-no-wrap width-10"><span className="usa-sr-only">Open URL in new window</span></th>
-        <th scope="col" className="text-no-wrap">Issues found</th>
-        <th scope="col" className="text-right text-no-wrap">Scan results</th>
+        <th scope="col" className="text-no-wrap">Results found</th>
+        <th scope="col" className="text-right text-no-wrap">Page-level results</th>
       </tr>
     </thead>
     <tbody>
@@ -214,14 +219,14 @@ const ScanResultsChildPages = ({ pages, reportId }) => (
             </a>
             )}
           </td>
-          <td data-label="Issues count" className="font-body-xs text-no-wrap">
+          <td data-label="Results count" className="font-body-xs text-no-wrap">
             <b className="usa-sr-only">
-              Issues:
+              Results:
               <br />
             </b>
             <IssuesCount {...page} />
           </td>
-          <td data-label="Scan results" className="text-right">
+          <td data-label="Page-level results" className="text-right">
             {page.failed ? (
               <span className="text-bold text-error-dark">Scan failed</span>
             ) : (

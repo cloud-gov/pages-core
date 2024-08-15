@@ -54,7 +54,7 @@ const ScanNav = ({
       </tbody>
     </table>
     <p className="font-body-3xs line-height-body-3 maxw-card-lg">
-      Results for
+      This report was generated for
       {' '}
       <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
         build #

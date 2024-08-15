@@ -243,7 +243,7 @@ function ScanConfigs({ siteId: id }) {
             >
               documentation
             </a>
-            . If you’d like to suggest a rule to be suppressed due to false positives,
+            . If you’d like to suggest a rule to be suppressed due to “false positives”,
             {' '}
             <a href="mailto:pages-support@cloud.gov" target="_blank" rel="noopener noreferrer" title="Email Pages Support at pages-support@cloud.gov">let us know</a>
             .

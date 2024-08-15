@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import * as utils from '../../util/reports';
 import * as datetime from '../../util/datetime';
 import ScanNav from './ScanNav';
@@ -31,7 +32,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
       count: data?.violationsCount,
     },
     {
-      label: 'All unresolved results',
+      label: 'All unsuppressed results',
       count: unsuppressed.length,
       boldMe: true,
     },
@@ -73,7 +74,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
         <div className="tablet:grid-col tablet:margin-left-4">
           <div className="margin-bottom-2 margin-top-4">
             <section
-              className={`usa-alert usa-alert--${data.violationsCount > 0 ? 'error' : 'success'}`}
+              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">
@@ -82,20 +83,20 @@ export default function A11yScanChild({ data, siteId, buildId }) {
                       We’ve found
                       <b>
                         {`
-                          ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unresolved issue')}
+                          ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')}
                           in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')}
                         `}
                       </b>
                       on this page.
                     </>
                   )}
-                  { (unsuppressed.length < 1 || allResults.length < 1) && (
+                  { (unsuppressed.length < 1) && (
                     <>
                       We’ve found
                       <b>
-                        {` ${allResults.length} ${utils.plural(allResults.length, 'resolved result')} `}
+                        {` ${unsuppressed.length} unsuppressed results `}
                       </b>
-                      for this site.
+                      on this page.
                     </>
                   )}
                 </p>
@@ -114,15 +115,19 @@ export default function A11yScanChild({ data, siteId, buildId }) {
             <A11yPassed passes={data.passes} />
             <hr />
             <About scanType="a11y" siteId={siteId}>
-              <p className="font-body-xs">
-                Scanned on
+              <p className="font-body-xs line-height-body-3">
+                This report was generated for
+                {' '}
+                <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.url}</code>
+                {' from '}
+                <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
+                  build #
+                  {buildId}
+                </Link>
+                {' '}
+                scanned on
                 {' '}
                 {datetime.dateAndTimeSimple(data.timestamp)}
-              </p>
-              <p className="font-body-xs">
-                URL scanned:
-                {' '}
-                <code className="narrow-mono">{data.url}</code>
               </p>
             </About>
           </div>

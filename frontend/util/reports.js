@@ -85,5 +85,5 @@ export function getSeverityThemeToken(lookup, theme = 'zap') {
 }
 
 export function plural(count, name) {
-  return `${name}${count > 1 ? 's' : ''}`;
+  return `${name}${count !== 1 ? 's' : ''}`;
 }
