@@ -17,7 +17,7 @@ function ScanFindingsSummaryTable({
           <th scope="col" className="width-full">{title}</th>
           {hasSuppressColumn && (<th scope="col" className="">Suppressed source</th>)}
           <th scope="col" className="text-no-wrap">Severity</th>
-          <th scope="col" className="text-right text-no-wrap">Places</th>
+          <th scope="col" className="text-right text-no-wrap">Places found</th>
         </tr>
       </thead>
       <tbody>
@@ -28,7 +28,8 @@ function ScanFindingsSummaryTable({
                 Result name:
                 <br />
               </b>
-              {finding.ref && (
+              { !finding.anchor && (finding.name)}
+              {/* {finding.ref && (
                 <a className="usa-link" href={finding.ref}>
                   {finding.name}
                   &nbsp;
@@ -36,7 +37,7 @@ function ScanFindingsSummaryTable({
                     <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
                   </svg>
                 </a>
-              )}
+              )} */}
               {finding.anchor && (
                 <a className="usa-link" href={`#finding-${finding.anchor}`}>{finding.name}</a>
               )}
@@ -60,10 +61,10 @@ function ScanFindingsSummaryTable({
                 {finding.severity?.label}
               </span>
             </td>
-            <td data-label="Places count" className="text-right">
+            <td data-label="Places found count" className="text-right">
               <span className="usa-sr-only">
                 {plural(finding.count, 'place')}
-                :
+                found:
               </span>
               {finding.count}
             </td>

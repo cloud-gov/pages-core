@@ -30,13 +30,13 @@ const scanResultsIcon = (status, count) => {
     case 'success':
       if (count === 1) {
         icon = IconExclamationCircle;
-        results = '1 issue';
+        results = '1 issue found';
       } else if (count > 1) {
         icon = IconExclamationCircle;
-        results = `${count} issues`;
+        results = `${count} issues found`;
       } else {
         icon = IconCheckCircle;
-        results = 'No issues';
+        results = 'No issues found';
       }
       break;
     default:

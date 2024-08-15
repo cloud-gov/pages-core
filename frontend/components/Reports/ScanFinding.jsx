@@ -235,9 +235,9 @@ FindingReference.propTypes = { url: PropTypes.string.isRequired };
 const FindingLocations = ({ locations, anchor, scanType }) => (
   <>
     <h3 className="font-body-md margin-y-2">
-      Evidence for this result was identified:
+      Evidence for this result was found:
     </h3>
-    <ol>
+    <ol className="padding-left-3">
       {locations.map((location, locationIndex) => {
         const { uri: url, otherInfo } = location;
         const evidence = scanType === 'zap' ? location.evidence : location.html;

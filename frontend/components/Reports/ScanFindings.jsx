@@ -18,7 +18,7 @@ const ScanFindings = ({
             <React.Fragment key={group}>
               {groupedFindings[group] && groupedFindings[group].length > 0 && (
                 <>
-                  <h2 className="font-heading-xl margin-bottom-1 margin-top-4" id={`${label}-findings`}>
+                  <h2 className="font-heading-xl margin-bottom-1 padding-top-2 margin-top-2" id={`${label}-findings`}>
                     {label}
                     {' '}
                     findings

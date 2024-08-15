@@ -96,7 +96,7 @@ export default function Zap({ data, buildId, siteId }) {
                     <>
                       We’ve found
                       <b>
-                        {` ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed results')} in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')} `}
+                        {` ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')} in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')} `}
                       </b>
                       across this site.
                     </>

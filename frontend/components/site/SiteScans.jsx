@@ -88,9 +88,7 @@ function SiteScans() {
                         <th scope="row">
                           <h4>{task.name}</h4>
                           <p>
-                            {`${task.description} `}
-                            <br />
-                            {'For more information, refer to the '}
+                            {`${task.description} For more information, refer to the `}
                             <Link to={task.url}>documentation</Link>
                             .
                           </p>
@@ -151,11 +149,9 @@ function SiteScans() {
                     <tr key={scan.id}>
                       <th scope="row" data-title="Scan">
                         <div className="scan-info">
-                          <Link reloadDocument to={`/report/${scan.id}`}>
-                            <h3 className="scan-info-name">
-                              { scan.BuildTaskType.name }
-                            </h3>
-                          </Link>
+                          <h3 className="scan-info-name">
+                            { scan.BuildTaskType.name }
+                          </h3>
                           {scan.createdAt && (
                             <p>
                               For
@@ -196,24 +192,17 @@ function SiteScans() {
                       </td>
                       <td data-title="Results" className="scan-results">
                         <ScanResultsSummary status={scan.status} count={scan.count}>
-                          { scan.artifact?.url && (
-                          <>
+                          { (scan.artifact || parseInt(scan.count, 10) > -1) && (
                             <Link
-                              to={scan.artifact?.url}
-                              title={'Download scan results for ' && scan.BuildTaskType.name}
+                              reloadDocument
+                              to={`/report/${scan.id}`}
+                              title={'View scan results for ' && scan.BuildTaskType.name}
                               className="artifact-filename"
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              Download results
+                              View full results
                             </Link>
-                            {' '}
-                            <span className="artifact-filesize">
-                              (
-                              { prettyBytes(scan.artifact?.size) }
-                              )
-                            </span>
-                          </>
                           )}
                         </ScanResultsSummary>
                       </td>

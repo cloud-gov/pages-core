@@ -163,7 +163,7 @@ const A11yPassed = ({ passes }) => (
         <thead>
           <tr>
             <th>Description</th>
-            <th className="text-right">Places</th>
+            <th className="text-right">Places found</th>
           </tr>
         </thead>
         <tbody>

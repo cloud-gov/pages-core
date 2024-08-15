@@ -64,7 +64,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
                 </b>
                 and
                 <b>
-                  {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'suppressed or informational result')} `}
+                  {` ${suppressed.length} ${utils.plural(suppressed.length, 'suppressed or informational result')} `}
                 </b>
                 for this site.  View each page report below for specific details.
               </p>
@@ -74,7 +74,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-4">
+          <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 padding-top-2 margin-top-2">
             All results
             {' '}
             <span className="font-body-lg text-secondary-vivid">
