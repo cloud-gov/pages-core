@@ -50,6 +50,9 @@ hr {
   border: none;
 }
 
+ol li::marker {
+  font-family: 'Roboto Mono Web', 'Bitstream Vera Sans Mono',Consolas,Courier,monospace;
+}
 .break-anywhere {
   line-break: anywhere;
 }

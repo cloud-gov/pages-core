@@ -1,10 +1,9 @@
+/* eslint-disable max-len */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 export default function About({ scanType, siteId, children }) {
-  const poweredBy = scanType === 'zap' ? 'ZAP' : 'axe-core';
-
   return (
     <section className="usa-prose margin-y-4 maxw-tablet-lg">
       <h2>
@@ -12,6 +11,7 @@ export default function About({ scanType, siteId, children }) {
       </h2>
       <div className="font-body-md line-height-body-5">
         { scanType === 'zap' ? <ZapAbout /> : <A11yAbout /> }
+        <h3>Suppressed results</h3>
         <p>
           Pages may automatically suppress certain results
           which are irrelevant for statically hosted websites or frequently produce “false
@@ -60,6 +60,74 @@ const ZapAbout = () => (
       opportunities, cross-site scripting (XSS) flaws, and the use of components with known
       vulnerabilities.
     </p>
+    <h3>Result severity level</h3>
+    <p>
+      The ZAP scan follows the OWASP Risk Rating Methodology to estimate the severity of results based on the likelyhood and impact of these common vulnerabilities.  In any given situation, the actual cybersecurity threat could be lower or higher. It’s essential for agencies to evaluate each individual result and assess the actual risk in the context of their websites and organization. Although these are general guidelines,&nbsp;
+      <a
+        href="https://owasp.org/www-community/OWASP_Risk_Rating_Methodology"
+        target="_blank"
+        className="usa-link"
+        rel="noreferrer"
+      >
+        determining risk is subjective
+      </a>
+      &nbsp;and agency website maintainers, rather than OWASP or Pages, are best positioned to decide how to triage and address the results.&nbsp;
+    </p>
+    <table className="usa-table usa-table--borderless ">
+      <thead>
+        <tr>
+          <th scope="col">Severity</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tr>
+        <th scope="row">
+          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-high margin-0 display-inline">High risk</span>
+        </th>
+        <td>
+          High severity vulnerabilities usually pose a significant risk to application security or can be easily exploited, leading to critical consequences such as unauthorized access, data loss, or system compromise.
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-medium margin-0 display-inline">Medium risk</span>
+        </th>
+        <td>
+          Medium severity vulnerabilities may expose the application to serious risks such as sensitive data exposure or unauthorized actions by malicious actors, due to the ease of exploitation or sophistication of the attack.
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-low margin-0 display-inline">Low risk</span>
+        </th>
+        <td>
+          Low severity vulnerabilities present clear risk to the security of the web application but may not have a catastrophic impact on overall security or may be more difficult (but not impossible) to exploit.
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Informational</span>
+        </th>
+        <td>
+          Informational findings provide insights or about the configuration, architecture, behavior, and exploitability of the web application, but do not directly indicate any security vulnerabilities.
+        </td>
+      </tr>
+    </table>
+
+    <p>
+      More information about the mechanism powering this scan is available in the
+      {' '}
+      <a
+        href="https://www.zaproxy.org/docs/"
+        target="_blank"
+        className="usa-link"
+        rel="noreferrer"
+      >
+        ZAP scan documentation
+      </a>
+      .
+    </p>
+    <hr />
   </>
 );
 
@@ -101,20 +169,6 @@ const A11yAbout = () => {
         ))}
       </ul>
       <p>
-        Descriptions of the rulesets are available in the
-        {' '}
-        <a
-          href="https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md#rule-descriptions"
-          target="_blank"
-          className="usa-link"
-          rel="noreferrer"
-        >
-          axe-core documentation
-        </a>
-        .
-      </p>
-
-      <p>
         This scan uses the open source axe-core project to identify common violations.
         With axe-core, you may expect to find a little over 55% of WCAG issues automatically.
         Please remember that
@@ -124,6 +178,77 @@ const A11yAbout = () => {
         and usability testing with people with disabilities, as well as testing with users of
         adaptive technologies.
       </p>
+      <h3>Result severity level</h3>
+      <p>
+        Axe-core distinguishes the severity of results by the likely impact of the issue on a user with a relevant disability. In any given situation, the actual, experienced impact for a user could be lower or higher. It’s essential for agencies to evaluate each individual result and assess the actual impact in the context of their website or content. The given severity levels are&nbsp;
+        <a
+          href="https://github.com/dequelabs/axe-core/blob/develop/doc/issue_impact.md"
+          target="_blank"
+          className="usa-link"
+          rel="noreferrer"
+        >
+          defined by axe-core
+        </a>
+        , not Pages, but may prove useful in triaging and addressing the results.&nbsp;
+        <b>
+          Regardless of the severity, every result is an accessibility challenge that can and should be remediated by the website maintainer.
+        </b>
+      </p>
+      <table className="usa-table usa-table--borderless ">
+        <thead>
+          <tr>
+            <th scope="col">Severity</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-high margin-0 display-inline">Critical</span>
+          </th>
+          <td>
+            A “Critical” result indicates an issue that may entirely block access to the website content or controls for people with disabilities, prohibiting users from accomplishing fundamental tasks.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-medium margin-0 display-inline">Serious</span>
+          </th>
+          <td>
+            A “Serious” result indicates an issue that may present a significant, frustrating barrier for people with disabilities by interfering with or fully prohibiting access to fundamental features or content. These results often cause users of assistive technologies to abandon essential workflows.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-low margin-0 display-inline">Moderate</span>
+          </th>
+          <td>
+            A “Moderate” result likely indicates an issue that presents some frustration and difficulty for people with disabilities. Although such issues may not prohibit users from accessing fundamental features or content, these results often cause users of assistive technologies to abandon non-critical workflows.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Minor</span>
+          </th>
+          <td>
+            A “Minor” result indicates a nuisance that introduces minor difficulty for people with disabilities. These issues oft4en produce a frustrating, though ultimately functional, experience for users.
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        More information about the mechanism powering this scan is available in the
+        {' '}
+        <a
+          href="https://github.com/dequelabs/axe-core/blob/develop/doc/"
+          target="_blank"
+          className="usa-link"
+          rel="noreferrer"
+        >
+          axe-core documentation
+        </a>
+        .
+      </p>
+      <hr />
     </>
   );
 };

@@ -128,19 +128,21 @@ const FindingDescription = ({
   ignore = false,
   ignoreSource = null,
 }) => (
-  <div className="usa-prose font-serif-xs margin-y-3">
+  <div className="margin-y-3">
     {ignore && (
-      <p className="text-italic">
-        {`(Note: This finding has been suppressed by ${ignoreSource || 'an existing scan configuration'}. This is common for results that have been previously identified as a false positive. You can review the scan rules and criteria that are suppressed during report generation in your `}
-        <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Scan Configuration</Link>
-        {'.) '}
-      </p>
+      <div className="usa-prose font-serif-xs">
+        <p className="text-italic">
+          {`(Note: This finding has been suppressed by ${ignoreSource || 'an existing scan configuration'}. This is common for results that have been previously identified as a false positive. You can review the scan rules and criteria that are suppressed during report generation in your `}
+          <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Scan Configuration</Link>
+          {'.) '}
+        </p>
+      </div>
     )}
     { scanType === 'zap' && (
       // eslint-disable-next-line react/no-danger
-      <span dangerouslySetInnerHTML={{ __html: description }} />
+      <div className="usa-prose font-serif-xs" dangerouslySetInnerHTML={{ __html: description }} />
     )}
-    { scanType !== 'zap' && description }
+    { scanType !== 'zap' && <div className="usa-prose font-serif-xs"><p>{description}</p></div> }
   </div>
 );
 
@@ -240,7 +242,7 @@ const FindingLocations = ({ locations, anchor, scanType }) => (
     <ol className="padding-left-3">
       {locations.map((location, locationIndex) => {
         const { uri: url, otherInfo } = location;
-        const evidence = scanType === 'zap' ? location.evidence : location.html;
+        const code = scanType === 'zap' ? location.evidence : location.html;
         const target = scanType === 'zap' ? location.param : location.target;
         const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
         return (
@@ -253,8 +255,8 @@ const FindingLocations = ({ locations, anchor, scanType }) => (
               <FindingLocationURL url={url} />
             </h4>
             )}
+            {code && <FindingLocationEvidence code={code} />}
             {target && <FindingLocationTarget target={target} />}
-            {evidence && <FindingLocationEvidence evidence={evidence} />}
             {otherInfo && (
             <p className="font-body-sm padding-bottom-2 border-bottom-1px">
               Additional info:
@@ -295,7 +297,7 @@ FindingLocationURL.propTypes = {
 
 const FindingLocationTarget = ({ target }) => (
   <>
-    <h5 className="margin-bottom-2 font-body-sm text-normal">For this target:</h5>
+    <h5 className="margin-bottom-2 margin-top-0 font-body-sm text-normal">Related to this element:</h5>
     <code className="css text-normal narrow-mono font-mono-sm line-height-mono-4 bg-accent-warm-lighter padding-05 break-anywhere">
       {target}
     </code>
@@ -306,17 +308,17 @@ FindingLocationTarget.propTypes = {
   target: PropTypes.string.isRequired,
 };
 
-const FindingLocationEvidence = ({ evidence }) => (
+const FindingLocationEvidence = ({ code }) => (
   <>
-    <h5 className="margin-bottom-0 margin-top-2 font-body-sm text-normal">Within this fragment:</h5>
+    <h5 className="margin-bottom-0 margin-top-3 font-body-sm text-normal">Within this code:</h5>
     <Highlight className="html text-wrap width-full font-mono-xs line-height-mono-4 narrow-mono padding-2 display-inline-block">
-      {evidence}
+      {code}
     </Highlight>
   </>
 );
 
 FindingLocationEvidence.propTypes = {
-  evidence: PropTypes.string.isRequired,
+  code: PropTypes.string.isRequired,
 };
 
 export default ScanFinding;
