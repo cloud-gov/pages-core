@@ -1,12 +1,14 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { plural } from '../../util/reports';
+import { relPath, plural } from '../../util/reports';
+import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 
 function ScanFindingsSummaryTable({
-  title, findings, hasSuppressColumn = false,
+  findings, hasSuppressColumn = false, baseurl,
 }) {
   if (findings.length < 1) return null;
+
   return (
     <table
       className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full margin-bottom-4"
@@ -14,44 +16,14 @@ function ScanFindingsSummaryTable({
     >
       <thead>
         <tr>
-          <th scope="col" className="width-full">{title}</th>
-          {hasSuppressColumn && (<th scope="col" className="">Suppressed source</th>)}
           <th scope="col" className="text-no-wrap">Severity</th>
-          <th scope="col" className="text-right text-no-wrap">Places found</th>
+          <th scope="col" className="width-full">Finding</th>
+          {hasSuppressColumn && (<th scope="col" className="text-no-wrap">Suppressed by</th>)}
         </tr>
       </thead>
       <tbody>
         {findings.map(finding => (
           <tr key={finding.alertRef || finding.id}>
-            <th data-label={title} scope="row">
-              <b className="usa-sr-only">
-                Result name:
-                <br />
-              </b>
-              { !finding.anchor && (finding.name)}
-              {/* {finding.ref && (
-                <a className="usa-link" href={finding.ref}>
-                  {finding.name}
-                  &nbsp;
-                  <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                    <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
-                  </svg>
-                </a>
-              )} */}
-              {finding.anchor && (
-                <a className="usa-link" href={`#finding-${finding.anchor}`}>{finding.name}</a>
-              )}
-            </th>
-            {hasSuppressColumn && (
-              <td data-label="Suppressed source" className="font-body-xs">
-                {finding.ignore && (
-                  <i className="text-no-wrap">
-                    {'Suppressed by '}
-                    {finding.ignoreSource || 'site configuration'}
-                  </i>
-                )}
-              </td>
-            )}
             <td data-label="Severity Risk level" className="font-body-xs text-no-wrap">
               <b className="usa-sr-only">
                 Severity:
@@ -61,13 +33,52 @@ function ScanFindingsSummaryTable({
                 {finding.severity?.label}
               </span>
             </td>
-            <td data-label="Places found count" className="text-right">
-              <span className="usa-sr-only">
-                {plural(finding.count, 'place')}
-                found:
-              </span>
-              {finding.count}
-            </td>
+            <th data-label="Finding" scope="row">
+              <b className="usa-sr-only">
+                Result name:
+                <br />
+              </b>
+              {!finding.anchor && (
+                <details>
+                  <summary>
+                    <b>{finding.name}</b>
+                    {' on '}
+                    {finding.count}
+                    {plural(finding.count, ' page')}
+                  </summary>
+                  <ol className="font-mono-3xs">
+                    {finding.urls.map((url, i) => (
+                      <li key={url} className="margin-bottom-1">
+                        <ScanPagePathAndReportLink
+                          pagePath={relPath(url, baseurl)}
+                          reportLink={`${finding.reports[i]}#finding-${finding.id}`}
+                          pageURL={url}
+                        />
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              )}
+              {finding.anchor && (
+                <>
+                  <a className="usa-link text-bold" href={`#finding-${finding.anchor}`}>
+                    {finding.name}
+                  </a>
+                  {' in '}
+                  {finding.count}
+                  {plural(finding.count, ' place')}
+                </>
+              )}
+            </th>
+            {hasSuppressColumn && (
+              <td data-label="Suppressed source" className="font-body-xs text-right">
+                {finding.ignore && (
+                  <i className="text-no-wrap">
+                    {finding.ignoreSource || 'Customer criteria'}
+                  </i>
+                )}
+              </td>
+            )}
           </tr>
         ))}
       </tbody>
@@ -76,22 +87,31 @@ function ScanFindingsSummaryTable({
 }
 
 ScanFindingsSummaryTable.propTypes = {
-  title: PropTypes.string.isRequired,
   findings: PropTypes.array.isRequired,
   hasSuppressColumn: PropTypes.bool,
+  baseurl: PropTypes.string,
 };
 
-const ScanFindingsSummary = ({ suppressedFindings, unsuppressedFindings, scanType }) => (
+const ScanFindingsSummary = ({ suppressedFindings, unsuppressedFindings, baseurl }) => (
   <>
-    <ScanFindingsSummaryTable theme={scanType} title="Unsuppressed results" findings={unsuppressedFindings} />
-    <ScanFindingsSummaryTable theme={scanType} title="Suppressed or informational results" findings={suppressedFindings} hasSuppressColumn />
+    <h3>⚠️ Unsuppressed Results</h3>
+    <ScanFindingsSummaryTable
+      baseurl={baseurl}
+      findings={unsuppressedFindings}
+    />
+    <h3>🔕  Suppressed or informational results</h3>
+    <ScanFindingsSummaryTable
+      baseurl={baseurl}
+      findings={suppressedFindings}
+      hasSuppressColumn
+    />
   </>
 );
 
 ScanFindingsSummary.propTypes = {
   suppressedFindings: PropTypes.array,
   unsuppressedFindings: PropTypes.array,
-  scanType: PropTypes.string, // currently unused
+  baseurl: PropTypes.string,
 };
 
 export default ScanFindingsSummary;

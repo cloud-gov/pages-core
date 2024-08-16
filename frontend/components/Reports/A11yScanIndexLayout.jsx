@@ -1,26 +1,27 @@
 import React, { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import * as utils from '../../util/reports';
 import * as datetime from '../../util/datetime';
 
+import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
 
 export default function A11yScanIndex({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} scans report index for ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)} for build id #${buildId}`;
-  const { id } = useParams();
-  const reportId = parseInt(id, 10);
-
+  function findReportsPerURLs(url) {
+    return data.reportPages.find(page => page.absoluteURL === url).path || '';
+  }
   const summarizedResults = [...data.violatedRules].map(result => ({
     ...result,
-    name: result.description,
+    name: result.help,
     ref: result.helpUrl,
     severity: utils.getSeverityThemeToken(result.impact, 'a11y'),
-    count: result.total || result.nodes.length,
-  })
-  );
+    count: result.urls.length,
+    reports: result.urls.map(url => findReportsPerURLs(url)),
+  }));
 
   const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
   const suppressed = summarizedResults.filter(ignoreFn);
@@ -74,7 +75,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 padding-top-2 margin-top-2">
+          <h2 className="font-heading-xl grid-col padding-right-2 margin-bottom-0 padding-top-2 margin-top-2">
             All results
             {' '}
             <span className="font-body-lg text-secondary-vivid">
@@ -82,17 +83,21 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
               {data.violatedRules.length}
               )
             </span>
-          </h3>
+          </h2>
         </div>
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <ScanFindingsSummary scanType="a11y" suppressedFindings={suppressed} unsuppressedFindings={unsuppressed} />
+          <ScanFindingsSummary
+            baseurl={data.baseurl}
+            suppressedFindings={suppressed}
+            unsuppressedFindings={unsuppressed}
+          />
         </div>
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h3 className="font-heading-lg grid-col padding-right-2 margin-bottom-0 margin-top-1">
+          <h2 className="font-heading-xl grid-col padding-right-2 margin-bottom-0 margin-top-1">
             All reports
             {' '}
             <span className="font-body-lg text-accent-cool-darker">
@@ -100,7 +105,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
               {data.reportPages.length}
               )
             </span>
-          </h3>
+          </h2>
         </div>
       </div>
       <div className="grid-row">
@@ -108,7 +113,6 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           <ScanResultsChildPages
             pages={data.reportPages}
             baseurl={data.baseurl}
-            reportId={reportId}
           />
           <p className="font-body-2xs line-height-body-3">
             This report was generated for
@@ -180,60 +184,46 @@ IssuesCount.propTypes = {
   moreCount: PropTypes.number.isRequired,
 };
 
-const ScanResultsChildPages = ({ pages, reportId }) => (
+const ScanResultsChildPages = ({ pages, baseurl }) => (
   <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Scan reports list with links to detailed reports">
     <thead>
       <tr>
-        <th scope="col" className="width-full">Scanned URL</th>
-        <th scope="col" className="text-no-wrap width-10"><span className="usa-sr-only">Open URL in new window</span></th>
-        <th scope="col" className="text-no-wrap">Results found</th>
-        <th scope="col" className="text-right text-no-wrap">Page-level results</th>
+        <th scope="col" className="width-full">Page scanned</th>
+        <th scope="col" className="text-no-wrap text-right">Findings</th>
       </tr>
     </thead>
     <tbody>
       {pages.map(page => (
-        <tr key={page.absoluteURL}>
+        <tr key={page.absoluteURL} id={`jump-to-${utils.relPath(page.absoluteURL, baseurl)}`}>
           <th data-label="Scanned URL" scope="row">
             <b className="usa-sr-only">
-              Scanned URL:
+              Page scanned:
               <br />
             </b>
             {page.failed ? (
-              <span className="font-body-2xs narrow-body text-bold text-error-dark">
-                Couldn&apos;t process scan results. Please contact support.
-                <br />
-              </span>
+              <>
+                <span className="font-mono-2xs margin-right-1">
+                  {utils.relPath(page.absoluteURL, baseurl)}
+                </span>
+                <span className="font-body-2xs narrow-body text-bold text-error-dark">
+                  Couldn&apos;t process scan results. Please contact support.
+                  <br />
+                </span>
+              </>
             ) : (
-              <span className="font-mono-2xs narrow-mono break-anywhere" aria-label={`dot slash ${page.path},`}>
-                {page.absoluteURL}
-              </span>
+              <ScanPagePathAndReportLink
+                pagePath={utils.relPath(page.absoluteURL, baseurl)}
+                pageURL={page.absoluteURL}
+                reportLink={page.path}
+              />
             )}
           </th>
-          <td data-label="Link to open URL">
-            {!page.failed && (
-            <a className="usa-link font-body-3xs text-no-wrap" target="_blank" aria-label="open scanned URL in a new window," title="open scanned URL in a new window" href={page.absoluteURL} rel="noreferrer">
-              open URL
-              <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
-              </svg>
-            </a>
-            )}
-          </td>
-          <td data-label="Results count" className="font-body-xs text-no-wrap">
+          <td data-label="Results count" className="font-body-xs text-no-wrap text-right">
             <b className="usa-sr-only">
-              Results:
+              Findings:
               <br />
             </b>
             <IssuesCount {...page} />
-          </td>
-          <td data-label="Page-level results" className="text-right">
-            {page.failed ? (
-              <span className="text-bold text-error-dark">Scan failed</span>
-            ) : (
-              <Link className="usa-link text-bold font-body-xs text-no-wrap" to={`/report/${reportId}/${page.path}/`} title={`Full results for ${page.absoluteURL}`} aria-label={`Full results for dot slash ${page.path},`}>
-                View page report
-              </Link>
-            )}
           </td>
         </tr>
       ))}
@@ -244,7 +234,7 @@ const ScanResultsChildPages = ({ pages, reportId }) => (
 ScanResultsChildPages.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   pages: PropTypes.array.isRequired,
-  reportId: PropTypes.number.isRequired,
+  baseurl: PropTypes.string,
 };
 
 A11yScanIndex.propTypes = {

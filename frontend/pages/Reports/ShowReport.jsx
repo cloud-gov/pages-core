@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 
 import A11yScanIndex from '../../components/Reports/A11yScanIndexLayout';
 import A11yScanChild from '../../components/Reports/A11yScanChildLayout';
@@ -25,12 +25,29 @@ import { useReportData } from '../../hooks/useReportData';
 
 export default function Report() {
   const { id, subpage } = useParams();
+  const location = useLocation();
+  const mostRecentScrollToHash = useRef('');
 
-  const { data, isLoading } = useReportData(id, subpage);
+  const scrollToHash = () => {
+    if (location.hash) {
+      const hash = location.hash.replace('#', '');
+      const element = document.getElementById(hash);
+      if (element && hash !== mostRecentScrollToHash.current) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+        });
+        mostRecentScrollToHash.current = hash;
+      }
+    }
+  };
   if (isLoading) return 'Loading';
   if (!data) return <TypeNotFound />;
 
   const { report, siteId, buildId } = data;
+
+  useEffect(() => {
+    scrollToHash();
+  });
 
   switch (data.type) {
     case 'owasp-zap':

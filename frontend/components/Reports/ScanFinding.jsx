@@ -28,7 +28,7 @@ const ScanFinding = ({
   }
   if (scanType === 'a11y') {
     title = `${finding.help}.`;
-    anchor = `finding-${groupLabel}-${index}`;
+    anchor = `finding-${finding.id}`;
     count = finding.nodes.length;
     description = `${finding.description}.`;
     locations = finding.nodes || [];
@@ -45,6 +45,7 @@ const ScanFinding = ({
         count={count}
         references={references}
         scanType={scanType}
+        anchor={anchor}
       />
       <div className="maxw-tablet-lg">
         <FindingDescription
@@ -80,10 +81,12 @@ const FindingTitle = ({
   count,
   references = [],
   scanType,
+  anchor,
 }) => (
   <div className="bg-white padding-top-05 sticky">
     <h3 className="font-heading-lg margin-y-105">
       {title}
+      <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">#</a>
     </h3>
     <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
       <span className={`usa-tag bg-${groupColor} radius-pill`}>
@@ -119,6 +122,8 @@ FindingTitle.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   references: PropTypes.array,
   scanType: PropTypes.string.isRequired,
+  anchor: PropTypes.string.isRequired,
+
 };
 
 const FindingDescription = ({
@@ -156,46 +161,49 @@ FindingDescription.propTypes = {
 
 const FindingRecommendation = ({ anchor, solution, scanType }) => (
   <div
-    className="usa-summary-box margin-y-4"
-    role="region"
-    aria-labelledby={`${anchor}-solution`}
+    id={`${anchor}-recommendation`}
+    className="padding-top-15"
+    aria-labelledby={`${anchor}-recommendation`}
   >
-    { (scanType === 'zap') && (
-    <>
-      <h4 className="usa-summary-box__heading" id={`${anchor}-solution`}>
-        Recommendation(s):
-      </h4>
-      <div className="usa-summary-box__body margin-bottom-neg-2">
-        { /* eslint-disable-next-line react/no-danger */ }
-        <div dangerouslySetInnerHTML={{ __html: solution }} />
-      </div>
-    </>
-    )}
-    { (scanType === 'a11y') && (
-    <>
-      {solution.split('\n\n').map((fixList, listindex) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={`${anchor}-location-${listindex}`}>
-          {fixList.split('\n').map((str, i) => (
-            i === 0 ? (
-            // <a id={`${group}-violation-${index + 1}-element-${nodeindex + 1}-fix-${listindex}`}>
-              // eslint-disable-next-line react/no-array-index-key
-              <h4 key={i} className="usa-summary-box__heading" id={`${anchor}-solution`}>
-                {str}
-              </h4>
-            ) : (
-              <div className="usa-summary-box__body">
-                { /* eslint-disable-next-line react/no-array-index-key */ }
-                <ul key={i} className="usa-list margin-bottom-2">
-                  <li>{str}</li>
-                </ul>
-              </div>
-            )
-          ))}
+    <div className="usa-summary-box margin-bottom-6 margin-top-neg-3" role="region">
+      { (scanType === 'zap') && (
+      <>
+        <h4 className="usa-summary-box__heading">
+          Recommendation(s):
+          <a href={`#${anchor}-recommendation`} className="usa-link target-highlight anchor-indicator">#</a>
+        </h4>
+        <div className="usa-summary-box__body margin-bottom-neg-2">
+          { /* eslint-disable-next-line react/no-danger */ }
+          <div dangerouslySetInnerHTML={{ __html: solution }} />
         </div>
-      ))}
-    </>
-    )}
+      </>
+      )}
+      { (scanType === 'a11y') && (
+      <>
+        {solution.split('\n\n').map((fixList, listindex) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={`${anchor}-location-${listindex}`}>
+            {fixList.split('\n').map((str, i) => (
+              i === 0 ? (
+                // eslint-disable-next-line react/no-array-index-key
+                <h4 key={i} className="usa-summary-box__heading">
+                  {str}
+                  <a href={`#${anchor}-recommendation`} className="usa-link target-highlight anchor-indicator">#</a>
+                </h4>
+              ) : (
+                <div className="usa-summary-box__body">
+                  { /* eslint-disable-next-line react/no-array-index-key */ }
+                  <ul key={i} className="usa-list margin-bottom-2">
+                    <li>{str}</li>
+                  </ul>
+                </div>
+              )
+            ))}
+          </div>
+        ))}
+      </>
+      )}
+    </div>
   </div>
 );
 
@@ -239,35 +247,38 @@ const FindingLocations = ({ locations, anchor, scanType }) => (
     <h3 className="font-body-md margin-y-2">
       Evidence for this result was found:
     </h3>
-    <ol className="padding-left-3">
-      {locations.map((location, locationIndex) => {
-        const { uri: url, otherInfo } = location;
-        const code = scanType === 'zap' ? location.evidence : location.html;
-        const target = scanType === 'zap' ? location.param : location.target;
-        const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
-        return (
-          <li key={locationAnchor} className="margin-bottom-5 margin-left-2 font-mono-md">
-            {/* TODO: Review this one */}
-            {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
-            <a id={locationAnchor} href={`#${locationAnchor}`} label="anchor" />
-            {url && (
-            <h4 className="font-body-md text-normal margin-bottom-0">
-              <FindingLocationURL url={url} />
-            </h4>
-            )}
-            {code && <FindingLocationEvidence code={code} />}
-            {target && <FindingLocationTarget target={target} />}
-            {otherInfo && (
-            <p className="font-body-sm padding-bottom-2 border-bottom-1px">
-              Additional info:
-              {' '}
-              {otherInfo}
-            </p>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+    <div className="margin-bottom-neg-10">
+      <ol className="padding-left-3">
+        {locations.map((location, locationIndex) => {
+          const { uri: url, otherInfo } = location;
+          const code = scanType === 'zap' ? location.evidence : location.html;
+          const target = scanType === 'zap' ? location.param : location.target;
+          const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
+          return (
+            <li key={locationAnchor} className="margin-bottom-5 margin-left-2 font-mono-md">
+              {/* TODO: Review this one */}
+              {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
+              <a id={locationAnchor} href={`#${locationAnchor}`} label="anchor" />
+              {url && (
+              <h4 className="font-body-md text-normal margin-bottom-0">
+                <FindingLocationURL url={url} />
+              </h4>
+              )}
+              {code && <FindingLocationEvidence code={code} />}
+              {target && <FindingLocationTarget target={target} />}
+              {otherInfo && (
+              <p className="font-body-sm padding-bottom-2 border-bottom-1px">
+                Additional info:
+                {' '}
+                {otherInfo}
+              </p>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  
   </>
 );
 

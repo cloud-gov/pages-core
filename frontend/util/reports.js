@@ -87,3 +87,7 @@ export function getSeverityThemeToken(lookup, theme = 'zap') {
 export function plural(count, name) {
   return `${name}${count !== 1 ? 's' : ''}`;
 }
+
+export function relPath(url, baseurl) {
+  return url.split(baseurl)[1];
+}

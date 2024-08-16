@@ -114,7 +114,7 @@ export default function Zap({ data, buildId, siteId }) {
               </div>
             </section>
             <ScanFindingsSummary
-              scanType="zap"
+              baseurl={data.site['@name']}
               suppressedFindings={suppressed}
               unsuppressedFindings={unsuppressed}
             />

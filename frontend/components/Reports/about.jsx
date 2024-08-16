@@ -62,7 +62,7 @@ const ZapAbout = () => (
     </p>
     <h3>Result severity level</h3>
     <p>
-      The ZAP scan follows the OWASP Risk Rating Methodology to estimate the severity of results based on the likelyhood and impact of these common vulnerabilities.  In any given situation, the actual cybersecurity threat could be lower or higher. It’s essential for agencies to evaluate each individual result and assess the actual risk in the context of their websites and organization. Although these are general guidelines,&nbsp;
+      The Pages ZAP scan follows the OWASP Risk Rating Methodology to estimate the severity of identified issues by evaluating their likelihood of exploitation and their potential impact. However, the actual cybersecurity threat could be lower or higher. Therefore, it is important for agencies to assess each individual finding and evaluate the real risk within the contest of the specific websites and organization. These are general guidelines and&nbsp;
       <a
         href="https://owasp.org/www-community/OWASP_Risk_Rating_Methodology"
         target="_blank"
@@ -71,7 +71,7 @@ const ZapAbout = () => (
       >
         determining risk is subjective
       </a>
-      &nbsp;and agency website maintainers, rather than OWASP or Pages, are best positioned to decide how to triage and address the results.&nbsp;
+      . Agency website maintainers, rather than OWASP or Pages, are best positioned to decide how to triage and address the scan findings.
     </p>
     <table className="usa-table usa-table--borderless ">
       <thead>
@@ -80,38 +80,40 @@ const ZapAbout = () => (
           <th scope="col">Description</th>
         </tr>
       </thead>
-      <tr>
-        <th scope="row">
-          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-high margin-0 display-inline">High risk</span>
-        </th>
-        <td>
-          High severity vulnerabilities usually pose a significant risk to application security or can be easily exploited, leading to critical consequences such as unauthorized access, data loss, or system compromise.
-        </td>
-      </tr>
-      <tr>
-        <th scope="row">
-          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-medium margin-0 display-inline">Medium risk</span>
-        </th>
-        <td>
-          Medium severity vulnerabilities may expose the application to serious risks such as sensitive data exposure or unauthorized actions by malicious actors, due to the ease of exploitation or sophistication of the attack.
-        </td>
-      </tr>
-      <tr>
-        <th scope="row">
-          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-low margin-0 display-inline">Low risk</span>
-        </th>
-        <td>
-          Low severity vulnerabilities present clear risk to the security of the web application but may not have a catastrophic impact on overall security or may be more difficult (but not impossible) to exploit.
-        </td>
-      </tr>
-      <tr>
-        <th scope="row">
-          <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Informational</span>
-        </th>
-        <td>
-          Informational findings provide insights or about the configuration, architecture, behavior, and exploitability of the web application, but do not directly indicate any security vulnerabilities.
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-high margin-0 display-inline">High risk</span>
+          </th>
+          <td>
+            High severity vulnerabilities usually pose a significant risk to application security or can be easily exploited, leading to critical consequences such as unauthorized access, data loss, or system compromise.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-medium margin-0 display-inline">Medium risk</span>
+          </th>
+          <td>
+            Medium severity vulnerabilities may expose the application to serious risks such as sensitive data exposure or unauthorized actions by malicious actors, due to the ease of exploitation or sophistication of the attack.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-low margin-0 display-inline">Low risk</span>
+          </th>
+          <td>
+            Low severity vulnerabilities present clear risk to the security of the web application but may not have a catastrophic impact on overall security or may be more difficult (but not impossible) to exploit.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Informational</span>
+          </th>
+          <td>
+            Informational findings provide general insights or about the configuration, architecture, behavior, and exploitability of the web application, but do not directly indicate any security vulnerabilities.
+          </td>
+        </tr>
+      </tbody>
     </table>
 
     <p>
@@ -201,38 +203,40 @@ const A11yAbout = () => {
             <th scope="col">Description</th>
           </tr>
         </thead>
-        <tr>
-          <th scope="row">
-            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-high margin-0 display-inline">Critical</span>
-          </th>
-          <td>
-            A “Critical” result indicates an issue that may entirely block access to the website content or controls for people with disabilities, prohibiting users from accomplishing fundamental tasks.
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">
-            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-medium margin-0 display-inline">Serious</span>
-          </th>
-          <td>
-            A “Serious” result indicates an issue that may present a significant, frustrating barrier for people with disabilities by interfering with or fully prohibiting access to fundamental features or content. These results often cause users of assistive technologies to abandon essential workflows.
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">
-            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-low margin-0 display-inline">Moderate</span>
-          </th>
-          <td>
-            A “Moderate” result likely indicates an issue that presents some frustration and difficulty for people with disabilities. Although such issues may not prohibit users from accessing fundamental features or content, these results often cause users of assistive technologies to abandon non-critical workflows.
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">
-            <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Minor</span>
-          </th>
-          <td>
-            A “Minor” result indicates a nuisance that introduces minor difficulty for people with disabilities. These issues oft4en produce a frustrating, though ultimately functional, experience for users.
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <th scope="row">
+              <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-high margin-0 display-inline">Critical</span>
+            </th>
+            <td>
+              A “Critical” result indicates an issue that may entirely block access to the website content or controls for people with disabilities, prohibiting users from accomplishing fundamental tasks.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-medium margin-0 display-inline">Serious</span>
+            </th>
+            <td>
+              A “Serious” result indicates an issue that may present a significant, frustrating barrier for people with disabilities by interfering with or fully prohibiting access to fundamental features or content. These results often cause users of assistive technologies to abandon essential workflows.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-low margin-0 display-inline">Moderate</span>
+            </th>
+            <td>
+              A “Moderate” result likely indicates an issue that presents some frustration and difficulty for people with disabilities. Although such issues may not prohibit users from accessing fundamental features or content, these results often cause users of assistive technologies to abandon non-critical workflows.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Minor</span>
+            </th>
+            <td>
+              A “Minor” result indicates a nuisance that introduces minor difficulty for people with disabilities. These issues oft4en produce a frustrating, though ultimately functional, experience for users.
+            </td>
+          </tr>
+        </tbody>
       </table>
 
       <p>

@@ -56,6 +56,35 @@ ol li::marker {
 .break-anywhere {
   line-break: anywhere;
 }
+summary {
+  cursor: pointer;
+}
+summary b:hover {
+  text-decoration: underline;
+}
+.usa-table--compact th,
+.usa-table--compact td {
+  vertical-align: top;
+  padding: .4rem .75rem;
+}
+.usa-table--compact thead th {
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-size: 95%;
+  opacity: .75;
+  -webkit-font-smoothing: antialiased;
+}
+[id]:target .target-highlight {
+  background-color: #e7f6f8;
+}
+.anchor-indicator {
+  text-decoration: none;
+  margin: .25em;
+  padding: .125em;
+  font-weight: normal;
+  font-variant-position: super;
+  display: inline-block;
+}
 
 @media (max-width: 40em) {
   td.text-right {
