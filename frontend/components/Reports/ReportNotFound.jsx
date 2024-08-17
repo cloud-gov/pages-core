@@ -1,18 +1,17 @@
 import React from 'react';
 
-export default function TypeNotFound() {
+export default function ReportNotFound() {
   return (
     <div className="usa-prose padding-y-10">
-      <h1>Report type not found</h1>
+      <h1>Report not found</h1>
       <p className="usa-intro">
-        We are sorry, we cannot find the report type you are looking for. This may
-        be an error, it changed location, or made is no longer unavailable.
+        This report is not available.
       </p>
       <div className="margin-y-5">
         <ul className="usa-button-group">
           <li className="usa-button-group__item">
-            <a href="/" className="usa-button">
-              Return to Pages
+            <a href="/sites" className="usa-button">
+              Return to your Pages sites
             </a>
           </li>
           <li className="usa-button-group__item">

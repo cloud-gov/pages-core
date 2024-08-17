@@ -1,20 +1,19 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import AlertBanner from '../../components/Reports/AlertBanner';
-import TypeNotFound from '../../components/Reports/TypeNotFound';
+import TypeNotFound from '../../components/Reports/ReportNotFound';
 
 export default function Report() {
   const { pathname } = useLocation();
-  const onReportIndex = pathname === '/report' || pathname === '/report/';
+  const onReportPage = pathname.startsWith('/report');
 
-  // TODO: A not found for missing reports, not just report types
   return (
     <>
-      {!onReportIndex && <AlertBanner />}
+      {!onReportPage && <AlertBanner />}
       { /* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */ }
       <a name="top" />
       <main className="grid-container">
-        {onReportIndex ? <TypeNotFound /> : <Outlet />}
+        {onReportPage ? <TypeNotFound /> : <Outlet />}
       </main>
     </>
   );
