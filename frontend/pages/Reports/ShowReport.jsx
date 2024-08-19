@@ -48,7 +48,7 @@ export default function Report() {
 
   useEffect(() => {
     scrollToHash();
-  });
+  }, []);
 
   switch (data.type) {
     case 'owasp-zap':
