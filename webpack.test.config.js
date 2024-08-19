@@ -32,7 +32,6 @@ const config = {
   output: {
     filename: 'js/[name].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -106,7 +105,7 @@ const config = {
     new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
     new WebpackManifestPlugin({
       fileName: '../webpack-manifest.json',
-      publicPath: '/dist/',
+      publicPath: 'dist/',
     }),
     new webpack.EnvironmentPlugin([
       ...getFeatureFlags(process.env),

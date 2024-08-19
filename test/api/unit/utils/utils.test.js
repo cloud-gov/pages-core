@@ -185,8 +185,8 @@ describe('utils', () => {
     it('loads and uses the development webpack config', () => {
       const result = utils.loadDevelopmentManifest();
       expect(result).to.deep.eq({
-        'bundle.js': `${path.join(publicPath, filenameJs)}`,
-        'bundle.css': `${path.join(publicPath, filenameCss)}`,
+        'bundle.js': `${path.join(publicPath.slice(1), filenameJs)}`,
+        'bundle.css': `${path.join(publicPath.slice(1), filenameCss)}`,
       });
     });
   });

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSearchParams, Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import prettyBytes from 'pretty-bytes';
 import { sandboxMsg } from '../../util';
 import {
   dateAndTimeSimple,

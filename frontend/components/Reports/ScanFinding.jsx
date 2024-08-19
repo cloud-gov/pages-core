@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { plural } from '../../util/reports';
 
 const ScanFinding = ({
-  finding, groupColor, groupLabel, scanType = 'zap', index, siteId
+  finding, groupColor, groupLabel, scanType = 'zap', siteId,
 }) => {
   const { ignore, ignoreSource } = finding;
   let title = '';
@@ -278,7 +278,6 @@ const FindingLocations = ({ locations, anchor, scanType }) => (
         })}
       </ol>
     </div>
-  
   </>
 );
 
