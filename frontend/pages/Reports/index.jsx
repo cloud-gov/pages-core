@@ -1,19 +1,24 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import {
+  Outlet,
+  // useLocation
+} from 'react-router-dom';
 import AlertBanner from '../../components/Reports/AlertBanner';
-import ReportNotFound from '../../components/Reports/ReportNotFound';
+// import ReportNotFound from '../../components/Reports/ReportNotFound';
 
 export default function Report() {
-  const { pathname } = useLocation();
-  const onReportPage = pathname.startsWith('report');
+  // const { pathname } = useLocation();
+  // const onReportPage = pathname.startsWith('report');
 
   return (
     <>
-      {!onReportPage && <AlertBanner />}
+      {/* {!onReportPage && <AlertBanner />} */}
+      <AlertBanner />
       { /* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */ }
       <a name="top" />
       <main className="grid-container">
-        {onReportPage ? <ReportNotFound /> : <Outlet />}
+        {/* {onReportPage ? <ReportNotFound /> : <Outlet />} */}
+        <Outlet />
       </main>
     </>
   );
