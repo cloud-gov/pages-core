@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function AlterBanner() {
+export default function AlertBanner() {
   return (
     <section className="usa-alert usa-alert--warning usa-alert--slim usa-alert--no-icon">
       <div className="usa-alert__body">

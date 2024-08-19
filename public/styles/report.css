@@ -292,3 +292,65 @@ a.bg-risk-other:hover  { background: #565c65}
   }
 
 }
+
+
+@keyframes uil-ring-anim {
+  0% {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+
+.loader {
+  color: #5b616b;
+  margin: 40px 0;
+  min-height: 200px;
+  text-align: center;
+}
+
+.uil-ring-css {
+  background: none;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  transform: scale(0.6);
+}
+.uil-ring-css > div {
+  position: absolute;
+  display: block;
+  width: 160px;
+  height: 160px;
+  top: 20px;
+  left: 20px;
+  border-radius: 80px;
+  box-shadow: 0 6px 0 0 #aeb0b5;
+  animation: uil-ring-anim 1s linear infinite;
+}
+
+.loader--mini {
+  margin: 20px auto;
+  min-height: 100px;
+}
+.loader--mini .uil-ring-css {
+  width: 100px;
+  height: 100px;
+}
+.loader--mini .uil-ring-css > div {
+  width: 80px;
+  height: 80px;
+  top: 10px;
+  left: 10px;
+  border-radius: 80px;
+}

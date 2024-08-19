@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import A11yScanIndex from '../../components/Reports/A11yScanIndexLayout';
 import A11yScanChild from '../../components/Reports/A11yScanChildLayout';
@@ -40,9 +41,8 @@ export default function Report() {
       }
     }
   };
-  if (isLoading) return 'Loading';
+  if (isLoading) return <ReportLoading />;
   if (!data) return <ReportNotFound />;
-
   const { report, siteId, buildId } = data;
 
   useEffect(() => {
@@ -69,3 +69,21 @@ export default function Report() {
 // Report.propTypes = {
 //   id: PropTypes.number.isRequired,
 // };
+
+const ReportLoading = ({ text = 'Please wait...' }) => (
+  <div className="usa-prose padding-y-10">
+    <h1>Report loading</h1>
+    <p className="usa-intro">
+      {text}
+    </p>
+    <div className="loader loader--main">
+      <div className="uil-ring-css">
+        <div />
+      </div>
+    </div>
+  </div>
+);
+
+ReportLoading.propTypes = {
+  text: PropTypes.string,
+};
