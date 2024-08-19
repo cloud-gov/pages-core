@@ -41,6 +41,7 @@ export default function Report() {
       }
     }
   };
+  const { data, isLoading } = useReportData(id, subpage);
   if (isLoading) return <ReportLoading />;
   if (!data) return <ReportNotFound />;
   const { report, siteId, buildId } = data;
