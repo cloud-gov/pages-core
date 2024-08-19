@@ -69,9 +69,8 @@ ScanFinding.propTypes = {
   finding: PropTypes.object,
   groupColor: PropTypes.string,
   groupLabel: PropTypes.string,
-  scanType: PropTypes.string,
-  index: PropTypes.number,
   siteId: PropTypes.number.isRequired,
+  scanType: PropTypes.string,
 };
 
 const FindingTitle = ({

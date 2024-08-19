@@ -23,7 +23,7 @@ const svgoConfig = {
 };
 
 const config = {
-  mode: 'development',
+  mode: process.env.NODE_ENV,
   entry: {
     bundle: './frontend/main.jsx',
     report: './frontend/mainReport.jsx',

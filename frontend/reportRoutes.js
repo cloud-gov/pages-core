@@ -4,13 +4,13 @@ import { Route } from 'react-router-dom';
 import Report from './pages/Reports';
 import ShowReport from './pages/Reports/ShowReport';
 import NotFound from './components/NotFound';
-// import Error from './components/Error';
+import RouterError from './components/RouterError';
 
 export default (
   <Route
     path="/report/"
     element={<Report />}
-    errorElement={<NotFound />}
+    errorElement={<RouterError />}
   >
     <Route path=":id" element={<ShowReport />} />
     <Route path=":id/:subpage" element={<ShowReport />} />
