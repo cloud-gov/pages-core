@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { plural } from '../../util/reports';
 
 const ScanFinding = ({
   finding, groupColor, groupLabel, scanType = 'zap', siteId,
 }) => {
+  const ref = useRef(null);
+  const { hash } = useLocation();
   const { ignore, ignoreSource } = finding;
   let title = '';
   let count = 0;
@@ -36,8 +38,18 @@ const ScanFinding = ({
     references = [finding.helpUrl];
   }
 
+  useEffect(() => {
+    async function scrollToAnchor() {
+      if (ref && hash?.slice(1) === anchor) {
+        ref.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    scrollToAnchor();
+  }, [ref, hash, anchor]);
+
   return (
-    <div id={anchor} className="margin-bottom-5">
+    <div ref={ref} id={anchor} className="margin-bottom-5">
       <FindingTitle
         title={title}
         groupLabel={groupLabel}
