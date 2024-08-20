@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 
 import BranchConfigs from './BranchConfigs';
-import ScanConfigs from './ScanConfigs';
+import ReportConfigs from './ReportConfigs';
 import AdvancedSiteSettings from './AdvancedSiteSettings';
 import EnvironmentVariables from './EnvironmentVariables';
 import siteActions from '../../../actions/siteActions';
@@ -80,7 +80,7 @@ function SiteSettings() {
       />
 
       <EnvironmentVariables siteId={site.id} />
-      <ScanConfigs siteId={site.id} />
+      <ReportConfigs siteId={site.id} />
     </div>
   );
 }

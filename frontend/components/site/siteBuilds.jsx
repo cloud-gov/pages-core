@@ -106,7 +106,7 @@ function SiteBuilds() {
                   <th scope="col">Branch</th>
                   { siteHasBuildTasks(builds) && (
                     <th scope="col">
-                      Scans
+                      Reports
                       {' '}
                       (
                       {scansDocsLink('https://cloud.gov/pages/documentation/build-scans/')}

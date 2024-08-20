@@ -10,7 +10,7 @@ import About from './about';
 
 export default function A11yScanIndex({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages | ${scanTitle} scans report index for ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)} for build id #${buildId}`;
+  const pageTitle = `Pages | ${scanTitle} report index for ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)} for build id #${buildId}`;
   function findReportsPerURLs(url) {
     return data.reportPages.find(page => page.absoluteURL === url).path || '';
   }
@@ -35,7 +35,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
     <>
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
-          Accessibility scan reports for
+          Accessibility reports for
           {' '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
@@ -185,7 +185,7 @@ IssuesCount.propTypes = {
 };
 
 const ScanResultsChildPages = ({ pages, baseurl }) => (
-  <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Scan reports list with links to detailed reports">
+  <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Page list with links to detailed reports">
     <thead>
       <tr>
         <th scope="col" className="width-full">Page scanned</th>
@@ -206,7 +206,7 @@ const ScanResultsChildPages = ({ pages, baseurl }) => (
                   {utils.relPath(page.absoluteURL, baseurl)}
                 </span>
                 <span className="font-body-2xs narrow-body text-bold text-error-dark">
-                  Couldn&apos;t process scan results. Please contact support.
+                  Couldn&apos;t process report results. Please contact support.
                   <br />
                 </span>
               </>

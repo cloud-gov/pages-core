@@ -7,7 +7,7 @@ export default function About({ scanType, siteId, children }) {
   return (
     <section className="usa-prose margin-y-4 maxw-tablet-lg">
       <h2>
-        About this scan
+        About this report
       </h2>
       <div className="font-body-md line-height-body-5">
         { scanType === 'zap' ? <ZapAbout /> : <A11yAbout /> }
@@ -17,7 +17,7 @@ export default function About({ scanType, siteId, children }) {
           which are irrelevant for statically hosted websites or frequently produce “false
           positives” for our customers.  While still visible in the report, the suppressed
           results don’t count towards your total issue count. Customers can specify additional
-          criteria to be suppressed in future scans for this site in your Pages
+          criteria to be suppressed in future reports for this site in your Pages
           {' '}
           <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
           .
@@ -50,19 +50,19 @@ const ZapAbout = () => (
       where appropriate, based on threat analysis and the criticality of the underlying system.
     </p>
     <p>
-      This scan uses the open source penetration testing tool Zed Attack Proxy (ZAP). The
+      This report uses the open source penetration testing tool Zed Attack Proxy (ZAP). The
       {' '}
       <a href="https://www.zaproxy.org/docs/docker/baseline-scan/" target="_blank" className="usa-link" rel="noreferrer">ZAP Baseline security scan</a>
       {' '}
       passively scans your published website for common security vulnerabilities, but does
-      not perform any attack or attempt to maliciously modify your site code. This scan may
+      not perform any attack or attempt to maliciously modify your site code. This report may
       find evidence of issues such as the unintended exposure of sensitive data, SQL injection
       opportunities, cross-site scripting (XSS) flaws, and the use of components with known
       vulnerabilities.
     </p>
     <h3>Result severity level</h3>
     <p>
-      The Pages ZAP scan follows the OWASP Risk Rating Methodology to estimate the severity of identified issues by evaluating their likelihood of exploitation and their potential impact. However, the actual cybersecurity threat could be lower or higher. Therefore, it is important for agencies to assess each individual finding and evaluate the real risk within the contest of the specific websites and organization. These are general guidelines and&nbsp;
+      The Pages ZAP report follows the OWASP Risk Rating Methodology to estimate the severity of identified issues by evaluating their likelihood of exploitation and their potential impact. However, the actual cybersecurity threat could be lower or higher. Therefore, it is important for agencies to assess each individual finding and evaluate the real risk within the contest of the specific websites and organization. These are general guidelines and&nbsp;
       <a
         href="https://owasp.org/www-community/OWASP_Risk_Rating_Methodology"
         target="_blank"
@@ -71,7 +71,7 @@ const ZapAbout = () => (
       >
         determining risk is subjective
       </a>
-      . Agency website maintainers, rather than OWASP or Pages, are best positioned to decide how to triage and address the scan findings.
+      . Agency website maintainers, rather than OWASP or Pages, are best positioned to decide how to triage and address report findings.
     </p>
     <table className="usa-table usa-table--borderless ">
       <thead>
@@ -117,7 +117,7 @@ const ZapAbout = () => (
     </table>
 
     <p>
-      More information about the mechanism powering this scan is available in the
+      More information about the mechanism powering this report is available in the
       {' '}
       <a
         href="https://www.zaproxy.org/docs/"
@@ -125,7 +125,7 @@ const ZapAbout = () => (
         className="usa-link"
         rel="noreferrer"
       >
-        ZAP scan documentation
+        ZAP documentation
       </a>
       .
     </p>
@@ -157,7 +157,7 @@ const A11yAbout = () => {
         <a className="usa-link" href="https://www.w3.org/WAI/standards-guidelines/" target="_blank" rel="noreferrer">Web Content Accessibility Guidelines (WCAG)</a>
         {' '}
         published by the World Wide Web Consortium (W3C) to websites and web applications,
-        where possible. This accessibility scan checks each webpage for violations of the latest
+        where possible. This accessibility report checks each webpage for violations of the latest
         WCAG version,  currently
         {' '}
         <b>WCAG 2.2 Level AA</b>
@@ -171,7 +171,7 @@ const A11yAbout = () => {
         ))}
       </ul>
       <p>
-        This scan uses the open source axe-core project to identify common violations.
+        This report uses the open source axe-core project to identify common violations.
         With axe-core, you may expect to find a little over 55% of WCAG issues automatically.
         Please remember that
         {' '}
@@ -240,7 +240,7 @@ const A11yAbout = () => {
       </table>
 
       <p>
-        More information about the mechanism powering this scan is available in the
+        More information about the mechanism powering this report is available in the
         {' '}
         <a
           href="https://github.com/dequelabs/axe-core/blob/develop/doc/"

@@ -10,7 +10,7 @@ import About from './about';
 
 export default function A11yScanChild({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages | ${scanTitle} scan report for ${data.url} on ${datetime.dateAndTimeSimple(data.timestamp)} for build id ${buildId}`;
+  const pageTitle = `Pages | ${scanTitle} report for ${data.url} on ${datetime.dateAndTimeSimple(data.timestamp)} for build id ${buildId}`;
 
   const allResults = Object.values(data.groupedViolations).flat(1);
   const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
@@ -50,7 +50,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
     <>
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
-          Accessibility scan report for
+          Accessibility report for
           {' '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">{data.url}</span>

@@ -24,9 +24,9 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'IconBook',
   },
   {
-    display: 'Scan history',
-    route: 'scans',
-    icon: 'IconExperiment',
+    display: 'Report history',
+    route: 'reports',
+    icon: 'IconReport',
   },
   {
     display: 'Site settings',
@@ -43,8 +43,8 @@ export const SITE_NAVIGATION_CONFIG = [
 export const SITE_TITLE_CONFIG = [
   ...SITE_NAVIGATION_CONFIG,
   {
-    display: 'Scan results for build #',
-    route: 'scans',
+    display: 'Reports for build #',
+    route: 'reports',
   },
   {
     display: 'Logs for build #',

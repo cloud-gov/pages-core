@@ -5,26 +5,26 @@ import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX, IconIgnore,
 } from './icons';
 
-const scanResultsIcon = (status, count) => {
+const reportResultsIcon = (status, count) => {
   let icon;
   let results;
   switch (status) {
     case 'error':
-      results = 'Scan failed';
+      results = 'Report failed';
       icon = IconX;
       break;
     // this case should never happen, unless we want to show cancelled scans
     case 'cancelled':
-      results = 'Not scanned';
+      results = 'Report cancelled';
       icon = IconIgnore;
       break;
     case 'processing':
-      results = 'Scanning';
+      results = 'Generating report';
       icon = IconSpinner;
       break;
     case 'queued':
     case 'created':
-      results = 'Scan queued';
+      results = 'Report queued';
       icon = IconClock;
       break;
     case 'success':
@@ -45,9 +45,9 @@ const scanResultsIcon = (status, count) => {
   return { icon, results };
 };
 
-const ScanResultsSummary = (props) => {
+const ReportResultsSummary = (props) => {
   const { status, count, children } = props;
-  const { icon, results } = scanResultsIcon(status, count);
+  const { icon, results } = reportResultsIcon(status, count);
 
   return (
     <div className="scan-status">
@@ -66,16 +66,15 @@ const ScanResultsSummary = (props) => {
   );
 };
 
-ScanResultsSummary.propTypes = {
+ReportResultsSummary.propTypes = {
   status: PropTypes.string.isRequired,
   count: PropTypes.number,
   children: PropTypes.node,
 };
 
-ScanResultsSummary.defaultProps = {
+ReportResultsSummary.defaultProps = {
   count: null,
   children: null,
 };
 
-// export default React.memo(ScanResultsSummary);
-export default ScanResultsSummary;
+export default ReportResultsSummary;

@@ -11,7 +11,7 @@ import * as utils from '../../util/reports';
 
 export default function Zap({ data, buildId, siteId }) {
   const scanTitle = 'Vulnerability';
-  const pageTitle = `Pages | ${scanTitle} scan report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
+  const pageTitle = `Pages | ${scanTitle} report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
 
   const navGroups = [...utils.severity.zap].map(group => ({
     ...group,
@@ -53,7 +53,7 @@ export default function Zap({ data, buildId, siteId }) {
       <div className="grid-row">
         <h1 className="font-heading-xl grid-col padding-right-2">
           {scanTitle}
-          {' scan report for '}
+          {' report for '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
             {data.site['@name']}

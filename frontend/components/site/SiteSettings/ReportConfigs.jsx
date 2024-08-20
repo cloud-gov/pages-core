@@ -16,7 +16,7 @@ function getRuleName(rule) {
 function getRuleLink(rule) {
   return BUILD_SCAN_RULES.find(r => r.id === rule.id)?.url;
 }
-function ScanConfigs({ siteId: id }) {
+function ReportConfigs({ siteId: id }) {
   // TODO: maybe someday this needs to take siteBuildTask.branch into account
 
   const { siteBuildTasks } = useSiteBuildTasks(id);
@@ -44,8 +44,8 @@ function ScanConfigs({ siteId: id }) {
     setRulesSynced(true);
 
     return api.updateSiteBuildTask(id, siteBuildTask.sbtId, { rules: typeRules })
-      .then(() => notificationActions.success('Successfully saved scan configuration.'))
-      .catch(() => notificationActions.success('Error saving scan configuration.'))
+      .then(() => notificationActions.success('Successfully saved report configuration.'))
+      .catch(() => notificationActions.success('Error saving report configuration.'))
       .finally(() => setIsLoading(false));
   }
 
@@ -165,7 +165,7 @@ function ScanConfigs({ siteId: id }) {
           {' '}
           {sbt.name}
           {' '}
-          reports produced by cloud.gov Pages will automatically suppress certain scan findings
+          produced by cloud.gov Pages will automatically suppress certain findings
           which are irrelevant for statically hosted websites or frequently produce ‘false
           positive’ findings for our customers. You can specify additional findings to be
           suppressed for this site by adding the rule and any matching criteria to the ignore
@@ -233,12 +233,12 @@ function ScanConfigs({ siteId: id }) {
             Save all rules
           </button>
           <p className="post-scan-config-table-info">
-            For more information on scans and rulesets, check out the
+            For more information on reports and rulesets, check out the
             {' '}
             <a
               target="_blank"
               rel="noopener noreferrer"
-              title="Pages documentation on site scans"
+              title="Pages documentation on site reports"
               href="https://cloud.gov/pages/documentation/build-scans/"
             >
               documentation
@@ -255,11 +255,11 @@ function ScanConfigs({ siteId: id }) {
 
   return (
     <div>
-      <h3>Scan Configurations</h3>
+      <h3>Report Configurations</h3>
       {!defaultScanRules && (
         <div>
           <h4>
-            An error occurred while loading your site scan configurations.
+            An error occurred while loading your site report configurations.
           </h4>
         </div>
       )}
@@ -278,8 +278,8 @@ function ScanConfigs({ siteId: id }) {
   );
 }
 
-ScanConfigs.propTypes = {
+ReportConfigs.propTypes = {
   siteId: PropTypes.number.isRequired,
 };
 
-export default ScanConfigs;
+export default ReportConfigs;

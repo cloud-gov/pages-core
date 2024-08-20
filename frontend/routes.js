@@ -14,7 +14,7 @@ import SiteSettings from './components/site/SiteSettings';
 import CustomDomains from './components/site/CustomDomains';
 import NewCustomDomain from './components/site/CustomDomains/New';
 import EditCustomDomain from './components/site/CustomDomains/Edit';
-import SiteScans from './components/site/SiteScans';
+import SiteReports from './components/site/SiteReports';
 import AddSite from './components/AddSite';
 import NotFound from './components/NotFound';
 import Error from './components/Error';
@@ -51,8 +51,9 @@ export default (
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
+      <Route path="scans" loader={() => redirect('../reports')} />
       {(process.env.FEATURE_BUILD_TASKS === 'active') && (
-        <Route path="scans" element={<SiteScans />} />
+        <Route path="reports" element={<SiteReports />} />
       )}
     </Route>
     <Route path="settings" element={<UserSettings />} />
