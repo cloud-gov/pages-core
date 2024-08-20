@@ -74,7 +74,7 @@ function SiteReports() {
                 Pages is now offering automated monthly quality reports for customer production sites. These reports examine your Pages site for common website issues and provide guidance and resources for remediation. Pages Reports are part of a larger effort to help our customers comply with OMB Memo 23-22 and ATO requirements.
               </p>
               { siteBuildTasks.length > 0 && !buildIdToFilterBy && (
-                <table id="scheduled" className="usa-table table-full-width usa-table-borderless">
+                <table id="scheduled" className="usa-table table-full-width usa-table-borderless site-reports-table">
                   <thead>
                     <tr>
                       <th scope="col">Report</th>
@@ -85,7 +85,7 @@ function SiteReports() {
                     { siteBuildTasks.map(task => (
                       <tr key={task.id}>
                         <th scope="row">
-                          <h4>{task.name}</h4>
+                          <h3>{task.name}</h3>
                           <p>
                             {`${task.description} For more information, refer to the `}
                             <Link to={task.url}>documentation</Link>

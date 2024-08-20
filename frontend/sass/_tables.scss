@@ -61,7 +61,7 @@
   .build-info-details, 
   .scan-status-details {
     p, h4 {
-      font-size: 1.1em;
+      font-size: 1em;
       margin: 0;
       white-space: initial;
       line-height: 1.4em;
@@ -92,7 +92,7 @@
   .result-link,
   .branch-link, 
   .commit-link {
-    font-size: 1.1em;
+    font-size: 1em;
     // font-weight: 600;
     white-space: nowrap;
     svg {
@@ -234,7 +234,7 @@
   }
 
   td, tbody th {
-    padding: 2.5rem 1rem 1.5rem;
+    padding: 2rem 1rem 1.5rem;
   }
   tbody th {
     padding-top: 1.5rem;
@@ -449,4 +449,13 @@
 .post-scan-config-table-info {
   margin-top: 1em;
 }
-
+.site-reports-table td {
+  max-width: 80%;
+}
+.site-reports-table h3 {
+  font-size: 1.4em;
+}
+.site-reports-table p {
+  font-size: 1em;
+  line-height: 1.4;
+}
