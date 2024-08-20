@@ -233,7 +233,7 @@ const A11yAbout = () => {
               <span className="usa-tag--big usa-tag text-uppercase radius-pill bg-risk-info margin-0 display-inline">Minor</span>
             </th>
             <td>
-              A “Minor” result indicates a nuisance that introduces minor difficulty for people with disabilities. These issues oft4en produce a frustrating, though ultimately functional, experience for users.
+              A “Minor” result indicates a nuisance that introduces minor difficulty for people with disabilities. These issues often produce a frustrating yet mostly functional experience for users.
             </td>
           </tr>
         </tbody>
