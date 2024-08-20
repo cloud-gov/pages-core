@@ -11,11 +11,17 @@ export const useReportData = (id, subPage) => {
   const [results, setResults] = useState(initResultsState);
 
   useEffect(() => {
-    api.fetchReportData(id, subPage).then(data => setResults({
-      isLoading: false,
-      data,
-    }));
-  }, []);
+    async function fetchData() {
+      setResults(() => initResultsState);
+      const data = await api.fetchReportData(id, subPage);
+      setResults(() => ({
+        isLoading: false,
+        data,
+      }));
+    }
+
+    fetchData();
+  }, [id, subPage]);
 
   return results;
 };
