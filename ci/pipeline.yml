@@ -458,41 +458,37 @@ jobs:
         file: src/ci/partials/get-test-user-cookie.yml
       - load_var: cookie
         file: src/cookie
-      - task: scan
+      - task: scan-core
         privileged: true
         image: dind
-        config:
-          platform: linux
-          inputs:
-            - name: src
-            - name: zap
-          outputs: [name: src]
-          params:
-            ZAP_AUTH_HEADER: cookie
-            ZAP_AUTH_HEADER_VALUE: ((.:cookie))
-            DOMAIN: ((((deploy-env))-pages-domain))
-          run:
-            dir: src
-            path: ci/docker/entrypoint.sh
-            args:
-              - bash
-              - -ceux
-              - |
-                sed -i s/DOMAIN/$DOMAIN/g ci/zap/zap.yaml
-                pushd ..
-                  docker load -i zap/image.tar
-                  docker tag "$(cat zap/repository):$(cat zap/tag)" zap-docker
-                popd
-                docker run -v $(pwd)/ci/zap:/zap/wrk/:rw -e ZAP_AUTH_HEADER=$ZAP_AUTH_HEADER -e ZAP_AUTH_HEADER_VALUE=$ZAP_AUTH_HEADER_VALUE zap-docker zap.sh -cmd -autorun /zap/wrk/zap.yaml
-        ensure:
-          do:
-            - task: remove-test-users
-              file: src/ci/partials/remove-test-users.yml
-              image: node
-              params:
-                APP_ENV: ((deploy-env))
-                PRODUCT: pages
-            - put: s3
+        file: src/ci/partials/zap.yml
+        params:
+          ZAP_AUTH_HEADER: cookie
+          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          DOMAIN: ((((deploy-env))-pages-domain))
+      - task: scan-admin
+        privileged: true
+        image: dind
+        file: src/ci/partials/zap.yml
+        params:
+          ZAP_AUTH_HEADER: cookie
+          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          DOMAIN: admin.((((deploy-env))-pages-domain))
+      - task: scan-queues
+        privileged: true
+        image: dind
+        file: src/ci/partials/zap.yml
+        params:
+          ZAP_AUTH_HEADER: cookie
+          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          DOMAIN: queues.((((deploy-env))-pages-domain))
+      - task: remove-test-users
+        file: src/ci/partials/remove-test-users.yml
+        image: node
+        params:
+          APP_ENV: ((deploy-env))
+          PRODUCT: pages
+      - put: s3
 
   #@ if/end env == 'production':
   - name: release

@@ -3,7 +3,6 @@ env:
     - name: baseline
       urls:
         - https://DOMAIN
-        - https://admin.DOMAIN
       excludePaths:
         - cloudflare-dns\.com
         - digitalgov\.gov
@@ -53,12 +52,12 @@ jobs:
   - type: report
     parameters:
       reportDir: /zap/wrk/
-      reportFile: "{{yyyyMMdd}}-ZAP-pages.xml"
+      reportFile: "{{yyyyMMdd}}-ZAP-DOMAIN.xml"
       reportTitle: ZAP Scanning Report
       template: traditional-xml
   - type: report
     parameters:
       reportDir: /zap/wrk/
-      reportFile: "{{yyyyMMdd}}-ZAP-pages.html"
+      reportFile: "{{yyyyMMdd}}-ZAP-DOMAIN.html"
       reportTitle: ZAP Scanning Report
       template: traditional-html

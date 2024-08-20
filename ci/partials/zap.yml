@@ -1,0 +1,19 @@
+platform: linux
+inputs:
+  - name: src
+  - name: zap
+outputs:
+  - name: src
+run:
+  dir: src
+  path: ci/docker/entrypoint.sh
+  args:
+    - bash
+    - -ceux
+    - |
+      sed -i s/DOMAIN/$DOMAIN/g ci/zap/zap.yaml
+      pushd ..
+        docker load -i zap/image.tar
+        docker tag "$(cat zap/repository):$(cat zap/tag)" zap-docker
+      popd
+      docker run -v $(pwd)/ci/zap:/zap/wrk/:rw -e ZAP_AUTH_HEADER=$ZAP_AUTH_HEADER -e ZAP_AUTH_HEADER_VALUE=$ZAP_AUTH_HEADER_VALUE zap-docker zap.sh -cmd -autorun /zap/wrk/zap.yaml
