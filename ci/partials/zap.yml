@@ -11,7 +11,7 @@ run:
     - bash
     - -ceux
     - |
-      sed s/DOMAIN/$DOMAIN/g ci/zap/temp.yaml
+      sed s/DOMAIN/$DOMAIN/g ci/zap/zap.yaml > ci/zap/temp.yaml
       pushd ..
         docker load -i zap/image.tar
         docker tag "$(cat zap/repository):$(cat zap/tag)" zap-docker
