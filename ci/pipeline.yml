@@ -458,37 +458,40 @@ jobs:
         file: src/ci/partials/get-test-user-cookie.yml
       - load_var: cookie
         file: src/cookie
-      - task: scan-core
-        privileged: true
-        image: dind
-        file: src/ci/partials/zap.yml
-        params:
-          ZAP_AUTH_HEADER: cookie
-          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
-          DOMAIN: ((((deploy-env))-pages-domain))
-      - task: scan-admin
-        privileged: true
-        image: dind
-        file: src/ci/partials/zap.yml
-        params:
-          ZAP_AUTH_HEADER: cookie
-          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
-          DOMAIN: admin.((((deploy-env))-pages-domain))
-      - task: scan-queues
-        privileged: true
-        image: dind
-        file: src/ci/partials/zap.yml
-        params:
-          ZAP_AUTH_HEADER: cookie
-          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
-          DOMAIN: queues.((((deploy-env))-pages-domain))
-      - task: remove-test-users
-        file: src/ci/partials/remove-test-users.yml
-        image: node
-        params:
-          APP_ENV: ((deploy-env))
-          PRODUCT: pages
-      - put: s3
+      - in_parallel:
+          - task: scan-core
+            privileged: true
+            image: dind
+            file: src/ci/partials/zap.yml
+            params:
+              ZAP_AUTH_HEADER: cookie
+              ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+              DOMAIN: ((((deploy-env))-pages-domain))
+          - task: scan-admin
+            privileged: true
+            image: dind
+            file: src/ci/partials/zap.yml
+            params:
+              ZAP_AUTH_HEADER: cookie
+              ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+              DOMAIN: admin.((((deploy-env))-pages-domain))
+          - task: scan-queues
+            privileged: true
+            image: dind
+            file: src/ci/partials/zap.yml
+            params:
+              ZAP_AUTH_HEADER: cookie
+              ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+              DOMAIN: queues.((((deploy-env))-pages-domain))
+        ensure:
+          do:
+            - task: remove-test-users
+              file: src/ci/partials/remove-test-users.yml
+              image: node
+              params:
+                APP_ENV: ((deploy-env))
+                PRODUCT: pages
+            - put: s3
 
   #@ if/end env == 'production':
   - name: release
