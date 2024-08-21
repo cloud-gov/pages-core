@@ -573,6 +573,7 @@ resources:
         - "--exclude '*'"
         - "--include 'playwright-report/*'"
         - "--include 'ci/zap/*'"
+        - "--exclude 'ci/zap/*.yaml'"
 
   #@ if env == 'production':
   - name: slack-cg-pages
