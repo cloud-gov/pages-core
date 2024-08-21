@@ -575,7 +575,7 @@ resources:
       options:
         - "--exclude '*'"
         - "--include 'playwright-report/*'"
-        - "--include 'zap/wrk/*'"
+        - "--include 'ci/zap/*'"
 
   #@ if env == 'production':
   - name: slack-cg-pages
