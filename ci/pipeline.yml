@@ -396,6 +396,7 @@ jobs:
           DOMAIN: ((((deploy-env))-pages-domain))
           APP_ENV: ((deploy-env))
           PRODUCT: pages
+          PAGES_TEST_USER: e2e-test-user
       - task: run-e2e-tests
         file: src/ci/partials/e2e-test.yml
         image: node
@@ -422,6 +423,72 @@ jobs:
         -  #@ slack_hook("success", "e2e testing")
         #@ if/end env == 'dev':
         -  #@ pr_hook("success", "e2e-test")
+
+  - name: zap-conmon
+    plan:
+      - get: node
+      - get: zap
+        params:
+          format: oci
+      - get: pipeline-tasks
+      - get: dind
+      - get: general-task
+      - get: monthly
+        trigger: true
+      - get: src
+        passed:
+          - audit-dependencies
+      - task: get-app-env
+        image: general-task
+        file: pipeline-tasks/tasks/get-app-env.yml
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: create-test-users
+        file: src/ci/partials/create-test-users.yml
+        image: node
+        params:
+          DOMAIN: ((((deploy-env))-pages-domain))
+          APP_ENV: ((deploy-env))
+          PRODUCT: pages
+          PAGES_TEST_USER: zap-test-user
+      - task: get-test-user-cookie
+        image: general-task
+        file: src/ci/partials/get-test-user-cookie.yml
+      - load_var: cookie
+        file: src/cookie
+      - task: scan-core
+        privileged: true
+        image: dind
+        file: src/ci/partials/zap.yml
+        params:
+          ZAP_AUTH_HEADER: cookie
+          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          DOMAIN: ((((deploy-env))-pages-domain))
+      - task: scan-admin
+        privileged: true
+        image: dind
+        file: src/ci/partials/zap.yml
+        params:
+          ZAP_AUTH_HEADER: cookie
+          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          DOMAIN: admin.((((deploy-env))-pages-domain))
+      - task: scan-queues
+        privileged: true
+        image: dind
+        file: src/ci/partials/zap.yml
+        params:
+          ZAP_AUTH_HEADER: cookie
+          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          DOMAIN: queues.((((deploy-env))-pages-domain))
+      - task: remove-test-users
+        file: src/ci/partials/remove-test-users.yml
+        image: node
+        params:
+          APP_ENV: ((deploy-env))
+          PRODUCT: pages
+      - put: s3
 
   #@ if/end env == 'production':
   - name: release
@@ -480,6 +547,13 @@ resources:
       stop: 1:00 AM
       location: America/New_York
 
+  - name: monthly
+    type: cron
+    source:
+      expression: "0 6 23 * *"
+      location: "America/New_York"
+      fire_immediately: true
+
   #@ if/end env != 'dev':
   - name: five-minutes
     type: time
@@ -498,6 +572,8 @@ resources:
       options:
         - "--exclude '*'"
         - "--include 'playwright-report/*'"
+        - "--include 'ci/zap/*'"
+        - "--exclude 'ci/zap/*.yaml'"
 
   #@ if env == 'production':
   - name: slack-cg-pages
@@ -516,6 +592,8 @@ resources:
   - name: redis
   - name: postgres
   - name: node
+  - name: zap
+  - name: dind
   - name: slack
   - name: general-task
   - name: pipeline-tasks
@@ -527,6 +605,7 @@ resource_types:
   - name: slack-notification
   - name: registry-image
   - name: time
+  - name: cron
   #@ if/end env == 'dev':
   - name: pull-request
   #@ if/end env != 'production':

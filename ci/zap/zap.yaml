@@ -1,0 +1,63 @@
+env:
+  contexts:
+    - name: baseline
+      urls:
+        - https://DOMAIN
+      excludePaths:
+        - cloudflare-dns\.com
+        - digitalgov\.gov
+        - elastic\.co
+        - grafana\.com
+        - jsdelivr\.net
+        - secureauth\.gsa\.gov
+      technology:
+        include:
+          - PostgreSQL
+          - JavaScript
+          - Tomcat
+          - XML
+          - Linux
+          - Git
+          - MySQL
+          - SQLite
+          - JSP/Servlet
+          - Java
+          - Python
+          - Ruby
+        exclude:
+          - CouchDB
+          - Firebird
+          - HypersonicSQL
+          - IBM DB2
+          - Microsoft Access
+          - Microsoft SQL Server
+          - MongoDB
+          - Oracle
+          - SAP MaxDB
+          - Sybase
+          - ASP
+          - C
+          - PHP
+          - MacOS
+          - Windows
+          - SVN
+          - Apache
+          - IIS
+  parameters:
+    failOnError: true
+    progressToStdout: true
+jobs:
+  - type: spider
+  - type: activeScan
+  - type: report
+    parameters:
+      reportDir: /zap/wrk/
+      reportFile: "{{yyyyMMdd}}-ZAP-DOMAIN.xml"
+      reportTitle: ZAP Scanning Report
+      template: traditional-xml
+  - type: report
+    parameters:
+      reportDir: /zap/wrk/
+      reportFile: "{{yyyyMMdd}}-ZAP-DOMAIN.html"
+      reportTitle: ZAP Scanning Report
+      template: traditional-html
