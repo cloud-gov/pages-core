@@ -18,7 +18,7 @@ const { SiteSettings } = proxyquire(
     '../../../actions/siteActions': siteActionsMock,
     './EnvironmentVariables': () => <div />,
     './BranchConfigs': () => <div />,
-    './ScanConfigs': () => <div />,
+    './ReportConfigs': () => <div />,
     './Domains': () => <div />,
   }
 );

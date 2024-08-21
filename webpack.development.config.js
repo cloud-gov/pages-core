@@ -2,11 +2,11 @@ const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { getFeatureFlags } = require('./webpack-utils');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const RESOURCE_GENERATOR = {
-  filename: 'images/[contenthash][ext]',
+  filename: 'images/[name][ext]',
 };
 
 const svgoConfig = {
@@ -24,7 +24,10 @@ const svgoConfig = {
 
 module.exports = {
   mode: 'development',
-  entry: './frontend/main.jsx',
+  entry: {
+    bundle: './frontend/main.jsx',
+    report: './frontend/mainReport.jsx',
+  },
   devtool: 'inline-source-map',
   devServer: {
     static: {
@@ -33,7 +36,7 @@ module.exports = {
   },
   stats: 'minimal',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
   },
@@ -54,7 +57,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              url: { filter: (url) => !url.includes('images') },
+              url: { filter: url => !url.includes('images') },
             },
           },
           {
@@ -71,7 +74,7 @@ module.exports = {
             options: {
               sassOptions: {
                 quietDeps: true,
-                loadPath: path.resolve(__dirname, 'node_modules/uswds/src/stylesheets/'),
+                loadPath: path.resolve(__dirname, '.'),
               },
             },
           },
@@ -115,7 +118,7 @@ module.exports = {
     ]),
     new BundleAnalyzerPlugin({
       analyzerHost: '0.0.0.0',
-      analyzerPort: '8888'
+      analyzerPort: '8888',
     }),
   ],
 };

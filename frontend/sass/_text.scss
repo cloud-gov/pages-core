@@ -130,7 +130,7 @@ h3 {
 }
 
 h4 {
-  color: $color-gray-dark;
+  color: $body-copy-color;
   font-size: $h4-font-size;
   line-height: $h4-line-height;
 }
@@ -191,4 +191,11 @@ label.margin-0 {
 
 sup, sub {
   font-size: 80%
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+.text-bold {
+  font-weight: bold;
 }

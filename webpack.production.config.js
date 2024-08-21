@@ -7,7 +7,6 @@ const { getFeatureFlags } = require('./webpack-utils');
 
 const RESOURCE_GENERATOR = {
   filename: 'images/[contenthash][ext]',
-  publicPath: '/',
 };
 
 const svgoConfig = {
@@ -25,9 +24,12 @@ const svgoConfig = {
 
 const config = {
   mode: process.env.NODE_ENV,
-  entry: './frontend/main.jsx',
+  entry: {
+    bundle: './frontend/main.jsx',
+    report: './frontend/mainReport.jsx',
+  },
   output: {
-    filename: `js/bundle${process.env.NODE_ENV === 'production' ? '.[contenthash]' : ''}.js`,
+    filename: `js/[name]${process.env.NODE_ENV === 'production' ? '.[contenthash]' : ''}.js`,
     path: path.resolve(__dirname, 'public'),
   },
   resolve: {

@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const fs = require('node:fs');
+const path = require('node:path');
 const sinon = require('sinon');
 const moment = require('moment');
 const fsMock = require('mock-fs');
@@ -7,9 +8,15 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const config = require('../../../../config');
 
+const publicPath = '/publicPath/';
+const filename = 'bundle';
+const filenameJs = `${filename}.js`;
+const filenameCss = `${filename}.css`;
+
 const MockWebpackConfig = {
-  output: { filename: 'filename.js', publicPath: '/publicPath/' },
-  plugins: [{ options: { filename: 'filename.css' } }],
+  output: { filename: filenameJs, publicPath },
+  plugins: [{ options: { filename: filenameCss } }],
+  entry: { bundle: './js/to/bundle.js' },
 };
 
 const utils = proxyquire('../../../../api/utils', { '../../webpack.development.config.js': MockWebpackConfig });
@@ -178,8 +185,8 @@ describe('utils', () => {
     it('loads and uses the development webpack config', () => {
       const result = utils.loadDevelopmentManifest();
       expect(result).to.deep.eq({
-        'main.js': 'publicPath/filename.js',
-        'main.css': 'publicPath/filename.css',
+        'bundle.js': `${path.join(publicPath.slice(1), filenameJs)}`,
+        'bundle.css': `${path.join(publicPath.slice(1), filenameCss)}`,
       });
     });
   });

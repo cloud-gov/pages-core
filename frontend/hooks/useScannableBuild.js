@@ -55,15 +55,15 @@ export const useScannableBuild = (build, previewBuilds, showBuildTasks) => {
 
     try {
       await api.runScansForBuild(buildId);
-      alertActions.alertSuccess(`Scans queued for build # ${buildId}`);
-      return window.location.replace(`/sites/${state.build.site.id}/scans?build=${build.id}`);
+      alertActions.alertSuccess(`Report generation queued for build # ${buildId}`);
+      return window.location.replace(`/sites/${state.build.site.id}/reports?build=${build.id}`);
     } catch (error) {
       setState(currentState => ({
         ...currentState,
         isScanActionDisabled: false,
       }));
       return alertActions.alertError(
-        `An error occured when attempting to start scan: ${error.message}`
+        `An error occured when attempting to start report: ${error.message}`
       );
     }
   }

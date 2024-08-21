@@ -15,8 +15,8 @@ const notificationActions = {
 const useSiteBuildTasks = stub();
 const useDefaultScanRules = stub();
 
-const { ScanConfigs } = proxyquire(
-  '../../../../../frontend/components/site/SiteSettings/ScanConfigs', {
+const { ReportConfigs } = proxyquire(
+  '../../../../../frontend/components/site/SiteSettings/ReportConfigs', {
     '../../../actions/notificationActions': notificationActions,
     '../../../hooks/useSiteBuildTasks': { useSiteBuildTasks },
     '../../../hooks/useDefaultScanRules': { useDefaultScanRules },
@@ -27,7 +27,7 @@ const { ScanConfigs } = proxyquire(
   }
 );
 
-describe('<ScanConfigs/>', () => {
+describe('<ReportConfigs/>', () => {
   const state = {};
 
   let wrapper;
@@ -44,7 +44,7 @@ describe('<ScanConfigs/>', () => {
   });
 
   it('should render', () => {
-    wrapper = mountRouter(<ScanConfigs siteId={1} />, '/sites/:id/settings', '/sites/1/settings', state);
+    wrapper = mountRouter(<ReportConfigs siteId={1} />, '/sites/:id/settings', '/sites/1/settings', state);
 
     expect(wrapper.exists()).to.be.true;
   });
@@ -66,7 +66,7 @@ describe('<ScanConfigs/>', () => {
       defaultScanRules: [{ id: '10063', source: 'Pages', type: 'owasp-zap' }],
     });
 
-    wrapper = mountRouter(<ScanConfigs siteId={1} />, '/sites/:id/settings', '/sites/1/settings', state);
+    wrapper = mountRouter(<ReportConfigs siteId={1} />, '/sites/:id/settings', '/sites/1/settings', state);
 
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('b#rule-10063')).to.exist;
@@ -89,7 +89,7 @@ describe('<ScanConfigs/>', () => {
       }],
     });
 
-    wrapper = mountRouter(<ScanConfigs siteId={1} />, '/sites/:id/settings', '/sites/1/settings', state);
+    wrapper = mountRouter(<ReportConfigs siteId={1} />, '/sites/:id/settings', '/sites/1/settings', state);
 
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('b#rule-10063')).to.exist;

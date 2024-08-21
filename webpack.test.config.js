@@ -25,11 +25,13 @@ const svgoConfig = {
 
 const config = {
   mode: 'production',
-  entry: './frontend/main.jsx',
+  entry: {
+    bundle: './frontend/main.jsx',
+    report: './frontend/mainReport.jsx',
+  },
   output: {
-    filename: 'js/bundle.js',
+    filename: 'js/[name].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -103,7 +105,7 @@ const config = {
     new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
     new WebpackManifestPlugin({
       fileName: '../webpack-manifest.json',
-      publicPath: '/dist/',
+      publicPath: 'dist/',
     }),
     new webpack.EnvironmentPlugin([
       ...getFeatureFlags(process.env),

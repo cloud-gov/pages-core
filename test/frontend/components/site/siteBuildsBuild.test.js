@@ -109,8 +109,7 @@ describe('<SiteBuildsBuild/>', () => {
     const resultsCell = wrapper.find('td[data-title="Results"]');
     expect(resultsCell).to.exist;
     expect(wrapper.find('p.site-link')).to.have.length(1);
-    // expect(wrapper.find('p.site-link').text()).to.equal(viewSiteBuildCTA);
-    expect(resultsCell.find('branchViewLink')).to.have.length(1);
+    expect(resultsCell.find('p.site-link')).to.have.length(1);
   });
 
   it('should not render a `BranchViewLink` component if state is not successful', () => {

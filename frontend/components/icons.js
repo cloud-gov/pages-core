@@ -13,6 +13,7 @@ import IconIgnore from '../../public/images/icons/icon-ignore.svg';
 import IconLink from '../../public/images/icons/icon-link.svg';
 import IconPeople from '../../public/images/icons/icon-people.svg';
 import IconPlus from '../../public/images/icons/icon-plus.svg';
+import IconReport from '../../public/images/icons/icon-report.svg';
 import IconSpinner from '../../public/images/icons/icon-spinner-solid.svg';
 import IconView from '../../public/images/icons/icon-view.svg';
 import IconRebuild from '../../public/images/icons/icon-rebuild.svg';
@@ -35,6 +36,7 @@ export {
   IconLink,
   IconPeople,
   IconPlus,
+  IconReport,
   IconRebuild,
   IconSpinner,
   IconView,

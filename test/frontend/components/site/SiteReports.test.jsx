@@ -92,8 +92,8 @@ const useSiteBuildTasks = sinon.stub().returns({
   siteBuildTasks: [defaultSiteBuildTask],
 });
 
-const { SiteScans } = proxyquire('../../../../frontend/components/site/SiteScans', {
-  '../ScanResultsSummary': () => <span />,
+const { SiteReports } = proxyquire('../../../../frontend/components/site/SiteReports', {
+  '../ReportResultsSummary': () => <span />,
   '../../hooks/useSiteBuildTasks': { useSiteBuildTasks },
   '../../hooks/useBuildTasksForSite': { useBuildTasksForSite },
   '../GithubBuildBranchLink': () => <span />,
@@ -101,17 +101,7 @@ const { SiteScans } = proxyquire('../../../../frontend/components/site/SiteScans
 
 });
 
-function columnIndex(wrapper, name) {
-  let index;
-  wrapper.find('tr').children().forEach((child, childIndex) => {
-    if (child.contains(name)) {
-      index = childIndex;
-    }
-  });
-  return index;
-}
-
-describe('<SiteScans/>', () => {
+describe('<SiteReports/>', () => {
   beforeEach(() => {
     state = lodashClonedeep(defaultState);
   });
@@ -125,23 +115,23 @@ describe('<SiteScans/>', () => {
       isLoading: false,
       buildTasks: [{ ...defaultScan, status: 'unexpected' }],
     });
-    mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans', state);
+    mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
   });
 
-  it('should render an empty state if no scans are present', () => {
+  it('should render an empty state if no reports are present', () => {
     useBuildTasksForSite.returns({
       isLoading: false,
       buildTasks: [],
     });
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
     expect(
       wrapper.find('p',
-        { children: 'Looks like thise site doesn’t have any scans yet.' }
+        { children: 'Looks like this site doesn’t have any reports yet.' }
       )
     ).to.exist;
   });
 
-  it('should render as many rows as there are scans, plus one for the table header', () => {
+  it('should render as many rows as there are reports, plus one for the table header', () => {
     const N = 4;
     useBuildTasksForSite.returns({
       isLoading: false,
@@ -150,10 +140,10 @@ describe('<SiteScans/>', () => {
         .map((val, index) => ({ ...defaultScan, id: index })),
     });
 
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
     expect(wrapper.find('table#list tr')).to.have.length(N + 1);
     expect(wrapper.find('table#list + p')).to.have.length(1);
-    expect(wrapper.find('table#list + p').text()).to.contain(`Showing ${N} most recent scan(s).`);
+    expect(wrapper.find('table#list + p').text()).to.contain(`Showing ${N} most recent report(s).`);
   });
 
   it('should render a paragraph about truncation if 100 or more builds are present', () => {
@@ -164,18 +154,18 @@ describe('<SiteScans/>', () => {
         .map((val, index) => ({ ...defaultScan, id: index })),
     });
 
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
     expect(wrapper.find('table#list tr')).to.have.length(101); // front end does not actually truncate the list
     expect(wrapper.find('table#list + p + p')).to.have.length(1);
-    expect(wrapper.find('table#list + p + p').contains('List only displays 100 most recent scans from the last 180 days.')).to.be.true;
+    expect(wrapper.find('table#list + p + p').contains('List only displays 100 most recent reports from the last 180 days.')).to.be.true;
   });
 
-  it('should render a loading state if the scans are loading', () => {
+  it('should render a loading state if the reports are loading', () => {
     useBuildTasksForSite.returns({
       isLoading: true,
       buildTasks: [],
     });
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
     expect(wrapper.find('table#list')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
@@ -191,19 +181,19 @@ describe('<SiteScans/>', () => {
         .concat({ ...defaultScan, id: N + 1, buildId: 5 }),
     });
 
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans?build=1', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports?build=1', state);
     expect(wrapper.find('table#list tr')).to.have.length(N + 1);
     expect(wrapper.find('p.usa-alert-text')).to.have.length(1);
-    expect(wrapper.find('p.usa-alert-text').text()).to.contain(`Showing ${N} matching scans for build #${buildId}`);
+    expect(wrapper.find('p.usa-alert-text').text()).to.contain(`Showing ${N} matching reports for build #${buildId}`);
   });
 
   it('should hide the schedule table with a build parameter', () => {
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans?build=1', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports?build=1', state);
     expect(wrapper.find('table#scheduled')).to.have.length(0);
   });
 
   it('should show the schedule table without a build parameter', () => {
-    const wrapper = mountRouter(<SiteScans />, '/site/:id/scans', '/site/5/scans', state);
+    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
     expect(wrapper.find('table#scheduled')).to.have.length(1);
   });
 });
