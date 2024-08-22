@@ -4,10 +4,14 @@ config/local-from-staging.js
 
 # Webpack-generated assets
 public/js/bundle.js
+public/js/report*
 public/js/bundle.*.js*
+public/js/bundle.*
 public/styles/styles.css
 public/styles/styles.*.css*
 public/styles/uswds.*.css*
+public/uswds3/*
+!public/uswds3/.keep
 webpack-manifest.json
 webpackAssets
 public/stats.json
@@ -49,5 +53,5 @@ playwright-report/
 blob-report/
 playwright/.cache/
 playwright/.auth/*
-!playwright/.auth/.gitkeep 
+!playwright/.auth/.gitkeep
 database.json

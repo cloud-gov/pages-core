@@ -532,8 +532,8 @@ async function createData() {
   ]);
 
   const taskType1 = await BuildTaskType.create({
-    name: 'OWASP ZAP Vulnerability Scan',
-    description: 'This scan identifies potential website security issues like unintended exposure of sensitive data, SQL injection opportunities, cross-site scripting (XSS) flaws, and the use of components with known vulnerabilities.',
+    name: 'ZAP Vulnerability Report',
+    description: 'This report identifies potential website security issues like unintended exposure of sensitive data, SQL injection opportunities, cross-site scripting (XSS) flaws, and the use of components with known vulnerabilities.',
     metadata: {
       appName: 'pages-owasp-zap-task-dev',
     },
@@ -555,7 +555,7 @@ async function createData() {
     name: 'type',
     status: 'processing',
     artifact: null,
-    message: 'Scan in progress',
+    message: 'Report in progress',
     count: null,
   });
   await BuildTask.create({
@@ -564,7 +564,7 @@ async function createData() {
     name: 'type',
     status: 'cancelled',
     artifact: null,
-    message: 'Scan cancelled',
+    message: 'Report cancelled',
     count: null,
   });
   await BuildTask.create({
@@ -587,8 +587,8 @@ async function createData() {
   });
 
   const taskType2 = await BuildTaskType.create({
-    name: 'WCAG 2.2 AA Accessibility Scan',
-    description: 'This scan detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG 2.2 Level A and AA requirements.',
+    name: 'WCAG Accessibility Report',
+    description: 'This report detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG 2.2 Level A and AA requirements.',
     metadata: {
       appName: 'pages-a11y-task-dev',
     },

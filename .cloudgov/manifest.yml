@@ -7,12 +7,12 @@ applications:
     processes:
       - type: web
         command: yarn start
-        disk_quota: 2G
+        disk_quota: 5G
         instances: ((instances))
         memory: ((memory))
       - type: worker
         command: yarn start-workers
-        disk_quota: 2G
+        disk_quota: 5G
         instances: 1
         memory: 2G
     services:

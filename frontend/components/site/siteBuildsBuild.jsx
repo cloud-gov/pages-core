@@ -191,11 +191,11 @@ export const SiteBuildsBuild = ({
 
       </td>
       { initShowBuildTasks && (
-        <td data-title="Scans">
+        <td data-title="Reports">
           {build.BuildTasks?.length > 0 && (
             <p className="scan-link">
-              <Link to={`/sites/${siteId}/scans?build=${build.id}`}>
-                View scans
+              <Link to={`/sites/${siteId}/reports?build=${build.id}`}>
+                View reports
               </Link>
             </p>
           )}
@@ -208,12 +208,12 @@ export const SiteBuildsBuild = ({
               {buildHasBuildTasks ? (
                 <>
                   <IconRebuild />
-                  Rescan
+                  Rerun report
                 </>
               ) : (
                 <>
                   <IconExperiment />
-                  Run scans
+                  Get report
                 </>
               )}
             </CreateScanLink>
