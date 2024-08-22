@@ -27,6 +27,9 @@ const ScanFinding = ({
     count = parseInt(finding.count, 10);
     locations = finding.instances || [];
     references = finding.referenceURLs || [];
+    if (finding.otherinfo) {
+      description += `\n ${finding.otherinfo}`;
+    }
   }
   if (scanType === 'a11y') {
     title = `${finding.help}.`;
@@ -261,9 +264,10 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
     <div className="margin-bottom-neg-10">
       <ol className="padding-left-3">
         {locations.map((location, locationIndex) => {
-          const { uri: url, otherInfo } = location;
+          const { uri: url } = location;
           const code = scanType === 'zap' ? location.evidence : location.html;
           const target = scanType === 'zap' ? location.param : location.target;
+          const moreInfo = scanType === 'zap' ? location.otherinfo : null;
           const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
           return (
             <li key={locationAnchor} className="margin-bottom-5 margin-left-2 font-mono-md">
@@ -277,12 +281,15 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
               )}
               {code && <FindingLocationEvidence code={code} />}
               {target && <FindingLocationTarget target={target} />}
-              {otherInfo && (
-              <p className="font-body-sm padding-bottom-2 border-bottom-1px">
-                Additional info:
-                {' '}
-                {otherInfo}
-              </p>
+              {moreInfo && (
+                <>
+                  <h4 className="font-body-md text-normal margin-bottom-0">
+                    Additional information:
+                  </h4>
+                  <p className="font-body-sm padding-bottom-4 border-bottom-1px">
+                    {moreInfo}
+                  </p>
+                </>
               )}
             </li>
           );
