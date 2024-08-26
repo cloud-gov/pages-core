@@ -464,7 +464,7 @@ jobs:
         image: general-task
         file: src/ci/partials/get-test-user-cookies.yml
       - load_var: cookies
-        file: src/cookies
+        file: src/cookies.json
       - task: scan-core
         privileged: true
         image: dind
