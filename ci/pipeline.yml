@@ -436,6 +436,11 @@ jobs:
       - get: monthly
         trigger: true
       - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
         passed:
           - audit-dependencies
       - task: get-app-env
