@@ -4,15 +4,8 @@ const factory = require('../test/api/support/factory');
 const { Organization, Role } = require('../api/models');
 const { authenticatedSession } = require('../e2e/auth-session');
 
-async function createUsers() {
-  const org = await Organization.findOne({ where: { name: 'testing-org' } }); // exists in all environments
-  const userRole = await Role.findOne({ where: { name: 'user' } }); // exists in all environments
-  const user = await factory.user({ username: process.env.PAGES_TEST_USER || 'generic-test-user' });
-
-  await org.addUser(user, { through: { roleId: userRole.id } });
-
-  const [name, value] = (await authenticatedSession(user)).split('=');
-  const cookie = {
+function createCookie(name, value) {
+  return {
     name,
     value,
     domain: process.env.DOMAIN,
@@ -22,9 +15,32 @@ async function createUsers() {
     secure: process.env.APP_ENV === 'production',
     sameSite: 'Lax',
   };
+}
+
+async function createUsers() {
+  const org = await Organization.findOne({ where: { name: 'testing-org' } }); // exists in all environments
+  const userRole = await Role.findOne({ where: { name: 'user' } }); // exists in all environments
+  const user = await factory.user({ username: process.env.PAGES_TEST_USER || 'generic-test-user' });
+
+  await org.addUser(user, { through: { roleId: userRole.id } });
+
+  const [name, value] = (await authenticatedSession(user)).split('=');
+  const cookie = createCookie(name, value);
+  const cookies = [cookie];
+
+  if (process.env.ADMIN_COOKIE) {
+    const [adminName, adminValue] = (await authenticatedSession(user, 'admin')).split('=');
+    const adminCookie = createCookie(adminName, adminValue);
+    cookies.push(adminCookie);
+  }
+  if (process.env.QUEUES_COOKIE) {
+    const [queuesName, queuesValue] = (await authenticatedSession(user, 'queues')).split('=');
+    const queuesCookie = createCookie(queuesName, queuesValue);
+    cookies.push(queuesCookie);
+  }
 
   fs.writeFileSync('user.json', JSON.stringify(
-    { cookies: [cookie] }
+    { cookies }
   ));
 }
 

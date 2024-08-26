@@ -458,18 +458,20 @@ jobs:
           APP_ENV: ((deploy-env))
           PRODUCT: pages
           PAGES_TEST_USER: zap-test-user
-      - task: get-test-user-cookie
+          ADMIN_COOKIE: true
+          QUEUES_COOKIE: true
+      - task: get-test-user-cookies
         image: general-task
-        file: src/ci/partials/get-test-user-cookie.yml
-      - load_var: cookie
-        file: src/cookie
+        file: src/ci/partials/get-test-user-cookies.yml
+      - load_var: cookies
+        file: src/cookies
       - task: scan-core
         privileged: true
         image: dind
         file: src/ci/partials/zap.yml
         params:
           ZAP_AUTH_HEADER: cookie
-          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          ZAP_AUTH_HEADER_VALUE: ((.:cookies.pages))
           DOMAIN: ((((deploy-env))-pages-domain))
       - task: scan-admin
         privileged: true
@@ -477,7 +479,7 @@ jobs:
         file: src/ci/partials/zap.yml
         params:
           ZAP_AUTH_HEADER: cookie
-          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          ZAP_AUTH_HEADER_VALUE: ((.:cookies.admin))
           DOMAIN: admin.((((deploy-env))-pages-domain))
       - task: scan-queues
         privileged: true
@@ -485,7 +487,7 @@ jobs:
         file: src/ci/partials/zap.yml
         params:
           ZAP_AUTH_HEADER: cookie
-          ZAP_AUTH_HEADER_VALUE: ((.:cookie))
+          ZAP_AUTH_HEADER_VALUE: ((.:cookies.queues))
           DOMAIN: queues.((((deploy-env))-pages-domain))
       - task: remove-test-users
         file: src/ci/partials/remove-test-users.yml

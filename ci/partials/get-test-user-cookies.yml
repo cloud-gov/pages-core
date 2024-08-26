@@ -3,4 +3,4 @@ inputs: [name: src]
 outputs: [name: src]
 run:
   dir: src
-  path: ci/tasks/get-test-user-cookie.sh
+  path: ci/tasks/get-test-user-cookies.sh
