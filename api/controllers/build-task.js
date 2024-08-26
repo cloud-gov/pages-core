@@ -121,14 +121,10 @@ module.exports = wrapHandlers({
 
     // add report data to the task
     let report = null;
-    try {
-      const key = `${task.artifact}${subPage || 'index'}.json`;
-      const reportReponse = await getObject(task.Build.Site, key);
-      const reportString = await reportReponse.Body.transformToString();
-      report = JSON.parse(reportString);
-    } catch (err) {
-      console.err(err);
-    }
+    const key = `${task.artifact}${subPage || 'index'}.json`;
+    const reportReponse = await getObject(task.Build.Site, key);
+    const reportString = await reportReponse.Body.transformToString();
+    report = JSON.parse(reportString);
 
     const type = appMatch(task.BuildTaskType);
 
