@@ -1,10 +1,16 @@
 /* eslint-disable no-console */
 const fs = require('fs');
 const factory = require('../test/api/support/factory');
+const { Organization, Role } = require('../api/models');
 const { authenticatedSession } = require('../e2e/auth-session');
 
 async function createUsers() {
+  const org = await Organization.findOne({ where: { name: 'testing-org' } }); // exists in all environments
+  const userRole = await Role.findOne({ where: { name: 'user' } }); // exists in all environments
   const user = await factory.user({ username: process.env.PAGES_TEST_USER || 'generic-test-user' });
+
+  await org.addUser(user, { through: { roleId: userRole.id } });
+
   const [name, value] = (await authenticatedSession(user)).split('=');
   const cookie = {
     name,
