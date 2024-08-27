@@ -14,6 +14,8 @@ function createCookie(name, value, domain) {
     httpOnly: true,
     secure: process.env.APP_ENV === 'production',
     sameSite: 'Lax',
+    // for testing only
+    label: domain.replace(/([a-z]*)\..*/, '$1'),
   };
 }
 
@@ -30,7 +32,6 @@ async function createUsers() {
 
   if (process.env.ADMIN_COOKIE) {
     const [adminName, adminValue] = (await authenticatedSession(user, 'admin')).split('=');
-    // admin cookie uses pages.cloud.gov as the domain in prod but this is needed for testing
     const adminCookie = createCookie(adminName, adminValue, `admin.${process.env.DOMAIN}`);
     cookies.push(adminCookie);
   }
