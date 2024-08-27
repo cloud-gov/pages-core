@@ -4,11 +4,11 @@ const factory = require('../test/api/support/factory');
 const { Organization, Role } = require('../api/models');
 const { authenticatedSession } = require('../e2e/auth-session');
 
-function createCookie(name, value) {
+function createCookie(name, value, domain) {
   return {
     name,
     value,
-    domain: process.env.DOMAIN,
+    domain,
     path: '/',
     expires: (Number(new Date()) + (24 * 60 * 60 * 1000)) / 1000,
     httpOnly: true,
@@ -25,17 +25,18 @@ async function createUsers() {
   await org.addUser(user, { through: { roleId: userRole.id } });
 
   const [name, value] = (await authenticatedSession(user)).split('=');
-  const cookie = createCookie(name, value);
+  const cookie = createCookie(name, value, process.env.DOMAIN);
   const cookies = [cookie];
 
   if (process.env.ADMIN_COOKIE) {
     const [adminName, adminValue] = (await authenticatedSession(user, 'admin')).split('=');
-    const adminCookie = createCookie(adminName, adminValue);
+    // admin cookie uses pages.cloud.gov as the domain in prod but this is needed for testing
+    const adminCookie = createCookie(adminName, adminValue, `admin.${process.env.DOMAIN}`);
     cookies.push(adminCookie);
   }
   if (process.env.QUEUES_COOKIE) {
     const [queuesName, queuesValue] = (await authenticatedSession(user, 'queues')).split('=');
-    const queuesCookie = createCookie(queuesName, queuesValue);
+    const queuesCookie = createCookie(queuesName, queuesValue, `queues.${process.env.DOMAIN}`);
     cookies.push(queuesCookie);
   }
 
