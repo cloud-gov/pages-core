@@ -132,10 +132,13 @@ export function SiteContainer(props) {
   }
 
   const pageTitle = getPageTitle(location.pathname, buildId);
+  const navConig = SITE_NAVIGATION_CONFIG.filter(navItem => !(
+    navItem.route === 'reports' && site.SiteBuildTasks.length === 0
+  ));
 
   return (
     <div className="usa-grid site">
-      <SideNav siteId={site.id} config={SITE_NAVIGATION_CONFIG} />
+      <SideNav siteId={site.id} config={navConig} />
       <div className="usa-width-five-sixths site-main" id="pages-container" role="main">
 
         <AlertBanner

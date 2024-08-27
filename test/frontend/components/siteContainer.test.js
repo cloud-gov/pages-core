@@ -27,6 +27,7 @@ const site = {
   repository: 'test-repo',
   organizationId: 1,
   isActive: true,
+  SiteBuildTasks: [],
 };
 const organization = {
   id: 1,

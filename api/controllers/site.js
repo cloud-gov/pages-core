@@ -41,7 +41,7 @@ module.exports = wrapHandlers({
     const { user } = req;
 
     const sites = await Site.forUser(user).findAll({
-      include: [Domain, SiteBranchConfig],
+      include: [Domain, SiteBranchConfig, SiteBuildTask],
     });
 
     if (!sites) {

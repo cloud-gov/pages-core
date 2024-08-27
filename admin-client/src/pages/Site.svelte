@@ -78,8 +78,8 @@
     notification.setError(`Site webhook create error: ${error.message}`);
   }
 
-  async function handleSiteBuildTaskSubmit(buildTaskTypeId, branch) {
-    return addSiteBuildTask(id, { buildTaskTypeId, branch });
+  async function handleSiteBuildTaskSubmit(buildTaskTypeId, branch, runDay = null) {
+    return addSiteBuildTask(id, { buildTaskTypeId, branch, runDay });
   }
 
   async function handleSiteBuildTaskSuccess() {
