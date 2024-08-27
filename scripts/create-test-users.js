@@ -15,7 +15,7 @@ function createCookie(name, value, domain) {
     secure: process.env.APP_ENV === 'production',
     sameSite: 'Lax',
     // for testing only
-    label: domain.replace(/([a-z]*)\..*/, '$1'),
+    label: domain.replace(/([a-z]*).*/, '$1'),
   };
 }
 
