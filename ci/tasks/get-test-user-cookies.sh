@@ -5,4 +5,4 @@ set -e
 # playwright uses an array of cookies
 # to reuse this JSON and the script that generates, we set this to an object with
 # keys as the first subdomain of the domain, and values as the cookie
-cat user.json | jq -r '.cookies | map( { (.domain|tostring|sub("https://(?<base>[a-z]*).*"; "\(.base)")): "\(.name)=\(.value)" } ) | add' > cookies.json
+cat user.json | jq -r '.cookies | map( { (.domain|tostring|sub("(?<base>[a-z]*).*"; "\(.base)")): "\(.name)=\(.value)" } ) | add' > cookies.json
