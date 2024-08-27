@@ -38,6 +38,7 @@ describe('<SiteSettings/>', () => {
           engine: 'jekyll',
           basicAuth: {},
           organizationId: 1,
+          SiteBuildTasks: [],
         },
       ],
     },

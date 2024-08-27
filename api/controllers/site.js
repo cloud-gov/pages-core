@@ -304,7 +304,7 @@ module.exports = wrapHandlers({
       body,
     } = req;
 
-    const { metadata } = body;
+    const { metadata: { rules } } = body;
 
     // check Site for authorizer's sake
     const site = await Site.findByPk(siteId);
@@ -321,7 +321,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    await siteBuildTask.update({ metadata });
+    const { metadata } = siteBuildTask.dataValues;
+
+    await siteBuildTask.update({ metadata: { ...metadata, rules } });
 
     return res.ok({});
   },
