@@ -57,12 +57,26 @@ module.exports = wrapHandlers({
   },
 
   async addSiteBuildTask(req, res) {
+    const { branch, runDay } = req.body;
+    const metadata = runDay ? { runDay } : {};
+
     await SiteBuildTask.create({
       buildTaskTypeId: req.body.buildTaskTypeId,
       siteId: req.params.id,
-      branch: req.body.branch,
-      metadata: {},
+      branch,
+      metadata,
     });
+
+    return res.json({});
+  },
+
+  async updateSiteBuildTask(req, res) {
+    const { id } = req.params;
+    const { runDay } = req.body;
+
+    const sbt = await SiteBuildTask.findByPk(id);
+
+    await sbt.update({ metadata: { ...sbt.metadata, runDay } });
 
     return res.json({});
   },

@@ -30,8 +30,9 @@ function latestBuildByBranch(builds) {
   });
   return maxBuilds;
 }
-function siteHasBuildTasks({ data, isLoading }) {
-  return process.env.FEATURE_BUILD_TASKS === 'active' && !isLoading && data.some(build => build.BuildTasks?.length);
+
+function siteHasBuildTasks(SiteBuildTasks = []) {
+  return SiteBuildTasks.length > 0;
 }
 
 function SiteBuilds() {
@@ -104,7 +105,7 @@ function SiteBuilds() {
                 <tr>
                   <th scope="col">Build</th>
                   <th scope="col">Branch</th>
-                  { siteHasBuildTasks(builds) && (
+                  { siteHasBuildTasks(site.SiteBuildTasks) && (
                     <th scope="col">
                       Reports
                       {' '}
@@ -121,7 +122,7 @@ function SiteBuilds() {
                 {builds.data.map(build => (
                   <SiteBuildsBuild
                     build={build}
-                    showBuildTasks={siteHasBuildTasks(builds)}
+                    showBuildTasks={siteHasBuildTasks(site.SiteBuildTasks)}
                     previewBuilds={previewBuilds}
                     site={site}
                     key={build.id}

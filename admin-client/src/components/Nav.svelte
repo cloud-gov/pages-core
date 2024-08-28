@@ -97,6 +97,11 @@
             </a>
           </li>
           <li class="usa-nav__primary-item">
+            <a class="usa-nav__link"  class:usa-current={currentPath === '/tasks'} href="/tasks">
+              <span>Tasks</span>
+            </a>
+          </li>
+          <li class="usa-nav__primary-item">
             <a class="usa-nav__link"  class:usa-current={currentPath === '/users'} href="/users">
               <span>Users</span>
             </a>

@@ -12,6 +12,7 @@
     fetchUsers,
     updateSite,
     addSiteBuildTask,
+    updateSiteBuildTask,
     removeBuildTask,
   } from '../lib/api';
   import {
@@ -33,6 +34,7 @@
   import { destroySite } from '../flows';
   import { selectSiteDomains, stateColor } from '../lib/utils';
   import SiteFormBuildTaskType from '../components/SiteFormBuildTaskType.svelte';
+  import SiteFormUpdateBuildTaskType from '../components/SiteFormUpdateBuildTaskType.svelte';
 
   const { id } = $router.params;
   $: sitePromise = fetchSite(id);
@@ -43,6 +45,14 @@
   $: orgsPromise = fetchOrganizations({ limit: 100 });
   $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
+
+  const initEditedBuildTask = {
+    isEditing: false,
+    initialRunDay: null,
+    data: null,
+  };
+
+  let editedBuildTask = initEditedBuildTask;
 
   async function handleOrganizationSubmit(organizationId) {
     return updateSite(id, { organizationId });
@@ -78,8 +88,12 @@
     notification.setError(`Site webhook create error: ${error.message}`);
   }
 
-  async function handleSiteBuildTaskSubmit(buildTaskTypeId, branch) {
-    return addSiteBuildTask(id, { buildTaskTypeId, branch });
+  async function handleSiteBuildTaskSubmit(
+    buildTaskTypeId,
+    branch,
+    runDay = null,
+  ) {
+    return addSiteBuildTask(id, { buildTaskTypeId, branch, runDay });
   }
 
   async function handleSiteBuildTaskSuccess() {
@@ -89,6 +103,28 @@
 
   async function handleSiteBuildTaskFailure() {
     notification.setError('Build task update error');
+  }
+
+  async function handleCloseEditSiteBuildTask() {
+    editedBuildTask = initEditedBuildTask;
+  }
+
+  async function handleOpenEditSiteBuildTask(data) {
+    editedBuildTask = {
+      isEditing: true,
+      initialRunDay: data?.metadata?.runDay,
+      data,
+    };
+  }
+
+  async function handleEditSiteBuildTaskSubmit(sbtId, runDay = null) {
+    return updateSiteBuildTask(sbtId, { runDay });
+  }
+
+  async function handleEditSiteBuildTaskSuccess() {
+    sitePromise = fetchSite(id);
+    notification.setSuccess('Build task edited successfully');
+    editedBuildTask = initEditedBuildTask;
   }
 
   async function handleRemoveBuildTask(sbt) {
@@ -166,10 +202,7 @@
         </Await>
       </AccordionContent>
       <AccordionContent title="Domains">
-        <DataTable
-          data={selectSiteDomains(site)}
-          borderless={true}
-        >
+        <DataTable data={selectSiteDomains(site)} borderless={true}>
           <tr slot="header">
             <th>Domain Names</th>
             <th>Context</th>
@@ -236,8 +269,10 @@
             <th>Build Task Type</th>
             <th>Type Id</th>
             <th>Branch</th>
-            <th>Metadata</th>
+            <th>Run Day</th>
+            <th>Rules</th>
             <th>Created At</th>
+            <th>Edit</th>
             <th>Remove</th>
           </tr>
           <tr slot="item" let:item={sbt}>
@@ -245,14 +280,27 @@
             <td>{sbt.BuildTaskType.name}</td>
             <td>{sbt.buildTaskTypeId}</td>
             <td>{sbt.branch}</td>
-            <td>{JSON.stringify(sbt.metadata)}</td>
+            <td>
+              {sbt.metadata?.runDay}
+            </td>
+            <td>{JSON.stringify(sbt.metadata?.rules)}</td>
             <td>{sbt.createdAt}</td>
+            <td>
+              <input
+                class="usa-button"
+                type="button"
+                value="Edit"
+                on:click|preventDefault={() => handleOpenEditSiteBuildTask(sbt)}
+              />
+            </td>
             <td>
               <input
                 class="usa-button usa-button--base"
                 type="reset"
                 value="Remove"
-                on:click|preventDefault={() => handleRemoveBuildTask(sbt)} /></td>
+                on:click|preventDefault={() => handleRemoveBuildTask(sbt)}
+              />
+            </td>
           </tr>
           <p slot="empty">No build tasks registered</p>
         </DataTable>
@@ -271,3 +319,18 @@
     </Accordion>
   </Await>
 </GridContainer>
+
+{#if editedBuildTask.isEditing}
+  <SiteFormUpdateBuildTaskType
+    isEditing={editedBuildTask.site}
+    branch={editedBuildTask.data?.branch}
+    buildTaskName={editedBuildTask?.data?.BuildTaskType?.name}
+    id={editedBuildTask?.data?.id}
+    initialRunDay={editedBuildTask.initialRunDay}
+    runDay={editedBuildTask.data?.metadata?.runDay}
+    closeModal={handleCloseEditSiteBuildTask}
+    onSubmit={handleEditSiteBuildTaskSubmit}
+    onSuccess={handleEditSiteBuildTaskSuccess}
+    onFailure={handleSiteBuildTaskFailure}
+  />
+{/if}

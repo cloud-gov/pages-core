@@ -1,8 +1,9 @@
 <script>
   import Form from './Form.svelte';
+  import NumberInput from './NumberInput.svelte';
   import SelectInput from './SelectInput.svelte';
 
-  export let buildTaskTypes;
+  export let buildTaskTypes = [];
   export let site;
   export let onSubmit;
   export let onSuccess;
@@ -21,13 +22,14 @@
 
   $: value = undefined;
   $: branch = undefined;
+  $: runDay = undefined;
 </script>
 
 <div class="grid-row">
   <div class="grid-col-8 grid-offset-4">
     <Form
       action="Add"
-      onSubmit={() => onSubmit(value, branch)}
+      onSubmit={() => onSubmit(value, branch, runDay)}
       {onSuccess}
       {onFailure}
       let:errors
@@ -39,6 +41,7 @@
           name="build-task-types"
           label='Build Task Types'
           options={options}
+          required
           bind:value={value}
         />
         <SelectInput
@@ -48,7 +51,14 @@
           options={branches}
           bind:value={branch}
         />
-
+        <NumberInput
+          error={errors.isActive}
+          name="runDay"
+          label='Runs On'
+          min={1}
+          max={27}
+          bind:value={runDay}
+        />
       </fieldset>
     </Form>
   </div>

@@ -80,7 +80,9 @@ function SiteSettings() {
       />
 
       <EnvironmentVariables siteId={site.id} />
-      <ReportConfigs siteId={site.id} />
+      {site.SiteBuildTasks.length > 0 && (
+        <ReportConfigs siteId={site.id} />
+      )}
     </div>
   );
 }
