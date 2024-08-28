@@ -91,7 +91,7 @@
   async function handleSiteBuildTaskSubmit(
     buildTaskTypeId,
     branch,
-    runDay = null
+    runDay = null,
   ) {
     return addSiteBuildTask(id, { buildTaskTypeId, branch, runDay });
   }
