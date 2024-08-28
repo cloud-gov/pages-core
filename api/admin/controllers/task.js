@@ -70,6 +70,17 @@ module.exports = wrapHandlers({
     return res.json({});
   },
 
+  async updateSiteBuildTask(req, res) {
+    const { id } = req.params;
+    const { runDay } = req.body;
+
+    const sbt = await SiteBuildTask.findByPk(id);
+
+    await sbt.update({ metadata: { ...sbt.metadata, runDay } });
+
+    return res.json({});
+  },
+
   async removeSiteBuiltTask(req, res) {
     const { id } = req.params;
 

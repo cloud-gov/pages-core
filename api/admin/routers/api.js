@@ -56,6 +56,7 @@ apiRouter.post('/sites/:id/tasks', AdminControllers.Task.addSiteBuildTask);
 apiRouter.get('/tasks', AdminControllers.Task.list);
 apiRouter.get('/tasks/types', AdminControllers.Task.listTypes);
 apiRouter.delete('/site-build-tasks/:id', authorize(['pages.admin']), AdminControllers.Task.removeSiteBuiltTask);
+apiRouter.put('/site-build-tasks/:id', AdminControllers.Task.updateSiteBuildTask);
 apiRouter.get('/me', AdminControllers.User.me);
 apiRouter.get('/user-environment-variables', AdminControllers.UserEnvironmentVariable.list);
 apiRouter.get('/users', AdminControllers.User.list);

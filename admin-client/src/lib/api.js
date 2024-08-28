@@ -318,12 +318,17 @@ async function addSiteBuildTask(id, params) {
   return post(`/sites/${id}/tasks`, params);
 }
 
+async function updateSiteBuildTask(id, params) {
+  return put(`/site-build-tasks/${id}`, params);
+}
+
 async function removeBuildTask(id) {
   return destroy(`/site-build-tasks/${id}`);
 }
 
 export {
   addSiteBuildTask,
+  updateSiteBuildTask,
   removeBuildTask,
   destroySite,
   fetchMe,

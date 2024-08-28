@@ -3,7 +3,7 @@
   import NumberInput from './NumberInput.svelte';
   import SelectInput from './SelectInput.svelte';
 
-  export let buildTaskTypes;
+  export let buildTaskTypes = [];
   export let site;
   export let onSubmit;
   export let onSuccess;
