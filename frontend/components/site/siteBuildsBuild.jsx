@@ -23,7 +23,7 @@ import {
   IconSpinner,
   IconX,
   IconRebuild,
-  IconExperiment,
+  IconReport,
 } from '../icons';
 
 function BuildLogsLink({ buildId, siteId }) {
@@ -212,7 +212,7 @@ export const SiteBuildsBuild = ({
                 </>
               ) : (
                 <>
-                  <IconExperiment />
+                  <IconReport />
                   Get report
                 </>
               )}
