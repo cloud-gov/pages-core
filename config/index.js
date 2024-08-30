@@ -32,6 +32,11 @@ if (fs.existsSync(path.join(__dirname, 'local-from-staging.js'))) {
   deepExtend(config, require(path.join(__dirname, 'local-from-staging.js')));
 }
 
+if (fs.existsSync(path.join(__dirname, 'local-site-build-tasks.json'))) {
+  const rawFile = fs.readFileSync(path.join(__dirname, 'local-site-build-tasks.json'), 'utf-8');
+  deepExtend(config, { localSiteBuildTasks: JSON.parse(rawFile) });
+}
+
 let environment = process.env.NODE_ENV;
 
 // TODO: the dev deploy needs production.js to connect to the DB in certain situations (which?)

@@ -1,3 +1,6 @@
+const { readFile } = require('node:fs/promises');
+const { join } = require('node:path');
+const { localSiteBuildTasks } = require('../../config');
 const { wrapHandlers, appMatch } = require('../utils');
 const {
   Build, BuildTask, BuildTaskType, SiteBuildTask, Site,
@@ -86,10 +89,9 @@ module.exports = wrapHandlers({
       },
     });
 
-    await Promise.all(siteBuildTasks.map(siteBuildTask => (
-      siteBuildTask
-        .createBuildTask(build)
-        .then(async task => task.enqueue())
+    await Promise.all(siteBuildTasks.map(siteBuildTask => (siteBuildTask
+      .createBuildTask(build)
+      .then(async task => task.enqueue())
     )));
 
     return res.ok({});
@@ -98,6 +100,25 @@ module.exports = wrapHandlers({
   report: async (req, res) => {
     const { params, user } = req;
     const { task_id: taskId, sub_page: subPage } = params;
+
+    if (process.env.DOMAIN === 'localhost:1337') {
+      const task = localSiteBuildTasks.find(t => t.id.toString() === taskId);
+      const file = subPage || 'index';
+      const reportPath = join(
+        __dirname,
+        `../../services/local/tasks/${task.type}/${file}.json`
+      );
+
+      const raw = await readFile(reportPath, 'utf-8');
+      const report = JSON.parse(raw);
+
+      return res.json({
+        type: task.type,
+        siteId: task.id,
+        buildId: task.id,
+        report,
+      });
+    }
 
     const task = await BuildTask.findOne({
       where: { id: taskId },
