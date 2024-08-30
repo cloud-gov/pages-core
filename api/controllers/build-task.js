@@ -101,7 +101,7 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { task_id: taskId, sub_page: subPage } = params;
 
-    if (process.env.DOMAIN === 'localhost:1337') {
+    if (process.env.FEATURE_LOCAL_BUILD_REPORTS === 'active') {
       const task = localSiteBuildTasks.find(t => t.id.toString() === taskId);
       const file = subPage || 'index';
       const reportPath = join(

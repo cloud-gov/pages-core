@@ -28,6 +28,11 @@ export default {
       .then(dispatchBuildsReceivedAction);
   },
 
+  refetchBuilds(site) {
+    return api.fetchBuilds(site)
+      .then(dispatchBuildsReceivedAction);
+  },
+
   restartBuild(buildId, siteId) {
     return api.restartBuild(buildId, siteId)
       .then((build) => {

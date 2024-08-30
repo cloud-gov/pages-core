@@ -29,6 +29,7 @@ services:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
       FEATURE_BUILD_TASKS: 'active'
+      FEATURE_LOCAL_BUILD_REPORTS: 'active'
       PORT: 1337
       PRODUCT: pages
       UAA_HOST: http://localhost:9000
