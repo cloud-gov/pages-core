@@ -173,10 +173,10 @@ function ReportConfigs({ siteId: id }) {
           {sbt.name}
           {' '}
           produced by cloud.gov Pages will automatically suppress certain findings
-          which are irrelevant for statically hosted websites or frequently produce ‘false
-          positive’ findings for our customers. You can specify additional findings to be
-          suppressed for this site by adding the rule and any matching criteria to the ignore
-          list below.
+          which are irrelevant for statically hosted websites, based on unconfigurable
+          server settings, or frequently produce ‘false positive’ findings for our customers.
+          You can specify additional findings to be suppressed for this site by adding the rule
+          and any matching criteria to the ignore list below.
           {' '}
           <b>
             While still visible in the report, the suppressed findings don’t count towards your
@@ -250,7 +250,7 @@ function ReportConfigs({ siteId: id }) {
             >
               documentation
             </a>
-            . If you’d like to suggest a rule to be suppressed due to “false positives”,
+            . If you’d like to suggest a rule to be suppressed for all sites,
             {' '}
             <a href="mailto:pages-support@cloud.gov" target="_blank" rel="noopener noreferrer" title="Email Pages Support at pages-support@cloud.gov">let us know</a>
             .
