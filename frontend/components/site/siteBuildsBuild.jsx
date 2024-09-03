@@ -7,7 +7,6 @@ import {
   dateAndTimeSimple,
   duration,
   timeFrom,
-  dateAndTime,
 } from '../../util/datetime';
 import buildActions from '../../actions/buildActions';
 
@@ -182,9 +181,6 @@ export const SiteBuildsBuild = ({
             <GithubBuildShaLink build={build} site={site} />
             <span className="commit-user" title={build.user?.email}>
               {build.username}
-            </span>
-            <span className="commit-time" title={dateAndTime(build.createdAt)}>
-              {timeFrom(build.createdAt)}
             </span>
           </div>
         </div>

@@ -1,0 +1,346 @@
+{
+  "baseurl": "https://example.gov/preview/owner/repo/branch",
+  "totalPageCount": 8,
+  "totalViolationsCount": 11,
+  "violatedRules": [
+    {
+      "id": "aria-hidden-focus",
+      "impact": "serious",
+      "tags": [
+        "cat.name-role-value",
+        "wcag2a",
+        "wcag412",
+        "TTv5",
+        "TT6.a",
+        "EN-301-549",
+        "EN-9.4.1.2"
+      ],
+      "description": "Ensure aria-hidden elements are not focusable nor contain focusable elements",
+      "help": "ARIA hidden element must not be focusable or contain focusable elements",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/aria-hidden-focus?application=webdriverjs",
+      "nodes": [
+        {
+          "any": [],
+          "all": [
+            {
+              "id": "focusable-not-tabbable",
+              "data": null,
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"direct-link\" href=\"#section-heading-(h1)\" aria-hidden=\"true\">#</a>",
+                  "target": ["a[href$=\"#section-heading-(h1)\"]"]
+                }
+              ],
+              "impact": "serious",
+              "message": "Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+            }
+          ],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"direct-link\" href=\"#section-heading-(h1)\" aria-hidden=\"true\">#</a>",
+          "target": ["a[href$=\"#section-heading-(h1)\"]"],
+          "failureSummary": "Fix all of the following:\n  Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+        },
+        {
+          "any": [],
+          "all": [
+            {
+              "id": "focusable-not-tabbable",
+              "data": null,
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"direct-link\" href=\"#section-heading-(h2)\" aria-hidden=\"true\">#</a>",
+                  "target": ["a[href$=\"#section-heading-(h2)\"]"]
+                }
+              ],
+              "impact": "serious",
+              "message": "Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+            }
+          ],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"direct-link\" href=\"#section-heading-(h2)\" aria-hidden=\"true\">#</a>",
+          "target": ["a[href$=\"#section-heading-(h2)\"]"],
+          "failureSummary": "Fix all of the following:\n  Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+        },
+        {
+          "any": [],
+          "all": [
+            {
+              "id": "focusable-not-tabbable",
+              "data": null,
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"direct-link\" href=\"#subsection-heading-(h3)\" aria-hidden=\"true\">#</a>",
+                  "target": ["a[href$=\"#subsection-heading-(h3)\"]"]
+                }
+              ],
+              "impact": "serious",
+              "message": "Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+            }
+          ],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"direct-link\" href=\"#subsection-heading-(h3)\" aria-hidden=\"true\">#</a>",
+          "target": ["a[href$=\"#subsection-heading-(h3)\"]"],
+          "failureSummary": "Fix all of the following:\n  Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+        },
+        {
+          "any": [],
+          "all": [
+            {
+              "id": "focusable-not-tabbable",
+              "data": null,
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"direct-link\" href=\"#subsection-heading-(h4)\" aria-hidden=\"true\">#</a>",
+                  "target": ["a[href$=\"#subsection-heading-(h4)\"]"]
+                }
+              ],
+              "impact": "serious",
+              "message": "Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+            }
+          ],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"direct-link\" href=\"#subsection-heading-(h4)\" aria-hidden=\"true\">#</a>",
+          "target": ["a[href$=\"#subsection-heading-(h4)\"]"],
+          "failureSummary": "Fix all of the following:\n  Focusable content should have tabindex=\"-1\" or be removed from the DOM"
+        }
+      ],
+      "color": "error-dark",
+      "order": 1,
+      "total": 8,
+      "ignore": false,
+      "ignoreSource": "",
+      "urls": [
+        "https://example.gov/preview/owner/repo/branch/document-with-sidenav/",
+        "https://example.gov/preview/owner/repo/branch/document/"
+      ]
+    },
+    {
+      "id": "document-title",
+      "impact": "serious",
+      "tags": [
+        "cat.text-alternatives",
+        "wcag2a",
+        "wcag242",
+        "TTv5",
+        "TT12.a",
+        "EN-301-549",
+        "EN-9.2.4.2",
+        "ACT"
+      ],
+      "description": "Ensure each HTML document contains a non-empty <title> element",
+      "help": "Documents must have <title> element to aid in navigation",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/document-title?application=webdriverjs",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "doc-has-title",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Document does not have a non-empty <title> element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<html lang=\"en\">",
+          "target": ["html"],
+          "failureSummary": "Fix any of the following:\n  Document does not have a non-empty <title> element"
+        }
+      ],
+      "color": "error-dark",
+      "order": 1,
+      "total": 8,
+      "ignore": false,
+      "ignoreSource": "",
+      "urls": [
+        "https://example.gov/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+        "https://example.gov/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+        "https://example.gov/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+        "https://example.gov/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+        "https://example.gov/preview/owner/repo/branch/blog/",
+        "https://example.gov/preview/owner/repo/branch/document-with-sidenav/",
+        "https://example.gov/preview/owner/repo/branch/document/",
+        "https://example.gov/preview/owner/repo/branch/"
+      ]
+    },
+    {
+      "id": "listitem",
+      "impact": "serious",
+      "tags": [
+        "cat.structure",
+        "wcag2a",
+        "wcag131",
+        "EN-301-549",
+        "EN-9.1.3.1"
+      ],
+      "description": "Ensure <li> elements are used semantically",
+      "help": "<li> elements must be contained in a <ul> or <ol>",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/listitem?application=webdriverjs",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "listitem",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "List item does not have a <ul>, <ol> parent element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<li class=\"usa-collection__item\">",
+          "target": [".usa-collection__item:nth-child(1)"],
+          "failureSummary": "Fix any of the following:\n  List item does not have a <ul>, <ol> parent element"
+        },
+        {
+          "any": [
+            {
+              "id": "listitem",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "List item does not have a <ul>, <ol> parent element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<li class=\"usa-collection__item\">",
+          "target": [".usa-collection__item:nth-child(2)"],
+          "failureSummary": "Fix any of the following:\n  List item does not have a <ul>, <ol> parent element"
+        },
+        {
+          "any": [
+            {
+              "id": "listitem",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "List item does not have a <ul>, <ol> parent element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<li class=\"usa-collection__item\">",
+          "target": [".usa-collection__item:nth-child(3)"],
+          "failureSummary": "Fix any of the following:\n  List item does not have a <ul>, <ol> parent element"
+        },
+        {
+          "any": [
+            {
+              "id": "listitem",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "List item does not have a <ul>, <ol> parent element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<li class=\"usa-collection__item\">",
+          "target": [".usa-collection__item:nth-child(4)"],
+          "failureSummary": "Fix any of the following:\n  List item does not have a <ul>, <ol> parent element"
+        }
+      ],
+      "color": "error-dark",
+      "order": 1,
+      "total": 4,
+      "ignore": false,
+      "ignoreSource": "",
+      "urls": ["https://example.gov/preview/owner/repo/branch/blog/"]
+    }
+  ],
+  "currentPage": 8,
+  "reportPages": [
+    {
+      "path": "axe-results-1724877589721",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/blog/",
+      "relativeURL": "/blog/",
+      "timestamp": "2024-08-28T20:39:49.295Z",
+      "violationsCount": 2,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 2 }],
+      "indexPills": [{ "name": "serious", "count": 2 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877587825",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/document-with-sidenav/",
+      "relativeURL": "/document-with-sidenav/",
+      "timestamp": "2024-08-28T20:39:47.416Z",
+      "violationsCount": 2,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 2 }],
+      "indexPills": [{ "name": "serious", "count": 2 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877585914",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/document/",
+      "relativeURL": "/document/",
+      "timestamp": "2024-08-28T20:39:45.507Z",
+      "violationsCount": 2,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 2 }],
+      "indexPills": [{ "name": "serious", "count": 2 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877597158",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+      "relativeURL": "/posts/2019-01-13-an-extra/",
+      "timestamp": "2024-08-28T20:39:56.752Z",
+      "violationsCount": 1,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
+      "indexPills": [{ "name": "serious", "count": 1 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877595526",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+      "relativeURL": "/posts/2021-01-16-third-post/",
+      "timestamp": "2024-08-28T20:39:55.130Z",
+      "violationsCount": 1,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
+      "indexPills": [{ "name": "serious", "count": 1 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877593610",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+      "relativeURL": "/posts/2022-01-14-hello-world/",
+      "timestamp": "2024-08-28T20:39:53.217Z",
+      "violationsCount": 1,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
+      "indexPills": [{ "name": "serious", "count": 1 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877591584",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+      "relativeURL": "/posts/2020-01-15-second-post/",
+      "timestamp": "2024-08-28T20:39:51.184Z",
+      "violationsCount": 1,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
+      "indexPills": [{ "name": "serious", "count": 1 }],
+      "moreCount": 0
+    },
+    {
+      "path": "axe-results-1724877584083",
+      "absoluteURL": "https://example.gov/preview/owner/repo/branch/",
+      "relativeURL": "/",
+      "timestamp": "2024-08-28T20:39:43.681Z",
+      "violationsCount": 1,
+      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
+      "indexPills": [{ "name": "serious", "count": 1 }],
+      "moreCount": 0
+    }
+  ]
+}

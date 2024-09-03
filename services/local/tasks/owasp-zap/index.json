@@ -1,0 +1,1862 @@
+{
+  "site": {
+    "@name": "https://example.com",
+    "@host": "example.com",
+    "@port": "443",
+    "@ssl": "true",
+    "alerts": [
+      {
+        "pluginid": "10097",
+        "alertRef": "10097",
+        "alert": "Hash Disclosure - Mac OSX salted SHA-1",
+        "name": "Hash Disclosure - Mac OSX salted SHA-1",
+        "riskcode": "3",
+        "confidence": "2",
+        "riskdesc": "High (Medium)",
+        "desc": "<p>A hash was disclosed by the web server. - Mac OSX salted SHA-1</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/assets/styles/styles-KHOXEEPC.css",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "otherinfo": "",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          }
+        ],
+        "count": "1",
+        "solution": "<p>Ensure that hashes that are used to protect credentials or other resources are not leaked by the web server or database. There is typically no requirement for password hashes to be accessible to the web browser.</p>\n",
+        "otherinfo": "",
+        "reference": "<p>https://openwall.info/wiki/john/sample-hashes</p>",
+        "cweid": "200",
+        "wascid": "13",
+        "sourceid": "93",
+        "ignore": true,
+        "ignoreSource": "Pages",
+        "description": "<p>A hash was disclosed by the web server. - Mac OSX salted SHA-1</p>\n",
+        "riskLabel": "High",
+        "referenceURLs": ["\nhttps://openwall.info/wiki/john/sample-hashes\n"]
+      },
+      {
+        "pluginid": "10202",
+        "alertRef": "10202",
+        "alert": "Absence of Anti-CSRF Tokens",
+        "name": "Absence of Anti-CSRF Tokens",
+        "riskcode": "2",
+        "confidence": "1",
+        "riskdesc": "Medium (Low)",
+        "desc": "<p>No Anti-CSRF tokens were found in a HTML submission form.</p><p>A cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.</p><p></p><p>CSRF attacks are effective in a number of situations, including:</p><p>    * The victim has an active session on the target site.</p><p>    * The victim is authenticated via HTTP auth on the target site.</p><p>    * The victim is on the same local network as the target site.</p><p></p><p>CSRF has primarily been used to perform an action against a target site using the victim's privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/blog/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+            "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+            "ignore": true,
+            "ignoreSource": "Pages"
+          }
+        ],
+        "count": "9",
+        "solution": "<h5>Phase: Architecture and Design</h5>\n<p>Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.</p>\n<p>For example, use anti-CSRF packages such as the OWASP CSRFGuard.</p>\n<h5>Phase: Implementation</h5>\n<p>Ensure that your application is free of cross-site scripting issues, because most CSRF defenses can be bypassed using attacker-controlled script.</p>\n<h5>Phase: Architecture and Design</h5>\n<p>Generate a unique nonce for each form, place the nonce into the form, and verify the nonce upon receipt of the form. Be sure that the nonce is not predictable (CWE-330).</p>\n<p>Note that this can be bypassed using XSS.</p>\n<p>Identify especially dangerous operations. When the user performs a dangerous operation, send a separate confirmation request to ensure that the user intended to perform that operation.</p>\n<p>Note that this can be bypassed using XSS.</p>\n<p>Use the ESAPI Session Management control.</p>\n<p>This control includes a component for CSRF.</p>\n<p>Do not use the GET method for any request that triggers a state change.</p>\n<h5>Phase: Implementation</h5>\n<p>Check the HTTP Referer header to see if the request originated from an expected page. This could break legitimate functionality, because users or proxies may have disabled sending the Referer for privacy reasons.</p>\n",
+        "otherinfo": "<p>No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].</p>",
+        "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html</p><p>https://cwe.mitre.org/data/definitions/352.html</p>",
+        "cweid": "352",
+        "wascid": "9",
+        "sourceid": "1",
+        "ignore": true,
+        "ignoreSource": "Pages",
+        "description": "<p>No Anti-CSRF tokens were found in a HTML submission form.</p>\n<p>A cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.</p>\n<p>CSRF attacks are effective in a number of situations, including:</p>\n<ul>\n<li>The victim has an active session on the target site.</li>\n<li>The victim is authenticated via HTTP auth on the target site.</li>\n<li>The victim is on the same local network as the target site.</li>\n</ul>\n<p>CSRF has primarily been used to perform an action against a target site using the victim&#39;s privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.</p>\n",
+        "riskLabel": "Medium",
+        "referenceURLs": [
+          "\nhttps://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html",
+          "https://cwe.mitre.org/data/definitions/352.html\n"
+        ]
+      },
+      {
+        "pluginid": "10038",
+        "alertRef": "10038-1",
+        "alert": "Content Security Policy (CSP) Header Not Set",
+        "name": "Content Security Policy (CSP) Header Not Set",
+        "riskcode": "2",
+        "confidence": "3",
+        "riskdesc": "Medium (High)",
+        "desc": "<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/blog",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/blog/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/document-with-sidenav/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/document/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/posts/2020-01-15-second-post/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/posts/2021-01-16-third-post/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/posts/2022-01-14-hello-world/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/sitemap.xml",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          }
+        ],
+        "count": "12",
+        "solution": "<p>Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.</p>\n",
+        "otherinfo": "",
+        "reference": "<p>https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy</p><p>https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html</p><p>https://www.w3.org/TR/CSP/</p><p>https://w3c.github.io/webappsec-csp/</p><p>https://web.dev/articles/csp</p><p>https://caniuse.com/#feat=contentsecuritypolicy</p><p>https://content-security-policy.com/</p>",
+        "cweid": "693",
+        "wascid": "15",
+        "sourceid": "14",
+        "ignore": true,
+        "ignoreSource": "Pages",
+        "description": "<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>\n",
+        "riskLabel": "Medium",
+        "referenceURLs": [
+          "\nhttps://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy",
+          "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html",
+          "https://www.w3.org/TR/CSP/",
+          "https://w3c.github.io/webappsec-csp/",
+          "https://web.dev/articles/csp",
+          "https://caniuse.com/#feat=contentsecuritypolicy",
+          "https://content-security-policy.com/\n"
+        ]
+      },
+      {
+        "pluginid": "90003",
+        "alertRef": "90003",
+        "alert": "Sub Resource Integrity Attribute Missing",
+        "name": "Sub Resource Integrity Attribute Missing",
+        "riskcode": "2",
+        "confidence": "3",
+        "riskdesc": "Medium (High)",
+        "desc": "<p>The integrity attribute is missing on a script or link tag served by an external server. The integrity tag prevents an attacker who have gained access to this server from injecting a malicious content.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async=\"\" src=\" \"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async=\"\" src=\" \"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/blog/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/blog/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async=\"\" src=\" \"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async=\"\" src=\" \"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async=\"\" src=\" \"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": "",
+            "ignore": true
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<script async=\"\" src=\" \"></script>",
+            "otherinfo": "",
+            "ignore": true
+          }
+        ],
+        "count": "12",
+        "solution": "<p>Provide a valid integrity attribute to the tag.</p>\n",
+        "otherinfo": "",
+        "reference": "<p>https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity</p>",
+        "cweid": "345",
+        "wascid": "15",
+        "sourceid": "1",
+        "ignore": true,
+        "description": "<p>The integrity attribute is missing on a script or link tag served by an external server. The integrity tag prevents an attacker who have gained access to this server from injecting a malicious content.</p>\n",
+        "riskLabel": "Medium",
+        "referenceURLs": [
+          "\nhttps://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity\n"
+        ]
+      },
+      {
+        "pluginid": "10017",
+        "alertRef": "10017",
+        "alert": "Cross-Domain JavaScript Source File Inclusion",
+        "name": "Cross-Domain JavaScript Source File Inclusion",
+        "riskcode": "1",
+        "confidence": "2",
+        "riskdesc": "Low (Medium)",
+        "desc": "<p>The page includes one or more script files from a third-party domain.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/blog/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+            "method": "GET",
+            "param": "https://search.usa.gov/javascripts/remote.loader.js",
+            "attack": "",
+            "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+            "otherinfo": ""
+          }
+        ],
+        "count": "9",
+        "solution": "<p>Ensure JavaScript source files are loaded from only trusted sources, and the sources can&#39;t be controlled by end users of the application.</p>\n",
+        "otherinfo": "",
+        "reference": "",
+        "cweid": "829",
+        "wascid": "15",
+        "sourceid": "1",
+        "description": "<p>The page includes one or more script files from a third-party domain.</p>\n",
+        "riskLabel": "Low",
+        "referenceURLs": null
+      },
+      {
+        "pluginid": "10063",
+        "alertRef": "10063-1",
+        "alert": "Permissions Policy Header Not Set",
+        "name": "Permissions Policy Header Not Set",
+        "riskcode": "1",
+        "confidence": "2",
+        "riskdesc": "Low (Medium)",
+        "desc": "<p>Permissions Policy Header is an added layer of security that helps to restrict from unauthorized access or usage of browser/client features by web resources. This policy ensures the user privacy by limiting or specifying the features of the browsers can be used by the web resources. Permissions Policy provides a set of standard HTTP headers that allow website owners to limit which features of browsers can be used by the page such as camera, microphone, location, full screen etc.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/blog",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/blog/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/document-with-sidenav/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/document/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/posts/2021-01-16-third-post/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/posts/2022-01-14-hello-world/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/robots.txt",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/sitemap.xml",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": ""
+          }
+        ],
+        "count": "11",
+        "solution": "<p>Ensure that your web server, application server, load balancer, etc. is configured to set the Permissions-Policy header.</p>\n",
+        "otherinfo": "",
+        "reference": "<p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy</p><p>https://developer.chrome.com/blog/feature-policy/</p><p>https://scotthelme.co.uk/a-new-security-header-feature-policy/</p><p>https://w3c.github.io/webappsec-feature-policy/</p><p>https://www.smashingmagazine.com/2018/12/feature-policy/</p>",
+        "cweid": "693",
+        "wascid": "15",
+        "sourceid": "6",
+        "ignore": true,
+        "ignoreSource": "Pages",
+        "description": "<p>Permissions Policy Header is an added layer of security that helps to restrict from unauthorized access or usage of browser/client features by web resources. This policy ensures the user privacy by limiting or specifying the features of the browsers can be used by the web resources. Permissions Policy provides a set of standard HTTP headers that allow website owners to limit which features of browsers can be used by the page such as camera, microphone, location, full screen etc.</p>\n",
+        "riskLabel": "Low",
+        "referenceURLs": [
+          "\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy",
+          "https://developer.chrome.com/blog/feature-policy/",
+          "https://scotthelme.co.uk/a-new-security-header-feature-policy/",
+          "https://w3c.github.io/webappsec-feature-policy/",
+          "https://www.smashingmagazine.com/2018/12/feature-policy/\n"
+        ]
+      },
+      {
+        "pluginid": "10027",
+        "alertRef": "10027",
+        "alert": "Information Disclosure - Suspicious Comments",
+        "name": "Information Disclosure - Suspicious Comments",
+        "riskcode": "0",
+        "confidence": "1",
+        "riskdesc": "Informational (Low)",
+        "desc": "<p>The response appears to contain suspicious comments which may help an attacker. Note: Matches made within script blocks or files are against the entire content not only comments.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/assets/js/app-XWR645AF.js",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "from",
+            "otherinfo": "The following pattern was used: \\bFROM\\b and was detected in the element starting with: \"              return e3.classList.remove(c), e3.classList.add(l), s3.classList.add(c), n2.classList.add(d), a2.classList.add(f),\", see evidence field for the suspicious comment/snippet."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/assets/js/app-XWR645AF.js",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "query",
+            "otherinfo": "The following pattern was used: \\bQUERY\\b and was detected 2 times, the first in the element starting with: \"        const b = a + \"--pristine\", h = a + \"__select\", m = a + \"__input\", v = a + \"__clear-input\", O = v + \"__wrapper\", B = a +\", see evidence field for the suspicious comment/snippet."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/assets/js/app-XWR645AF.js",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "Select",
+            "otherinfo": "The following pattern was used: \\bSELECT\\b and was detected 41 times, the first in the element starting with: \"        }, keys: { 3: \"Cancel\", 6: \"Help\", 8: \"Backspace\", 9: \"Tab\", 12: \"Clear\", 13: \"Enter\", 16: \"Shift\", 17: \"Control\", 18: \"\", see evidence field for the suspicious comment/snippet."
+          }
+        ],
+        "count": "3",
+        "solution": "<p>Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.</p>\n",
+        "otherinfo": "<p>The following pattern was used: \\bFROM\\b and was detected in the element starting with: \"              return e3.classList.remove(c), e3.classList.add(l), s3.classList.add(c), n2.classList.add(d), a2.classList.add(f),\", see evidence field for the suspicious comment/snippet.</p>",
+        "reference": "",
+        "cweid": "200",
+        "wascid": "13",
+        "sourceid": "52",
+        "description": "<p>The response appears to contain suspicious comments which may help an attacker. Note: Matches made within script blocks or files are against the entire content not only comments.</p>\n",
+        "riskLabel": "Informational",
+        "referenceURLs": null
+      },
+      {
+        "pluginid": "10109",
+        "alertRef": "10109",
+        "alert": "Modern Web Application",
+        "name": "Modern Web Application",
+        "riskcode": "0",
+        "confidence": "2",
+        "riskdesc": "Informational (Medium)",
+        "desc": "<p>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/blog/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<a class=\"usa-link\" href=\"\"\n              >@18F on Twitter</a\n            >",
+            "otherinfo": "Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "<a href=\"\">Parent link</a>",
+            "otherinfo": "Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application."
+          }
+        ],
+        "count": "2",
+        "solution": "<p>This is an informational alert and so no changes are required.</p>\n",
+        "otherinfo": "<p>Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application.</p>",
+        "reference": "",
+        "cweid": "-1",
+        "wascid": "-1",
+        "sourceid": "37",
+        "description": "<p>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</p>\n",
+        "riskLabel": "Informational",
+        "referenceURLs": null
+      },
+      {
+        "pluginid": "10015",
+        "alertRef": "10015",
+        "alert": "Re-examine Cache-control Directives",
+        "name": "Re-examine Cache-control Directives",
+        "riskcode": "0",
+        "confidence": "1",
+        "riskdesc": "Informational (Low)",
+        "desc": "<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/blog/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/document/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+            "method": "GET",
+            "param": "cache-control",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          }
+        ],
+        "count": "9",
+        "solution": "<p>For secure content, ensure the cache-control HTTP header is set with &quot;no-cache, no-store, must-revalidate&quot;. If an asset should be cached consider setting the directives &quot;public, max-age, immutable&quot;.</p>\n",
+        "otherinfo": "",
+        "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching</p><p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control</p><p>https://grayduck.mn/2021/09/13/cache-control-recommendations/</p>",
+        "cweid": "525",
+        "wascid": "13",
+        "sourceid": "1",
+        "description": "<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>\n",
+        "riskLabel": "Informational",
+        "referenceURLs": [
+          "\nhttps://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching",
+          "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control",
+          "https://grayduck.mn/2021/09/13/cache-control-recommendations/\n"
+        ]
+      },
+      {
+        "pluginid": "10049",
+        "alertRef": "10049",
+        "alert": "Storable and Cacheable Content",
+        "name": "Storable and Cacheable Content",
+        "riskcode": "0",
+        "confidence": "2",
+        "riskdesc": "Informational (Medium)",
+        "desc": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where \"shared\" caching servers such as \"proxy\" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>",
+        "instances": [
+          {
+            "uri": "https://example.com/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/document/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/preview",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/preview/owner",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/img/F5u_E41U6o-64.png",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/preview/owner/repo/branch/img/xPu02brD0d-24.svg",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "max-age=60",
+            "otherinfo": ""
+          },
+          {
+            "uri": "https://example.com/robots.txt",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          },
+          {
+            "uri": "https://example.com/sitemap.xml",
+            "method": "GET",
+            "param": "",
+            "attack": "",
+            "evidence": "",
+            "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+          }
+        ],
+        "count": "11",
+        "solution": "<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:</p>\n<p>Cache-Control: no-cache, no-store, must-revalidate, private</p>\n<p>Pragma: no-cache</p>\n<p>Expires: 0</p>\n<p>This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>\n",
+        "otherinfo": "<p>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</p>",
+        "reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+        "cweid": "524",
+        "wascid": "13",
+        "sourceid": "6",
+        "description": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where &quot;shared&quot; caching servers such as &quot;proxy&quot; caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>\n",
+        "riskLabel": "Informational",
+        "referenceURLs": [
+          "\nhttps://datatracker.ietf.org/doc/html/rfc7234",
+          "https://datatracker.ietf.org/doc/html/rfc7231",
+          "https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html\n"
+        ]
+      }
+    ],
+    "groupedAlerts": {
+      "0": [
+        {
+          "pluginid": "10027",
+          "alertRef": "10027",
+          "alert": "Information Disclosure - Suspicious Comments",
+          "name": "Information Disclosure - Suspicious Comments",
+          "riskcode": "0",
+          "confidence": "1",
+          "riskdesc": "Informational (Low)",
+          "desc": "<p>The response appears to contain suspicious comments which may help an attacker. Note: Matches made within script blocks or files are against the entire content not only comments.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/assets/js/app-XWR645AF.js",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "from",
+              "otherinfo": "The following pattern was used: \\bFROM\\b and was detected in the element starting with: \"              return e3.classList.remove(c), e3.classList.add(l), s3.classList.add(c), n2.classList.add(d), a2.classList.add(f),\", see evidence field for the suspicious comment/snippet."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/assets/js/app-XWR645AF.js",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "query",
+              "otherinfo": "The following pattern was used: \\bQUERY\\b and was detected 2 times, the first in the element starting with: \"        const b = a + \"--pristine\", h = a + \"__select\", m = a + \"__input\", v = a + \"__clear-input\", O = v + \"__wrapper\", B = a +\", see evidence field for the suspicious comment/snippet."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/assets/js/app-XWR645AF.js",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "Select",
+              "otherinfo": "The following pattern was used: \\bSELECT\\b and was detected 41 times, the first in the element starting with: \"        }, keys: { 3: \"Cancel\", 6: \"Help\", 8: \"Backspace\", 9: \"Tab\", 12: \"Clear\", 13: \"Enter\", 16: \"Shift\", 17: \"Control\", 18: \"\", see evidence field for the suspicious comment/snippet."
+            }
+          ],
+          "count": "3",
+          "solution": "<p>Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.</p>\n",
+          "otherinfo": "<p>The following pattern was used: \\bFROM\\b and was detected in the element starting with: \"              return e3.classList.remove(c), e3.classList.add(l), s3.classList.add(c), n2.classList.add(d), a2.classList.add(f),\", see evidence field for the suspicious comment/snippet.</p>",
+          "reference": "",
+          "cweid": "200",
+          "wascid": "13",
+          "sourceid": "52",
+          "description": "<p>The response appears to contain suspicious comments which may help an attacker. Note: Matches made within script blocks or files are against the entire content not only comments.</p>\n",
+          "riskLabel": "Informational",
+          "referenceURLs": null
+        },
+        {
+          "pluginid": "10109",
+          "alertRef": "10109",
+          "alert": "Modern Web Application",
+          "name": "Modern Web Application",
+          "riskcode": "0",
+          "confidence": "2",
+          "riskdesc": "Informational (Medium)",
+          "desc": "<p>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/blog/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<a class=\"usa-link\" href=\"\"\n              >@18F on Twitter</a\n            >",
+              "otherinfo": "Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<a href=\"\">Parent link</a>",
+              "otherinfo": "Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application."
+            }
+          ],
+          "count": "2",
+          "solution": "<p>This is an informational alert and so no changes are required.</p>\n",
+          "otherinfo": "<p>Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application.</p>",
+          "reference": "",
+          "cweid": "-1",
+          "wascid": "-1",
+          "sourceid": "37",
+          "description": "<p>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</p>\n",
+          "riskLabel": "Informational",
+          "referenceURLs": null
+        },
+        {
+          "pluginid": "10015",
+          "alertRef": "10015",
+          "alert": "Re-examine Cache-control Directives",
+          "name": "Re-examine Cache-control Directives",
+          "riskcode": "0",
+          "confidence": "1",
+          "riskdesc": "Informational (Low)",
+          "desc": "<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/blog/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+              "method": "GET",
+              "param": "cache-control",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            }
+          ],
+          "count": "9",
+          "solution": "<p>For secure content, ensure the cache-control HTTP header is set with &quot;no-cache, no-store, must-revalidate&quot;. If an asset should be cached consider setting the directives &quot;public, max-age, immutable&quot;.</p>\n",
+          "otherinfo": "",
+          "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching</p><p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control</p><p>https://grayduck.mn/2021/09/13/cache-control-recommendations/</p>",
+          "cweid": "525",
+          "wascid": "13",
+          "sourceid": "1",
+          "description": "<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>\n",
+          "riskLabel": "Informational",
+          "referenceURLs": [
+            "\nhttps://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching",
+            "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control",
+            "https://grayduck.mn/2021/09/13/cache-control-recommendations/\n"
+          ]
+        },
+        {
+          "pluginid": "10049",
+          "alertRef": "10049",
+          "alert": "Storable and Cacheable Content",
+          "name": "Storable and Cacheable Content",
+          "riskcode": "0",
+          "confidence": "2",
+          "riskdesc": "Informational (Medium)",
+          "desc": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where \"shared\" caching servers such as \"proxy\" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/document/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/preview",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/preview/owner",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/img/F5u_E41U6o-64.png",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/img/xPu02brD0d-24.svg",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "max-age=60",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/robots.txt",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            },
+            {
+              "uri": "https://example.com/sitemap.xml",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+            }
+          ],
+          "count": "11",
+          "solution": "<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:</p>\n<p>Cache-Control: no-cache, no-store, must-revalidate, private</p>\n<p>Pragma: no-cache</p>\n<p>Expires: 0</p>\n<p>This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>\n",
+          "otherinfo": "<p>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</p>",
+          "reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+          "cweid": "524",
+          "wascid": "13",
+          "sourceid": "6",
+          "description": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where &quot;shared&quot; caching servers such as &quot;proxy&quot; caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>\n",
+          "riskLabel": "Informational",
+          "referenceURLs": [
+            "\nhttps://datatracker.ietf.org/doc/html/rfc7234",
+            "https://datatracker.ietf.org/doc/html/rfc7231",
+            "https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html\n"
+          ]
+        }
+      ],
+      "1": [
+        {
+          "pluginid": "10017",
+          "alertRef": "10017",
+          "alert": "Cross-Domain JavaScript Source File Inclusion",
+          "name": "Cross-Domain JavaScript Source File Inclusion",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "<p>The page includes one or more script files from a third-party domain.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/blog/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+              "method": "GET",
+              "param": "https://search.usa.gov/javascripts/remote.loader.js",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": ""
+            }
+          ],
+          "count": "9",
+          "solution": "<p>Ensure JavaScript source files are loaded from only trusted sources, and the sources can&#39;t be controlled by end users of the application.</p>\n",
+          "otherinfo": "",
+          "reference": "",
+          "cweid": "829",
+          "wascid": "15",
+          "sourceid": "1",
+          "description": "<p>The page includes one or more script files from a third-party domain.</p>\n",
+          "riskLabel": "Low",
+          "referenceURLs": null
+        },
+        {
+          "pluginid": "10063",
+          "alertRef": "10063-1",
+          "alert": "Permissions Policy Header Not Set",
+          "name": "Permissions Policy Header Not Set",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "<p>Permissions Policy Header is an added layer of security that helps to restrict from unauthorized access or usage of browser/client features by web resources. This policy ensures the user privacy by limiting or specifying the features of the browsers can be used by the web resources. Permissions Policy provides a set of standard HTTP headers that allow website owners to limit which features of browsers can be used by the page such as camera, microphone, location, full screen etc.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/blog",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/blog/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/document-with-sidenav/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/document/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/posts/2021-01-16-third-post/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/posts/2022-01-14-hello-world/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/robots.txt",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/sitemap.xml",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            }
+          ],
+          "count": "11",
+          "solution": "<p>Ensure that your web server, application server, load balancer, etc. is configured to set the Permissions-Policy header.</p>\n",
+          "otherinfo": "",
+          "reference": "<p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy</p><p>https://developer.chrome.com/blog/feature-policy/</p><p>https://scotthelme.co.uk/a-new-security-header-feature-policy/</p><p>https://w3c.github.io/webappsec-feature-policy/</p><p>https://www.smashingmagazine.com/2018/12/feature-policy/</p>",
+          "cweid": "693",
+          "wascid": "15",
+          "sourceid": "6",
+          "ignore": true,
+          "ignoreSource": "Pages",
+          "description": "<p>Permissions Policy Header is an added layer of security that helps to restrict from unauthorized access or usage of browser/client features by web resources. This policy ensures the user privacy by limiting or specifying the features of the browsers can be used by the web resources. Permissions Policy provides a set of standard HTTP headers that allow website owners to limit which features of browsers can be used by the page such as camera, microphone, location, full screen etc.</p>\n",
+          "riskLabel": "Low",
+          "referenceURLs": [
+            "\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy",
+            "https://developer.chrome.com/blog/feature-policy/",
+            "https://scotthelme.co.uk/a-new-security-header-feature-policy/",
+            "https://w3c.github.io/webappsec-feature-policy/",
+            "https://www.smashingmagazine.com/2018/12/feature-policy/\n"
+          ]
+        }
+      ],
+      "2": [
+        {
+          "pluginid": "10202",
+          "alertRef": "10202",
+          "alert": "Absence of Anti-CSRF Tokens",
+          "name": "Absence of Anti-CSRF Tokens",
+          "riskcode": "2",
+          "confidence": "1",
+          "riskdesc": "Medium (Low)",
+          "desc": "<p>No Anti-CSRF tokens were found in a HTML submission form.</p><p>A cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.</p><p></p><p>CSRF attacks are effective in a number of situations, including:</p><p>    * The victim has an active session on the target site.</p><p>    * The victim is authenticated via HTTP auth on the target site.</p><p>    * The victim is on the same local network as the target site.</p><p></p><p>CSRF has primarily been used to perform an action against a target site using the victim's privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/blog/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2020-01-15-second-post/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2021-01-16-third-post/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2022-01-14-hello-world/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<form id=\"search_form\" class=\"usa-search usa-search--small\" action=\"/preview/owner/repo/branch/search/\" accept-charset=\"UTF-8\" method=\"get\">",
+              "otherinfo": "No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            }
+          ],
+          "count": "9",
+          "solution": "<h5>Phase: Architecture and Design</h5>\n<p>Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.</p>\n<p>For example, use anti-CSRF packages such as the OWASP CSRFGuard.</p>\n<h5>Phase: Implementation</h5>\n<p>Ensure that your application is free of cross-site scripting issues, because most CSRF defenses can be bypassed using attacker-controlled script.</p>\n<h5>Phase: Architecture and Design</h5>\n<p>Generate a unique nonce for each form, place the nonce into the form, and verify the nonce upon receipt of the form. Be sure that the nonce is not predictable (CWE-330).</p>\n<p>Note that this can be bypassed using XSS.</p>\n<p>Identify especially dangerous operations. When the user performs a dangerous operation, send a separate confirmation request to ensure that the user intended to perform that operation.</p>\n<p>Note that this can be bypassed using XSS.</p>\n<p>Use the ESAPI Session Management control.</p>\n<p>This control includes a component for CSRF.</p>\n<p>Do not use the GET method for any request that triggers a state change.</p>\n<h5>Phase: Implementation</h5>\n<p>Check the HTTP Referer header to see if the request originated from an expected page. This could break legitimate functionality, because users or proxies may have disabled sending the Referer for privacy reasons.</p>\n",
+          "otherinfo": "<p>No known Anti-CSRF token [anticsrf, CSRFToken, __RequestVerificationToken, csrfmiddlewaretoken, authenticity_token, OWASP_CSRFTOKEN, anoncsrf, csrf_token, _csrf, _csrfSecret, __csrf_magic, CSRF, _token, _csrf_token] was found in the following HTML form: [Form 1: \"affiliate\" \"extended-search-field-small\" \"utf8\" ].</p>",
+          "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html</p><p>https://cwe.mitre.org/data/definitions/352.html</p>",
+          "cweid": "352",
+          "wascid": "9",
+          "sourceid": "1",
+          "ignore": true,
+          "ignoreSource": "Pages",
+          "description": "<p>No Anti-CSRF tokens were found in a HTML submission form.</p>\n<p>A cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.</p>\n<p>CSRF attacks are effective in a number of situations, including:</p>\n<ul>\n<li>The victim has an active session on the target site.</li>\n<li>The victim is authenticated via HTTP auth on the target site.</li>\n<li>The victim is on the same local network as the target site.</li>\n</ul>\n<p>CSRF has primarily been used to perform an action against a target site using the victim&#39;s privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.</p>\n",
+          "riskLabel": "Medium",
+          "referenceURLs": [
+            "\nhttps://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html",
+            "https://cwe.mitre.org/data/definitions/352.html\n"
+          ]
+        },
+        {
+          "pluginid": "10038",
+          "alertRef": "10038-1",
+          "alert": "Content Security Policy (CSP) Header Not Set",
+          "name": "Content Security Policy (CSP) Header Not Set",
+          "riskcode": "2",
+          "confidence": "3",
+          "riskdesc": "Medium (High)",
+          "desc": "<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/blog",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/blog/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/document-with-sidenav/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/document/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/posts/2020-01-15-second-post/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/posts/2021-01-16-third-post/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/posts/2022-01-14-hello-world/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            },
+            {
+              "uri": "https://example.com/sitemap.xml",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "",
+              "otherinfo": ""
+            }
+          ],
+          "count": "12",
+          "solution": "<p>Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.</p>\n",
+          "otherinfo": "",
+          "reference": "<p>https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy</p><p>https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html</p><p>https://www.w3.org/TR/CSP/</p><p>https://w3c.github.io/webappsec-csp/</p><p>https://web.dev/articles/csp</p><p>https://caniuse.com/#feat=contentsecuritypolicy</p><p>https://content-security-policy.com/</p>",
+          "cweid": "693",
+          "wascid": "15",
+          "sourceid": "14",
+          "ignore": true,
+          "ignoreSource": "Pages",
+          "description": "<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>\n",
+          "riskLabel": "Medium",
+          "referenceURLs": [
+            "\nhttps://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy",
+            "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html",
+            "https://www.w3.org/TR/CSP/",
+            "https://w3c.github.io/webappsec-csp/",
+            "https://web.dev/articles/csp",
+            "https://caniuse.com/#feat=contentsecuritypolicy",
+            "https://content-security-policy.com/\n"
+          ]
+        },
+        {
+          "pluginid": "90003",
+          "alertRef": "90003",
+          "alert": "Sub Resource Integrity Attribute Missing",
+          "name": "Sub Resource Integrity Attribute Missing",
+          "riskcode": "2",
+          "confidence": "3",
+          "riskdesc": "Medium (High)",
+          "desc": "<p>The integrity attribute is missing on a script or link tag served by an external server. The integrity tag prevents an attacker who have gained access to this server from injecting a malicious content.</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async=\"\" src=\" \"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async=\"\" src=\" \"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/blog/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/blog/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async=\"\" src=\" \"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document-with-sidenav/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async=\"\" src=\" \"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/document/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async=\"\" src=\" \"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async src=\"https://search.usa.gov/javascripts/remote.loader.js\" type=\"text/javascript\"></script>",
+              "otherinfo": "",
+              "ignore": true
+            },
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/posts/2019-01-13-an-extra/",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "<script async=\"\" src=\" \"></script>",
+              "otherinfo": "",
+              "ignore": true
+            }
+          ],
+          "count": "12",
+          "solution": "<p>Provide a valid integrity attribute to the tag.</p>\n",
+          "otherinfo": "",
+          "reference": "<p>https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity</p>",
+          "cweid": "345",
+          "wascid": "15",
+          "sourceid": "1",
+          "ignore": true,
+          "description": "<p>The integrity attribute is missing on a script or link tag served by an external server. The integrity tag prevents an attacker who have gained access to this server from injecting a malicious content.</p>\n",
+          "riskLabel": "Medium",
+          "referenceURLs": [
+            "\nhttps://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity\n"
+          ]
+        }
+      ],
+      "3": [
+        {
+          "pluginid": "10097",
+          "alertRef": "10097",
+          "alert": "Hash Disclosure - Mac OSX salted SHA-1",
+          "name": "Hash Disclosure - Mac OSX salted SHA-1",
+          "riskcode": "3",
+          "confidence": "2",
+          "riskdesc": "High (Medium)",
+          "desc": "<p>A hash was disclosed by the web server. - Mac OSX salted SHA-1</p>",
+          "instances": [
+            {
+              "uri": "https://example.com/preview/owner/repo/branch/assets/styles/styles-KHOXEEPC.css",
+              "method": "GET",
+              "param": "",
+              "attack": "",
+              "evidence": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "otherinfo": "",
+              "ignore": true,
+              "ignoreSource": "Pages"
+            }
+          ],
+          "count": "1",
+          "solution": "<p>Ensure that hashes that are used to protect credentials or other resources are not leaked by the web server or database. There is typically no requirement for password hashes to be accessible to the web browser.</p>\n",
+          "otherinfo": "",
+          "reference": "<p>https://openwall.info/wiki/john/sample-hashes</p>",
+          "cweid": "200",
+          "wascid": "13",
+          "sourceid": "93",
+          "ignore": true,
+          "ignoreSource": "Pages",
+          "description": "<p>A hash was disclosed by the web server. - Mac OSX salted SHA-1</p>\n",
+          "riskLabel": "High",
+          "referenceURLs": ["\nhttps://openwall.info/wiki/john/sample-hashes\n"]
+        }
+      ]
+    },
+    "issueCount": 1
+  },
+  "generated": "Wed, 28 Aug 2024 20:39:52"
+}

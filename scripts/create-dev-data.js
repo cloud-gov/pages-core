@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+const { writeFile } = require('node:fs/promises');
+const path = require('node:path');
 const { addDays, addMinutes } = require('date-fns');
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
@@ -20,6 +22,9 @@ const {
   UserAction,
 } = require('../api/models');
 const { site: siteFactory } = require('../test/api/support/factory');
+
+const localSiteBuildTasks = [];
+const localSiteBuildTasksFile = path.join(__dirname, '../config/local-site-build-tasks.json');
 
 const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
   Nullam fringilla, arcu ut ultricies auctor, elit quam
@@ -567,7 +572,7 @@ async function createData() {
     message: 'Report cancelled',
     count: null,
   });
-  await BuildTask.create({
+  const btZap1 = await BuildTask.create({
     buildId: nodeSiteBuilds[5].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
@@ -576,7 +581,9 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 0,
   });
-  await BuildTask.create({
+  localSiteBuildTasks.push({ id: btZap1.id, type: 'owasp-zap' });
+
+  const btZap2 = await BuildTask.create({
     buildId: nodeSiteBuilds[6].id,
     buildTaskTypeId: taskType1.id,
     name: 'type',
@@ -585,6 +592,7 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 42,
   });
+  localSiteBuildTasks.push({ id: btZap2.id, type: 'owasp-zap' });
 
   const taskType2 = await BuildTaskType.create({
     name: 'WCAG Accessibility Report',
@@ -631,7 +639,7 @@ async function createData() {
     message: 'Scan failed',
     count: null,
   });
-  await BuildTask.create({
+  const btA11y1 = await BuildTask.create({
     buildId: nodeSiteBuilds[6].id,
     buildTaskTypeId: taskType2.id,
     name: 'type',
@@ -640,6 +648,10 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 3,
   });
+  localSiteBuildTasks.push({ id: btA11y1.id, type: 'a11y' });
+
+  // write localSiteBuildTasks.json file for viewing out reports
+  await writeFile(localSiteBuildTasksFile, JSON.stringify(localSiteBuildTasks), 'utf-8');
 
   // task "hook" for each site
   await SiteBuildTask.create({

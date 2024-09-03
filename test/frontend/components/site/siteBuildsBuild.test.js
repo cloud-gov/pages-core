@@ -68,13 +68,6 @@ describe('<SiteBuildsBuild/>', () => {
       expect(commitUserName).to.exist;
       expect(commitUserName.text()).to.equal(defaultBuild.username);
     });
-    it("should render a commit timestamp", () => {
-      const wrapper = shallow(<SiteBuildsBuild  {...defaultProps} />);
-      const branchCell = wrapper.find('td[data-title="Branch"]');
-      const commitTime = branchCell.find('.commit-time');
-      expect(commitTime).to.exist;
-      expect(commitTime.text()).to.include('ago');
-    });
     it("should render a link to the branch on GitHub using <GitHubLink>", () => {
       const wrapper = shallow(<SiteBuildsBuild  {...defaultProps} />);
       const branchCell = wrapper.find('td[data-title="Branch"]');
