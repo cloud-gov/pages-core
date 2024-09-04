@@ -1,3 +1,31 @@
+## 0.11.0 (2024-09-04)
+
+### Added
+
+- Auto refresh site builds statuses
+- **admin**: Add edit functionality to site build task run day
+- **admin**: Add runDay input to manage build tasks
+- Add in app report rendering
+- add build scans page (#4539)
+- style  build scan config (#4261)
+
+### Fixed
+
+- API should only update a site build tasks metadata rules
+- API build tasks report logging
+- rule match should be an array
+
+### Maintenance
+
+- add dap rule suppressions
+- update suppression language to allow for more forms of suppressed rules
+- Improve build task dev experience
+- swap experiment icon for report icon in report button
+- Upgrade dependency axios to v1.7.5
+- fix missing data from zap findings
+- add test for previous bug
+- unvendor the node modules
+
 ## 0.10.0 (2024-07-03)
 
 ### Added
