@@ -14,9 +14,9 @@ export default function About({ scanType, siteId, children }) {
         <h3>Suppressed results</h3>
         <p>
           Pages may automatically suppress certain results
-          which are irrelevant for statically hosted websites or frequently produce “false
-          positives” for our customers.  While still visible in the report, the suppressed
-          results don’t count towards your total issue count. Customers can specify additional
+          which are irrelevant for statically hosted websites, based on unconfigurable server settings,
+          or frequently produce “false positives” for our customers.  While still visible in the report,
+          the suppressed results don’t count towards your total issue count. Customers can specify additional
           criteria to be suppressed in future reports for this site in your Pages
           {' '}
           <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>

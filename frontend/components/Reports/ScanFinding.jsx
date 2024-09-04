@@ -151,7 +151,7 @@ const FindingDescription = ({
     {ignore && (
       <div className="usa-prose font-serif-xs">
         <p className="text-italic">
-          {`(Note: This finding has been suppressed by ${ignoreSource || 'an existing report configuration'}. This is common for results that have been previously identified as a false positive. You can review the report rules and criteria that are suppressed during report generation in your `}
+          {`(Note: This finding has been suppressed by ${ignoreSource || 'an existing report configuration'}. You can review the report rules and criteria that are suppressed during report generation in your `}
           <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Report Configuration</Link>
           {'.) '}
         </p>
