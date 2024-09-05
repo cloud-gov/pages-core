@@ -30,26 +30,39 @@ function BuildLogsLink({ buildId, siteId }) {
   return <Link to={`/sites/${siteId}/builds/${buildId}/logs`}>{cta}</Link>;
 }
 
+function checkBuildHasBuildTasks(build) {
+  return build.BuildTasks?.length > 0;
+}
+
+function checkAllBuildTasksFinished(build) {
+  return build.BuildTasks?.every(
+    ({ status }) => status === 'success' || status === 'error' || status === 'cancelled'
+  );
+}
+
+function checkIsScannableBuild(build, showBuildTasks, latestForBranch) {
+  return (
+    showBuildTasks
+    && latestForBranch
+    && checkAllBuildTasksFinished(build)
+  );
+}
+
 BuildLogsLink.propTypes = {
   buildId: PropTypes.number.isRequired,
   siteId: PropTypes.number.isRequired,
 };
 
 export const SiteBuildsBuild = ({
-  build: initBuild,
-  previewBuilds: initPreviewBuilds,
-  showBuildTasks: initShowBuildTasks,
+  build,
+  latestForBranch,
+  showBuildTasks = false,
   site,
 }) => {
   const siteId = site.id;
-  const {
-    build,
-    buildHasBuildTasks,
-    isPreviewBuild,
-    isScannableBuild,
-    isScanActionDisabled,
-    startScan,
-  } = useScannableBuild(initBuild, initPreviewBuilds, initShowBuildTasks);
+  const buildHasBuildTasks = checkBuildHasBuildTasks(build);
+  const isScannableBuild = checkIsScannableBuild(build, showBuildTasks, latestForBranch);
+  const { isScanActionDisabled, startScan } = useScannableBuild(build);
 
   const buildStateData = ({ state, error }) => {
     let messageStatusDoneIcon;
@@ -117,7 +130,7 @@ export const SiteBuildsBuild = ({
   return (
     <tr
       aria-labelledby={`build-${build.id}`}
-      className={isPreviewBuild ? 'is-preview-build' : ''}
+      className={latestForBranch ? 'is-preview-build' : ''}
     >
       <th scope="row" data-title="Build">
         <div className="build-info">
@@ -186,7 +199,7 @@ export const SiteBuildsBuild = ({
         </div>
 
       </td>
-      { initShowBuildTasks && (
+      { showBuildTasks && (
         <td data-title="Reports">
           {build.BuildTasks?.length > 0 && (
             <p className="scan-link">
@@ -217,7 +230,7 @@ export const SiteBuildsBuild = ({
         </td>
       )}
       <td data-title="Results" className="table-actions">
-        {isPreviewBuild && build.state === 'success' && (
+        {latestForBranch && build.state === 'success' && (
           <p className="site-link">
             <BranchViewLink
               branchName={build.branch}
@@ -227,7 +240,7 @@ export const SiteBuildsBuild = ({
             />
           </p>
         )}
-        {isPreviewBuild && ['error', 'success'].includes(build.state) && (
+        {latestForBranch && ['error', 'success'].includes(build.state) && (
           <CreateBuildLink
             handlerParams={{ buildId: build.id, siteId }}
             handleClick={buildActions.restartBuild}
@@ -246,13 +259,9 @@ SiteBuildsBuild.propTypes = {
   build: BUILD.isRequired,
   // we're getting previewBuilds from the parent
   // eslint-disable-next-line react/forbid-prop-types
-  previewBuilds: PropTypes.object,
+  latestForBranch: PropTypes.object.isRequired,
   showBuildTasks: PropTypes.bool,
   site: SITE.isRequired,
-};
-SiteBuildsBuild.defaultProps = {
-  showBuildTasks: false,
-  previewBuilds: [],
 };
 
 export default SiteBuildsBuild;

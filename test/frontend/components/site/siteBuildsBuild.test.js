@@ -52,8 +52,7 @@ const defaultBuild = {
 };
 const defaultProps = {
   build: defaultBuild,
-  // previewBuilds: { main: 1 },
-  previewBuilds: { [defaultBuild.branch]: defaultBuild.id },
+  latestForBranch: true,
   showBuildTasks: false,
   site: defaultSite,
 }
@@ -97,7 +96,7 @@ describe('<SiteBuildsBuild/>', () => {
   });
 
 
-  it('should render a `BranchViewLink` component if state is successful and is a preview build', () => {
+  it('should render a `BranchViewLink` component if state is successful and is the latest build', () => {
     const wrapper = shallow(<SiteBuildsBuild  {...defaultProps} />);
     const resultsCell = wrapper.find('td[data-title="Results"]');
     expect(resultsCell).to.exist;
@@ -140,5 +139,18 @@ describe('<SiteBuildsBuild/>', () => {
     const wrapper = shallow(<SiteBuildsBuild  {...modifiedProps} />);
     expect(wrapper.find('.view-site-link')).to.have.length(0);
   });
+
+  it('should display a rebuild button for failed, latest builds', () => {
+    let modifiedProps = {
+      ...defaultProps,
+      build: {
+        ...defaultBuild,
+        state: 'error'
+      }
+    }
+
+    const wrapper = shallow(<SiteBuildsBuild  {...modifiedProps} />);
+    expect(wrapper.find('.rebuild-button')).to.have.length(1);
+  })
 
 });
