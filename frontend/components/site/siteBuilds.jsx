@@ -24,17 +24,16 @@ function latestBuildByBranch(builds) {
   const maxBuilds = {};
   const branchNames = [...new Set(builds.map(item => item.branch))];
   branchNames.forEach((branchName) => {
-    let successes = builds.filter(
-      b => b.branch === branchName && b.state === 'success'
-    );
-    successes = successes.sort(
-      (a, b) => new Date(b.completedAt) - new Date(a.completedAt)
-    );
-    if (successes.length > 0) {
-      maxBuilds[branchName] = successes[0].id;
-    }
+    const maxBuild = builds
+      .filter(b => b.branch === branchName)
+      .reduce((a, b) => (new Date(b.completedAt) > new Date(a.completedAt) ? b : a));
+    maxBuilds[branchName] = maxBuild.id;
   });
   return maxBuilds;
+}
+
+function isLatest(build, builds) {
+  return builds[build.branch] === build.id;
 }
 
 function siteHasBuildTasks(SiteBuildTasks = []) {
@@ -68,7 +67,7 @@ function SiteBuilds() {
       <AlertBanner status="info" header={header} message={message} />
     );
   }
-  const previewBuilds = builds.data && latestBuildByBranch(builds.data);
+  const latestBuilds = builds.data && latestBuildByBranch(builds.data);
 
   return (
     <div>
@@ -111,7 +110,7 @@ function SiteBuilds() {
                   <SiteBuild
                     build={build}
                     showBuildTasks={siteHasBuildTasks(site.SiteBuildTasks)}
-                    previewBuilds={previewBuilds}
+                    latestForBranch={isLatest(build, latestBuilds)}
                     site={site}
                     key={build.id}
                   />
