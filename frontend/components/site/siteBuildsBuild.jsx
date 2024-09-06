@@ -234,7 +234,7 @@ export const SiteBuildsBuild = ({
           <p className="site-link">
             <BranchViewLink
               branchName={build.branch}
-              site={build.site}
+              site={site}
               showIcon
               completedAt={build.completedAt}
             />
