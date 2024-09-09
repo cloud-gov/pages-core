@@ -1,3 +1,11 @@
+## 0.11.1 (2024-09-09)
+
+### Fixed
+
+- Site builds polling to use doc visibilityState #4591
+- use serialized site reponse to fix build preview link
+- restore the ability to rebuild failed latest branches
+
 ## 0.11.0 (2024-09-04)
 
 ### Added
