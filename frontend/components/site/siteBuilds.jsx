@@ -51,7 +51,7 @@ function SiteBuilds() {
     buildActions.fetchBuilds({ id });
 
     const intervalHandle = setInterval(() => {
-      if (document.hasFocus()) {
+      if (document.visibilityState === 'visible') {
         buildActions.refetchBuilds({ id });
       }
     }, REFRESH_INTERVAL);
