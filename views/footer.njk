@@ -1,0 +1,52 @@
+<footer class="usa-footer usa-footer--slim">
+  <div class="grid-container usa-footer__return-to-top">
+    <a href="#">Return to top</a>
+  </div>
+  <div class="usa-footer__primary-section padding-y-3">
+    <div class="usa-footer__primary-container grid-row">
+      <div class="grid-col-12">
+        <img class="maxw-15" src="/images/logos/pages-logo-blue.svg" alt="Pages Logo"/>
+      </div>
+      <div class="mobile-lg:grid-col-3">
+        <p>
+          There’s no easier way to build, launch and manage government sites.
+        </p>
+        <a href="{{ homepageUrl }}/contact/" class="usa-button">
+          Contact
+        </a>
+      </div>
+      <div class="mobile-lg:grid-col-8 mobile-lg:grid-offset-1">
+        <nav class="usa-footer__nav" aria-label="Footer navigation,">
+          <ul class="grid-row grid-gap">
+            <li
+              class="mobile-lg:grid-col-6 desktop:grid-col-4 usa-footer__primary-content">
+              <a class="usa-footer__primary-link" href="{{ homepageUrl }}/features/">Features</a>
+            </li>
+            <li
+              class="mobile-lg:grid-col-6 desktop:grid-col-4 usa-footer__primary-content">
+              <a class="usa-footer__primary-link" href="{{ homepageUrl }}/success-stories/">Success stories</a>
+            </li>
+            <li
+              class="mobile-lg:grid-col-6 desktop:grid-col-4 usa-footer__primary-content">
+              <a class="usa-footer__primary-link" href="mailto:{{ supportEmail }}">Contact support</a>
+            </li>
+            <li
+              class="mobile-lg:grid-col-6 desktop:grid-col-4 usa-footer__primary-content">
+              <a class="usa-footer__primary-link" href="https://cloudgov.statuspage.io">Platform status</a>
+            </li>
+            <li
+              class="mobile-lg:grid-col-6 desktop:grid-col-4 usa-footer__primary-content">
+              <a class="usa-footer__primary-link" href="{{ homepageUrl }}/documentation/">Documentation</a>
+            </li>
+            <li
+              class="mobile-lg:grid-col-6 desktop:grid-col-4 usa-footer__primary-content">
+              <a class="usa-footer__primary-link" href="https://github.com/cloud-gov/pages-core/">Source code</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% include "usa-identifier.njk" %}

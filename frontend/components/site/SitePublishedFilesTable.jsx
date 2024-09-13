@@ -83,7 +83,7 @@ function renderPublishedFilesTable(files, name, currentPage, lastPage, setCurren
         has publicly published.
         Up to 200 files are shown per page.
       </p>
-      <table className="usa-table-borderless table-full-width log-table">
+      <table className="usa-table usa-table--borderless width-full usa-table--stacked log-table table-full-width">
         <thead>
           <tr>
             <th scope="col">File</th>

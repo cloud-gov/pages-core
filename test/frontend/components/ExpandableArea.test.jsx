@@ -14,11 +14,11 @@ describe('<ExpandableArea/>', () => {
 
     expect(wrapper.exists()).to.be.true;
 
-    const content = wrapper.find('.usa-accordion-content');
+    const content = wrapper.find('.usa-accordion__content');
     expect(content.exists()).to.be.true;
-    expect(content.prop('aria-hidden')).to.equal(true);
+    expect(content.prop('hidden')).to.equal(true);
 
-    const button = wrapper.find('.usa-accordion-button');
+    const button = wrapper.find('.usa-accordion__button');
     expect(button.prop('aria-controls')).to.equal(content.prop('id'));
   });
 });

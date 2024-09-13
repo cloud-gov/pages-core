@@ -81,87 +81,97 @@ class TemplateSite extends React.Component {
     } = this.state;
 
     return (
-      <div className="federalist-template-list-item">
-        <div className="federalist-template-list-item-img">
-          <img
-            data-action="name-site"
-            className="thumbnail"
-            src={thumb}
-            alt={`Thumbnail screenshot for the ${title} template`}
-          />
-
-        </div>
-        <div className="federalist-template-list-item-content">
-          <h3 className="federalist-template-title">{title}</h3>
-          <p>{description}</p>
-          {this.getFormVisible()
-            ? (
-              <form
-                className="new-site-form"
-                onSubmit={this.handleSubmit}
-              >
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label htmlFor="owner">What GitHub account will own your site?</label>
-                <input
-                  id="owner"
-                  name="owner"
-                  type="text"
-                  value={owner}
-                  onChange={this.handleChange}
-                />
-                {
-                  hasOrgs(organizations) ? (
-                    <div className="form-group">
-                      <UserOrgSelect
-                        error={error}
-                        id="templateOrganizationId"
-                        name="templateOrganizationId"
-                        value={templateOrganizationId}
-                        onChange={this.handleChange}
-                        orgData={organizations.data}
-                        mustChooseOption
-                        touched={touched}
-                      />
-                    </div>
-                  ) : null
-                }
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label htmlFor="repository">Name your new site</label>
-                <input
-                  id="repository"
-                  name="repository"
-                  type="text"
-                  value={repository}
-                  onChange={this.handleChange}
-                />
-                <input type="submit" className="usa-button usa-button-primary" value="Create site" />
-              </form>
-            )
-            : null}
-          {!this.getFormVisible()
-            && (
-            <div>
-              <a
-                href={example}
-                target="_blank"
-                rel="noopener noreferrer"
-                role="button"
-                className="view-template-link"
-              >
-                View sample
-              </a>
-              <br />
-              <button
-                className="usa-button"
-                onClick={this.handleChooseActive}
-                type="button"
-              >
-                Use this template
-              </button>
+      <li className="federalist-template-list-item usa-card usa-card--flag flex-1 tablet-lg:grid-col-6">
+        <div className="usa-card__container bg-base-lightest">
+          <div className="federalist-template-list-item-img usa-card__media">
+            <div className="usa-card__img">
+              <img
+                data-action="name-site"
+                className="thumbnail"
+                src={thumb}
+                alt={`Thumbnail screenshot for the ${title} template`}
+              />
             </div>
-            )}
+          </div>
+          <div className="usa-card__header">
+            <h3 className="usa-card__heading federalist-template-title">{title}</h3>
+          </div>
+          <div className="usa-card__body federalist-template-list-item-content">
+            <p>{description}</p>
+            {this.getFormVisible()
+              ? (
+                <form
+                  className="new-site-form"
+                  onSubmit={this.handleSubmit}
+                >
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                  <label className="usa-label text-bold" htmlFor="owner">What GitHub account will own your site?</label>
+                  <input
+                    id="owner"
+                    name="owner"
+                    type="text"
+                    value={owner}
+                    className="usa-input"
+                    onChange={this.handleChange}
+                  />
+                  {
+                    hasOrgs(organizations) ? (
+                      <div className="form-group">
+                        <UserOrgSelect
+                          error={error}
+                          id="templateOrganizationId"
+                          name="templateOrganizationId"
+                          value={templateOrganizationId}
+                          onChange={this.handleChange}
+                          orgData={organizations.data}
+                          mustChooseOption
+                          touched={touched}
+                        />
+                      </div>
+                    ) : null
+                  }
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                  <label className="usa-label text-bold" htmlFor="repository">Name your new site</label>
+                  <input
+                    className="usa-input"
+                    id="repository"
+                    name="repository"
+                    type="text"
+                    value={repository}
+                    onChange={this.handleChange}
+                  />
+                  <input type="submit" className="usa-button usa-button-primary margin-top-1" value="Create site" />
+                </form>
+              )
+              : null}
+          </div>
+          <div className="usa-card__footer">
+            {!this.getFormVisible()
+              && (
+              <div>
+                <p>
+                  <a
+                    href={example}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    role="button"
+                    className="view-template-link"
+                  >
+                    View sample
+                  </a>
+                </p>
+                <button
+                  className="usa-button"
+                  onClick={this.handleChooseActive}
+                  type="button"
+                >
+                  Use this template
+                </button>
+              </div>
+              )}
+          </div>
         </div>
-      </div>
+      </li>
     );
   }
 }

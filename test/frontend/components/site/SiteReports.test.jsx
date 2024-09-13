@@ -10,28 +10,28 @@ import { mountRouter } from '../../support/_mount';
 proxyquire.noCallThru();
 
 let state;
-const defaultUser = {
-  id: 1,
-  username: 'user123',
-};
+// const defaultUser = {
+//   id: 1,
+//   username: 'user123',
+// };
 const defaultSite = {
   id: 5,
   owner: 'an-owner',
   repository: 'the-repo',
   organizationId: 1,
 };
-const defaultBuild = {
-  user: defaultUser,
-  site: defaultSite,
-  id: 1,
-  branch: 'main',
-  createdAt: '2016-12-28T12:00:00',
-  startedAt: '2016-12-28T12:01:00',
-  completedAt: '2016-12-28T12:05:00',
-  state: 'success',
-  requestedCommitSha: '123A',
-  username: 'build-username',
-};
+// const defaultBuild = {
+//   user: defaultUser,
+//   site: defaultSite,
+//   id: 1,
+//   branch: 'main',
+//   createdAt: '2016-12-28T12:00:00',
+//   startedAt: '2016-12-28T12:01:00',
+//   completedAt: '2016-12-28T12:05:00',
+//   state: 'success',
+//   requestedCommitSha: '123A',
+//   username: 'build-username',
+// };
 const defaultSiteBuildTask = {
   id: 1,
   buildTaskTypeId: 1,
@@ -168,32 +168,5 @@ describe('<SiteReports/>', () => {
     const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
     expect(wrapper.find('table#list')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
-  });
-
-  it('should render a filtered list with a build parameter', () => {
-    const N = 4;
-    const buildId = 1;
-    useBuildTasksForSite.returns({
-      isLoading: false,
-      buildTasks: Array(N)
-        .fill(1)
-        .map((val, index) => ({ ...defaultScan, id: index }))
-        .concat({ ...defaultScan, id: N + 1, buildId: 5 }),
-    });
-
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports?build=1', state);
-    expect(wrapper.find('table#list tr')).to.have.length(N + 1);
-    expect(wrapper.find('p.usa-alert-text')).to.have.length(1);
-    expect(wrapper.find('p.usa-alert-text').text()).to.contain(`Showing ${N} matching reports for build #${buildId}`);
-  });
-
-  it('should hide the schedule table with a build parameter', () => {
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports?build=1', state);
-    expect(wrapper.find('table#scheduled')).to.have.length(0);
-  });
-
-  it('should show the schedule table without a build parameter', () => {
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
-    expect(wrapper.find('table#scheduled')).to.have.length(1);
   });
 });

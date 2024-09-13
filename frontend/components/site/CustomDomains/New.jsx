@@ -49,7 +49,7 @@ function NewCustomDomain() {
 
   return (
     <>
-      <h2>Create New Custom Domain</h2>
+      <h2 className="font-sans-2xl">Create New Custom Domain</h2>
       <div>
         <AlertBanner status="info" message={infoContent} alertRole={false} />
       </div>
@@ -63,7 +63,7 @@ function NewCustomDomain() {
         <div className="well">
           <div>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label htmlFor="domain-name">Domain Name</label>
+            <label className="usa-label font-sans-lg text-bold" htmlFor="domain-name">Domain Name</label>
             <p>
               Enter the custom domain name you will be launching.
               {' '}
@@ -94,6 +94,7 @@ function NewCustomDomain() {
             </p>
             <input
               id="domain-name"
+              className="usa-input"
               name="domain-name"
               value={domain.names}
               placeholder='ie. "site.agency.gov"'
@@ -108,7 +109,7 @@ function NewCustomDomain() {
           </div>
           <div>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label htmlFor="branch-context">Branch Context</label>
+            <label className="usa-label font-sans-lg text-bold" htmlFor="branch-context">Branch Context</label>
             <p>
               Select the site&apos;s branch context you will associate to the custom
               domain.
@@ -137,6 +138,7 @@ function NewCustomDomain() {
             <select
               id="branch-context"
               name="branch-context"
+              className="usa-select"
               value={domain.data.siteBranchConfigId}
               onChange={(event) => {
                 setDomainValues({
@@ -160,7 +162,8 @@ function NewCustomDomain() {
               ))}
             </select>
           </div>
-          <button type="submit" className="usa-button usa-button-primary">
+          <br />
+          <button type="submit" className="usa-button usa-button--primary">
             Save
           </button>
         </div>

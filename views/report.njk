@@ -33,11 +33,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="/uswds3/dist/css/uswds.min.css">
+    <link rel="stylesheet" href="/{{ webpackAssets['bundle.css'] }}">
     <link rel="stylesheet" href="/styles/report.css">
 
-    <script src="/uswds3/dist/js/uswds-init.min.js" type="text/javascript"></script>
-    <script defer src="/uswds3/dist/js/uswds.min.js" type="text/javascript"></script>
+    <script src="/js/uswds-init.min.js" type="text/javascript"></script>
+    <script defer src="/js/uswds.min.js" type="text/javascript"></script>
     <title>
       {{ appName }}
       {% if siteDisplayEnv %}
@@ -47,7 +47,7 @@
     </title>
     {% block head_extra %}{% endblock %}
   </head>
-  <body class="body {{ productName }} scan-reports">
+  <body>
       <div id="report-app"></div>
       <script nonce="{{ nonce }}">
         window.CSRF_TOKEN = "{{ csrfToken }}";

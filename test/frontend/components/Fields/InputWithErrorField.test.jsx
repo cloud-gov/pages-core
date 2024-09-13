@@ -33,21 +33,21 @@ describe('<InputWithErrorField />', () => {
     };
 
     let wrapper = shallow(<InputWithErrorField {...props} />);
-    expect(wrapper.find('.usa-input-error')).to.have.length(0);
-    expect(wrapper.find('.usa-input-error-message')).to.have.length(0);
+    expect(wrapper.find('.usa-input--error')).to.have.length(0);
+    expect(wrapper.find('.usa-error-message')).to.have.length(0);
 
     props.meta.error = 'boop error';
     // touched is still false, so no errors should be shown
     wrapper = shallow(<InputWithErrorField {...props} />);
-    expect(wrapper.find('.usa-input-error')).to.have.length(0);
-    expect(wrapper.find('.usa-input-error-message')).to.have.length(0);
+    expect(wrapper.find('.usa-input--error')).to.have.length(0);
+    expect(wrapper.find('.usa-error-message')).to.have.length(0);
 
     props.meta.touched = true;
     // now that both touched and error have been set,
     // the error should be shown
     wrapper = shallow(<InputWithErrorField {...props} />);
-    expect(wrapper.find('.usa-input-error')).to.have.length(1);
-    expect(wrapper.find('.usa-input-error-message')).to.have.length(1);
-    expect(wrapper.find('.usa-input-error-message').text()).to.equal('boop error');
+    expect(wrapper.find('.usa-input--error')).to.have.length(1);
+    expect(wrapper.find('.usa-error-message')).to.have.length(1);
+    expect(wrapper.find('.usa-error-message').text()).to.equal('boop error');
   });
 });

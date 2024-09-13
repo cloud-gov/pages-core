@@ -35,12 +35,12 @@ describe('<AdvancedSiteSettingsForm/>', () => {
     const props = makeProps();
     let wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button.usa-button--outline').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
-    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button.usa-button--outline').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
@@ -48,7 +48,7 @@ describe('<AdvancedSiteSettingsForm/>', () => {
     const props = makeProps();
     props.pristine = false;
     const wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
-    const resetButton = wrapper.find('button.usa-button-secondary');
+    const resetButton = wrapper.find('button.usa-button.usa-button--outline');
 
     expect(props.reset.called).to.be.false;
     resetButton.simulate('click');

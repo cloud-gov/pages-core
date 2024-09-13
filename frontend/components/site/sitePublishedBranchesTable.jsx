@@ -19,7 +19,7 @@ function renderPublishedBranchRow(branch, site) {
     <tr key={branch.name}>
       <td>{branch.name}</td>
       <td>
-        <ul className="usa-unstyled-list">
+        <ul className="usa-list--unstyled">
           <li>
             <BranchViewLink branchName={branch.name} site={site} />
           </li>
@@ -42,7 +42,7 @@ function renderPublishedBranchesTable(data, site) {
         {` ${globals.APP_NAME} `}
         has published.
       </p>
-      <table className="usa-table-borderless published-branch-table log-table table-full-width">
+      <table className="usa-table usa-table--borderless usa-table--stacked published-branch-table log-table width-full table-full-width">
         <thead>
           <tr>
             <th>Branch</th>

@@ -1,44 +1,65 @@
+@use 'uswds' with (
+  $theme-font-path: '../../node_modules/@uswds/uswds/dist/fonts',
+  // $theme-image-path: '/../../node_modules/@uswds/uswds/dist/img',
+  $theme-show-notifications: false,
+  $theme-utility-breakpoints: (
+    'card':              false,   // 160px
+    'card-lg':           false,   // 240px
+    'mobile':            false,   // 320px
+    'mobile-lg':         true,    // 480px
+    'tablet':            true,    // 640px
+    'tablet-lg':         true,   // 880px
+    'desktop':           true,    // 1024px
+    'desktop-lg':        true,   // 1200px
+    'widescreen':        true,   // 1400px
+  ),
+  $theme-identifier-max-width: 'desktop-lg',
+  $theme-footer-max-width: 'desktop-lg',
+  $theme-header-max-width: 'desktop-lg',
+  $theme-banner-max-width: 'desktop-lg',
+  $theme-grid-container-max-width: 'desktop-lg',
+  // $theme-site-margins-breakpoint: 'desktop-lg',
+  $theme-site-alert-max-width: 'desktop-lg',
+  $theme-header-logo-text-width: 70%,
+  $theme-color-primary-family: 'blue',
+  $theme-color-primary-lightest: 'blue-warm-5',
+  $theme-color-primary-lighter: 'blue-warm-10',
+  $theme-color-primary-light: 'blue-30',
+  $theme-color-primary: 'blue-60',
+  $theme-color-primary-vivid: 'blue-70v',
+  $theme-color-primary-dark: 'blue-70',
+  $theme-color-primary-darker: 'blue-warm-80v',
+//  $theme-color-primary-darkest: 'blue-cool',
+  $theme-color-base-lightest: 'gray-cool-3',
+  $theme-color-base-lighter: 'gray-cool-5',
+  $theme-color-base-light: 'gray-cool-10',
+  $theme-color-base-dark: 'blue-70',
+  $theme-color-base-darker: 'blue-warm-80v',
+  $theme-color-base-ink: 'blue-warm-80v',
+  $theme-button-border-radius: 'sm',
+  $theme-identifier-background-color: 'blue-warm-80v',
+  $theme-identifier-primary-link-color: 'blue-cool-5',
+  $theme-identifier-secondary-link-color: 'blue-cool-10',
+  $theme-global-link-styles: true,
+  $theme-card-header-typeset: ( "body", "xl", 2),
+  $theme-card-border-radius: "sm",
+  $theme-card-border-color: 'base-light',
+  $theme-card-margin-bottom: 2,
+  $theme-card-border-width: '1px',
+  $theme-card-flag-image-width: 'mobile',
+  $theme-font-role-heading: 'sans',
+  $theme-table-header-background-color: 'primary-lightest',
+);
 
-// Setup for the US Web Design Standards
-$font-path: '../../node_modules/uswds/src/fonts';
-$image-path: '../../node_modules/uswds/src/img';
 
-@import 'uswds';
+@import "build-logs";
+@import "icons";
+@import "loader";
+@import "tables";
+@import "log-tools";
 
-@import "_variables";
 
-@import "_actions";
-@import "_alerts";
-@import "_banner";
-@import "_build-logs";
-@import "_case_study";
-@import "_criteria_list";
-@import "_checklist";
-@import "_commit-summary";
-@import "_dashboard";
-@import "_example_sites";
-@import "_feature_group";
-@import "_features_page";
-@import "_figure_group";
-@import "_flexbox";
-@import "_forms";
-@import "_header";
-@import "_home";
-@import "_icons";
-@import "_info_block";
-@import "_labels";
-@import "_list";
-@import "_loader";
-@import "_text";
-@import "_wells";
-@import "_tables";
-@import "_log-tools";
-@import "_navigation";
-@import "side-nav";
-@import "template-items";
-@import "_footer";
-
-.body {
+body {
   display: flex;
   flex-flow: column nowrap;
   min-height: 100vh;
@@ -47,140 +68,90 @@ $image-path: '../../node_modules/uswds/src/img';
 .main-content {
   flex-grow: 1;
 }
-
-.usa-grid.site {
-  height: inherit;
-  padding-left: 0;
-  padding-right: 0;
-}
-
 #js-app {
   height: 100%;
-  max-width: 1040px;
-  margin: 0 auto;
-  > [data-reactroot] {
-    height: inherit;
+  margin: 0 auto
+}
+
+#js-app>[data-reactroot] {
+  height: inherit
+}
+
+// menu restyle for desktop
+@media (min-width: 64em) {
+  .usa-nav__primary > .usa-nav__primary-item {
+    & > a.usa-nav-link {
+      -webkit-font-smoothing: antialiased;
+      color: #fff;
+      font-weight: 400;
+      &:hover,
+      &:focus,
+      &:target {
+        color: #dae9ee; // blue-cool-10
+        text-decoration: underline;
+      }
+    }
+    &:last-child > a {
+      padding-right: 0;
+      span { margin-right: 0 }
+    }
+  }
+  .usa-logo {
+      margin: 1.5rem 0;
   }
 }
-
-.site-main {
-  background-color: white;
-  padding-bottom: 5rem;
-}
-
-.offset-top {
-  margin-top: 6em;
-}
-
-.offset-left {
-  margin-left: 2em;
-}
-
-.usa-grid.site:before {
-  bottom: 0;
-  content: '';
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 50%;
-  z-index: -1;
-}
-
-.back-to-top {
-  display: block;
-  padding-bottom: 5rem;
-  padding-top: 2rem;
-}
-
-@media screen and (max-width: $mobile-size) {
-  .flex-center {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    float: none;
-  }
-
-  .full-width {
-    margin: 0;
-    width: 100%;
+.usa-button {
+  -webkit-font-smoothing: antialiased;
+  svg {
+    display: inline-block;
+    fill: currentColor;
+    height: 1em;
+    position: relative;
+    width: 1em;
+    flex-shrink: 0;
   }
 }
-
-@mixin clearfix {
-  &:after {
-    clear: both;
-    content: '';
-    display: block;
-  }
-}
-@media screen and (min-width: 1000px) {
-  .site-main {
-    min-height: calc(100vh - 235px);
-  }
-}
-@media screen and (min-width: 600px) {
-.usa-grid.site:before {
-    background-color: $color-gray-lightest;
-  }
-
-  .site-main {
-    height: inherit;
-    padding-left: 3rem;
-  }
-
-  .usa-width-one-sixth {
-    margin-right: initial;
-    width: initial;
-  }
-}
-
-@media screen and (max-width: $mobile-size) {
-  .desktop-only {
-    display: none;
-  }
-}
-
-.table-container {
-  overflow-x: auto;
-  margin-bottom: 3em;
-  table, tr {
-    margin-bottom: 0;
-    margin-top: .5em;
-  }
-}
-
-// unclear why this isn't already the case...
-@media screen and (min-width: $mobile-size) {
-  .usa-width-five-sixths {
-    width: 83%;
-  }
-}
-
-.commit-link {
-  font-weight: bold;
-}
-
-.github-auth-button {
-  display: inline-flex;
-  align-items: center;
-
-  &>svg {
-    margin-right: 1rem;
-  }
-}
-
-.flex {
-  display: flex;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.inline-block {
+a > svg {
   display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  position: relative;
+  width: 1em;
+  flex-shrink: 0;
 }
 
-.text-center {
-  text-align: center;
+.usa-button--outline {
+  background: white;
+}
+
+.usa-card__img img {
+  object-position: top left;
+}
+
+.site > .side-nav {
+  @media (min-width: 64em) {
+    position: relative;
+    &:before {
+      content: '';
+      width: 100vw;
+      height: 100%;
+      position: absolute;
+      left: -100vw;
+      top: 0;
+      margin-left: 10em;
+      background-color: inherit;
+      display: block;
+      z-index: -1;
+    }
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+.usa-sidenav-list {
+  @media (min-width: 64em) {
+    position: sticky;
+    top: 1rem;
+  }
 }

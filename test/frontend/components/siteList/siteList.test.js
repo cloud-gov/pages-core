@@ -49,7 +49,7 @@ describe('<SiteList />', () => {
   beforeEach(() => {
     SiteList = proxyquire('../../../../frontend/components/siteList/siteList', {
       './siteListItem': SiteListItem,
-      '../icons': { IconPlus: 'IconPlus' },
+      '../UsaIcon': { UsaIcon: 'UsaIcon' },
     }).SiteList;
   });
 
@@ -105,7 +105,7 @@ describe('<SiteList />', () => {
     });
 
     it('renders a container for the list of sites', () => {
-      expect(wrapper.find('.sites-list')).to.have.length(1);
+      expect(wrapper.find('.usa-card-group')).to.have.length(1);
     });
 
     it('renders a SiteListItem component for each site in the list', () => {

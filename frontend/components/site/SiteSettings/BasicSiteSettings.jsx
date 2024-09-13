@@ -19,8 +19,8 @@ export const BasicSiteSettings = ({
   <form className="settings-form" onSubmit={handleSubmit}>
     <h3>Basic settings</h3>
     <div className="well">
-      <fieldset>
-        <legend>Live site</legend>
+      <fieldset className="usa-fieldset">
+        <legend className="usa-label">Live site</legend>
         <p className="well-text">
           Set the primary branch
           {` ${globals.APP_NAME} `}
@@ -45,7 +45,6 @@ export const BasicSiteSettings = ({
           type="text"
           id="defaultBranchInput"
           name="defaultBranch"
-          className="form-control"
           placeholder="Branch name"
         />
         {!isSandbox
@@ -55,15 +54,14 @@ export const BasicSiteSettings = ({
             name="domain"
             id="domainInput"
             placeholder="https://example.gov"
-            className="form-control"
             disabled={!initialValues.canEditLiveUrl}
           />
           )}
       </fieldset>
     </div>
     <div className="well">
-      <fieldset>
-        <legend>Demo site</legend>
+      <fieldset className="usa-fieldset">
+        <legend className="usa-label">Demo site</legend>
         <p className="well-text">
           Optional: After setting up DNS with the
           {` ${globals.APP_NAME} `}
@@ -80,7 +78,6 @@ export const BasicSiteSettings = ({
           label="Branch name:"
           name="demoBranch"
           id="demoBranchInput"
-          className="form-control"
           type="text"
           placeholder="Branch name"
         />
@@ -91,7 +88,6 @@ export const BasicSiteSettings = ({
             name="demoDomain"
             id="demoDomainInput"
             placeholder="https://demo.example.gov"
-            className="form-control"
             disabled={!initialValues.canEditDemoUrl}
           />
           )}
@@ -99,7 +95,7 @@ export const BasicSiteSettings = ({
     </div>
     <button
       type="button"
-      className="usa-button usa-button-secondary"
+      className="usa-button usa-button--outline"
       disabled={pristine}
       onClick={reset}
     >
@@ -108,7 +104,7 @@ export const BasicSiteSettings = ({
 
     <button
       type="submit"
-      className="usa-button usa-button-primary"
+      className="usa-button usa-button--primary"
       disabled={pristine}
     >
       Save basic settings

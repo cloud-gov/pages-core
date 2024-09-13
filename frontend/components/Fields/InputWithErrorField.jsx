@@ -12,15 +12,16 @@ const InputWithErrorField = ({
   type,
   ...props
 }) => (
-  <div className={touched && error ? 'usa-input-error' : ''}>
-    { label && <label htmlFor={id}>{ label }</label> }
+  <div className="padding-y-2 margin-y-neg-2 padding-x-2 margin-x-neg-2">
+    { label && <label className="usa-label text-bold" htmlFor={id}>{ label }</label> }
     { help }
-    {touched && (error && <span className="usa-input-error-message">{error}</span>)}
+    {touched && (error && <span className="usa-error-message">{error}</span>)}
     <input
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...input}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
+      className={`usa-input ${touched && error ? 'usa-input--error' : ''}`}
       placeholder={placeholder}
       type={type}
       id={id}

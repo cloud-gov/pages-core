@@ -69,30 +69,44 @@ function Settings({
 
   return (
     <div className="user-settings">
-      <div className="page-header usa-grid-full">
-        <div className="usa-width-one-half">
-          <h1>
+      <div className="page-header grid-row">
+        <div className="grid-col">
+          <h1 className="font-sans-2xl">
             User Settings
           </h1>
         </div>
       </div>
-      <div className="well">
-        <h2>Github Token</h2>
-        <GithubAuthButton
-          onSuccess={onGithubAuthSuccess}
-          onFailure={onGithubAuthFailure}
-          text="Reset your Github Access Token."
-          revokeFirst
-        />
-        <h2>Build Notifications</h2>
-        <SettingsForm
-          initialValues={initialValues}
-          organizations={organizations.data}
-          sites={sites.data}
-          onSubmit={onSubmit}
-          onSubmitFail={onSubmitFail}
-          onSubmitSuccess={onSubmitSuccess}
-        />
+      <div className="well grid-row">
+        <div className="grid-col">
+          <h2>Github Token</h2>
+        </div>
+      </div>
+      <div className="well grid-row">
+        <div className="grid-col">
+          <GithubAuthButton
+            onSuccess={onGithubAuthSuccess}
+            onFailure={onGithubAuthFailure}
+            text="Reset your Github Access Token."
+            revokeFirst
+          />
+        </div>
+      </div>
+      <div className="well grid-row">
+        <div className="grid-col">
+          <h2 className="margin-top-5 margin-bottom-0">Build Notifications</h2>
+        </div>
+      </div>
+      <div className="well grid-row">
+        <div className="grid-col">
+          <SettingsForm
+            initialValues={initialValues}
+            organizations={organizations.data}
+            sites={sites.data}
+            onSubmit={onSubmit}
+            onSubmitFail={onSubmitFail}
+            onSubmitSuccess={onSubmitSuccess}
+          />
+        </div>
       </div>
     </div>
   );

@@ -51,7 +51,7 @@ export default function Zap({ data, buildId, siteId }) {
   return (
     <>
       <div className="grid-row">
-        <h1 className="font-heading-xl grid-col padding-right-2">
+        <h1 className="font-serif-xl grid-col padding-right-2">
           {scanTitle}
           {' report for '}
           <br />

@@ -137,9 +137,9 @@ export function SiteContainer(props) {
   ));
 
   return (
-    <div className="usa-grid site">
+    <div className="grid-row grid-gap-6 site">
       <SideNav siteId={site.id} config={navConig} />
-      <div className="usa-width-five-sixths site-main" id="pages-container" role="main">
+      <div className="tablet:grid-col-9 desktop:grid-col-10 grid-col-12 site-main" id="pages-container" role="main">
 
         <AlertBanner
           message={alert.message}

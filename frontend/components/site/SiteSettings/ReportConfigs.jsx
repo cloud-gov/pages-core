@@ -84,6 +84,7 @@ function ReportConfigs({ siteId: id }) {
       <select
         name={name}
         id={`select-${rule.id}`}
+        className="usa-select"
         value={rule[prop]}
         onChange={event => updateRule(event, rule.id, prop)}
         disabled={rule.source === 'Pages'}
@@ -160,6 +161,7 @@ function ReportConfigs({ siteId: id }) {
                 { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
                 <label className="usa-sr-only" htmlFor={`${rule.id}-criteria`}>Criteria to match:</label>
                 <input
+                  className="usa-input"
                   id={`${rule.id}-criteria`}
                   type="text"
                   placeholder={customPlaceholder}
@@ -171,8 +173,9 @@ function ReportConfigs({ siteId: id }) {
               <td className="has-button">
                 { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
                 <label className="usa-sr-only" htmlFor={`${rule.id}-delete`}>Delete this rule</label>
-                <button id={`${rule.id}-delete`} className="button-delete" aria-label={isPagesRule ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
-                  <IconTrash className="icon-delete" aria-hidden />
+                <button id={`${rule.id}-delete`} className="margin-0 usa-button usa-button--secondary" aria-label={isPagesRule ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
+                  <span className="usa-sr-only">Delete</span>
+                  <IconTrash className="" aria-hidden />
                 </button>
               </td>
             </>
@@ -236,7 +239,7 @@ function ReportConfigs({ siteId: id }) {
       >
         <div className="well">
           {helperText()}
-          <table className="usa-table usa-table-borderless scan-config-table">
+          <table className="usa-table usa-table--borderless usa-table--stacked scan-config-table">
             <thead>
               <tr>
                 <th scope="col">Rule to suppress</th>
@@ -249,7 +252,7 @@ function ReportConfigs({ siteId: id }) {
               {customerRules.filter(rule => rule.type === sbt.id).map(ruleRender)}
             </tbody>
           </table>
-          <button className="usa-button usa-button-secondary" type="button" onClick={() => addNewRule(i)}>Add custom rule</button>
+          <button className="usa-button usa-button--outline" type="button" onClick={() => addNewRule(i)}>Add custom rule</button>
           <button
             className="usa-button"
             type="button"
@@ -283,8 +286,8 @@ function ReportConfigs({ siteId: id }) {
   }
 
   return (
-    <div>
-      <h3>Report Configurations</h3>
+    <div className="grid-col-12">
+      <h3 className="font-heading-xl margin-top-4 margin-bottom-2">Report Configurations</h3>
       {!defaultScanRules && (
         <div>
           <h4>

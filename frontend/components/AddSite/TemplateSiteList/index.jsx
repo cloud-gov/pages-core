@@ -19,7 +19,7 @@ const templateGrid = (
     const template = templates[templateKey];
 
     return (
-      <div className="federalist-template-list" key={templateKey}>
+      <ul className="federalist-template-list usa-card-group" key={templateKey}>
         <TemplateSite
           templateKey={templateKey}
           index={index}
@@ -31,7 +31,7 @@ const templateGrid = (
           organizations={organizations}
           {...template}
         />
-      </div>
+      </ul>
     );
   })
 );
@@ -47,7 +47,7 @@ function TemplateList(props) {
   }
 
   return (
-    <div>
+    <div className="margin-top-6">
       <h2>Or choose from one of our templates</h2>
       {templateGrid(
         activeChildId,

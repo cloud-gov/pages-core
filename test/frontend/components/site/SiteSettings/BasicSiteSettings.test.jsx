@@ -42,7 +42,6 @@ describe('<BasicSiteSettings/>', () => {
       name: 'domain',
       id: 'domainInput',
       placeholder: 'https://example.gov',
-      className: 'form-control',
       disabled: true,
     });
 
@@ -53,7 +52,6 @@ describe('<BasicSiteSettings/>', () => {
       name: 'demoDomain',
       id: 'demoDomainInput',
       placeholder: 'https://demo.example.gov',
-      className: 'form-control',
       disabled: false,
     });
   });
@@ -70,12 +68,12 @@ describe('<BasicSiteSettings/>', () => {
     const props = makeProps();
     let wrapper = shallow(<BasicSiteSettings {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button--outline').prop('disabled')).to.be.true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<BasicSiteSettings {...props} />);
-    expect(wrapper.find('button.usa-button-secondary').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button--primary').prop('disabled')).to.be.false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 
@@ -83,7 +81,7 @@ describe('<BasicSiteSettings/>', () => {
     const props = makeProps();
     props.pristine = false;
     const wrapper = shallow(<BasicSiteSettings {...props} />);
-    const resetButton = wrapper.find('button.usa-button-secondary');
+    const resetButton = wrapper.find('button.usa-button--outline');
 
     expect(props.reset.called).to.be.false;
     resetButton.simulate('click');

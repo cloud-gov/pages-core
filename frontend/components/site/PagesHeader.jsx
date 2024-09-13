@@ -6,17 +6,19 @@ import GitHubLink from '../GitHubLink';
 const PagesHeader = ({
   owner, repository, title,
 }) => (
-  <div className="page-header usa-grid-full">
-    <div className="usa-width-two-thirds">
+  <div className="page-header grid-row flex-align-center">
+    <div className="desktop:grid-col-fill grid-col-12">
       <div className="header-title">
-        <h1>
+        <h1 className="font-sans-lg margin-top-3">
           {`${owner}/${repository}`}
         </h1>
       </div>
-      {title && <h2>{title}</h2>}
     </div>
-    <div className="usa-width-one-third header-actions">
-      <GitHubLink text="View repo" owner={owner} repository={repository} />
+    <div className="desktop:grid-col-auto grid-col-12 header-actions margin-right-neg-1">
+      <GitHubLink text="View repo" owner={owner} repository={repository} isButton />
+    </div>
+    <div className="grid-col-12">
+      {title && <h2 className="font-sans-2xl margin-y-2">{title}</h2>}
     </div>
   </div>
 );

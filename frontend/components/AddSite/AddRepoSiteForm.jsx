@@ -34,40 +34,39 @@ export const AddRepoSiteForm = ({
   showAddNewSiteFields,
 }) => (
   <form onSubmit={handleSubmit}>
-    <div className="form-group">
+    <div className="form-group margin-y-3">
       <GitHubRepoUrlField
         label="Already have a GitHub repo for your site? Paste the URL here."
         name="repoUrl"
         id="repoUrl"
         placeholder="https://github.com/owner/repository"
-        className="form-control"
         readOnly={showAddNewSiteFields}
       />
-      <div className="form-group">
-        <Field
-          name="repoOrganizationId"
-          type="select"
-          component={p => (
-            <UserOrgSelect
-              id="repoOrganizationId"
-              name="repoOrganizationId"
-              value={p.input.value}
-              onChange={p.input.onChange}
-              orgData={organizations.data}
-              mustChooseOption
-              {...p.meta}
-            />
-          )}
-        />
-      </div>
+    </div>
+    <div className="form-group margin-y-3">
+      <Field
+        name="repoOrganizationId"
+        type="select"
+        component={p => (
+          <UserOrgSelect
+            id="repoOrganizationId"
+            name="repoOrganizationId"
+            value={p.input.value}
+            onChange={p.input.onChange}
+            orgData={organizations.data}
+            mustChooseOption
+            {...p.meta}
+          />
+        )}
+      />
     </div>
     {
       showAddNewSiteFields && (
       <div className="add-repo-site-additional-fields">
         {showNewSiteAlert()}
-        <div className="form-group">
+        <div className="form-group margin-y-2">
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label htmlFor="engine">Site engine</label>
+          <label className="usa-label text-bold" htmlFor="engine">Site engine</label>
           <Field
             name="engine"
             component={p => (
@@ -76,7 +75,6 @@ export const AddRepoSiteForm = ({
                 id="engine"
                 value={p.input.value}
                 onChange={p.input.onChange}
-                className="form-control"
               />
             )}
           />
@@ -86,7 +84,7 @@ export const AddRepoSiteForm = ({
 }
     <button
       type="submit"
-      className="usa-button usa-button-primary inline-block"
+      className="usa-button usa-button--primary inline-block"
       disabled={pristine}
     >
       Add repository-based site

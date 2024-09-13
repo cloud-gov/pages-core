@@ -7,7 +7,9 @@ export default function About({ scanType, siteId, children }) {
   return (
     <section className="usa-prose margin-y-4 maxw-tablet-lg">
       <h2>
-        About this report
+        <span className="font-serif-xl">
+          About this report
+        </span>
       </h2>
       <div className="font-body-md line-height-body-5">
         { scanType === 'zap' ? <ZapAbout /> : <A11yAbout /> }

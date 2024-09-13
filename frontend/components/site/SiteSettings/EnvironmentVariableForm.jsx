@@ -15,13 +15,14 @@ export const EnvironmentVariableForm = ({
   handleSubmit, invalid, pristine, reset, submitting,
 }) => (
   <form onSubmit={data => handleSubmit(data).then(reset)}>
-    <fieldset>
-      <legend className="sr-only">Add new environment variable</legend>
+    <fieldset className="usa-fieldset">
+      <legend className="usa-sr-only">Add new environment variable</legend>
       <Field
         name="name"
         id="nameInput"
         type="text"
         label="Name:"
+        className="margin-bottom-2"
         component={InputWithErrorField}
         required
         validate={[validateName]}
@@ -37,12 +38,14 @@ export const EnvironmentVariableForm = ({
         validate={[validateValue]}
       />
     </fieldset>
-    <button type="button" className="usa-button usa-button-secondary" disabled={pristine || submitting} onClick={reset}>
-      Clear
-    </button>
-    <button type="submit" className="usa-button usa-button-primary" disabled={invalid || submitting}>
-      Save
-    </button>
+    <div className="usa-button-group margin-y-2 margin-x-0">
+      <button type="button" className="usa-button usa-button--outline" disabled={pristine || submitting} onClick={reset}>
+        Clear
+      </button>
+      <button type="submit" className="usa-button usa-button--primary" disabled={invalid || submitting}>
+        Save
+      </button>
+    </div>
   </form>
 );
 

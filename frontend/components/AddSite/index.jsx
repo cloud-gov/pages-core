@@ -63,12 +63,12 @@ function AddSite() {
 
   if (!hasOrgs(organizations)) {
     return (
-      <div className="usa-grid">
-        <div className="page-header usa-grid-full">
+      <div className="grid-row">
+        <div className="page-header grid-col-12">
           {/* eslint-disable-next-line react/jsx-props-no-spreading */}
           <AlertBanner {...alert} />
           <div className="header-title">
-            <h1>
+            <h1 className="font-sans-2xl">
               Make a new site
             </h1>
             <AlertBanner
@@ -83,32 +83,34 @@ function AddSite() {
   }
 
   return (
-    <div>
-      <div className="usa-grid">
-        <div className="page-header usa-grid-full">
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <AlertBanner {...alert} />
-          <div className="header-title">
-            <h1>
-              Make a new site
-            </h1>
-          </div>
+    <div className="grid-row">
+      <div className="page-header grid-col-12">
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        <AlertBanner {...alert} />
+        <div className="header-title">
+          <h1 className="font-sans-2xl">
+            Make a new site
+          </h1>
         </div>
-        <div className="usa-content">
-          <p>
-            There are two different ways you can add sites to
-            {` ${globals.APP_NAME}. `}
-            You can specify the GitHub repository where your site&#39;s code lives.
-            Or, you can start with a brand new site by selecting one of our template sites below.
-          </p>
-        </div>
+      </div>
+      <div className="usa-prose grid-col-12">
+        <p className="usa-intro margin-0">
+          There are two different ways you can add sites to
+          {` ${globals.APP_NAME}. `}
+          You can specify the GitHub repository where your site&#39;s code lives.
+          Or, you can start with a brand new site by selecting one of our template sites below.
+        </p>
         <h2>Use your own GitHub repository</h2>
+      </div>
+      <div className="grid-col-8">
         <AddRepoSiteForm
           initialValues={{ engine: 'jekyll' }}
           organizations={organizations}
           showAddNewSiteFields={showAddNewSiteFields}
           onSubmit={formSubmitFunc}
         />
+      </div>
+      <div className="grid-col-12">
         <TemplateSiteList
           defaultOwner={defaultOwner(user)}
           organizations={organizations}

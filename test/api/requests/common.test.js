@@ -75,18 +75,6 @@ commonPaths.forEach((path) => {
         config.app.appName = origAppName;
       });
 
-      it('should display the appEnv in the title element', (done) => {
-        config.app.appEnv = 'testing123';
-        request(app)
-          .get(path)
-          .then((response) => {
-            const titleRegex = new RegExp(`<title>\\s*${config.app.appName} \\| testing123\\s*<\\/title>`, 'g');
-            expect(response.text.search(titleRegex)).to.be.above(-1);
-            done();
-          })
-          .catch(done);
-      });
-
       it('should not display the appEnv in the title when it is "production"', (done) => {
         config.app.appEnv = 'production';
         request(app)

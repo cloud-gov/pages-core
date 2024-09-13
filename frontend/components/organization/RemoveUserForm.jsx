@@ -9,7 +9,7 @@ const RemoveUserForm = ({
   <form onSubmit={handleSubmit}>
     <button
       type="submit"
-      className="usa-button usa-button-red margin-0 small-button"
+      className="usa-button usa-button--secondary margin-bottom-1 small-button"
       disabled={submitting}
     >
       Remove

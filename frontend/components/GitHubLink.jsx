@@ -6,7 +6,7 @@ import { IconGitHub, IconBranch } from './icons';
 const BASE = 'https://github.com';
 
 const GitHubLink = ({
-  owner, repository, text, branch, sha, icon, ...props
+  owner, repository, text, branch, sha, icon, isButton = false, ...props
 }) => {
   const baseHref = `${BASE}/${owner}/${repository}`;
 
@@ -40,7 +40,7 @@ const GitHubLink = ({
 
   return (
     <a
-      className={`${icon}-link`}
+      className={`${icon}-link ${isButton ? 'usa-button usa-button--outline' : 'usa-link'}`}
       href={href}
       title={title}
       target="_blank"
@@ -58,6 +58,7 @@ GitHubLink.propTypes = {
   repository: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   branch: PropTypes.string,
+  isButton: PropTypes.bool,
   sha: PropTypes.string,
   title: PropTypes.string,
   icon: PropTypes.string,
@@ -65,6 +66,7 @@ GitHubLink.propTypes = {
 
 GitHubLink.defaultProps = {
   branch: null,
+  isButton: false,
   sha: null,
   icon: 'repo',
   title: 'View repository on GitHub',

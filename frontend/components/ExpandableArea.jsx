@@ -11,19 +11,21 @@ function ExpandableArea(props) {
     bordered, children, isExpanded, title,
   } = props;
   return (
-    <div className={`usa-accordion${bordered ? '-bordered' : ''}`}>
-      <button
-        className="usa-accordion-button"
-        aria-expanded={isExpanded} // this is controlled by uswds.js
-        aria-controls={id}
-        type="button"
-      >
-        {title}
-      </button>
+    <div className={`usa-accordion ${bordered ? 'usa-accordion--bordered' : ''} width-full`}>
+      <div className="usa-accordion__heading">
+        <button
+          className="usa-accordion__button"
+          aria-expanded={isExpanded} // this is controlled by uswds.js
+          aria-controls={id}
+          type="button"
+        >
+          {title}
+        </button>
+      </div>
       <div
         id={id}
-        className="usa-accordion-content"
-        aria-hidden={!isExpanded}
+        className="usa-accordion__content"
+        hidden={!isExpanded}
       >
         {children}
       </div>

@@ -2,7 +2,20 @@
 html {
   font-size: 16px;
 }
+.usa-summary-box,
+.usa-table,
+.usa-alert .usa-alert__body,
+.usa-alert .usa-alert__body .usa-alert__text,
+.usa-table--borderless thead th,
+.usa-table--striped tbody tr:nth-child(odd) td, 
+.usa-table--striped tbody tr:nth-child(odd) th,
+#report-app {
+  color: #13171f;
+}
+.usa-alert--error .usa-alert__body::before {
+  background-color: #13171f;
 
+}
 pre {
   white-space: normal;
   max-width: 80rem;

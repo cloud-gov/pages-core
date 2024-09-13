@@ -72,7 +72,7 @@ const BasicAuthSettings = ({ siteId, basicAuth: { username, password } }) => {
               {password}
               <br />
               <br />
-              <button type="button" className="margin-0" id="delete-basic-auth-btn" onClick={() => deleteBasicAuth()}>
+              <button type="button" className="margin-0 usa-button" id="delete-basic-auth-btn" onClick={() => deleteBasicAuth()}>
                 Delete
               </button>
             </p>

@@ -10,7 +10,7 @@ const ResendInviteForm = ({
   <form onSubmit={handleSubmit}>
     <button
       type="submit"
-      className="usa-button usa-button-secondary margin-0 small-button"
+      className="usa-button usa-button--outline small-button"
       disabled={submitting}
     >
       <IconEnvelope />

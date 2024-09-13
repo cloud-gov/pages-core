@@ -1,7 +1,15 @@
+$color-blue: #1c5982;
+$color-blue-dark: #112e51;
+$color-blue-bright: rgb(5, 104, 253);
+
+
+$link-color: $color-blue;
+$link-color-active: $color-blue-dark;
 
 .repo-link {
   svg {
-    fill: $link-color;
+    color: currentColor;
+    fill: currentColor;
     margin-right: 0.4rem;
     stroke-width: 0;
     vertical-align: middle;
@@ -9,21 +17,22 @@
   }
 
   &:hover svg {
-    fill: $link-color-active;
+    fill: currentColor;
   }
 
 }
 
 .view-site-link {
   svg {
-    fill: $link-color;
+    color: currentColor;
+    fill: currentColor;
     margin-right: 0.4rem;
     vertical-align: middle;
     width: 13px;
   }
 
   &:hover svg {
-    fill: $link-color-active;
+    fill: currentColor;
   }
 
 }
@@ -66,7 +75,8 @@
 .external-link {
   line-height: 1em;
   svg {
-    fill: $link-color;
+    color: currentColor;
+    fill: currentColor;
     margin-left: 0.4rem;
     stroke-width: 0;
     vertical-align: middle;

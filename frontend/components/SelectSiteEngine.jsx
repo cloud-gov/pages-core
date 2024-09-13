@@ -30,7 +30,8 @@ const SelectSiteEngine = ({
   value, onChange, name, id, className,
 }) => (
   <select
-    {...{ name, id, className }}
+    className={`usa-select ${className}`}
+    {...{ name, id }}
     value={value}
     onChange={onChange}
   >

@@ -18,12 +18,12 @@ function SettingsForm(props) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <fieldset>
+      <fieldset className="usa-fieldset margin-bottom-2">
         <legend className="usa-sr-only">Build Notification Settings</legend>
-        <span className="usa-input-error-message" id="input-error-message" role="alert">
+        <span className="usa-error-message" id="input-error-message" role="alert">
           {errorMessage}
         </span>
-        <table className="usa-table-borderless log-table log-table__site-settings org-member-table table-full-width">
+        <table className="usa-table usa-table--borderless usa-table--stacked log-table log-table__site-settings org-member-table width-full table-full-width">
           <thead>
             <tr>
               <th scope="col">Repository</th>
@@ -34,45 +34,48 @@ function SettingsForm(props) {
           <tbody>
             {sites.map(site => (
               <tr key={site.id}>
-                <th scope="row" data-title="Repository">
+                <th scope="row" data-title="Repository" className="font-body-sm">
                   {site.owner}
                   /
                   {site.repository}
                 </th>
-                <td data-title="Organization">
+                <td data-title="Organization" className="font-body-sm">
                   {organizations.find(org => org.id === site.organizationId)?.name || '-'}
                 </td>
                 <td>
-                  <div className="flex justify-between">
-                    <div>
+                  <div className="grid-row">
+                    <div className="flex-1 usa-radio">
                       <Field
+                        className="usa-radio__input"
                         component="input"
                         type="radio"
                         name={`buildNotificationSettings.${site.id}`}
                         id={`${site.id}-none`}
                         value="none"
                       />
-                      <label className="margin-0" htmlFor={`${site.id}-none`}>None</label>
+                      <label className="usa-radio__label font-body-xs" htmlFor={`${site.id}-none`}>None</label>
                     </div>
-                    <div>
+                    <div className="flex-1 usa-radio">
                       <Field
+                        className="usa-radio__input"
                         component="input"
                         type="radio"
                         name={`buildNotificationSettings.${site.id}`}
                         id={`${site.id}-builds`}
                         value="builds"
                       />
-                      <label className="margin-0" htmlFor={`${site.id}-builds`}>Only Mine</label>
+                      <label className="usa-radio__label font-body-xs" htmlFor={`${site.id}-builds`}>Only Mine</label>
                     </div>
-                    <div>
+                    <div className="flex-1 usa-radio">
                       <Field
+                        className="usa-radio__input"
                         component="input"
                         type="radio"
                         name={`buildNotificationSettings.${site.id}`}
                         id={`${site.id}-site`}
                         value="site"
                       />
-                      <label className="margin-0" htmlFor={`${site.id}-site`}>All</label>
+                      <label className="usa-radio__label font-body-xs" htmlFor={`${site.id}-site`}>All</label>
                     </div>
                   </div>
                 </td>

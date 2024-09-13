@@ -6,17 +6,19 @@ import DeleteSiteForm from './DeleteSiteForm';
 import ExpandableArea from '../../ExpandableArea';
 
 export const AdvancedSiteSettings = ({ initialValues, onDelete, onSubmit }) => (
-  <div>
-    <h3>Advanced Settings</h3>
-    <ExpandableArea bordered title="Site engine">
-      <AdvancedSiteSettingsForm
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-      />
-    </ExpandableArea>
-    <ExpandableArea bordered title="Delete site">
-      <DeleteSiteForm onSubmit={onDelete} />
-    </ExpandableArea>
+  <div className="grid-col-12">
+    <div className="">
+      <h3 className="font-heading-xl margin-top-4 margin-bottom-2">Advanced Settings</h3>
+      <ExpandableArea bordered title="Site engine">
+        <AdvancedSiteSettingsForm
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+        />
+      </ExpandableArea>
+      <ExpandableArea bordered title="Delete site">
+        <DeleteSiteForm onSubmit={onDelete} />
+      </ExpandableArea>
+    </div>
   </div>
 );
 

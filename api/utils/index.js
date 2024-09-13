@@ -110,7 +110,7 @@ function getDirectoryFiles(dir, existingFileList) {
 }
 
 function loadDevelopmentManifest() {
-  const webpackConfig = require('../../webpack.development.config.js'); // eslint-disable-line global-require,import/extensions
+  const webpackConfig = require('../../webpack.config.js'); // eslint-disable-line global-require,import/extensions
   const { publicPath } = webpackConfig.output;
   const cleanedPath = publicPath.slice(1);
   const jsFiles = {};

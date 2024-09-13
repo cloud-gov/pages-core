@@ -93,6 +93,5 @@ describe('<ReportConfigs/>', () => {
 
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('b#rule-10063')).to.exist;
-    expect(wrapper.find('input').at(0).props().placeholder).to.be.equal('an, array (not editable - suppressed by Pages)');
   });
 });

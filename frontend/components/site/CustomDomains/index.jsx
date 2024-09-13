@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { currentSite } from '../../../selectors/site';
-import { IconPlus } from '../../icons';
+import UsaIcon from '../../UsaIcon';
 import { useSiteDomains } from '../../../hooks';
 import { capitalize } from '../../../util';
 
@@ -39,7 +39,7 @@ ListRow.defaultProps = {
 function ContextTitle({ context }) {
   return (
     <div style={{ display: 'inline-block' }}>
-      <h4 style={{ fontWeight: 'bold', margin: 0 }}>
+      <h4 className="font-sans-lg margin-0">
         {context === 'site' ? 'Live Site' : `${capitalize(context)} Site`}
       </h4>
     </div>
@@ -66,14 +66,9 @@ const getStateColor = (state) => {
 function StateIndicator({ state }) {
   return (
     <div
+      className="usa-tag usa-tag--big radius-pill font-body-2xs text-ls-1"
       style={{
         backgroundColor: getStateColor(state),
-        borderRadius: '100px',
-        color: 'white',
-        display: 'inline-block',
-        fontSize: '12px',
-        padding: '5px 10px',
-        height: '30px',
       }}
     >
       {state}
@@ -105,9 +100,9 @@ DomainLink.propTypes = {
 function Domains({ siteId, domains, handleDelete }) {
   const navigate = useNavigate();
   return (
-    <div className="well-gray-lightest">
+    <div className="well-gray-lightest grid-row">
       {domains.error && (
-        <div className="well">
+        <div className="well grid-col-12">
           <h3>
             An error occurred while loading your site branch configurations.
           </h3>
@@ -115,82 +110,81 @@ function Domains({ siteId, domains, handleDelete }) {
         </div>
       )}
       {!domains.isLoading && !domains.error && domains.data && (
-        <ul>
-          {domains.data.map((domain, index) => {
+        <ul className="usa-card-group grid-col-12">
+          {domains.data.map((domain) => {
             const sbc = domain.SiteBranchConfig;
             const names = domain.names.split(',');
             const actionsDisabled = domain.state !== 'pending';
 
             return (
-              <li style={{ listStyle: 'none' }} key={`domain-${domain.id}`}>
-                {index > 0 && (
-                  <div
-                    style={{
-                      backgroundColor: 'rgb(40, 40, 40)',
-                      height: '1px',
-                      marginBottom: '1em',
-                      marginTop: '1em',
-                      width: '100%',
-                    }}
-                  />
-                )}
-                <ListRow>
-                  <ContextTitle context={sbc.context} branch={sbc.branch} />
-                  <StateIndicator state={domain.state} />
-                </ListRow>
-                <ListRow>
-                  <span style={{ fontWeight: 'bold' }}>Branch:</span>
-                  {sbc.branch}
-                </ListRow>
-                <ListRow>
-                  <span style={{ fontWeight: 'bold' }}>
-                    {names.length > 1 ? 'Domains' : 'Domain'}
-                    :
-                  </span>
-                  {names.map((name, idx) => (
-                    <span key={`domain-name-${name}`}>
-                      {domain.state === 'provisioned' ? (
-                        <DomainLink domain={name} />
-                      ) : (
-                        name
-                      )}
-                      {names.length > idx + 1 && ' '}
-                    </span>
-                  ))}
-                </ListRow>
-                <ListRow id="domain-edit-delete-actions" justify="flex-end">
-                  <button
-                    disabled={actionsDisabled}
-                    className="usa-button"
-                    onClick={() => navigate(
-                      `/sites/${siteId}/custom-domains/${domain.id}/edit`
+              <li className="usa-card grid-col-12" key={`domain-${domain.id}`}>
+                <div className="usa-card__container bg-base-lightest">
+                  <div className="usa-card__header">
+                    <ListRow>
+                      <ContextTitle context={sbc.context} branch={sbc.branch} />
+                      <StateIndicator state={domain.state} />
+                    </ListRow>
+                  </div>
+                  <div className="usa-card__body">
+                    <ListRow>
+                      <span style={{ fontWeight: 'bold' }}>Branch:</span>
+                      {sbc.branch}
+                    </ListRow>
+                    <ListRow>
+                      <span style={{ fontWeight: 'bold' }}>
+                        {names.length > 1 ? 'Domains' : 'Domain'}
+                        :
+                      </span>
+                      {names.map((name, idx) => (
+                        <span key={`domain-name-${name}`}>
+                          {domain.state === 'provisioned' ? (
+                            <DomainLink domain={name} />
+                          ) : (
+                            name
+                          )}
+                          {names.length > idx + 1 && ' '}
+                        </span>
+                      ))}
+                    </ListRow>
+                  </div>
+                  <div className="usa-card__footer">
+                    <ListRow id="domain-edit-delete-actions" justify="flex-end">
+                      <button
+                        disabled={actionsDisabled}
+                        className="usa-button"
+                        onClick={() => navigate(
+                          `/sites/${siteId}/custom-domains/${domain.id}/edit`
+                        )}
+                        alt={`Edit site domain ${domain.names}`}
+                        type="button"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        disabled={actionsDisabled}
+                        className="usa-button usa-button--secondary"
+                        onClick={() => handleDelete(domain.id)}
+                        alt={`Delete site domain ${domain.names}`}
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </ListRow>
+                    {actionsDisabled && (
+                      <ListRow justify="flex-end">
+                        <p className="margin-bottom-0">
+                          <em htmlFor="domain-edit-delete-actions">
+                            *Cannot edit or delete a
+                            {' '}
+                            {domain.state}
+                            {' '}
+                            domain.
+                          </em>
+                        </p>
+                      </ListRow>
                     )}
-                    alt={`Edit site domain ${domain.names}`}
-                    type="button"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    disabled={actionsDisabled}
-                    className="usa-button usa-button-red"
-                    onClick={() => handleDelete(domain.id)}
-                    alt={`Delete site domain ${domain.names}`}
-                    type="button"
-                  >
-                    Delete
-                  </button>
-                </ListRow>
-                {actionsDisabled && (
-                  <ListRow justify="flex-end">
-                    <em htmlFor="domain-edit-delete-actions">
-                      *Cannot edit or delete a
-                      {' '}
-                      {domain.state}
-                      {' '}
-                      domain.
-                    </em>
-                  </ListRow>
-                )}
+                  </div>
+                </div>
               </li>
             );
           })}
@@ -248,10 +242,10 @@ function CustomDomains() {
         <Link
           to={`/sites/${id}/custom-domains/new`}
           role="button"
-          className="usa-button button-add-website"
+          className="usa-button button-add-website margin-right-0"
           alt="Add a new site domain"
         >
-          <IconPlus />
+          <UsaIcon name="add" />
           {' '}
           Add new domain
         </Link>

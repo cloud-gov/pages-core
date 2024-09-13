@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { USER_ENVIRONMENT_VARIABLE } from '../../../propTypes';
+import { IconTrash } from '../../icons';
 
 const EnvironmentVariableTable = ({ uevs, onDelete }) => (
-  <table className="usa-table-borderless table-full-width">
-    <caption>Current Environment Variables</caption>
+  <table className="usa-table usa-table--borderless usa-table--stacked width-full">
+    <caption className="font-heading-md">Current Environment Variables</caption>
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -15,15 +16,16 @@ const EnvironmentVariableTable = ({ uevs, onDelete }) => (
     <tbody>
       {uevs.map(uev => (
         <tr key={uev.id}>
-          <th scope="row">{uev.name}</th>
-          <td>{`xxxx${uev.hint}`}</td>
+          <th className="font-mono-sm" scope="row">{uev.name}</th>
+          <td className="font-mono-sm">{`xxxx${uev.hint}`}</td>
           <td className="text-right">
             <button
               type="button"
-              className="margin-0"
+              className="margin-0 usa-button usa-button--secondary"
               onClick={() => onDelete(uev.id)}
             >
-              X
+              <span className="usa-sr-only">Delete</span>
+              <IconTrash />
             </button>
           </td>
         </tr>
