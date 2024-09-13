@@ -1,0 +1,545 @@
+/*
+* * * * * ==============================
+* * * * * ==============================
+* * * * * ==============================
+* * * * * ==============================
+========================================
+========================================
+========================================
+----------------------------------------
+USWDS THEME CUSTOM STYLES
+----------------------------------------
+!! Copy this file to your project's
+   sass root. Don't edit the version
+   in node_modules.
+----------------------------------------
+Custom project SASS goes here.
+
+i.e.
+@include u-padding-right('05');
+----------------------------------------
+*/
+
+//Table styles
+.usa-table th {
+  background-color: transparent;
+}
+//Responsive tables from USWDS SITE
+$theme-table-responsive-expand-at: 'tablet';
+$theme-table-responsive-title-width: 15;
+$theme-table-responsive-border-radius: 'md';
+$theme-table-padding-x: 2;
+
+$theme-table-responsive-expand-at: 'tablet';
+$theme-table-padding-x: 2;
+$theme-table-column-gap: 4;
+
+.site-prose .site-table-responsive,
+.site-table-responsive {
+  width: 100%;
+  max-width: none;
+
+  @include at-media-max($theme-table-responsive-expand-at) {
+    // @include typeset("lang", "2xs");
+    display: block;
+    width: 100%;
+
+    caption {
+      display: block;
+    }
+
+    thead {
+      @include sr-only;
+    }
+
+    caption,
+    tbody,
+    tr,
+    th,
+    td,
+    tfoot {
+      border: 0;
+      display: block;
+      padding: 0;
+      text-align: left;
+      white-space: normal;
+    }
+
+    caption {
+      font-weight: fw('bold');
+      padding-bottom: units(1);
+    }
+
+    td,
+    th {
+      width: 100%;
+      padding: units(0.5) units(0.5) units(0.5) 0;
+      position: relative;
+      z-index: z(100);
+
+      &[data-title]:before {
+        // @include typeset("lang", 1, 2);
+        @include u-padding-x(1);
+        content: attr(data-title);
+        flex: none;
+        font-weight: fw('normal');
+        margin-right: units(0.5);
+        max-width: units($theme-table-responsive-title-width);
+        text-align: left;
+        width: 50%;
+      }
+
+      &.is-empty {
+        display: none;
+      }
+    }
+
+    th:not([data-title]) {
+      font-weight: fw('bold');
+    }
+
+    tr {
+      background-color: color('white');
+      border: 1px solid;
+      border-radius: radius($theme-table-responsive-border-radius);
+      display: block;
+      padding-bottom: units(2px);
+      position: relative;
+
+      &::after {
+        @include u-pin('y');
+        @include u-pin('left');
+        content: '';
+        background-color: color('gray-2');
+        border-bottom-left-radius: radius(
+          $theme-table-responsive-border-radius
+        );
+        border-top-left-radius: radius($theme-table-responsive-border-radius);
+        display: block;
+        max-width: units($theme-table-responsive-title-width);
+        position: absolute;
+        width: 50%;
+        z-index: z(0);
+      }
+
+      &.is-empty {
+        display: none;
+      }
+
+      & + tr {
+        margin-top: units(1);
+      }
+    }
+
+    td {
+      align-items: baseline;
+      background-color: transparent;
+      display: flex;
+
+      &:empty {
+        display: none;
+      }
+
+      & + td {
+        border-top: units(1px) solid color('base-lighter');
+      }
+
+      .site-inline-swatch {
+        width: 100%;
+      }
+    }
+  }
+
+  @include at-media($theme-table-responsive-expand-at) {
+    thead {
+      //   @include u-font("lang", 1);
+    }
+
+    caption {
+      font-weight: fw('bold');
+      padding-bottom: units(1);
+    }
+
+    caption,
+    tbody,
+    tr,
+    th,
+    td,
+    tfoot {
+      text-align: left;
+    }
+
+    th:first-child {
+      padding-left: units(2);
+    }
+
+    tr,
+    td {
+      background-color: transparent;
+    }
+
+    th,
+    td {
+      @include u-padding-x($theme-table-column-gap / 2);
+      @include u-padding-y(1);
+      border: none;
+      text-align: left;
+
+      &:first-child {
+        padding-left: units($theme-table-padding-x);
+      }
+
+      &:last-child {
+        padding-right: units($theme-table-padding-x);
+      }
+    }
+
+    tbody {
+      tr {
+        border: none;
+        border-top: units(2px) solid;
+
+        & + tr {
+          border-top: units(1px) solid color('base-lighter');
+
+          h3 {
+            @include u-margin-bottom(0);
+          }
+
+          a.usa-button {
+            @include u-margin-bottom(2);
+          }
+        }
+      }
+    }
+  }
+
+  &.site-table-simple {
+    p {
+      margin: 0;
+    }
+
+    @include at-media($theme-table-responsive-expand-at) {
+      thead {
+        // @include u-font("lang", 2);
+      }
+
+      th,
+      td {
+        @include u-padding-x($theme-table-column-gap / 2);
+        @include u-padding-y(0.5);
+        border: none;
+
+        &:first-child {
+          padding-left: 0;
+        }
+
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+
+      tr {
+        display: flex;
+
+        th,
+        td {
+          flex: flex(1);
+        }
+      }
+
+      tbody {
+        tr {
+          border: none;
+          border-top: units(1px) solid color('base-light');
+          @include u-padding-y(3);
+
+          &:first-child {
+            border-top: none;
+            padding-bottom: 0;
+          }
+
+          &:nth-child(2) {
+            border-top: none;
+            @include u-padding(0);
+          }
+        }
+      }
+    }
+  }
+}
+
+.site-inline-swatch {
+  @include u-square(4);
+  border-radius: radius('sm');
+  display: inline-block;
+  text-align: middle;
+
+  table & {
+    display: block;
+  }
+}
+
+.site-caption-swatches {
+  //   @include typeset("lang", 10, 2);
+  color: color('ink');
+  margin-top: units(2);
+  margin-bottom: units(1);
+  padding-left: 0;
+
+  @include at-media($theme-table-responsive-expand-at) {
+    padding-left: units(2);
+  }
+}
+
+.site-table-note {
+  //   @include typeset("lang", "2xs", 4);
+  padding: units(2);
+  background-color: color('gold-20v');
+  border-radius: radius('md');
+  margin-bottom: units(1);
+
+  @include at-media($theme-table-responsive-expand-at) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+  }
+}
+
+//Custom headings
+h1,
+.usa-prose h1 {
+  @include u-text('semibold');
+}
+
+h2,
+.usa-prose h2,
+h3,
+.usa-prose h3,
+h4,
+.usa-prose h4,
+h5,
+.usa-prose h5,
+h6 .usa-prose h6 {
+  @include u-text('medium');
+  @include u-font-family('sans');
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include u-text('ls-neg-3');
+}
+//Set the heading styles outside of usa-prose
+.usa-section h2 {
+  @include u-font-size('sans', $theme-h2-font-size);
+}
+
+.usa-section h3 {
+  @include u-font-size('sans', $theme-h3-font-size);
+}
+
+.usa-section h4 {
+  @include u-font-size('sans', $theme-h4-font-size);
+}
+
+.usa-section h5 {
+  @include u-font-size('sans', $theme-h5-font-size);
+}
+
+//Header styles
+.usa-header--extended .usa-nav {
+  border: none;
+
+  li.usa-nav__primary-item a,
+  li.usa-nav__primary-item button {
+    @include u-text('medium');
+    @include u-color('ink');
+
+    &:hover {
+      @include u-color('primary-dark');
+
+      &::after {
+        @include u-bg('primary-dark');
+      }
+    }
+
+    &[aria-expanded='true'] {
+      @include at-media('desktop') {
+        @include u-color('white');
+        &:hover {
+          @include u-color('white');
+
+          &::after {
+            @include u-bg('primary');
+          }
+        }
+      }
+    }
+
+    .usa-nav__submenu {
+      display: hidden;
+    }
+  }
+
+  li.usa-nav__primary-item li.usa-nav__submenu-item a {
+    @include at-media('desktop') {
+      @include u-color('white');
+    }
+    @include u-text('normal');
+  }
+
+  .usa-nav__secondary-links a {
+    @include u-color('ink');
+  }
+
+  input.usagov-search-autocomplete {
+    @include at-media('desktop') {
+      @include u-width('card-lg');
+    }
+    @include at-media('mobile') {
+      @include u-width('card');
+    }
+    @include u-border('base-light');
+  }
+}
+
+main .usa-button {
+  @include u-radius(1px);
+  @include u-text('medium');
+  @include u-font-size('sans', 'sm');
+
+  &:hover {
+    @include u-bg('primary-darker');
+  }
+}
+
+main .usa-button--secondary {
+  @include u-color('ink');
+
+  &:hover {
+    @include u-color('ink');
+    @include u-bg('secondary-light');
+  }
+}
+
+.usa-button--big {
+  @include u-width('card-lg');
+  text-align: left;
+  @include u-font-size('sans', 'sm');
+
+  &::after {
+    content: '→';
+    float: right;
+  }
+}
+
+.usa-header [role='search'] {
+  width: min-content;
+}
+
+//USA section
+
+@media (min-width: 40em) {
+  .usa-section {
+    @include u-padding-y(4);
+  }
+}
+.usa-section--dark {
+  @include u-bg('primary-darkest');
+
+  h1 {
+    @include u-color('white');
+    @include u-font-size('sans', $theme-h1-font-size);
+  }
+}
+
+// Mobile settings
+.usa-footer [class*='grid-col'] {
+  @include at-media(mobile) {
+    @include u-margin-y(2);
+  }
+}
+
+// Documentation page
+
+// intro styling
+.usa-prose > h1 + p {
+  @extend .usa-intro;
+}
+
+// Sidenav
+.usa-sidenav {
+  border-bottom: 0;
+
+  .usa-sidenav__item {
+    border-top: 0;
+
+    a {
+      cursor: pointer;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+  }
+  i {
+    @include u-color('accent-warm-dark');
+  }
+
+  a {
+    @include u-color('ink');
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+  .usa-current {
+    @include u-text('medium');
+  }
+}
+
+.usa-sidenav .usa-current i,
+.usa-sidenav a:hover i {
+  @include u-color('primary-vivid');
+}
+
+.usa-sidenav__sublist a {
+  padding-left: 2.75rem;
+}
+
+//Grandchild link
+.usa-sidenav__sublist .usa-sidenav__sublist a {
+  @include u-padding-left(8);
+}
+
+// To Dop add in dropdown arrows
+// .usa-sidenav__item[aria-expanded=false] a {
+//   @include add-icon("angle-arrow-down-primary", "after", 2, 1, 2px, "hover");
+// }
+
+// .usa-sidenav__item a[aria-expanded=true] {
+//   @include add-icon("angle-arrow-up-primary", "after", 2, 1, 2px, "hover");
+// }
+
+// Get started / Sign up
+
+.usa-section--sidebar-links {
+  @include u-padding-top(5);
+}
+
+// Use white for headlines inside .usa-section--dark
+.usa-section--dark {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: color("white");
+  }
+}

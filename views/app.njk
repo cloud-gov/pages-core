@@ -6,14 +6,12 @@
   </script>
 {% endblock %}
 
-{% block before_header %}
+{% block below_header %}
   {% if siteWideError %}
-    <div class="usa-alert usa-alert-warning usa-alert-home" role="alert">
-      <div class="usa-alert-body">
-        <h3 class="usa-alert-heading">
-          {{ siteWideError.heading }}
-        </h3>
-        <p class="usa-alert-text">
+    <div class="usa-alert usa-alert--error">
+      <div class="usa-alert__body">
+        <h4 class="usa-alert__heading">{{ siteWideError.heading }}</h4>
+        <p class="usa-alert__text">
           {{ siteWideError.body | safe }}
         </p>
       </div>
@@ -23,7 +21,7 @@
 
 
 {% block main_content %}
-  <div id="js-app" class="usa-grid"></div>
+  <div id="js-app" class="usa-section"></div>
 
   <script nonce="{{ nonce }}">
     window.CSRF_TOKEN = "{{ csrfToken }}";

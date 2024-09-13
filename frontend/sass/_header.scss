@@ -16,7 +16,7 @@
 }
 
 .usa-header {
-  background-color: $header-bg-color;
+  // background-color: $header-bg-color;
   border-bottom: none;
   min-height: 4rem;
   padding: $spacing-thin 0 $spacing-thin 0;
@@ -29,7 +29,7 @@
 }
 
 .usa-nav {
-  background-color: $header-bg-color;
+  // background-color: $header-bg-color;
 
   @media screen and (min-width: 951px) {
     padding-top: 0;
@@ -122,18 +122,14 @@ nav li a:visited {
 }
 
 .usa-logo a {
-  background-image: url('/images/logo.svg');
-  background-position: center;
+  background-image: url('/images/logos/pages-logo-blue.svg');
+  background-position: left;
   background-repeat: no-repeat;
   background-size: contain;
   color: transparent;
   display: inline-block;
   height: auto;
-  width: 100px;
-}
-
-.pages .usa-logo a {
-  background-image: url('/images/logo-pages.svg');
+  width: 100%;
 }
 
 @media screen and (min-width: 951px) {

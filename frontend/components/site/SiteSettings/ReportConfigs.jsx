@@ -84,6 +84,7 @@ function ReportConfigs({ siteId: id }) {
       <select
         name={name}
         id={`select-${rule.id}`}
+        className="usa-select"
         value={rule[prop]}
         onChange={event => updateRule(event, rule.id, prop)}
         disabled={rule.source === 'Pages'}

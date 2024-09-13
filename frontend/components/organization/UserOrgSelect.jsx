@@ -71,7 +71,7 @@ UserOrgSelect.propTypes = {
 };
 
 UserOrgSelect.defaultProps = {
-  className: 'form-control',
+  className: 'form-control usa-select',
   label: 'Select the site\'s organization',
   touched: false,
   error: null,

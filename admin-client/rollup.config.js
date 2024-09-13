@@ -11,7 +11,7 @@ const { API_URL, NODE_ENV, ROLLUP_WATCH } = process.env;
 const production = !ROLLUP_WATCH;
 const apiUrl = API_URL || 'http://localhost:1337';
 
-const uswds = 'node_modules/uswds/dist';
+const uswds = 'node_modules/@uswds/uswds/dist';
 
 function serve() {
   let server;

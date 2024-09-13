@@ -1,0 +1,54 @@
+<footer class="bg-base-lightest">
+  <div class="grid-container padding-y-6">
+    <div class="grid-row grid-gap">
+      <div class="tablet:grid-col-3">
+        <img class="maxw-15" src="/images/logos/pages-logo-blue.svg" alt="Pages Logo"/>
+      </div>
+    </div>
+    <div class="grid-row grid-gap">
+      <div class="tablet:grid-col-3">
+        <p>
+          There’s no easier way to build, launch and manage government sites.
+        </p>
+        <a href="{{ homepageUrl }}/contact/" class="usa-button an18f-button--dark">
+          Contact
+        </a>
+      </div>
+      <div class="tablet:grid-col-3">
+        <ul class="usa-list usa-list--unstyled font-sans-sm list-item-spacing-2">
+          <li>
+            <a href="{{ homepageUrl }}/features/">Features</a>
+          </li>
+          <li>
+            <a href="{{ homepageUrl }}/success-stories/">Success stories</a>
+          </li>
+        </ul>
+      </div>
+      <div class="tablet:grid-col-3">
+        <ul class="usa-list usa-list--unstyled font-sans-sm list-item-spacing-2">
+          <li>
+            <a href="mailto:{{ supportEmail }}">Contact support</a>
+          </li>
+          <li>
+            <a href="https://cloudgov.statuspage.io">Platform status</a>
+          </li>
+        </ul>
+      </div>
+      <div class="tablet:grid-col-3">
+        <ul class="usa-list usa-list--unstyled font-sans-sm list-item-spacing-2">
+          <li>
+            <a href="{{ homepageUrl }}/pages/documentation/">
+              Documentation
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/cloud-gov/pages-core/">
+              Source code
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% include "usa-identifier.njk" %}
+</footer>

@@ -28,6 +28,7 @@ const UpdateUserForm = ({
       <Field
         id="roleId"
         name="roleId"
+        className="usa-select"
         component={Select}
         options={roleOptions}
         validate={[validateRole]}

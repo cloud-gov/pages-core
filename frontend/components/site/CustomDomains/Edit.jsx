@@ -128,6 +128,7 @@ function EditCustomDomain() {
             <select
               id="branch-context"
               name="branch-context"
+              className="usa-select"
               value={domain.data.siteBranchConfigId}
               onChange={(event) => {
                 setDomainValues({

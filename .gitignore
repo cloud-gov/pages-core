@@ -7,6 +7,7 @@ config/local-site-build-tasks.json
 public/js/bundle.js
 public/js/report*
 public/js/bundle.*.js*
+public/js/uswds*.js*
 public/js/bundle.*
 public/styles/styles.css
 public/styles/styles.*.css*

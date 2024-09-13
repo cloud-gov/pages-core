@@ -113,6 +113,7 @@ class TemplateSite extends React.Component {
                   hasOrgs(organizations) ? (
                     <div className="form-group">
                       <UserOrgSelect
+                        className="usa-select"
                         error={error}
                         id="templateOrganizationId"
                         name="templateOrganizationId"

@@ -119,6 +119,7 @@ export const SiteList = ({
                   id="filter-sites-by-org"
                   label="Filter sites by organization."
                   name="filter-sites-by-org"
+                  className="usa-select"
                   orgData={orgFilterOptions(organizations)}
                   value={orgFilterValue}
                   onChange={({ target: { value } }) => setOrgFilterValue(value)}

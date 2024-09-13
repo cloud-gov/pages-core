@@ -41,6 +41,7 @@ const AddUserForm = ({
       <Field
         id="roleId"
         name="roleId"
+        className="usa-select"
         component={Select}
         includeEmptyOption
         label="Role:"

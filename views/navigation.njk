@@ -1,51 +1,49 @@
 {% block navigation %}
-  <header class="usa-header usa-header-basic" role="banner">
+<header class="usa-header usa-header--basic">
     <div class="usa-nav-container">
       <div class="usa-navbar">
-        <div class="usa-logo" id="basic-logo">
-          <em class="usa-logo-text">
-            <a href="/" title="cloud.gov Pages Home" aria-label="cloud.gov Pages Home">{{ appName }}</a>
+        <div class="usa-logo">
+          <em class="usa-logo__text">
+            <a href="/" title="cloud.gov Pages Home" aria-label="cloud.gov Pages Home">
+              Pages
+            </a>
           </em>
         </div>
-        <button class="usa-menu-btn">Menu</button>
+        <button type="button" class="usa-menu-btn">Menu</button>
       </div>
-
-      <nav role="navigation" class="usa-nav">
-        <button class="usa-nav-close">
-          <img src="/images/close.svg" alt="close">
+      <nav aria-label="Primary navigation," class="usa-nav">
+        <button type="button" class="usa-nav__close">
+          <img src="/img/usa-icons/close.svg" role="img" alt="Close" />
         </button>
-        <ul class="usa-nav-primary">
-          {% if isAuthenticated %}
-            <li>
-              <a class="usa-nav-link" href="/sites">
-                <span>Sites</span>
-              </a>
-            </li>
-            {% if isPages %}
-              <li>
-                <a class="usa-nav-link" href="/organizations">
-                  <span>Organizations</span>
-                </a>
-              </li>
-            {% endif %}
-          {% endif %}
-          <li>
-            <a class="usa-nav-link" href="{{ homepageUrl }}/documentation/">
-              <span>Documentation<span>
+        <ul class="usa-nav__primary usa-accordion">
+          <li class="usa-nav__primary-item">
+            <a href="/documentation" class="usa-nav-link text-white hover:text-gray-05">
+              <span>Documentation</span>
             </a>
           </li>
           {% if isAuthenticated %}
-            <li>
-              <a class="usa-nav-link" href="/settings">
-                <span>Settings<span>
+            <li class="usa-nav__primary-item">
+              <a href="/sites" class="usa-nav-link">
+                <span>Sites</span>
               </a>
             </li>
-            <li class="nav-action">
-              <a class="usa-button usa-button-white" href="/logout">Log out</a>
+            <li class="usa-nav__primary-item">
+              <a href="/organizations" class="usa-nav-link">
+                <span>Organizations</span>
+              </a>
+            </li>
+            <li class="usa-nav__primary-item">
+              <a href="/logout" class="usa-nav-link">
+                <span class="usa-button usa-button--outline display-none desktop:display-block">Logout</span>
+                <span class="usa-button desktop:display-none">Logout</span>
+              </a>
             </li>
           {% else %}
-            <li  class="nav-action">
-              <a href="/login" class="usa-button usa-button-white">Log in with cloud.gov</a>
+            <li class="usa-nav__primary-item">
+              <a href="/login" class="usa-nav-link">
+                <span class="usa-button usa-button--outline display-none desktop:display-block">Log in with cloud.gov</span>
+                <span class="usa-button desktop:display-none">Log in with cloud.gov</span>
+              </a>
             </li>
           {% endif %}
         </ul>

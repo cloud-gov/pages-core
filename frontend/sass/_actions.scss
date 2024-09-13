@@ -13,30 +13,30 @@
 }
 
 
-button,
-.usa-button,
-a.usa-button,
-.usa-button[role=button] {
-  background-color: $button-color;
-  border-radius: 2px 2px;
-  font-size: $base-font-size;
+// button,
+// .usa-button,
+// a.usa-button,
+// .usa-button[role=button] {
+//   background-color: $button-color;
+//   border-radius: 2px 2px;
+//   font-size: $base-font-size;
 
-  &:hover {
-    background-color: $button-color-active;
-  }
+//   &:hover {
+//     background-color: $button-color-active;
+//   }
 
-  &.usa-button-secondary {
-    background-color: $color-white;
-  }
+//   &.usa-button-secondary {
+//     background-color: $color-white;
+//   }
 
-  // Buttons containing icons, scale based on the font-size
-  img {
-    height: 1em;
-    vertical-align: bottom;
-  }
+//   // Buttons containing icons, scale based on the font-size
+//   img {
+//     height: 1em;
+//     vertical-align: bottom;
+//   }
 
-  svg {
-    stroke-width: 0;
-    fill: $button-text-color;
-  }
-}
+//   svg {
+//     stroke-width: 0;
+//     fill: $button-text-color;
+//   }
+// }

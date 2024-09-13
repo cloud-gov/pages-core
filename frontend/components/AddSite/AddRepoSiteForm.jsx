@@ -47,10 +47,12 @@ export const AddRepoSiteForm = ({
         <Field
           name="repoOrganizationId"
           type="select"
+          className="usa-select"
           component={p => (
             <UserOrgSelect
               id="repoOrganizationId"
               name="repoOrganizationId"
+              className="usa-select"
               value={p.input.value}
               onChange={p.input.onChange}
               orgData={organizations.data}
@@ -70,6 +72,7 @@ export const AddRepoSiteForm = ({
           <label htmlFor="engine">Site engine</label>
           <Field
             name="engine"
+            className="usa-select"
             component={p => (
               <SelectSiteEngine
                 name="engine"

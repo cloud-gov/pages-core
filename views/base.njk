@@ -3,9 +3,10 @@
   <head>
     {% if shouldIncludeTracking %}
       <!-- Digital Analytics Program roll-up, see https://analytics.usa.gov for data -->
-      <script id="_fed_an_ua_tag" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=TTS,Cloud.gov-Pages"></script>
+      <script
+        id="_fed_an_ua_tag"
+        src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA&subagency=TTS,Cloud.gov-Pages"></script>
     {% endif %}
-
     <link rel="apple-touch-icon" sizes="57x57" href="/images/favicons/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/images/favicons/apple-touch-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/images/favicons/apple-touch-icon-72x72.png">
@@ -31,112 +32,60 @@
     <meta name="theme-color" content="#ffffff">
     <meta charset="utf-8">
     <link rel="stylesheet" href="/{{ webpackAssets['bundle.css'] }}">
-    <link rel="stylesheet" href="/uswds/css/uswds.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- For Facebook -->
-    <meta property="og:title" content="{{ appName }} compliantly hosts federal government websites." />
-    <meta property="og:type" content="article" />
-    <meta property="og:image" content="https://pages.cloud.gov/images/social-cards/facebook-1200x627.png" />
-    <meta property="og:url" content="https://pages.cloud.gov" />
-    <meta property="og:description" content="{{ appName }} expertly manages the backend work of deploying secure, compliant, and scalable government websites, allowing federal offices to focus on their content." />
-
-    <!-- For Twitter -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content="https://pages.cloud.gov/images/social-cards/twitter-1024x512.png" />
-
-    <script src="/uswds/js/uswds.min.js" type="text/javascript"></script>
+    <meta
+    name="viewport" content="width=device-width, initial-scale=1"> <!-- For Facebook -->
+    <meta property="og:title" content="{{ appName }} compliantly hosts federal government websites."/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:image" content="https://pages.cloud.gov/images/social-cards/facebook-1200x627.png"/>
+    <meta property="og:url" content="https://pages.cloud.gov"/>
+    <meta
+    property="og:description" content="{{ appName }} expertly manages the backend work of deploying secure, compliant, and scalable government websites, allowing federal offices to focus on their content."/> <!-- For Twitter -->
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:image" content="https://pages.cloud.gov/images/social-cards/twitter-1024x512.png"/>
     <title>
-      {{ appName }}{% if siteDisplayEnv %} | {{ siteDisplayEnv }}{% endif %}
+      {{ appName }}
+      {% if siteDisplayEnv %}
+        | {{ siteDisplayEnv }}
+      {% endif %}
     </title>
-    {% block head_extra %}
-    {% endblock %}
+    {% block head_extra %}{% endblock %}
   </head>
-  <body class="body {{ productName }}">
-    {% block before_header %}
-    {% endblock %}
-
+  <body>
     {% include "usa-banner.njk" %}
     {% include "navigation.njk" %}
-
-    <div class="usa-overlay"></div>
+    {% block below_header %}{% endblock %}
     {% block flash_messages %}
       {% if messages.errors %}
         {% for error in messages.errors %}
-        <div class="usa-alert-home">
-          <div class="usa-alert usa-alert-error usa-alert-slim" role="alert">
-            <div class="usa-alert-body">
-              <p class="usa-alert-text"> {{ error }}</p>
+          <div class="usa-alert usa-alert--error" role="alert">
+            <div class="usa-alert__body">
+              <h4 class="usa-alert__heading">Error</h4>
+              <p class="usa-alert__text">
+                {{ error }}
+              </p>
             </div>
           </div>
-        </div>
         {% endfor %}
       {% endif %}
       {% if messages.warnings %}
         {% for warning in messages.warnings %}
-        <div class="usa-alert-home">
-          <div class="usa-alert usa-alert-warning usa-alert-slim" role="alert">
-            <div class="usa-alert-body">
-              <p class="usa-alert-text"> {{ warning }}</p>
+          <div class="usa-alert usa-alert--warning" role="alert">
+            <div class="usa-alert__body">
+              <h4 class="usa-alert__heading">Warning</h4>
+              <p class="usa-alert__text">
+                {{ warning }}
+              </p>
             </div>
           </div>
-        </div>
         {% endfor %}
       {% endif %}
     {% endblock %}
-
     <div class="main-content">
       {% block main_content %}
       {% endblock %}
     </div>
-
-    <footer class="usa-footer usa-footer-medium" role="contentinfo">
-      <div class="usa-footer-secondary_section">
-        <div class="usa-grid">
-          <div class="usa-footer-contact-links usa-width-one-half">
-            <ul class="usa-nav-primary">
-              <li>
-                <a class="usa-nav-link" href="{{ homepageUrl }}/features/">
-                  <span>Features</span>
-                </a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="{{ homepageUrl }}/success-stories/">
-                  <span>Success Stories</span>
-                </a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="{{ homepageUrl }}/contact/">
-                  <span>Contact<span>
-                </a>
-              </li>
-              <li>
-                <a class="usa-nav-link" href="https://cloudgov.statuspage.io">
-                  <span>Status<span>
-                </a>
-              </li>
-            </ul>
-            <div class="usa-footer-primary-content usa-footer-contact_info">
-              <p>
-                <a href="https://github.com/cloud-gov/pages-core/">
-                  <img src="/images/icons/icon-github-white.svg" alt="github logo"/>Browse source code</a>
-              </p>
-            </div>
-            <div class="usa-footer-primary-content usa-footer-contact_info">
-              <p>
-                <a href="mailto:{{ supportEmail }}">
-                  <img src="/images/icons/icon-envelope.svg" alt="envelope"/>{{ supportEmail }}</a>
-              </p>
-            </div>
-          </div>
-          <div class="usa-footer-logo usa-width-one-half align-right">
-            <a href="/"><img class="usa-footer-logo-img pages-logo" src="/images/logos/pages-logo.svg" alt="{{ appName }} Logo"></a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    {% include "footer.njk" %}
   </body>
+  <script src="/js/uswds-init.min.js" type="text/javascript"></script>
+  <script defer src="/js/uswds.min.js" type="text/javascript"></script>
 </html>
-
-{% block post_footer %}
-{% endblock %}

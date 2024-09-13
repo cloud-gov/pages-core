@@ -9,7 +9,7 @@
 }
 
 .table-full-width.log-table {
-  font-size: 1.45rem;
+  font-size: 1.1rem;
 
   pre {
     margin: 0;
@@ -22,7 +22,7 @@
   th, td {
     // min-width: 124px;
     padding: 1.5rem 1rem;
-    line-height: 1.4em;    
+    line-height: 1.4em;
     vertical-align: top;
   }
 
@@ -57,8 +57,8 @@
     line-height: 1.4em;
   }
   .status-info,
-  .scan-info,  
-  .build-info-details, 
+  .scan-info,
+  .build-info-details,
   .scan-status-details {
     p, h4 {
       font-size: 1em;
@@ -69,11 +69,11 @@
     h3 {
       display: flex;
       margin: 0 0;
-      font-size: 1.4em;
+      font-size: 1.2em;
       line-height: 1.4em;
     }
     .scan-info-name {
-      font-size: 1.3em;
+      font-size: 1.1em;
       font-weight: bold;
     }
     .scan-info-timestamp {
@@ -86,11 +86,11 @@
     margin: .5em 0 0;
     font-weight: normal;
   }
-  .scan-link, 
-  .repo-link, 
-  .view-site-link, 
+  .scan-link,
+  .repo-link,
+  .view-site-link,
   .result-link,
-  .branch-link, 
+  .branch-link,
   .commit-link {
     font-size: 1em;
     // font-weight: 600;
@@ -155,7 +155,7 @@
     padding: 0;
     margin: 0;
   }
-  
+
   a {
     margin: 0;
   }
@@ -170,7 +170,7 @@
     font-size: 1.1em;
     border-radius: 4px;
     white-space: nowrap;
-  
+
     svg {
       fill: currentColor;
       margin-right: .4em;
@@ -181,7 +181,7 @@
         fill: currentColor
       }
     }
-    
+
   }
 
   & + p { margin-top: 1em;}
@@ -203,7 +203,7 @@
   }
   .scan-status-title {
     font-weight: 600;
-    font-size: 1.2em;
+    font-size: 1.1em;
     line-height: 1.4em;
     color: #112e51;
     margin: 0;
@@ -226,7 +226,7 @@
     grid-row-start:    2;
     grid-column-start: 2;
     p {
-      font-size: 1.45rem;
+      font-size: 1.2rem;
       margin: 0;
       white-space: initial;
       line-height: 1.4em;
@@ -304,7 +304,7 @@
       }
 
       .branch-info {
-        margin: 1em 1.5em;         
+        margin: 1em 1.5em;
         max-width: fit-content;
       }
       .commit-info {
@@ -365,7 +365,7 @@
     color: $color-gray-dark;
     white-space: nowrap;
   }
-  
+
 }
 .scan-config-table {
   margin-bottom: .5em;
@@ -431,7 +431,7 @@
   }
   .icon-delete {
     width: 1.25em;
-    color: #323a45; 
+    color: #323a45;
     &:active {
       color: #112e51;
     }
@@ -453,7 +453,7 @@
   max-width: 80%;
 }
 .site-reports-table h3 {
-  font-size: 1.4em;
+  font-size: 1.2em;
 }
 .site-reports-table p {
   font-size: 1em;

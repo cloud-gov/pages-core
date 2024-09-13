@@ -66,7 +66,7 @@ const config = {
             options: {
               sassOptions: {
                 quietDeps: true,
-                loadPath: path.resolve(__dirname, 'node_modules/uswds/src/stylesheets/'),
+                loadPath: path.resolve(__dirname, 'node_modules/@uswds/uswds/src/stylesheets/'),
               },
             },
           },

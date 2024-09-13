@@ -1,48 +1,58 @@
+@use 'uswds' with (
+  $theme-font-path: '../../node_modules/@uswds/uswds/dist/fonts',
+  // $theme-image-path: '/../../node_modules/@uswds/uswds/dist/img',
+  $theme-show-notifications: false,
+);
 
-// Setup for the US Web Design Standards
-$font-path: '../../node_modules/uswds/src/fonts';
-$image-path: '../../node_modules/uswds/src/img';
+@forward 'theme/uswds-theme-general';
+@forward 'theme/uswds-theme-typography';
+@forward 'theme/uswds-theme-spacing';
+@forward 'theme/uswds-theme-color';
+@forward 'theme/uswds-theme-utilities';
+@forward 'theme/uswds-theme-components';
 
-@import 'uswds';
+@import "variables";
 
-@import "_variables";
-
-@import "_actions";
-@import "_alerts";
-@import "_banner";
-@import "_build-logs";
-@import "_case_study";
-@import "_criteria_list";
-@import "_checklist";
-@import "_commit-summary";
-@import "_dashboard";
-@import "_example_sites";
-@import "_feature_group";
-@import "_features_page";
-@import "_figure_group";
-@import "_flexbox";
-@import "_forms";
-@import "_header";
-@import "_home";
-@import "_icons";
-@import "_info_block";
-@import "_labels";
-@import "_list";
-@import "_loader";
-@import "_text";
-@import "_wells";
-@import "_tables";
-@import "_log-tools";
-@import "_navigation";
-@import "side-nav";
+// @import "actions";
+// @import "alerts";
+@import "banner";
+@import "build-logs";
+@import "case_study";
+@import "criteria_list";
+@import "checklist";
+@import "commit-summary";
+@import "dashboard";
+@import "example_sites";
+@import "feature_group";
+@import "features_page";
+@import "figure_group";
+@import "flexbox";
+@import "forms";
+@import "header";
+@import "home";
+@import "icons";
+@import "labels";
+@import "list";
+@import "loader";
+// @import "text";
+@import "wells";
+@import "tables";
+@import "log-tools";
+@import "navigation";
 @import "template-items";
-@import "_footer";
+@import "footer";
 
-.body {
-  display: flex;
-  flex-flow: column nowrap;
-  min-height: 100vh;
+// Mixins
+
+@mixin clearfix {
+  &:after {
+    clear: both;
+    content: '';
+    display: block;
+  }
 }
+
+// Styling
 
 .main-content {
   flex-grow: 1;
@@ -106,13 +116,6 @@ $image-path: '../../node_modules/uswds/src/img';
   }
 }
 
-@mixin clearfix {
-  &:after {
-    clear: both;
-    content: '';
-    display: block;
-  }
-}
 @media screen and (min-width: 1000px) {
   .site-main {
     min-height: calc(100vh - 235px);
@@ -184,3 +187,5 @@ $image-path: '../../node_modules/uswds/src/img';
 .text-center {
   text-align: center;
 }
+
+@import "info_block";
