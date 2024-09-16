@@ -53,7 +53,15 @@ export default function A11yScanChild({ data, siteId, buildId }) {
           Accessibility report for
           {' '}
           <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">{data.url}</span>
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">{data.url}</span>
+          <span className="font-sans-lg text-normal margin-left-1">
+            <a className="usa-link font-body-xs text-no-wrap margin-x-2" target="_blank" aria-label="open scanned page in a new window," title="open scanned page in a new window" href={data.url} rel="noreferrer">
+              open page
+              <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+              </svg>
+            </a>
+          </span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage" rel="noreferrer">

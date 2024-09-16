@@ -55,7 +55,7 @@ export default function Zap({ data, buildId, siteId }) {
           {scanTitle}
           {' report for '}
           <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">
             {data.site['@name']}
           </span>
           <span className="text-italic font-sans-lg text-normal margin-left-2">(all pages)</span>

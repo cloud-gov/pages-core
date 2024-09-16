@@ -38,7 +38,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           Accessibility reports for
           {' '}
           <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">
             {data.baseurl}
             {' '}
           </span>
