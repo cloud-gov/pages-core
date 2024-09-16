@@ -19,6 +19,7 @@ const ScanFinding = ({
   let references = [];
   let locations = [];
   let criteria = [];
+  let hasMoreInfo = '';
 
   if (scanType === 'zap') {
     ({
@@ -28,9 +29,7 @@ const ScanFinding = ({
     count = parseInt(finding.count, 10);
     locations = finding.instances || [];
     references = finding.referenceURLs || [];
-    if (finding.otherinfo) {
-      description += `\n ${finding.otherinfo}`;
-    }
+    hasMoreInfo = finding.otherinfo;
   }
   if (scanType === 'a11y') {
     title = `${finding.help}.`;
@@ -72,9 +71,10 @@ const ScanFinding = ({
           ignore={ignore}
           ignoreSource={ignoreSource}
           siteId={siteId}
+          moreInfo={hasMoreInfo}
         />
-        <FindingLocations anchor={anchor} scanType={scanType} locations={locations} />
         <FindingRecommendation solution={solution} anchor={anchor} scanType={scanType} />
+        <FindingLocations anchor={anchor} scanType={scanType} locations={locations} />
         <FindingReferences references={references} />
       </div>
       <hr />
@@ -105,7 +105,7 @@ const FindingTitle = ({
       {title}
       <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">#</a>
     </h3>
-    <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-sans-4 break-balance">
+    <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-sans-5 break-balance">
       <span className={`usa-tag bg-${groupColor} radius-pill`}>
         {groupLabel}
       </span>
@@ -149,28 +149,58 @@ const FindingDescription = ({
   siteId,
   ignore = false,
   ignoreSource = null,
+  moreInfo = null,
 }) => (
   <div className="margin-y-3">
     {ignore && (
-      <div className="usa-prose font-serif-xs">
-        <p className="text-italic">
-          {`(Note: This finding has been suppressed by ${ignoreSource || 'an existing report configuration'}. You can review the report rules and criteria that are suppressed during report generation in your `}
-          <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Report Configuration</Link>
-          {'.) '}
-        </p>
-      </div>
+      <section className="usa-alert usa-alert--info padding-y-1 margin-top-3">
+        <div className="usa-alert__body">
+          <h4 className="usa-alert__heading">
+            This result was suppressed by&nbsp;
+            {ignoreSource || 'customer criteria'}
+          </h4>
+          <div className="usa-alert__text">
+            <details className="margin-top-3">
+              <summary className="">
+                Why was this result&nbsp;
+                <b>suppressed</b>
+                ?
+              </summary>
+              <p>
+                { /* eslint-disable-next-line max-len */}
+                { ignoreSource && 'Pages automatically suppresses certain results in this report which are irrelevant for statically hosted websites, based on unconfigurable server settings, or frequently produce ‘false positive’ findings for our customers. '}
+                { /* eslint-disable-next-line max-len */}
+                { !ignoreSource && 'Customers can specify criteria to suppress during report generation to silence ‘false positive’ results. This result matches existing customer-defined criteria.'}
+                { ' ' /* eslint-disable-next-line max-len */}
+                <b>While still visible in the report, the suppressed results don’t count towards your total issue count.</b>
+                { ' ' /* eslint-disable-next-line max-len */}
+                Review the report rules and criteria that are suppressed during report generation in your &nbsp;
+                <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Report Configuration</Link>
+                .
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
     )}
     { scanType === 'zap' && (
       // eslint-disable-next-line react/no-danger
-      <div className="usa-prose font-serif-xs" dangerouslySetInnerHTML={{ __html: description }} />
+      <div className="usa-prose finding-description font-serif-sm margin-bottom-2" dangerouslySetInnerHTML={{ __html: description }} />
     )}
-    { scanType !== 'zap' && <div className="usa-prose font-serif-xs"><p>{description}</p></div> }
+    { moreInfo && (
+      <FindingLocationMoreInfo>
+        { /* eslint-disable-next-line react/no-danger */}
+        <code dangerouslySetInnerHTML={{ __html: moreInfo }} />
+      </FindingLocationMoreInfo>
+    )}
+    { scanType !== 'zap' && <div className="usa-prose finding-description font-serif-sm"><p>{description}</p></div> }
   </div>
 );
 
 FindingDescription.propTypes = {
   description: PropTypes.string.isRequired,
   scanType: PropTypes.string.isRequired,
+  moreInfo: PropTypes.string,
   ignore: PropTypes.bool,
   ignoreSource: PropTypes.string,
   siteId: PropTypes.number.isRequired,
@@ -179,10 +209,9 @@ FindingDescription.propTypes = {
 const FindingRecommendation = ({ anchor, solution, scanType }) => (
   <div
     id={`${anchor}-recommendation`}
-    className="padding-top-15"
     aria-labelledby={`${anchor}-recommendation`}
   >
-    <div className="usa-summary-box margin-bottom-6 margin-top-neg-3" role="region">
+    <div className="usa-summary-box margin-bottom-3" role="region">
       { (scanType === 'zap') && (
       <>
         <h4 className="usa-summary-box__heading">
@@ -211,7 +240,7 @@ const FindingRecommendation = ({ anchor, solution, scanType }) => (
                 <div className="usa-summary-box__body">
                   { /* eslint-disable-next-line react/no-array-index-key */ }
                   <ul key={i} className="usa-list margin-bottom-2">
-                    <li>{str}</li>
+                    <li className="font-body-md">{str}</li>
                   </ul>
                 </div>
               )
@@ -264,7 +293,7 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
     <h3 className="font-body-md margin-y-2">
       Evidence for this result was found:
     </h3>
-    <div className="margin-bottom-neg-10">
+    <div className="">
       <ol className="padding-left-3">
         {locations.map((location, locationIndex) => {
           const { uri: url } = location;
@@ -284,16 +313,7 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
               )}
               {code && <FindingLocationEvidence code={code} />}
               {target && <FindingLocationTarget target={target} />}
-              {moreInfo && (
-                <>
-                  <h4 className="font-body-md text-normal margin-bottom-0">
-                    Additional information:
-                  </h4>
-                  <p className="font-body-sm padding-bottom-4 border-bottom-1px">
-                    {moreInfo}
-                  </p>
-                </>
-              )}
+              {moreInfo && <FindingLocationMoreInfo info={moreInfo} />}
             </li>
           );
         })}
@@ -350,6 +370,23 @@ const FindingLocationEvidence = ({ code }) => (
 
 FindingLocationEvidence.propTypes = {
   code: PropTypes.string.isRequired,
+};
+
+const FindingLocationMoreInfo = ({ info = null, children = null }) => (
+  <details>
+    <summary className="margin-bottom-0 margin-top-1 font-body-sm text-normal">
+      <b>More information:</b>
+    </summary>
+    <pre className="hljs html text-wrap width-full font-mono-xs line-height-mono-4 narrow-mono padding-2 display-inline-block">
+      {info}
+      {children}
+    </pre>
+  </details>
+);
+
+FindingLocationMoreInfo.propTypes = {
+  info: PropTypes.string,
+  children: PropTypes.string,
 };
 
 export default ScanFinding;

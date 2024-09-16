@@ -58,6 +58,7 @@ ol li::marker {
 }
 .break-balance {
   text-wrap: balance;
+  text-wrap: pretty;
 }
 
 summary {
@@ -66,6 +67,12 @@ summary {
 summary b:hover {
   text-decoration: underline;
 }
+
+.finding-description > p:first-child {
+  font-size: 20px;
+  margin: 1em 0;
+}
+
 .usa-table--compact th,
 .usa-table--compact td {
   vertical-align: top;

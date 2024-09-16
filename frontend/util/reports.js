@@ -107,14 +107,14 @@ export function getSuccessCriteria({ tags, id }) {
         default:
           return {
             // turn wcag111 into "WCAG SC 1.1.1"
-            short: `WCAG Success Criteria ${tag.split('wcag')[1].split('').join('.')}`,
+            short: `WCAG SC ${tag.split('wcag')[1].split('').join('.')}`,
             url: `https://www.w3.org/TR/WCAG22/#:~:text=Success%20Criterion%20${tag.split('wcag')[1].split('').join('.')}`,
           };
       }
     } else if ((tag.startsWith('TT')) && tag !== 'TTv5') {
       return {
         // turn TT1.1a into "Trusted Tester 1.1A"
-        short: `${tag.toUpperCase().split('TT').join('Trusted Tester ')}`,
+        short: `${tag.toUpperCase().split('TT').join('TT ')}`,
         url: 'https://section508coordinators.github.io/TrustedTester/appendixc.html',
       };
     } else if (tag === 'ACT') {

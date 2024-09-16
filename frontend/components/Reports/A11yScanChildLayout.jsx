@@ -170,16 +170,20 @@ const A11yPassed = ({ passes = [] }) => (
       <table className="usa-table usa-table--striped usa-table--compact usa-table--borderless font-body-xs width-full">
         <thead>
           <tr>
-            <th>Description</th>
-            <th className="text-right">Places found</th>
+            <th scope="col">Description</th>
+            <th scope="col">Criteria</th>
+            <th scope="col" className="text-right">Places found</th>
           </tr>
         </thead>
         <tbody>
           {passes.map(check => (
             <tr key={check.help}>
-              <td>
+              <th scope="row">
                 {check.help}
                 .
+              </th>
+              <td className="font-body-xs">
+                {utils.getSuccessCriteria(check).map(c => c.short).join(', ')}
               </td>
               <td className="font-mono-sm text-tabular text-right">{check.nodes.length}</td>
             </tr>
