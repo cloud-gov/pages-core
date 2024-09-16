@@ -91,3 +91,39 @@ export function plural(count, name) {
 export function relPath(url, baseurl) {
   return url.split(baseurl)[1];
 }
+
+export function getSuccessCriteria({ tags, id }) {
+  const criteria = tags.map((tag) => {
+    if (tag.startsWith('wcag')) {
+      switch (tag) {
+        case 'wcag2a':
+        case 'wcag2aa':
+        case 'wcag2aaa':
+        case 'wcag21a':
+        case 'wcag21aa':
+        case 'wcag22aa':
+        case 'wcag2a-obsolete':
+          break;
+        default:
+          return {
+            // turn wcag111 into "WCAG SC 1.1.1"
+            short: `WCAG Success Criteria ${tag.split('wcag')[1].split('').join('.')}`,
+            url: `https://www.w3.org/TR/WCAG22/#:~:text=Success%20Criterion%20${tag.split('wcag')[1].split('').join('.')}`,
+          };
+      }
+    } else if ((tag.startsWith('TT')) && tag !== 'TTv5') {
+      return {
+        // turn TT1.1a into "Trusted Tester 1.1A"
+        short: `${tag.toUpperCase().split('TT').join('Trusted Tester ')}`,
+        url: 'https://section508coordinators.github.io/TrustedTester/appendixc.html',
+      };
+    } else if (tag === 'ACT') {
+      return {
+        short: 'ACT',
+        url: `https://www.access-board.gov/search/?query=wcag+sc+baseline+${id}`,
+      };
+    }
+    return undefined;
+  });
+  return criteria.filter(n => n);
+}

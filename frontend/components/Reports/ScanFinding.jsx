@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
 import { Link, useLocation } from 'react-router-dom';
 
-import { plural } from '../../util/reports';
+import { plural, getSuccessCriteria } from '../../util/reports';
 
 const ScanFinding = ({
   finding, groupColor, groupLabel, scanType = 'zap', siteId,
@@ -18,6 +18,7 @@ const ScanFinding = ({
   let solution = '';
   let references = [];
   let locations = [];
+  let criteria = [];
 
   if (scanType === 'zap') {
     ({
@@ -38,7 +39,8 @@ const ScanFinding = ({
     description = `${finding.description}.`;
     locations = finding.nodes || [];
     solution = finding.nodes[0]?.failureSummary || [];
-    references = [finding.helpUrl];
+    criteria = getSuccessCriteria(finding);
+    references = [finding.helpUrl, ...criteria.map(c => c.url)];
   }
 
   useEffect(() => {
@@ -61,6 +63,7 @@ const ScanFinding = ({
         references={references}
         scanType={scanType}
         anchor={anchor}
+        criteria={criteria.map(c => c.short)}
       />
       <div className="maxw-tablet-lg">
         <FindingDescription
@@ -93,21 +96,30 @@ const FindingTitle = ({
   groupLabel,
   groupColor,
   count,
-  references = [],
+  criteria = [],
   scanType,
   anchor,
 }) => (
   <div className="bg-white padding-top-05 sticky">
-    <h3 className="font-heading-lg margin-y-105">
+    <h3 className="font-heading-lg margin-y-105 break-balance line-height-serif-3">
       {title}
       <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">#</a>
     </h3>
-    <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-body-2">
+    <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-sans-4 break-balance">
       <span className={`usa-tag bg-${groupColor} radius-pill`}>
         {groupLabel}
       </span>
       {' '}
-      finding identified in
+      finding
+      {' '}
+      {scanType === 'a11y' && criteria.length > 0 && (
+        <>
+          that violates&nbsp;
+          <b>{ new Intl.ListFormat('en-US').format(criteria)}</b>
+        </>
+      )}
+      {' '}
+      was identified in
       {' '}
       <b>
         {count}
@@ -115,15 +127,6 @@ const FindingTitle = ({
         {plural(count, 'place')}
       </b>
       {'. '}
-      {scanType === 'a11y' && references.length > 0 && (
-      <a href={references[0]} target="_blank" className="usa-link font-body-sm" aria-label="Learn more about this rule" rel="noreferrer">
-        Learn more
-        {' '}
-        <svg className="usa-icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-          <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
-        </svg>
-      </a>
-      )}
     </p>
   </div>
 );
@@ -134,7 +137,7 @@ FindingTitle.propTypes = {
   groupColor: PropTypes.string.isRequired,
   count: PropTypes.number,
   // eslint-disable-next-line react/forbid-prop-types
-  references: PropTypes.array,
+  criteria: PropTypes.array,
   scanType: PropTypes.string.isRequired,
   anchor: PropTypes.string.isRequired,
 
@@ -250,7 +253,7 @@ FindingReferences.propTypes = {
 
 const FindingReference = ({ url }) => (
   <li className="font-body-2xs">
-    <a className="usa-link" href={url}>{url}</a>
+    <a target="_blank" rel="noreferrer" className="usa-link" href={url}>{url}</a>
   </li>
 );
 

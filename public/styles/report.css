@@ -54,8 +54,12 @@ ol li::marker {
   font-family: 'Roboto Mono Web', 'Bitstream Vera Sans Mono',Consolas,Courier,monospace;
 }
 .break-anywhere {
-  line-break: anywhere;
+  word-break: break-all;
 }
+.break-balance {
+  text-wrap: balance;
+}
+
 summary {
   cursor: pointer;
 }
@@ -79,8 +83,8 @@ summary b:hover {
 }
 .anchor-indicator {
   text-decoration: none;
-  margin: .25em;
-  padding: .125em;
+  margin: 0 .25em;
+  padding: 0 .125em;
   font-weight: normal;
   font-variant-position: super;
   display: inline-block;

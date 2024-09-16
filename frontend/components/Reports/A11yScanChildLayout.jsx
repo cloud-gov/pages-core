@@ -123,7 +123,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
             <A11yPassed passes={data.passes} />
             <hr />
             <About scanType="a11y" siteId={siteId}>
-              <p className="font-body-xs line-height-body-3">
+              <p className="font-body-xs line-height-sans-3">
                 This report was generated for
                 {' '}
                 <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.url}</code>
