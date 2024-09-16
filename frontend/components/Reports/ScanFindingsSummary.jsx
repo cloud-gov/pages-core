@@ -94,7 +94,7 @@ ScanFindingsSummaryTable.propTypes = {
 
 const ScanFindingsSummary = ({ suppressedFindings = [], unsuppressedFindings = [], baseurl }) => (
   <>
-    <h3>⚠️ Unsuppressed Results</h3>
+    <h3>⚠️ Unsuppressed results</h3>
     <ScanFindingsSummaryTable
       baseurl={baseurl}
       findings={unsuppressedFindings}
