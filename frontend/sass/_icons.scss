@@ -75,3 +75,19 @@
     margin-bottom: 2px;
   }
 }
+.filter-close-button {
+  svg {
+    color: currentColor;
+    margin-left: 0.6rem;
+    stroke-width: 0;
+    vertical-align: middle;
+    width: 18px;
+    height: 18px;
+    background: currentColor;
+    border-radius: 100%;
+    border: 1px solid currentColor;
+    path {
+      fill: #e1f3f8;
+    }
+  }
+}
