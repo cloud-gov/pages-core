@@ -403,6 +403,12 @@
   .rule-source--Pages {
     td {
       vertical-align: middle;
+      &[colspan] {
+        font-size: 16px;
+        code {
+          font-size: 14px;
+        }
+      }
     }
   }
   tr th {
@@ -411,9 +417,8 @@
   }
   td:first-child {
     padding-left: 0;
-    max-width: 50ch;
   }
-  td:last-child {
+  td.has-button{
     padding-right: 0;
     padding-left: 0;
     width: 10ch;
@@ -423,11 +428,7 @@
   .button-delete {
     background-color: transparent;
     padding: 0 1em;
-    margin: 0;
-    &:disabled {
-      opacity: .4;
-      cursor: not-allowed;
-    }
+    margin: 0 0 1em;
   }
   .icon-delete {
     width: 1.25em;
@@ -445,6 +446,18 @@
     border: none;
     color: #757575;
   }
+  .pages-suppressed-string {
+    background: #f1f1f1;
+    padding: 3px;
+    margin: 2px 0;
+    display: inline-block;
+  }
+}
+.save-reminder {
+  background: #fff1d2;
+  padding: .5em .75em;
+  font-size: 16px;
+  font-weight: bold;
 }
 .post-scan-config-table-info {
   margin-top: 1em;
