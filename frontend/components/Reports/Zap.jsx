@@ -86,9 +86,10 @@ export default function Zap({ data, buildId, siteId }) {
           />
         </section>
         <div className="tablet:grid-col tablet:margin-left-4">
-          <div className="margin-top-4">
+          <h2 className="usa-sr-only">Summary of results</h2>
+          <div className="margin-y-4">
             <section
-              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
+              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'} margin-bottom-3`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">

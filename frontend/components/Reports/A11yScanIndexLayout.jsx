@@ -53,7 +53,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col border-top-1px">
           <section
-            className={`margin-top-4 usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
+            className={`margin-top-4 usa-alert usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}`}
           >
             <div className="usa-alert__body">
               <p className="usa-alert__text">
@@ -63,10 +63,14 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
                     ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')}
                   `}
                 </b>
-                and
-                <b>
-                  {` ${suppressed.length} ${utils.plural(suppressed.length, 'suppressed or informational result')} `}
-                </b>
+                {suppressed.length > 0 && (
+                  <>
+                    and
+                    <b>
+                      {` ${suppressed.length} ${utils.plural(suppressed.length, 'suppressed or informational result')} `}
+                    </b>
+                  </>
+                )}
                 for this site.  View each page report below for specific details.
               </p>
             </div>
@@ -98,7 +102,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col">
           <h2 className="font-heading-xl grid-col padding-right-2 margin-bottom-0 margin-top-1">
-            All reports
+            All pages
             {' '}
             <span className="font-body-lg text-accent-cool-darker">
               (

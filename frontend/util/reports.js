@@ -92,7 +92,7 @@ export function relPath(url, baseurl) {
   return url.split(baseurl)[1];
 }
 
-export function getSuccessCriteria({ tags, id }) {
+export function getSuccessCriteria({ tags = [], id = '' }) {
   const criteria = tags.map((tag) => {
     if (tag.startsWith('wcag')) {
       switch (tag) {

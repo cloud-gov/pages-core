@@ -82,7 +82,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
         <div className="tablet:grid-col tablet:margin-left-4">
           <div className="margin-bottom-2 margin-top-4">
             <section
-              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
+              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">

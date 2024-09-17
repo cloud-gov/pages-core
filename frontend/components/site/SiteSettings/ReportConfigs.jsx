@@ -110,7 +110,7 @@ function ReportConfigs({ siteId: id }) {
     const isPagesRule = rule?.source === 'Pages';
     const customPlaceholder = '/assets class="ignore"';
     function pagesPlaceholder() {
-      if (rule.match) {
+      if (rule.match && Array.isArray(rule.match)) {
         return rule.match.map(match => (
           <code className="pages-suppressed-string" key="match">
             {match}

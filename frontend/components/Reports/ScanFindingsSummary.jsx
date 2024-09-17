@@ -1,5 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { relPath, plural } from '../../util/reports';
 import ScanPagePathAndReportLink from './ScanPagePathReportLink';
@@ -22,7 +23,7 @@ function ScanFindingsSummaryTable({
         </tr>
       </thead>
       <tbody>
-        {findings.map(finding => (
+        {findings.map((finding, fi) => (
           <tr key={finding.alertRef || finding.id}>
             <td data-label="Severity Risk level" className="font-body-xs text-no-wrap">
               <b className="usa-sr-only">
@@ -39,7 +40,7 @@ function ScanFindingsSummaryTable({
                 <br />
               </b>
               {!finding.anchor && (
-                <details>
+                <details open={(fi === 0)}>
                   <summary>
                     <b>{finding.name}</b>
                     {' on '}
@@ -48,7 +49,7 @@ function ScanFindingsSummaryTable({
                   </summary>
                   <ol className="font-mono-3xs">
                     {finding.urls?.map((url, i) => (
-                      <li key={url} className="margin-bottom-1">
+                      <li key={url} className="margin-bottom-1 report-item">
                         <ScanPagePathAndReportLink
                           pagePath={relPath(url, baseurl)}
                           reportLink={`${finding.reports[i]}#finding-${finding.id}`}
@@ -94,17 +95,59 @@ ScanFindingsSummaryTable.propTypes = {
 
 const ScanFindingsSummary = ({ suppressedFindings = [], unsuppressedFindings = [], baseurl }) => (
   <>
-    <h3>⚠️ Unsuppressed results</h3>
-    <ScanFindingsSummaryTable
-      baseurl={baseurl}
-      findings={unsuppressedFindings}
-    />
-    <h3>🔕  Suppressed or informational results</h3>
-    <ScanFindingsSummaryTable
-      baseurl={baseurl}
-      findings={suppressedFindings}
-      hasSuppressColumn
-    />
+    {unsuppressedFindings.length > 0 && (
+      <>
+        <h3 className="font-heading-lg margin-bottom-1 padding-top-2 margin-y-2">
+          ⚠️ Unsuppressed results
+          <span className="font-body-lg padding-left-1 text-secondary-vivid">
+            (
+            {unsuppressedFindings.length}
+            )
+          </span>
+        </h3>
+        <ScanFindingsSummaryTable
+          baseurl={baseurl}
+          findings={unsuppressedFindings}
+        />
+      </>
+    )}
+    {suppressedFindings.length > 0 && (
+      <>
+        <h3 className="font-heading-lg margin-bottom-1 padding-top-2 margin-y-2">
+          🔕  Suppressed or informational results
+          <span className="font-body-lg padding-left-1 text-accent-cool-darker">
+            (
+            {suppressedFindings.length}
+            )
+          </span>
+        </h3>
+        <section className="usa-alert usa-alert--info margin-top-3">
+          <div className="usa-alert__body">
+            <p className="usa-alert__text">
+              <b>
+                This report contains
+                {' '}
+                <a className="usa-link" href="#about-suppressed">
+                  suppressed results
+                </a>
+              </b>
+              , which don’t count towards your total issues.
+              For more information about excluded results and suppression rules, review the
+              {' '}
+              <Link to="https://cloud.gov/pages/documentation/automated-site-reports/" className="usa-link">
+                Automated Site Reports documentation
+              </Link>
+              .
+            </p>
+          </div>
+        </section>
+        <ScanFindingsSummaryTable
+          baseurl={baseurl}
+          findings={suppressedFindings}
+          hasSuppressColumn
+        />
+      </>
+    )}
   </>
 );
 

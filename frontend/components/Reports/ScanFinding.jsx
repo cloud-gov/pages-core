@@ -178,6 +178,14 @@ const FindingDescription = ({
                 <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Report Configuration</Link>
                 .
               </p>
+              <p>
+                For a full list of what Pages excludes from your results, review the
+                {' '}
+                <Link to="https://cloud.gov/pages/documentation/automated-site-reports/" className="usa-link">
+                  Automated Site Reports documentation
+                </Link>
+                .
+              </p>
             </details>
           </div>
         </div>
