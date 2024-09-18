@@ -151,8 +151,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: `${uswdsDist}/img`, to: 'img' },
-        { from: `${uswdsDist}/js/uswds-init.min.js`, to: '../public/js' },
-        { from: `${uswdsDist}/js/uswds.min.js`, to: '../public/js' },
+        { from: `${uswdsDist}/js`, to: 'js' },
       ],
     }),
     // When webpack bundles moment, it includes all of its locale files,
