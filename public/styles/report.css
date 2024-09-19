@@ -53,15 +53,33 @@ hr {
 ol li::marker {
   font-family: 'Roboto Mono Web', 'Bitstream Vera Sans Mono',Consolas,Courier,monospace;
 }
-.break-anywhere {
-  line-break: anywhere;
+
+ol li.report-item:hover,
+ol li.report-item:focus {
+  background: #92ddf24f;
+  outline: 3px solid #92ddf24f;
+  border-radius: 2px;
 }
+.break-anywhere {
+  word-break: break-all;
+}
+.break-balance {
+  text-wrap: balance;
+  text-wrap: pretty;
+}
+
 summary {
   cursor: pointer;
 }
 summary b:hover {
   text-decoration: underline;
 }
+
+.finding-description > p:first-child {
+  font-size: 20px;
+  margin: 1em 0;
+}
+
 .usa-table--compact th,
 .usa-table--compact td {
   vertical-align: top;
@@ -79,8 +97,8 @@ summary b:hover {
 }
 .anchor-indicator {
   text-decoration: none;
-  margin: .25em;
-  padding: .125em;
+  margin: 0 .25em;
+  padding: 0 .125em;
   font-weight: normal;
   font-variant-position: super;
   display: inline-block;

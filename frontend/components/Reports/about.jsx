@@ -11,7 +11,7 @@ export default function About({ scanType, siteId, children }) {
       </h2>
       <div className="font-body-md line-height-body-5">
         { scanType === 'zap' ? <ZapAbout /> : <A11yAbout /> }
-        <h3>Suppressed results</h3>
+        <h3 id="about-suppressed">Suppressed results</h3>
         <p>
           Pages may automatically suppress certain results
           which are irrelevant for statically hosted websites, based on unconfigurable server settings,
@@ -20,6 +20,14 @@ export default function About({ scanType, siteId, children }) {
           criteria to be suppressed in future reports for this site in your Pages
           {' '}
           <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings</Link>
+          .
+        </p>
+        <p>
+          For a full list of what Pages excludes from your results, review the
+          {' '}
+          <Link to="https://cloud.gov/pages/documentation/automated-site-reports/" className="usa-link">
+            Automated Site Reports documentation
+          </Link>
           .
         </p>
         <hr />

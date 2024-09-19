@@ -53,7 +53,15 @@ export default function A11yScanChild({ data, siteId, buildId }) {
           Accessibility report for
           {' '}
           <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono">{data.url}</span>
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">{data.url}</span>
+          <span className="font-sans-lg text-normal margin-left-1">
+            <a className="usa-link font-body-xs text-no-wrap margin-x-2" target="_blank" aria-label="open scanned page in a new window," title="open scanned page in a new window" href={data.url} rel="noreferrer">
+              open page
+              <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+              </svg>
+            </a>
+          </span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
           <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage" rel="noreferrer">
@@ -74,7 +82,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
         <div className="tablet:grid-col tablet:margin-left-4">
           <div className="margin-bottom-2 margin-top-4">
             <section
-              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'error' : 'success'}`}
+              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}`}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">
@@ -115,7 +123,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
             <A11yPassed passes={data.passes} />
             <hr />
             <About scanType="a11y" siteId={siteId}>
-              <p className="font-body-xs line-height-body-3">
+              <p className="font-body-xs line-height-sans-3">
                 This report was generated for
                 {' '}
                 <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.url}</code>
@@ -162,16 +170,20 @@ const A11yPassed = ({ passes = [] }) => (
       <table className="usa-table usa-table--striped usa-table--compact usa-table--borderless font-body-xs width-full">
         <thead>
           <tr>
-            <th>Description</th>
-            <th className="text-right">Places found</th>
+            <th scope="col">Description</th>
+            <th scope="col">Criteria</th>
+            <th scope="col" className="text-right">Places found</th>
           </tr>
         </thead>
         <tbody>
           {passes.map(check => (
             <tr key={check.help}>
-              <td>
+              <th scope="row">
                 {check.help}
                 .
+              </th>
+              <td className="font-body-xs">
+                {utils.getSuccessCriteria(check).map(c => c.short).join(', ')}
               </td>
               <td className="font-mono-sm text-tabular text-right">{check.nodes.length}</td>
             </tr>

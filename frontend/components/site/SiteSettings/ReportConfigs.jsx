@@ -108,7 +108,17 @@ function ReportConfigs({ siteId: id }) {
 
   function ruleRender(rule) {
     const isPagesRule = rule?.source === 'Pages';
-    const placeholder = (rule.match?.join(', ') || '') + (isPagesRule ? ' (not editable - suppressed by Pages)' : '/assets class="ignore"');
+    const customPlaceholder = '/assets class="ignore"';
+    function pagesPlaceholder() {
+      if (rule.match && Array.isArray(rule.match)) {
+        return rule.match.map(match => (
+          <code className="pages-suppressed-string" key="match">
+            {match}
+          </code>
+        ));
+      }
+      return 'Pages suppresses all results for this rule';
+    }
     return (
       (
         <tr key={rule.id} aria-labelledby={`rule-${rule.id}`} className={`rule-source--${rule.source}`}>
@@ -141,42 +151,45 @@ function ReportConfigs({ siteId: id }) {
               )}
 
           </td>
-          <td>
-            { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
-            <label className="usa-sr-only" htmlFor={`${rule.id}-criteria`}>Criteria to match:</label>
-            <input
-              id={`${rule.id}-criteria`}
-              type="text"
-              placeholder={placeholder}
-              disabled={isPagesRule}
-              onChange={event => updateRule(event, rule.id, 'match')}
-              value={isPagesRule ? '' : rule.match?.join(', ')}
-            />
-          </td>
-          <td>
-            { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
-            <label className="usa-sr-only" htmlFor={`${rule.id}-delete`}>Delete this rule</label>
-            <button id={`${rule.id}-delete`} className="button-delete" disabled={isPagesRule} aria-label={isPagesRule ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
-              <IconTrash className="icon-delete" aria-hidden />
-            </button>
-          </td>
+          {!isPagesRule && (
+            <>
+              <td>
+                { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
+                <label className="usa-sr-only" htmlFor={`${rule.id}-criteria`}>Criteria to match:</label>
+                <input
+                  id={`${rule.id}-criteria`}
+                  type="text"
+                  placeholder={customPlaceholder}
+                  disabled={isPagesRule}
+                  onChange={event => updateRule(event, rule.id, 'match')}
+                  value={isPagesRule ? '' : rule.match?.join(', ')}
+                />
+              </td>
+              <td className="has-button">
+                { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
+                <label className="usa-sr-only" htmlFor={`${rule.id}-delete`}>Delete this rule</label>
+                <button id={`${rule.id}-delete`} className="button-delete" aria-label={isPagesRule ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
+                  <IconTrash className="icon-delete" aria-hidden />
+                </button>
+              </td>
+            </>
+          )}
+          {isPagesRule && (
+            <td colSpan="2">
+              {pagesPlaceholder()}
+            </td>
+          )}
         </tr>
       )
     );
   }
-  function helperText(sbt) {
+  function helperText() {
     return (
       <>
         <p>
-          The
-          {' '}
-          {sbt.name}
-          {' '}
-          produced by cloud.gov Pages will automatically suppress certain findings
+          For some reports, Pages Automated Site Reports already exclude certain findings
           which are irrelevant for statically hosted websites, based on unconfigurable
           server settings, or frequently produce ‘false positive’ findings for our customers.
-          You can specify additional findings to be suppressed for this site by adding the rule
-          and any matching criteria to the ignore list below.
           {' '}
           <b>
             While still visible in the report, the suppressed findings don’t count towards your
@@ -184,21 +197,24 @@ function ReportConfigs({ siteId: id }) {
           </b>
         </p>
         <p>
-          Specifying match criteria will limit the suppression of findings to any partial string
-          match in:
+          You can specify additional results to be suppressed for this site by adding the
+          related rules and any matching criteria to the exclusion list below.
+          <ul>
+            <li>
+              <b>Specify match criteria</b>
+              {' '}
+              to make sure you’re only suppressing results where the
+              evidence contains that criteria you want to exclude.
+            </li>
+            <li>
+              <b>Leave the criteria field empty</b>
+              {' '}
+              to suppress all results for that rule.
+            </li>
+          </ul>
         </p>
-        <ul>
-          <li>
-            the HTML of the finding (such as an
-            {' '}
-            <code>id</code>
-            )
-          </li>
-          <li>the URL of the page where the finding is discovered</li>
-          <li>the URL of a specific resource to be ignored</li>
-        </ul>
         <p>
-          Try to
+          Remember to
           {' '}
           <b>be as specific as possible</b>
           {' '}
@@ -216,7 +232,7 @@ function ReportConfigs({ siteId: id }) {
         key={sbt.sbtId}
       >
         <div className="well">
-          {helperText(sbt)}
+          {helperText()}
           <table className="usa-table usa-table-borderless scan-config-table">
             <thead>
               <tr>
@@ -239,6 +255,9 @@ function ReportConfigs({ siteId: id }) {
           >
             Save all rules
           </button>
+          {!rulesSynced && (
+            <span className="save-reminder">Make sure to save these changes.</span>
+          )}
           <p className="post-scan-config-table-info">
             For more information on reports and rulesets, check out the
             {' '}
@@ -246,7 +265,7 @@ function ReportConfigs({ siteId: id }) {
               target="_blank"
               rel="noopener noreferrer"
               title="Pages documentation on site reports"
-              href="https://cloud.gov/pages/documentation/build-scans/"
+              href="https://cloud.gov/pages/documentation/automated-site-reports/#configuration"
             >
               documentation
             </a>

@@ -20,6 +20,8 @@ import { currentSite } from '../../selectors/site';
 import { getOrgById } from '../../selectors/organization';
 import ReportResultsSummary from '../ReportResultsSummary';
 import FilterIndicator from '../FilterIndicator';
+import ExpandableArea from '../ExpandableArea';
+import { IconX } from '../icons';
 
 const {
   setDate, isBefore, startOfToday, addMonths,
@@ -70,46 +72,13 @@ function SiteReports() {
             <div>
               <p>
                 {/* eslint-disable-next-line max-len */}
-                Pages is now offering automated monthly quality reports for customer production sites. These reports examine your Pages site for common website issues and provide guidance and resources for remediation. Pages Reports are part of a larger effort to help our customers comply with OMB Memo 23-22 and ATO requirements.
-              </p>
-              { siteBuildTasks.length > 0 && !buildIdToFilterBy && (
-                <table id="scheduled" className="usa-table table-full-width usa-table-borderless site-reports-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Report</th>
-                      <th scope="col" className="nowrap">Next report on</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    { siteBuildTasks.map(task => (
-                      <tr key={task.id}>
-                        <th scope="row">
-                          <h3>{task.name}</h3>
-                          <p>
-                            {`${task.description} For more information, refer to the `}
-                            <Link to={task.url}>documentation</Link>
-                            .
-                          </p>
-                        </th>
-                        <td>
-                          {dateOnly(nextScanDate(task))}
-                          {' on '}
-                          <b>{branchToBeScanned}</b>
-                        </td>
-                      </tr>
-                    ))}
-
-                  </tbody>
-                </table>
-              )}
-              <p>
-                You can request an immediate report for any recent site branch from
+                Pages is now offering monthly Automated Site Reports, which examine your Pages site for common website issues and provide guidance and resources for remediation. You can request an immediate report for any recent site branch from
                 {' '}
                 <Link to={`/sites/${id}/builds`}>Build history</Link>
                 . You can also customize your report results in
                 {' '}
                 <Link to={`/sites/${id}/settings`}>Site settings</Link>
-                . For more information on Pages Reports, check out the
+                . For more information on Pages Automated Site Reports, check out the
                 {' '}
                 <a
                   target="_blank"
@@ -121,13 +90,54 @@ function SiteReports() {
                 </a>
                 .
               </p>
+              { siteBuildTasks.length > 0 && (
+                <>
+                  <h3>
+                    Available report types (
+                    {siteBuildTasks.length}
+                    )
+                  </h3>
+                  { siteBuildTasks.map(task => (
+                    <ExpandableArea
+                      bordered
+                      title={task.name}
+                      key={task.id}
+                    >
+                      <div className="well">
+                        <p>
+                          Next scheduled for&nbsp;
+                          <b>{dateOnly(nextScanDate(task))}</b>
+                          &nbsp;on&nbsp;
+                          <b>{branchToBeScanned}</b>
+                        </p>
+                        <p>
+                          {`${task.description} For more information, refer to the `}
+                          <Link to={task.url}>documentation</Link>
+                          .
+                        </p>
+                      </div>
+                    </ExpandableArea>
+                  ))}
+                </>
+              )}
+
             </div>
+            <br />
+            <h3>
+              Generated reports (
+              {scans.length}
+              )
+            </h3>
             <FilterIndicator criteria={buildIdToFilterBy ? `build #${buildIdToFilterBy}` : null} count={filteredScans.length} noun="report">
               <>
                 {' '}
-                <a href="#list" role="button" tabIndex="0" className="usa-link" onClick={clearParams}>Clear filters</a>
+                <a href="#list" role="button" tabIndex="0" className="usa-link" onClick={clearParams}>
+                  Show all reports
+                  <span className="filter-close-button" title="close filter">
+                    <IconX />
+                  </span>
+                </a>
                 {' '}
-                to show all reports.
               </>
             </FilterIndicator>
             <div className="table-container">
