@@ -270,9 +270,9 @@ const ZAP_SCAN_RULES = [
   { id: '10099' },
   { id: '90004' },
   { id: '10017', match: ['https://dap.digitalgov.gov/', 'https://search.usa.gov/'] },
-  { id: '10202', match: ['search_form'] },
+  { id: '10202', match: ['search'] },
   { id: '10097', match: ['/assets/styles'] },
-  { id: '90003', match: ['https://dap.digital.gov/'] },
+  { id: '90003', match: ['https://dap.digitalgov.gov/', 'https://search.usa.gov/'] },
 ];
 
 const DEFAULT_SCAN_RULES = {
