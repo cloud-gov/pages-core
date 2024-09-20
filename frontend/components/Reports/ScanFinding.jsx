@@ -25,7 +25,7 @@ const ScanFinding = ({
     ({
       name: title, solution, description,
     } = finding);
-    anchor = `finding-${finding.alertRef}`;
+    anchor = `finding-${finding.alertRef}${ignore ? '-suppressed' : ''}`;
     count = parseInt(finding.count, 10);
     locations = finding.instances || [];
     references = finding.referenceURLs || [];
@@ -33,7 +33,7 @@ const ScanFinding = ({
   }
   if (scanType === 'a11y') {
     title = `${finding.help}.`;
-    anchor = `finding-${finding.id}`;
+    anchor = `finding-${finding.id}${ignore ? '-suppressed' : ''}`;
     count = finding.nodes.length;
     description = `${finding.description}.`;
     locations = finding.nodes || [];
