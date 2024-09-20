@@ -75,7 +75,7 @@ function ScanFindingsSummaryTable({
               <td data-label="Suppressed source" className="font-body-xs text-right">
                 {finding.ignore && (
                   <i className="text-no-wrap">
-                    {finding.ignoreSource || 'Customer criteria'}
+                    {finding.ignoreSource || 'customer criteria'}
                   </i>
                 )}
               </td>

@@ -170,7 +170,7 @@ const FindingDescription = ({
                 { /* eslint-disable-next-line max-len */}
                 { ignoreSource && 'Pages automatically suppresses certain results in this report which are irrelevant for statically hosted websites, based on unconfigurable server settings, or frequently produce ‘false positive’ findings for our customers. '}
                 { /* eslint-disable-next-line max-len */}
-                { !ignoreSource && 'Customers can specify criteria to suppress during report generation to silence ‘false positive’ results. This result matches existing customer-defined criteria.'}
+                { (!ignoreSource || ignoreSource === 'multiple criteria') && 'Customers can specify criteria to suppress during report generation to silence ‘false positive’ results.'}
                 { ' ' /* eslint-disable-next-line max-len */}
                 <b>While still visible in the report, the suppressed results don’t count towards your total issue count.</b>
                 { ' ' /* eslint-disable-next-line max-len */}
