@@ -26,17 +26,17 @@ const ScanFinding = ({
       name: title, solution, description,
     } = finding);
     anchor = `finding-${finding.alertRef}${ignore ? '-suppressed' : ''}`;
-    count = parseInt(finding.count, 10);
     locations = finding.instances || [];
+    count = locations.length;
     references = finding.referenceURLs || [];
     hasMoreInfo = finding.otherinfo;
   }
   if (scanType === 'a11y') {
     title = `${finding.help}.`;
     anchor = `finding-${finding.id}${ignore ? '-suppressed' : ''}`;
-    count = finding.nodes.length;
-    description = `${finding.description}.`;
     locations = finding.nodes || [];
+    count = locations.length;
+    description = `${finding.description}.`;
     solution = finding.nodes[0]?.failureSummary || [];
     criteria = getSuccessCriteria(finding);
     references = [finding.helpUrl, ...criteria.map(c => c.url)];
