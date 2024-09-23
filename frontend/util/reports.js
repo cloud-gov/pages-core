@@ -127,3 +127,233 @@ export function getSuccessCriteria({ tags = [], id = '' }) {
   });
   return criteria.filter(n => n);
 }
+
+export const AXE_TO_ACT = {
+  accesskeys: null,
+  'area-alt': [
+    'c487ae',
+  ],
+  'aria-allowed-attr': [
+    '5c01ea',
+  ],
+  'aria-allowed-role': null,
+  'aria-braille-equivalent': null,
+  'aria-command-name': [
+    '97a4e1',
+  ],
+  'aria-conditional-attr': [
+    '5c01ea',
+  ],
+  'aria-deprecated-role': [
+    '674b10',
+  ],
+  'aria-dialog-name': null,
+  'aria-hidden-body': null,
+  'aria-hidden-focus': [
+    '6cfa84',
+  ],
+  'aria-input-field-name': [
+    'e086e5',
+  ],
+  'aria-meter-name': null,
+  'aria-progressbar-name': null,
+  'aria-prohibited-attr': [
+    '5c01ea',
+  ],
+  'aria-required-attr': [
+    '4e8ab6',
+  ],
+  'aria-required-children': [
+    'bc4a75',
+    'ff89c9',
+  ],
+  'aria-required-parent': [
+    'ff89c9',
+  ],
+  'aria-roledescription': null,
+  'aria-roles': [
+    '674b10',
+  ],
+  'aria-text': null,
+  'aria-toggle-field-name': [
+    'e086e5',
+  ],
+  'aria-tooltip-name': null,
+  'aria-treeitem-name': null,
+  'aria-valid-attr-value': [
+    '6a7281',
+  ],
+  'aria-valid-attr': [
+    '5f99a7',
+  ],
+  'audio-caption': [
+    '2eb176',
+    'afb423',
+  ],
+  'autocomplete-valid': [
+    '73f2c2',
+  ],
+  'avoid-inline-spacing': [
+    '24afc2',
+    '9e45ec',
+    '78fd32',
+  ],
+  blink: null,
+  'button-name': [
+    '97a4e1',
+    'm6b1q3',
+  ],
+  bypass: [
+    'cf77f2',
+    '047fe0',
+    'b40fd1',
+    '3e12e1',
+    'ye5d6e',
+  ],
+  'color-contrast-enhanced': [
+    '09o5cg',
+  ],
+  'color-contrast': [
+    'afw4f7',
+    '09o5cg',
+  ],
+  'css-orientation-lock': [
+    'b33eff',
+  ],
+  'definition-list': null,
+  dlitem: null,
+  'document-title': [
+    '2779a5',
+  ],
+  'duplicate-id-active': [
+    '3ea0c8',
+  ],
+  'duplicate-id-aria': [
+    '3ea0c8',
+  ],
+  'duplicate-id': [
+    '3ea0c8',
+  ],
+  'empty-heading': [
+    'ffd0e9',
+  ],
+  'empty-table-header': null,
+  'focus-order-semantics': null,
+  'form-field-multiple-labels': null,
+  'frame-focusable-content': [
+    'akn7bn',
+  ],
+  'frame-tested': null,
+  'frame-title-unique': [
+    '4b1c6c',
+  ],
+  'frame-title': [
+    'cae760',
+  ],
+  'heading-order': null,
+  'hidden-content': null,
+  'html-has-lang': [
+    'b5c3f8',
+  ],
+  'html-lang-valid': [
+    'bf051a',
+  ],
+  'html-xml-lang-mismatch': [
+    '5b7ae0',
+  ],
+  'identical-links-same-purpose': [
+    'b20e66',
+  ],
+  'image-alt': [
+    '23a2a8',
+  ],
+  'image-redundant-alt': null,
+  'input-button-name': [
+    '97a4e1',
+  ],
+  'input-image-alt': [
+    '59796f',
+  ],
+  'label-content-name-mismatch': [
+    '2ee8b8',
+  ],
+  'label-title-only': null,
+  label: [
+    'e086e5',
+  ],
+  'landmark-banner-is-top-level': null,
+  'landmark-complementary-is-top-level': null,
+  'landmark-contentinfo-is-top-level': null,
+  'landmark-main-is-top-level': null,
+  'landmark-no-duplicate-banner': null,
+  'landmark-no-duplicate-contentinfo': null,
+  'landmark-no-duplicate-main': null,
+  'landmark-one-main': null,
+  'landmark-unique': null,
+  'link-in-text-block': null,
+  'link-name': [
+    'c487ae',
+  ],
+  list: null,
+  listitem: null,
+  marquee: null,
+  'meta-refresh-no-exceptions': [
+    'bisz58',
+  ],
+  'meta-refresh': [
+    'bc659a',
+    'bisz58',
+  ],
+  'meta-viewport-large': null,
+  'meta-viewport': [
+    'b4f0c3',
+  ],
+  'nested-interactive': [
+    '307n5z',
+  ],
+  'no-autoplay-audio': [
+    '80f0bf',
+  ],
+  'object-alt': [
+    '8fc3b6',
+  ],
+  'p-as-heading': null,
+  'page-has-heading-one': null,
+  'presentation-role-conflict': [
+    '46ca7f',
+  ],
+  region: null,
+  'role-img-alt': [
+    '23a2a8',
+  ],
+  'scope-attr-valid': null,
+  'scrollable-region-focusable': [
+    '0ssw9k',
+  ],
+  'select-name': [
+    'e086e5',
+  ],
+  'server-side-image-map': null,
+  'skip-link': null,
+  'summary-name': null,
+  'svg-img-alt': [
+    '7d6734',
+  ],
+  tabindex: null,
+  'table-duplicate-name': null,
+  'table-fake-caption': null,
+  'target-size': null,
+  'td-has-header': null,
+  'td-headers-attr': [
+    'a25f45',
+  ],
+  'th-has-data-cells': [
+    'd0f69e',
+  ],
+  'valid-lang': [
+    'de46e4',
+  ],
+  'video-caption': [
+    'eac66b',
+  ],
+};
