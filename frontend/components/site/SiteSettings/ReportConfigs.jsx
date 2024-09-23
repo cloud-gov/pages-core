@@ -111,10 +111,13 @@ function ReportConfigs({ siteId: id }) {
     const customPlaceholder = '/assets class="ignore"';
     function pagesPlaceholder() {
       if (rule.match && Array.isArray(rule.match)) {
-        return rule.match.map(match => (
-          <code className="pages-suppressed-string" key="match">
-            {match}
-          </code>
+        return rule.match.map((match, i) => (
+          <>
+            { i === 0 ? '' : ', '}
+            <code className="pages-suppressed-string" key="match">
+              {match}
+            </code>
+          </>
         ));
       }
       return 'Pages suppresses all results for this rule';
@@ -201,7 +204,7 @@ function ReportConfigs({ siteId: id }) {
           related rules and any matching criteria to the exclusion list below.
           <ul>
             <li>
-              <b>Specify match criteria</b>
+              <b>Specify comma-separated match criteria</b>
               {' '}
               to make sure you’re only suppressing results where the
               evidence contains that criteria you want to exclude.

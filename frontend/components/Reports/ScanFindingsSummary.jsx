@@ -52,7 +52,7 @@ function ScanFindingsSummaryTable({
                       <li key={url} className="margin-bottom-1 report-item">
                         <ScanPagePathAndReportLink
                           pagePath={relPath(url, baseurl)}
-                          reportLink={`${finding.reports[i]}#finding-${finding.id}`}
+                          reportLink={`${finding.reports[i]}#finding-${finding.id}${hasSuppressColumn ? '-suppressed' : ''}`}
                           pageURL={url}
                         />
                       </li>
@@ -62,7 +62,7 @@ function ScanFindingsSummaryTable({
               )}
               {finding.anchor && (
                 <>
-                  <a className="usa-link text-bold" href={`#finding-${finding.anchor}`}>
+                  <a className="usa-link text-bold" href={`#finding-${finding.anchor}${hasSuppressColumn ? '-suppressed' : ''}`}>
                     {finding.name}
                   </a>
                   {' in '}
@@ -75,7 +75,7 @@ function ScanFindingsSummaryTable({
               <td data-label="Suppressed source" className="font-body-xs text-right">
                 {finding.ignore && (
                   <i className="text-no-wrap">
-                    {finding.ignoreSource || 'Customer criteria'}
+                    {finding.ignoreSource || 'customer criteria'}
                   </i>
                 )}
               </td>
