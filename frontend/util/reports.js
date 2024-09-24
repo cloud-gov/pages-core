@@ -91,6 +91,74 @@ export function plural(count, name) {
 export function relPath(url, baseurl) {
   return url.split(baseurl)[1];
 }
+const TT_RULES = {
+  '1.A': 'https://section508coordinators.github.io/TrustedTester/alternate.html#check-alt-version-conformant',
+  '1.B': 'https://section508coordinators.github.io/TrustedTester/alternate.html#check-alt-version-equivalent',
+  '1.C': 'https://section508coordinators.github.io/TrustedTester/alternate.html#check-alt-version-access',
+  '1.D': 'https://section508coordinators.github.io/TrustedTester/alternate.html#check-alt-version-nc-access',
+  '1.E': 'https://section508coordinators.github.io/TrustedTester/alternate.html#check-non-interference',
+  '2.A': 'https://section508coordinators.github.io/TrustedTester/auto.html#check-142-audio-control',
+  '2.B': 'https://section508coordinators.github.io/TrustedTester/auto.html#check-222-blinking-moving-scrolling',
+  '2.C': 'https://section508coordinators.github.io/TrustedTester/auto.html#check-222-auto-updating',
+  '2.D': 'https://section508coordinators.github.io/TrustedTester/auto.html#check-412-change-notify-auto',
+  '3.A': 'https://section508coordinators.github.io/TrustedTester/flashing.html#check-231-flashing',
+  '4.A': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-211-keyboard-access',
+  '4.B': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-211-no-keystroke-timing',
+  '4.C': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-212-no-keyboard-trap',
+  '4.D': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-247-focus-visible',
+  '4.E': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-321-on-focus',
+  '4.F': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-243-focus-order-meaning',
+  '4.G': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-243-focus-order-reveal',
+  '4.H': 'https://section508coordinators.github.io/TrustedTester/keyboard.html#check-243-focus-order-return',
+  '5.A': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-332-label-provided',
+  '5.B': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-246-label-descriptive',
+  '5.C': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-131-programmatic-label',
+  '5.D': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-322-on-input',
+  '5.E': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-412-change-notify-form',
+  '5.F': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-331-error-identification',
+  '5.G': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-333-error-suggestion',
+  '5.H': 'https://section508coordinators.github.io/TrustedTester/forms.html#check-334-error-prevention',
+  '6.A': 'https://section508coordinators.github.io/TrustedTester/links.html#check-244-link-purpose',
+  '6.B': 'https://section508coordinators.github.io/TrustedTester/links.html#check-412-change-notify-links',
+  '7.A': 'https://section508coordinators.github.io/TrustedTester/images.html#for-meaningful-images--check-111-meaningful-image-name',
+  '7.B': 'https://section508coordinators.github.io/TrustedTester/images.html#for-decorative-images--check-111-decorative-image',
+  '7.C': 'https://section508coordinators.github.io/TrustedTester/images.html#check-111--decorative-background-image',
+  '7.D': 'https://section508coordinators.github.io/TrustedTester/images.html#check-111-captcha-alternative',
+  '7.E': 'https://section508coordinators.github.io/TrustedTester/images.html#check-145-image-of-text',
+  '8.A': 'https://section508coordinators.github.io/TrustedTester/timelimits.html#check-221-timing-adjustable',
+  '9.A': 'https://section508coordinators.github.io/TrustedTester/repetitive.html#check-241-bypass-function',
+  '9.B': 'https://section508coordinators.github.io/TrustedTester/repetitive.html#check-323-consistent--navigation',
+  '9.C': 'https://section508coordinators.github.io/TrustedTester/repetitive.html#check-324-consistent-identification',
+  '10.A': 'https://section508coordinators.github.io/TrustedTester/structure.html#check-246-heading-purpose',
+  '10.B': 'https://section508coordinators.github.io/TrustedTester/structure.html#check-131-heading-determinable',
+  '10.C': 'https://section508coordinators.github.io/TrustedTester/structure.html#check-131-heading-level',
+  '10.D': 'https://section508coordinators.github.io/TrustedTester/structure.html#check-131-list-type',
+  '11.A': 'https://section508coordinators.github.io/TrustedTester/language.html#check-311-page-language-defined',
+  '11.B': 'https://section508coordinators.github.io/TrustedTester/language.html#check-312-part-language-defined',
+  '12.A': 'https://section508coordinators.github.io/TrustedTester/titles.html#check-242-page-title-defined',
+  '12.B': 'https://section508coordinators.github.io/TrustedTester/titles.html#check-242-page-title-purpose',
+  '12.C': 'https://section508coordinators.github.io/TrustedTester/titles.html#check-412-frame-title',
+  '12.D': 'https://section508coordinators.github.io/TrustedTester/titles.html#check-412-iframe-name',
+  '13.A': 'https://section508coordinators.github.io/TrustedTester/sensory.html#check-141-color-meaning',
+  '13.B': 'https://section508coordinators.github.io/TrustedTester/sensory.html#check-133-sensory-info',
+  '13.C': 'https://section508coordinators.github.io/TrustedTester/sensory.html#check-143-contrast',
+  '14.A': 'https://section508coordinators.github.io/TrustedTester/tables.html#check-131-table-identification',
+  '14.B': 'https://section508coordinators.github.io/TrustedTester/tables.html#check-131-cell-header-association',
+  '14.C': 'https://section508coordinators.github.io/TrustedTester/tables.html#check-131-layout-table-structure',
+  '15.A': 'https://section508coordinators.github.io/TrustedTester/css-content-position.html#check-131-meaningful-content-css-before-after',
+  '15.B': 'https://section508coordinators.github.io/TrustedTester/css-content-position.html#check-132-content-order-meaning-css-position',
+  '16.A': 'https://section508coordinators.github.io/TrustedTester/audiovideo.html#check-121-audio-transcript-text',
+  '16.B': 'https://section508coordinators.github.io/TrustedTester/audiovideo.html#check-121-video--alternative-equivalent',
+  '17.A': 'https://section508coordinators.github.io/TrustedTester/media.html#check-122-captions-equivalent',
+  '17.B': 'https://section508coordinators.github.io/TrustedTester/media.html#check-125-audio-description-equivalent',
+  '17.C': 'https://section508coordinators.github.io/TrustedTester/media.html#check-124-captions-live-equivalent',
+  '17.D': 'https://section508coordinators.github.io/TrustedTester/media.html#check-5034-caption-description-controls',
+  '17.E': 'https://section508coordinators.github.io/TrustedTester/media.html#check-50341-caption-control',
+  '17.F': 'https://section508coordinators.github.io/TrustedTester/media.html#check-50342-description-control',
+  '18.A': 'https://section508coordinators.github.io/TrustedTester/resize.html#check-144-resize-text',
+  '19.A': 'https://section508coordinators.github.io/TrustedTester/multiple.html#check-245-multiple-ways',
+  '20.A': 'https://section508coordinators.github.io/TrustedTester/parsing.html#check-411-parsing',
+};
 
 export function getSuccessCriteria({ tags = [], id = '' }) {
   const criteria = tags.map((tag) => {
@@ -115,7 +183,7 @@ export function getSuccessCriteria({ tags = [], id = '' }) {
       return {
         // turn TT1.1a into "Trusted Tester 1.1A"
         short: `${tag.toUpperCase().split('TT').join('TT ')}`,
-        url: 'https://section508coordinators.github.io/TrustedTester/appendixc.html',
+        url: TT_RULES[tag.toUpperCase().split('TT')[1]] || 'https://section508coordinators.github.io/TrustedTester/appendixc.html',
       };
     } else if (tag === 'ACT') {
       return {
@@ -357,3 +425,10 @@ export const AXE_TO_ACT = {
     'eac66b',
   ],
 };
+
+const WCAG_RULES_URL = 'https://www.w3.org/WAI/standards-guidelines/act/rules/';
+const ACT_RULES_URL = 'https://act-rules.github.io/rules/';
+
+export function getWCAGRuleURLs(id = '') {
+  return AXE_TO_ACT[id]?.flatMap(rule => [`${WCAG_RULES_URL}${rule}`, `${ACT_RULES_URL}${rule}`]) || [];
+}

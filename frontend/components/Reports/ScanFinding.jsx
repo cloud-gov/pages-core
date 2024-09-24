@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
 import { Link, useLocation } from 'react-router-dom';
 
-import { plural, getSuccessCriteria } from '../../util/reports';
+import { plural, getSuccessCriteria, getWCAGRuleURLs } from '../../util/reports';
 
 const ScanFinding = ({
   finding, groupColor, groupLabel, scanType = 'zap', siteId,
@@ -39,7 +39,7 @@ const ScanFinding = ({
     description = `${finding.description}.`;
     solution = finding.nodes[0]?.failureSummary || [];
     criteria = getSuccessCriteria(finding);
-    references = [finding.helpUrl, ...criteria.map(c => c.url)];
+    references = [...getWCAGRuleURLs(finding.id), ...criteria.map(c => c.url), finding.helpUrl];
   }
 
   useEffect(() => {
