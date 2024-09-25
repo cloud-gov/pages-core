@@ -1,3 +1,29 @@
+## 0.12.0 (2024-09-25)
+
+### Added
+
+- add success criteria to a11y findings
+
+### Fixed
+
+- wrong instance count on zap alert titles
+- separate anchors between suppressed and unsuppressed
+- usability improvements to the report result content display
+- make urls wrap in report headers
+- URLs should wrap on the report index page
+- show report types even when filtered
+
+### Maintenance
+
+- regenerate lockfile, remove some overrides
+- don't audit devDependencies
+- add more references to a11y scan findings using ACT ids
+- add act id mapping
+- UX improvements for findings with multiple match criteria
+- update rule suppression related to search.gov and dap
+- usability improvements to reports
+- improve display of pages-suppressed rules in report config settings
+
 ## 0.11.1 (2024-09-09)
 
 ### Fixed
