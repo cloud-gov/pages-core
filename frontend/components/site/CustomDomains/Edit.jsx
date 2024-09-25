@@ -90,7 +90,7 @@ function EditCustomDomain() {
               id="domain-name"
               name="domain-name"
               value={domain.data.names}
-              placeholder={'ie. "site.agency.gov"'}
+              placeholder='ie. "site.agency.gov"'
               onChange={event => setDomainValues({
                 names: event.target.value,
               })}

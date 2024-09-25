@@ -6,7 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@aws-sdk/client-s3": "^3.620.1",
-    "@bull-board/express": "^5.15.3",
+    "@bull-board/express": "^5.23.0",
     "@json2csv/plainjs": "^7.0.1",
     "@octokit/request": "^6.2.2",
     "@octokit/rest": "^18.5.2",
@@ -188,7 +188,7 @@
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-middleware": "^7.1.1",
-    "webpack-dev-server": "^5.0.4",
+    "webpack-dev-server": "^5.1.0",
     "webpack-manifest-plugin": "^5.0.0"
   },
   "engines": {
@@ -200,11 +200,6 @@
     "*.jsx": "eslint"
   },
   "resolutions": {
-    "ws": "8.17.1",
-    "socket.io-adapter": "2.5.5",
-    "socket.io": "4.7.5",
-    "socket.io-client": "4.7.5",
-    "fast-xml-parser": "4.4.1",
     "**/cheerio": "1.0.0-rc.12"
   }
 }

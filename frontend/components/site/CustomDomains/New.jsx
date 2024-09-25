@@ -96,7 +96,7 @@ function NewCustomDomain() {
               id="domain-name"
               name="domain-name"
               value={domain.names}
-              placeholder={'ie. "site.agency.gov"'}
+              placeholder='ie. "site.agency.gov"'
               onChange={(event) => {
                 setDomainValues({
                   siteBranchConfigId,

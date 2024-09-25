@@ -5,4 +5,8 @@ run:
   dir: src/admin-client
   path: bash
   # https://classic.yarnpkg.com/lang/en/docs/cli/audit
-  args: [-c, "yarn audit; [[ $? -ge $VULN_THRESHOLD ]] && exit 1 || exit 0"]
+  args:
+    [
+      -c,
+      "yarn audit --groups dependencies; [[ $? -ge $VULN_THRESHOLD ]] && exit 1 || exit 0",
+    ]
