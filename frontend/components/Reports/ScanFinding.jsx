@@ -101,7 +101,7 @@ const FindingTitle = ({
   anchor,
 }) => (
   <div className="bg-white padding-top-05 sticky">
-    <h3 className="font-heading-lg margin-y-105 break-balance line-height-serif-3">
+    <h3 className="font-serif-lg margin-y-105">
       {title}
       <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">#</a>
     </h3>

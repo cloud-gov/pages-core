@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Error = () => (
-  <div className="usa-grid">
+  <div className="grid-container padding-y-6">
     <h1>An Unexpected Error Occurred</h1>
     <p>
       Apologies! An error occurred in the application that we didn&apos;t know to handle.

@@ -61,10 +61,11 @@ function BranchConfig({
           ) : (
             <>
               {context !== 'preview' && (
-                <div>
+                <div className="margin-bottom-3">
                   {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                  <label htmlFor={`${branch}-input`}>Branch name:</label>
+                  <label className="usa-label text-bold margin-top-0" htmlFor={`${branch}-input`}>Branch name:</label>
                   <input
+                    className="usa-input"
                     id={`${branch}-input`}
                     value={branchConfig.branch}
                     onChange={(event) => {
@@ -78,8 +79,8 @@ function BranchConfig({
               )}
               <div>
                 {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label htmlFor={`${branch}-config-input`}>Configuration:</label>
-                <p>
+                <label className="usa-label text-bold margin-top-0" htmlFor={`${branch}-config-input`}>Configuration:</label>
+                <p className="margin-top-0">
                   Add additional configuration in YAML to be added to your
                   _config.yml file when we build your
                   {' '}
@@ -88,6 +89,7 @@ function BranchConfig({
                   branch.
                 </p>
                 <textarea
+                  className="usa-input height-15"
                   id={`${branch}-config-input`}
                   name={`${branch}-config-input`}
                   value={branchConfig.config}
@@ -99,17 +101,19 @@ function BranchConfig({
                   }}
                 />
               </div>
-              <button
-                type="button"
-                className="usa-button usa-button-secondary"
-                onClick={() => resetValues()}
-              >
-                Reset
-              </button>
+              <div className="usa-button-group margin-y-2 margin-x-0">
+                <button
+                  type="button"
+                  className="usa-button usa-button--outline"
+                  onClick={() => resetValues()}
+                >
+                  Reset
+                </button>
 
-              <button type="submit" className="usa-button usa-button-primary">
-                Save
-              </button>
+                <button type="submit" className="usa-button usa-button--primary">
+                  Save
+                </button>
+              </div>
             </>
           )}
         </div>

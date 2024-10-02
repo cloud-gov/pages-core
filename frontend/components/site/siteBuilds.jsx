@@ -11,7 +11,7 @@ import AlertBanner from '../alertBanner';
 import { getOrgById } from '../../selectors/organization';
 import { sandboxMsg } from '../../util';
 
-export const REFRESH_INTERVAL = 15 * 1000;
+export const REFRESH_INTERVAL = 1500 * 1000;
 
 function scansDocsLink(url, cta = 'What’s this?') {
   return (
@@ -70,7 +70,7 @@ function SiteBuilds() {
   const latestBuilds = builds.data && latestBuildByBranch(builds.data);
 
   return (
-    <div>
+    <div className="grid-row">
       {organization?.isSandbox && (
         <div className="well">
           <AlertBanner
@@ -84,8 +84,8 @@ function SiteBuilds() {
         </div>
       )}
       {builds?.data?.length > 0 && (
-        <div className="table-container">
-          <table className="usa-table-borderless log-table log-table__site-builds table-full-width">
+        <div className="grid-col-12 table-container">
+          <table className="usa-table usa-table--borderless usa-table--stacked log-table log-table__site-builds width-full table-full-width">
             <thead>
               <tr>
                 <th scope="col">Build</th>

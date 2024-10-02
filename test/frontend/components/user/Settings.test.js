@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
+
 import { buildInitialValues, Settings } from '../../../../frontend/components/user/Settings';
 
 function getProps({
@@ -71,9 +72,8 @@ describe('<Settings />', () => {
     const props = getProps();
 
     const wrapper = shallow(<Settings {...props} />);
-
-    expect(wrapper.contains(<h1>User Settings</h1>)).to.be.true;
-    expect(wrapper.contains(<h2>Build Notifications</h2>)).to.be.true;
-    expect(wrapper.contains(<h2>Github Token</h2>)).to.be.true;
+    expect(wrapper.containsMatchingElement(<h1>User Settings</h1>)).to.be.true;
+    expect(wrapper.containsMatchingElement(<h2>Build Notifications</h2>)).to.be.true;
+    expect(wrapper.containsMatchingElement(<h2>Github Token</h2>)).to.be.true;
   });
 });

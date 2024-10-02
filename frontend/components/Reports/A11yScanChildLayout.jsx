@@ -49,7 +49,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
   return (
     <>
       <div className="grid-row">
-        <h1 className="font-heading-xl grid-col padding-right-2">
+        <h1 className="font-serif-xl grid-col padding-right-2">
           Accessibility report for
           {' '}
           <br />
@@ -148,7 +148,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
 
 const A11yPassed = ({ passes = [] }) => (
   <div>
-    <h3 className="font-heading-lg">
+    <h3 className="font-serif-lg">
       Passed checks &nbsp;
       <span className="font-body-lg text-accent-cool-darker">
         (

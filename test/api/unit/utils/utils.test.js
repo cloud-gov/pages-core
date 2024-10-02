@@ -19,7 +19,7 @@ const MockWebpackConfig = {
   entry: { bundle: './js/to/bundle.js' },
 };
 
-const utils = proxyquire('../../../../api/utils', { '../../webpack.development.config.js': MockWebpackConfig });
+const utils = proxyquire('../../../../api/utils', { '../../webpack.config.js': MockWebpackConfig });
 
 describe('utils', () => {
   describe('.buildEnum', () => {
@@ -141,33 +141,37 @@ describe('utils', () => {
           'boop.txt': 'boop content',
         },
       },
-    }
+    };
 
     beforeEach(() => {
-      const fsReaddirStub = sinon.stub(fs, 'readdirSync')
-      const fsStatStub = sinon.stub(fs, 'statSync')
+      const fsReaddirStub = sinon.stub(fs, 'readdirSync');
+      const fsStatStub = sinon.stub(fs, 'statSync');
 
-      fsReaddirStub.withArgs('mydir').returns(Object.keys(directoryStructure.mydir))
+      fsReaddirStub
+        .withArgs('mydir')
+        .returns(Object.keys(directoryStructure.mydir));
       fsStatStub.withArgs('mydir/foobar.html').returns({
-        isDirectory: () => false
-      })
+        isDirectory: () => false,
+      });
 
-      fsReaddirStub.withArgs('mydir/subdir').returns(Object.keys(directoryStructure.mydir.subdir))
+      fsReaddirStub
+        .withArgs('mydir/subdir')
+        .returns(Object.keys(directoryStructure.mydir.subdir));
       fsStatStub.withArgs('mydir/subdir').returns({
-        isDirectory: () => true
-      })
+        isDirectory: () => true,
+      });
 
       fsStatStub.withArgs('mydir/subdir/beep.txt').returns({
-        isDirectory: () => false
-      })
+        isDirectory: () => false,
+      });
 
       fsStatStub.withArgs('mydir/subdir/boop.txt').returns({
-        isDirectory: () => false
-      })
-    })
+        isDirectory: () => false,
+      });
+    });
 
     afterEach(() => {
-      sinon.restore()
+      sinon.restore();
     });
 
     it('returns a listing of all files in the given directory', () => {
@@ -193,8 +197,8 @@ describe('utils', () => {
 
   describe('.loadProductionManifest', () => {
     beforeEach(() => {
-      sinon.stub(fs, 'existsSync').returns(true)
-      sinon.stub(fs, 'readFileSync').returns(JSON.stringify({ manifest: 'yay' }))
+      sinon.stub(fs, 'existsSync').returns(true);
+      sinon.stub(fs, 'readFileSync').returns(JSON.stringify({ manifest: 'yay' }));
     });
 
     afterEach(() => {

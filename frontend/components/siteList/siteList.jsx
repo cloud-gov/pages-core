@@ -13,7 +13,7 @@ import UserOrgSelect from '../organization/UserOrgSelect';
 import SiteListItem from './siteListItem';
 import LoadingIndicator from '../LoadingIndicator';
 import GithubAuthButton from '../GithubAuthButton';
-import { IconPlus } from '../icons';
+import UsaIcon from '../UsaIcon';
 import alertActions from '../../actions/alertActions';
 import userActions from '../../actions/userActions';
 
@@ -53,15 +53,15 @@ const getSites = (organizations, sites, user) => {
 
   if (!data || !data.length) {
     return (
-      <div className="usa-grid">
-        <h1>No sites yet.</h1>
+      <div className="grid-row">
+        <h1 className="font-sans-2xl">No sites yet.</h1>
         <p>Add one now.</p>
       </div>
     );
   }
 
   return (
-    <ul className="sites-list usa-unstyled-list">
+    <ul className="usa-card-group">
       {mapSites(organizations, data, user)}
     </ul>
   );
@@ -80,10 +80,10 @@ export const SiteList = ({
       <Link
         to="/sites/new"
         role="button"
-        className="usa-button button-add-website"
+        className="usa-button button-add-website margin-right-0"
         alt="Add a new site"
       >
-        <IconPlus />
+        <UsaIcon name="add" />
         {' '}
         Add site
       </Link>
@@ -99,22 +99,22 @@ export const SiteList = ({
   }
 
   return (
-    <div>
-      <div className="page-header usa-grid-full">
-        <div className="usa-width-one-half">
-          <h1>
+    <div className="grid-col-12">
+      <div className="page-header grid-row flex-align-center">
+        <div className="tablet:grid-col-fill grid-col-12">
+          <h1 className="font-sans-2xl">
             Your sites
           </h1>
         </div>
-        <div className="usa-width-one-half header-actions">
+        <div className="tablet:grid-col-auto grid-col-12 header-actions">
           {topButton}
         </div>
       </div>
       {
         hasOrgs(organizations)
           ? (
-            <div className="page-header usa-grid-full">
-              <div className="usa-width-one-third">
+            <div className="margin-y-2 grid-row">
+              <div className="tablet:grid-col-4 grid-col-12">
                 <UserOrgSelect
                   id="filter-sites-by-org"
                   label="Filter sites by organization."
@@ -129,8 +129,11 @@ export const SiteList = ({
       }
 
       <AlertBanner {...alert} />
-      {getSites(organizations, groupedSites, user)}
-      <a href="#top" className="back-to-top">Return to top</a>
+      <div className="grid-row margin-y-3">
+        <div className="grid-col">
+          {getSites(organizations, groupedSites, user)}
+        </div>
+      </div>
     </div>
   );
 };

@@ -16,13 +16,13 @@ describe('<AlertBanner/>', () => {
     it(`outputs an ${status} banner when the status is ${status}`, () => {
       const component = shallow(<AlertBanner message="hello" status={status} />);
 
-      expect(component.find(`.usa-alert-${status}`).length).not.to.equal(0);
+      expect(component.find(`.usa-alert--${status}`).length).not.to.equal(0);
     });
   });
 
   it('falls back to an info banner when status is not provided', () => {
     const component = shallow(<AlertBanner message="hello" />);
-    expect(component.find('.usa-alert-info').length).not.to.equal(0);
+    expect(component.find('.usa-alert--info').length).not.to.equal(0);
   });
 
   it('can render a component as a message', () => {

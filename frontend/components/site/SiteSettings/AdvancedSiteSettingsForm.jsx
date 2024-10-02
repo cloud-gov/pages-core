@@ -19,7 +19,7 @@ export const AdvancedSiteSettingsForm = ({
   >
     <div className="well">
       {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-      <label htmlFor="engine">Site engine</label>
+      <label className="usa-sr-only" htmlFor="engine">Site engine</label>
       <Field
         name="engine"
         component={p => (
@@ -28,26 +28,27 @@ export const AdvancedSiteSettingsForm = ({
             id="engine"
             value={p.input.value}
             onChange={p.input.onChange}
-            className="form-control"
           />
         )}
       />
-      <button
-        type="button"
-        className="usa-button usa-button-secondary"
-        disabled={pristine}
-        onClick={reset}
-      >
-        Reset
-      </button>
+      <div className="usa-button-group margin-y-2 margin-x-0">
+        <button
+          type="button"
+          className="usa-button usa-button--outline"
+          disabled={pristine}
+          onClick={reset}
+        >
+          Reset
+        </button>
 
-      <button
-        type="submit"
-        className="usa-button usa-button-primary"
-        disabled={pristine}
-      >
-        Save advanced settings
-      </button>
+        <button
+          type="submit"
+          className="usa-button usa-button--primary"
+          disabled={pristine}
+        >
+          Save advanced settings
+        </button>
+      </div>
     </div>
   </form>
 );

@@ -11,14 +11,14 @@ export const DeleteSiteForm = ({
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="well">
       {/* DELETE SITE */}
-      <fieldset>
-        <legend>Delete Site</legend>
-        <p className="well-text">
+      <fieldset className="usa-fieldset">
+        <legend className="usa-sr-only">Delete Site</legend>
+        <p className="well-text margin-top-0">
           Deleting a site removes the published site from our servers and
           from the dashboards of all site users.
-          This will bring the entire site offline and make it inaccessible for users.
-          <br />
-          <br />
+        </p>
+        <p>
+          <b>This will bring the entire site offline and make it inaccessible for users.</b>
         </p>
         <AlertBanner
           status="warning"
@@ -28,7 +28,7 @@ export const DeleteSiteForm = ({
                    administrators can use this feature."
           alertRole={false}
         >
-          <button disabled={submitting} className="usa-button usa-button-red" type="submit">
+          <button disabled={submitting} className="usa-button usa-button--secondary margin-top-2" type="submit">
             Delete
           </button>
         </AlertBanner>

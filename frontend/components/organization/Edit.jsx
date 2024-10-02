@@ -112,7 +112,7 @@ function Edit({ actions }) {
 
   if (!org) {
     return (
-      <div className="usa-grid">
+      <div className="grid-row">
         <h3>Could not find this organization.</h3>
       </div>
     );
@@ -128,9 +128,9 @@ function Edit({ actions }) {
   const getSandboxMsg = days => <span>{sandboxMsg(days)}</span>;
 
   return (
-    <div>
-      <div className="page-header usa-grid-full">
-        <div className="usa-width-one-half">
+    <div className="grid-col-12">
+      <div className="page-header grid-row">
+        <div className="desktop:grid-col-6">
           <h1>{org.name}</h1>
         </div>
       </div>
@@ -153,7 +153,7 @@ function Edit({ actions }) {
             alertRole={false}
           />
           )}
-        <h3>Members</h3>
+        <h3 className="font-heading-xl">Members</h3>
         <AddUserForm
           className="well"
           roleOptions={roleOptions}
@@ -170,7 +170,7 @@ function Edit({ actions }) {
             }
           }
         />
-        <table className="usa-table-borderless log-table  org-member-table table-full-width">
+        <table className="usa-table usa-table--borderless usa-table--stacked log-table org-member-table width-full table-full-width">
           <thead>
             <tr>
               <th scope="col">Email</th>
@@ -267,8 +267,6 @@ function Edit({ actions }) {
           </tbody>
         </table>
       </div>
-
-      <a href="#top" className="back-to-top">Return to top</a>
     </div>
   );
 }

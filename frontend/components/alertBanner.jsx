@@ -7,7 +7,7 @@ const renderHeader = (text) => {
   }
 
   return (
-    <h3 className="usa-alert-heading">
+    <h3 className="usa-alert__heading">
       { text }
     </h3>
   );
@@ -37,12 +37,12 @@ const AlertBanner = ({
 
   return (
     <div
-      className={`usa-alert usa-alert-${status}`}
+      className={`usa-alert usa-alert--${status}`}
       role={alertRole ? 'alert' : undefined}
     >
-      <div className="usa-alert-body">
+      <div className="usa-alert__body">
         { renderHeader(header) }
-        <p className="usa-alert-text">
+        <p className="usa-alert__text">
           { msg }
         </p>
         { children }

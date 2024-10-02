@@ -49,8 +49,8 @@ function authorize(revokeFirst) {
 const GithubAuthButton = ({
   onFailure, onSuccess, text, revokeFirst,
 }) => (
-  <div className="well-gray-lightest">
-    <p>{text}</p>
+  <div className="bg-primary-lightest padding-2">
+    <p className="usa-label margin-top-0">{text}</p>
     <button
       type="button"
       className="usa-button github-auth-button"

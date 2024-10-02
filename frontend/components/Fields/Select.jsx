@@ -17,13 +17,14 @@ const Select = ({
   meta: { touched, error },
   options,
 }) => (
-  <div className={touched && error ? 'usa-input-error' : ''}>
-    { label && <label htmlFor={id}>{ label }</label> }
+  <div>
+    { label && <label className="usa-label text-bold" htmlFor={id}>{ label }</label> }
     { help }
-    { touched && (error && <span className="usa-input-error-message">{error}</span>) }
+    { touched && (error && <span className="usa-error-message">{error}</span>) }
     <select
+      className={`usa-select ${touched && error ? 'usa-select--error' : ''} ${className}`}
       // eslint-disable-next-line react/jsx-props-no-spreading
-      {...{ id, className }}
+      {...id}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...input}
     >

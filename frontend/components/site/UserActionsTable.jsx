@@ -50,7 +50,7 @@ function UserActionsTable(props) {
   }
 
   return (
-    <table className="table-full-width log-table">
+    <table className="width-full log-table table-full-width">
       <caption>Action Log</caption>
       {renderTableHead()}
       <tbody>

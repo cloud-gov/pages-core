@@ -70,7 +70,7 @@ function SiteReports() {
         : (
           <>
             <div>
-              <p>
+              <p className="font-body-sm line-height-sans-4 measure-6 margin-bottom-4">
                 {/* eslint-disable-next-line max-len */}
                 Pages is now offering monthly Automated Site Reports, which examine your Pages site for common website issues and provide guidance and resources for remediation. You can request an immediate report for any recent site branch from
                 {' '}
@@ -92,7 +92,7 @@ function SiteReports() {
               </p>
               { siteBuildTasks.length > 0 && (
                 <>
-                  <h3>
+                  <h3 className="font-sans-lg">
                     Available report types (
                     {siteBuildTasks.length}
                     )
@@ -123,7 +123,7 @@ function SiteReports() {
 
             </div>
             <br />
-            <h3>
+            <h3 className="font-sans-lg">
               Generated reports (
               {scans.length}
               )
@@ -140,10 +140,10 @@ function SiteReports() {
                 {' '}
               </>
             </FilterIndicator>
-            <div className="table-container">
+            <div className="grid-col-12 table-container">
               <table
                 id="list"
-                className="usa-table-borderless log-table log-table__site-scans table-full-width"
+                className="usa-table usa-table--borderless usa-table--stacked log-table log-table__site-scans width-full table-full-width"
               >
                 <thead>
                   <tr>

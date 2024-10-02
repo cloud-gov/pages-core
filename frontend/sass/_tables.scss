@@ -1,15 +1,20 @@
-.usa-table-borderless {
-  thead {
-    background-color: $color-gray-lightest;
-  }
 
-  th:first-child {
-    padding-left: 1rem;
+#js-app .usa-table--borderless {
+  thead,
+  thead th {
+    // uswds blue-warm-5
+    background: #ecf1f7;
+  }
+  @media screen and (min-width:1152px) {
+
+    th:first-child {
+      padding-left: 1rem;
+    }
   }
 }
 
 .table-full-width.log-table {
-  font-size: 1.45rem;
+  font-size: 17px;
 
   pre {
     margin: 0;
@@ -18,11 +23,16 @@
     white-space: pre-wrap;
   }
 
+  thead th {
+    // uswds blue-warm-5
+    background: #ecf1f7;
+    padding: 1em;
+  }
 
   th, td {
     // min-width: 124px;
-    padding: 1.5rem 1rem;
-    line-height: 1.4em;    
+    padding: 1.25em 1em;
+    line-height: 1.4em;
     vertical-align: top;
   }
 
@@ -57,8 +67,8 @@
     line-height: 1.4em;
   }
   .status-info,
-  .scan-info,  
-  .build-info-details, 
+  .scan-info,
+  .build-info-details,
   .scan-status-details {
     p, h4 {
       font-size: 1em;
@@ -69,11 +79,11 @@
     h3 {
       display: flex;
       margin: 0 0;
-      font-size: 1.4em;
+      font-size: 1.2em;
       line-height: 1.4em;
     }
     .scan-info-name {
-      font-size: 1.3em;
+      font-size: 1.1em;
       font-weight: bold;
     }
     .scan-info-timestamp {
@@ -86,17 +96,18 @@
     margin: .5em 0 0;
     font-weight: normal;
   }
-  .scan-link, 
-  .repo-link, 
-  .view-site-link, 
+  .scan-link,
+  .repo-link,
+  .view-site-link,
   .result-link,
-  .branch-link, 
+  .branch-link,
   .commit-link {
     font-size: 1em;
     // font-weight: 600;
     white-space: nowrap;
     svg {
-      fill: $link-color;
+      color: currentColor;
+      fill: currentColor;
       width: 12px;
       height: auto;
       margin-right: .3em;
@@ -111,7 +122,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 30ch;
+    max-width: 40ch;
     line-height: 1.3em;
     margin: 0;
   }
@@ -122,7 +133,7 @@
       white-space: nowrap;
       font-weight: 600;
       margin-right: .5em;
-      max-width: 33%;
+      max-width: calc(100% - 8ch);
       display: inline-block;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -155,25 +166,17 @@
     padding: 0;
     margin: 0;
   }
-  
+
   a {
     margin: 0;
   }
-  form {
-    & + form {
-      margin-top: .5em;
-    }
-  }
-
   .small-button {
     padding: 0.4em 0.6em;
     font-size: 1.1em;
     border-radius: 4px;
     white-space: nowrap;
-  
     svg {
       fill: currentColor;
-      margin-right: .4em;
       height: 1em;
       width: auto;
       vertical-align: bottom;
@@ -181,7 +184,7 @@
         fill: currentColor
       }
     }
-    
+
   }
 
   & + p { margin-top: 1em;}
@@ -203,7 +206,7 @@
   }
   .scan-status-title {
     font-weight: 600;
-    font-size: 1.2em;
+    font-size: 1.1em;
     line-height: 1.4em;
     color: #112e51;
     margin: 0;
@@ -226,7 +229,7 @@
     grid-row-start:    2;
     grid-column-start: 2;
     p {
-      font-size: 1.45rem;
+      font-size: 1.2rem;
       margin: 0;
       white-space: initial;
       line-height: 1.4em;
@@ -234,10 +237,10 @@
   }
 
   td, tbody th {
-    padding: 2rem 1rem 1.5rem;
+    // padding: 2rem 1rem 1.5rem;
   }
   tbody th {
-    padding-top: 1.5rem;
+  // padding-top: 1.5rem;
   }
   .no-scan-results {
     height: 0;
@@ -246,7 +249,7 @@
       display: none;
     }
   }
-  @media screen and (min-width: 990px) {
+  @media screen and (min-width: 1152px) {
     .table-actions {
       text-align: right;
       .small-button {
@@ -260,7 +263,7 @@
       flex-direction: row;
       .status-info-title {
         margin-right: 0.75em;
-        line-height: 3rem;
+        line-height: 1.5rem;
         text-align: right;
         min-width: 7ch;
       }
@@ -268,7 +271,7 @@
     .build-info-details {
     }
     .build-info-prefix {
-      line-height: 3rem;
+      line-height: 1.5rem;
       text-align: right;
       min-width: 7ch;
     }
@@ -278,7 +281,7 @@
     }
   }
 
-  @media screen and (max-width: 990px) {
+  @media screen and (max-width: 1152px) {
     display: block;
     width: 100%;
 
@@ -294,6 +297,7 @@
         display: block;
         border: 1px solid rgb(104, 104, 104);
         position: relative;
+        margin-bottom: 1em;
       }
 
       td > *:first-child {
@@ -304,7 +308,7 @@
       }
 
       .branch-info {
-        margin: 1em 1.5em;         
+        margin: 1em 1.5em;
         max-width: fit-content;
       }
       .commit-info {
@@ -324,9 +328,11 @@
         }
 
         &::before {
-          background-color: #eef4fb;
+          // uswds blue-warm-5
+          background-color: #ecf1f7;
           padding: 1.5rem;
-          color: $color-blue-dark;
+          // uswds blue-70
+          color: #274863;
           content: attr(data-title);
           flex: none;
           font-weight: bold;
@@ -348,7 +354,7 @@
   width: 100%;
   td,
   th {
-    padding: 1rem;
+    // padding: 1rem;
   }
 }
 
@@ -361,11 +367,6 @@
   .scan-info h3 {
     margin: 0
   }
-  .artifact-filesize {
-    color: $color-gray-dark;
-    white-space: nowrap;
-  }
-  
 }
 .scan-config-table {
   margin-bottom: .5em;
@@ -419,11 +420,10 @@
     padding-left: 0;
   }
   td.has-button{
-    padding-right: 0;
-    padding-left: 0;
+    padding: 1em 0 0;
     width: 10ch;
     text-align: center;
-    vertical-align: middle;
+    vertical-align: top;
   }
   .button-delete {
     background-color: transparent;
@@ -432,7 +432,7 @@
   }
   .icon-delete {
     width: 1.25em;
-    color: #323a45; 
+    color: #323a45;
     &:active {
       color: #112e51;
     }
@@ -466,7 +466,7 @@
   max-width: 80%;
 }
 .site-reports-table h3 {
-  font-size: 1.4em;
+  font-size: 1.2em;
 }
 .site-reports-table p {
   font-size: 1em;

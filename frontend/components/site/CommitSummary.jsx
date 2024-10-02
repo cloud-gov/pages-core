@@ -15,7 +15,7 @@ function buildShaLink(owner, repo, sha) {
   const linkHref = `${baseHref}/commit/${sha}`;
   return (
     <a
-      className="sha-link"
+      className="sha-link font-mono-xs"
       href={linkHref}
       title={sha}
       target="_blank"
@@ -33,12 +33,12 @@ function CommitSummary({ buildDetails }) {
 
   return (
     <div className="commit-summary">
-      <h3 className="commit-branch">
-        <IconBranch />
+      <h3 className="commit-branch margin-bottom-1">
+        <IconBranch className="usa-icon text-bottom" />
         {' '}
         {buildDetails?.branch}
       </h3>
-      <p className="commit-details">
+      <p className="commit-details margin-top-1 margin-left-205">
         {buildShaLink(
           buildDetails?.site?.owner,
           buildDetails?.site?.repository,

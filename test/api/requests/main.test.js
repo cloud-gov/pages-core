@@ -32,7 +32,6 @@ describe('Main Site', () => {
         .expect(404);
 
       expect(/Log in with (Github|cloud\.gov)/.test(response.text)).to.be.true;
-      expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
     });
 
     it('should work when authenticated', async () => {
@@ -41,7 +40,7 @@ describe('Main Site', () => {
         .get('/blahblahpage')
         .set('Cookie', cookie)
         .expect(404);
-      expect(response.text.indexOf('404 / Page not found')).to.be.above(-1);
+      expect(response.text.indexOf('Can\'t find the page you\'re looking for?')).to.be.above(-1);
     });
   });
 
@@ -94,7 +93,7 @@ describe('Main Site', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          expect(response.text.indexOf('<div id="js-app" class="usa-grid"></div>')).to.be.above(-1);
+          expect(response.text.indexOf('<div id="js-app" class="padding-top-2"></div>')).to.be.above(-1);
           done();
         })
         .catch(done);
@@ -107,10 +106,10 @@ describe('Main Site', () => {
           .set('Cookie', cookie)
           .expect(200))
         .then((response) => {
-          const stylesBundleRe = /<link rel="stylesheet" href="\/dist\/styles\/styles\.css">/;
+          const stylesBundleRe = /<link rel="stylesheet" href="\/styles\.css">/;
           expect(response.text.search(stylesBundleRe)).to.be.above(-1);
 
-          const jsBundleRe = /<script src="\/dist\/js\/bundle\.js"><\/script>/;
+          const jsBundleRe = /<script src="\/js\/bundle\.js"><\/script>/;
 
           expect(response.text.search(jsBundleRe)).to.be.above(-1);
           done();
@@ -167,7 +166,7 @@ describe('Main Site', () => {
           .get('/sites')
           .set('Cookie', cookie))
           .then((response) => {
-            expect(response.text).to.match(/usa-alert-warning/);
+            expect(response.text).to.match(/usa-alert usa-alert--error/);
             expect(response.text).to.match(/Error message heading/);
             expect(response.text).to.match(/Error message body/);
             done();

@@ -24,42 +24,52 @@ const handleRemoveSite = (site, user, navigate) => (event) => {
 function SiteListItem({ organization, site, user }) {
   const navigate = useNavigate();
   return (
-    <li className="sites-list-item">
-      <div className="sites-list-item-text">
-        <h2 className="site-list-item-title">
-          {(!site.isActive || (organization && !organization.isActive))
-            ? `${getSiteName(site)} (Inactive)`
-            : (
-              <Link to={`/sites/${site.id}`} title="View site settings">
-                {getSiteName(site)}
-              </Link>
-            )}
-          {' '}
-        </h2>
-        {
-          organization && (
-            <h3>
-              {`organization - ${organization.name}`}
-            </h3>
-          )
-        }
-        <RepoLastVerified site={site} userUpdated={user.updatedAt} />
-        { organization?.isSandbox
+    <li className="usa-card tablet-lg:grid-col-6">
+      <div className="usa-card__container bg-base-lightest">
+        <div className="usa-card__header">
+          <h2 className="usa-card__heading text-normal">
+            {(!site.isActive || (organization && !organization.isActive))
+              ? `${getSiteName(site)} (Inactive)`
+              : (
+                <Link to={`/sites/${site.id}`} title="View site settings">
+                  {getSiteName(site)}
+                </Link>
+              )}
+            {' '}
+          </h2>
+        </div>
+        <div className="usa-card__body">
+          {
+            organization && (
+              <h3>
+                {`organization - ${organization.name}`}
+              </h3>
+            )
+          }
+          <RepoLastVerified site={site} userUpdated={user.updatedAt} />
+          { organization?.isSandbox
+              && (
+              <p>
+                <em>
+                  {sandboxMsg(organization.daysUntilSandboxCleaning, 'site')}
+                </em>
+              </p>
+              )}
+          <PublishedState site={site} />
+        </div>
+        <div className="usa-card__footer usa-button-group">
+          <div className="usa-button-group__item">
+            <GitHubLink text="View repo" owner={site.owner} repository={site.repository} isButton />
+          </div>
+          {
+            !organization
             && (
-            <p>
-              <em>
-                {sandboxMsg(organization.daysUntilSandboxCleaning, 'site')}
-              </em>
-            </p>
-            )}
-        <PublishedState site={site} />
-      </div>
-      <div className="sites-list-item-actions">
-        <GitHubLink text="View repo" owner={site.owner} repository={site.repository} />
-        {
-          !organization
-          && <ButtonLink clickHandler={handleRemoveSite(site, user, navigate)}>Remove</ButtonLink>
-        }
+            <div className="usa-button-group__item">
+              <ButtonLink className="usa-button--secondary" clickHandler={handleRemoveSite(site, user, navigate)}>Remove</ButtonLink>
+            </div>
+            )
+          }
+        </div>
       </div>
     </li>
   );

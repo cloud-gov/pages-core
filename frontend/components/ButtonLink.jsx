@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const ButtonLink = ({ clickHandler, children }) => (
+const ButtonLink = ({ clickHandler, children, className = 'usa-button--outline' }) => (
   <button
     type="button"
     onClick={clickHandler}
-    className="usa-button usa-button-secondary"
+    className={`usa-button ${className}`}
   >
     {children}
   </button>
@@ -14,6 +14,7 @@ const ButtonLink = ({ clickHandler, children }) => (
 ButtonLink.propTypes = {
   clickHandler: PropTypes.func.isRequired,
   children: PropTypes.node,
+  className: PropTypes.string,
 };
 
 ButtonLink.defaultProps = {

@@ -10,7 +10,7 @@
 </svelte:head>
 
 <div
-  class="usa-grid info-block usa-content padding-y-4 margin-y-4
+  class="grid-row info-block usa-content padding-y-4 margin-y-4
   desktop:padding-y-7 desktop:margin-y-7">
   <h1 class="text-primary-darker text-bold">{status} / {error.message}</h1>
   <p>

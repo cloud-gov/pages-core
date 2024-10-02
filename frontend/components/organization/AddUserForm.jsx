@@ -26,8 +26,8 @@ const AddUserForm = ({
   submitting,
 }) => (
   <form className={className} onSubmit={data => handleSubmit(data).then(reset)}>
-    <fieldset>
-      <legend className="sr-only">Add new organization member</legend>
+    <fieldset className="usa-fieldset">
+      <legend className="font-heading-md text-bold margin-bottom-2">Add new organization member</legend>
       <Field
         id="uaaEmail"
         name="uaaEmail"
@@ -48,21 +48,23 @@ const AddUserForm = ({
         validate={[validateRole]}
       />
     </fieldset>
-    <button
-      type="submit"
-      className="usa-button usa-button-primary"
-      disabled={pristine || invalid || submitting}
-    >
-      Invite
-    </button>
-    <button
-      type="button"
-      className="usa-button usa-button-secondary"
-      disabled={pristine || submitting}
-      onClick={reset}
-    >
-      Cancel
-    </button>
+    <div className="usa-button-group margin-y-3">
+      <button
+        type="submit"
+        className="usa-button usa-button--primary"
+        disabled={pristine || invalid || submitting}
+      >
+        Invite
+      </button>
+      <button
+        type="button"
+        className="usa-button usa-button--outline"
+        disabled={pristine || submitting}
+        onClick={reset}
+      >
+        Cancel
+      </button>
+    </div>
   </form>
 );
 

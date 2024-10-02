@@ -36,7 +36,7 @@ export function App(props) {
   }, [location.key]);
 
   return (
-    <div>
+    <div className="grid-container">
       <Notifications notifications={notifications} />
       <Outlet />
     </div>

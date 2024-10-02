@@ -46,7 +46,7 @@ function EditCustomDomain() {
 
   return (
     <>
-      <h2>Edit Custom Domain</h2>
+      <h2 className="font-sans-2xl">Edit Custom Domain</h2>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -57,7 +57,7 @@ function EditCustomDomain() {
         <div className="well">
           <div>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label htmlFor="domain-name">Domain Name</label>
+            <label className="usa-label font-sans-lg text-bold" htmlFor="domain-name">Domain Name</label>
             <p>
               Enter the custom domain name you will be launching.
               {' '}
@@ -99,7 +99,7 @@ function EditCustomDomain() {
           </div>
           <div>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label htmlFor="branch-context">Branch Context</label>
+            <label className="usa-label font-sans-lg text-bold" htmlFor="branch-context">Branch Context</label>
             <p>
               Select the site&apos;s branch context you will associate to the custom
               domain.
@@ -128,6 +128,7 @@ function EditCustomDomain() {
             <select
               id="branch-context"
               name="branch-context"
+              className="usa-select"
               value={domain.data.siteBranchConfigId}
               onChange={(event) => {
                 setDomainValues({
@@ -150,7 +151,8 @@ function EditCustomDomain() {
               ))}
             </select>
           </div>
-          <button type="submit" className="usa-button usa-button-primary">
+          <br />
+          <button type="submit" className="usa-button usa-button--primary">
             Update
           </button>
         </div>

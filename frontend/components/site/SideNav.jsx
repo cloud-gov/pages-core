@@ -5,17 +5,19 @@ import { Link } from 'react-router-dom';
 import * as icons from '../icons';
 
 const SideNav = ({ config, siteId }) => (
-  <div className="usa-width-one-sixth side-nav" role="navigation">
-    <ul className="usa-sidenav-list">
+  <div className="tablet:grid-col-3 desktop:grid-col-2  grid-col-12 side-nav margin-top-neg-2 padding-y-2 tablet:padding-y-4 bg-primary-lightest" role="navigation">
+    <ul className="usa-sidenav-list usa-list--unstyled">
       {
         config.map((conf) => {
           const IconComponent = icons[conf.icon];
           return (
-            <li key={conf.route}>
-              <Link to={`/sites/${siteId}/${conf.route}`}>
+            <li className="margin-y-2" key={conf.route}>
+              <Link className="display-flex flex-align-center" to={`/sites/${siteId}/${conf.route}`}>
                 <IconComponent />
                 {' '}
-                {conf.display}
+                <span className="flex-fill margin-left-1 text-no-underline">
+                  {conf.display}
+                </span>
               </Link>
             </li>
           );

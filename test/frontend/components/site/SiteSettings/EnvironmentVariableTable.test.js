@@ -56,7 +56,7 @@ describe('<EnvironmentVariableTable/>', () => {
 
       it('including a delete button that calls `onDelete` with the uev id', () => {
         const deleteButtons = wrapper.find('tbody tr').map(n => n.find('button').first());
-        expect(deleteButtons.map(deleteButton => deleteButton.text())).to.deep.eq(['X', 'X']);
+        expect(deleteButtons.map(deleteButton => deleteButton.text())).to.deep.eq(['Delete', 'Delete']);
 
         deleteButtons.forEach(deleteButton => deleteButton.simulate('click'));
 

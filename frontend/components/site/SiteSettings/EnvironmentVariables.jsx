@@ -80,8 +80,8 @@ class EnvironmentVariables extends Component {
     const showTable = !isLoading && data.length > 0;
 
     return (
-      <>
-        <h3>Environment Variables</h3>
+      <div className="grid-col-12">
+        <h3 className="font-heading-xl margin-top-4 margin-bottom-2">Environment Variables</h3>
         <div>
           <AlertBanner
             status="info"
@@ -113,7 +113,7 @@ class EnvironmentVariables extends Component {
               </>
             )}
         </div>
-      </>
+      </div>
     );
   }
 }

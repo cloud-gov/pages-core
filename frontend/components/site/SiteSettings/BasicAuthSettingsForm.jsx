@@ -10,7 +10,7 @@ export const BasicAuthSettingsForm = ({
   <form className="settings-form" onSubmit={data => handleSubmit(data)}>
     <h3>Basic Authentication Settings</h3>
     <div className="well">
-      <fieldset>
+      <fieldset className="usa-fieldset">
         <p className="well-text">
           To enable basic authentication, please submit a username and password
           credentials required to preview your site builds.
@@ -19,6 +19,7 @@ export const BasicAuthSettingsForm = ({
           name="username"
           type="text"
           label="Username:"
+          className="margin-bottom-2"
           component={InputWithErrorField}
           required
           validate={[validBasicAuthUsername]}
@@ -34,7 +35,7 @@ export const BasicAuthSettingsForm = ({
           id="basicAuthPasswordInput"
         />
       </fieldset>
-      <button type="submit" disabled={invalid || pristine || submitting}>
+      <button className="usa-button" type="submit" disabled={invalid || pristine || submitting}>
         Save
       </button>
     </div>

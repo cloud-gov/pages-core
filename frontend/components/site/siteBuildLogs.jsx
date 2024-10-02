@@ -52,7 +52,7 @@ const SiteBuildLogs = () => {
     <div>
       <CommitSummary buildDetails={buildDetails} />
       <div className="log-tools">
-        <ul className="usa-unstyled-list">
+        <ul className="usa-list--unstyled">
           <li>
             <DownloadBuildLogsButton buildId={buildId} buildLogsData={logs} />
           </li>

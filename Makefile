@@ -65,7 +65,7 @@ test-all: ## Run all tests
 	docker compose run --rm app yarn test
 
 everything: # When you switch to a new branch and need to rebuild everything
-	docker compose down
+	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml down
 	make rebuild
 	make install
 	make migrate

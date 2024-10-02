@@ -34,7 +34,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
   return (
     <>
       <div className="grid-row">
-        <h1 className="font-heading-xl grid-col padding-right-2">
+        <h1 className="font-serif-xl grid-col padding-right-2">
           Accessibility reports for
           {' '}
           <br />
@@ -79,7 +79,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h2 className="font-heading-xl grid-col padding-right-2 margin-bottom-0 padding-top-2 margin-top-2">
+          <h2 className="font-serif-xl grid-col padding-right-2 margin-bottom-0 padding-top-2 margin-top-2">
             All results
             {' '}
             <span className="font-body-lg text-secondary-vivid">
@@ -101,8 +101,8 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h2 className="font-heading-xl grid-col padding-right-2 margin-bottom-0 margin-top-1">
-            All pages
+          <h2 className="font-serif-xl grid-col padding-right-2 margin-bottom-0 margin-top-1">
+            All reports
             {' '}
             <span className="font-body-lg text-accent-cool-darker">
               (

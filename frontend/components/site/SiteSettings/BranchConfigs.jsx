@@ -32,8 +32,8 @@ function BranchConfigs({ siteId, hash }) {
   const hashContext = getHashContext(hash);
 
   return (
-    <div>
-      <h3>Branch Configurations</h3>
+    <div className="grid-col-12">
+      <h3 className="font-heading-xl margin-top-0 margin-bottom-2">Branch Configurations</h3>
       {configs.error && (
         <div className="well">
           <h4>

@@ -47,31 +47,33 @@ function SiteSettings() {
   };
 
   return (
-    <div>
-      <p>
-        See our documentation site for more about
-        {' '}
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          title={`${globals.APP_NAME} documentation on settings`}
-          href="https://cloud.gov/pages/documentation/#managing-site-settings"
-        >
-          these settings
-        </a>
-        {' '}
-        or
-        {' '}
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          title={`${globals.APP_NAME} documentation on previews`}
-          href="https://cloud.gov/pages/documentation/previews/"
-        >
-          viewing site previews
-        </a>
-        .
-      </p>
+    <div className="grid-row">
+      <div className="grid-col-12">
+        <p className="font-body-sm line-height-sans-4 measure-6 margin-bottom-4">
+          See our documentation site for more about
+          {' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`${globals.APP_NAME} documentation on settings`}
+            href="https://cloud.gov/pages/documentation/#managing-site-settings"
+          >
+            these settings
+          </a>
+          {' '}
+          or
+          {' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`${globals.APP_NAME} documentation on previews`}
+            href="https://cloud.gov/pages/documentation/previews/"
+          >
+            viewing site previews
+          </a>
+          .
+        </p>
+      </div>
       <BranchConfigs siteId={site.id} hash={hash} />
       <AdvancedSiteSettings
         initialValues={advancedInitialValues}

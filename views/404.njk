@@ -1,11 +1,38 @@
-
 {% extends "base.njk" %}
-
 {% block main_content %}
-  <div class="usa-grid info-block usa-content">
-    <h1>404 / Page not found</h1>
-    <p>
-        You might want to double-check your link and try again, or return to the <a href="/">homepage<a/>.
-    </p>
+  <div class="usa-section">
+    <div class="grid-container">
+      <div class="grid-row grid-gap">
+        <main class="usa-prose">
+          <h1>🤔 Page not found</h1>
+          <p class="usa-intro">
+            Can't find the page you're looking for?
+          </p>
+          {% if isAuthenticated %}
+            <p>
+              Navigate to your sites so you can hopefully go in the right
+              direction. 👇
+            </p>
+          {% else %}
+            <p>
+              Go login to your Pages account first. Then you can try the link again. 👇
+            </p>
+          {% endif %}
+          <div class="margin-y-5">
+            <ul class="usa-button-group">
+              {% if isAuthenticated %}
+                <li class="usa-button-group__item">
+                  <a href="/sites" class="usa-button">Go to your sites</a>
+                </li>
+              {% else %}
+                <li class="usa-button-group__item">
+                  <a href="/login" class="usa-button">Login</a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </main>
+    </div>
   </div>
+</div>
 {% endblock %}

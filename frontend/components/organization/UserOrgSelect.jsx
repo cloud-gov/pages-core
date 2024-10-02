@@ -27,14 +27,15 @@ const UserOrgSelect = ({
   orgData,
   value,
 }) => (
-  <div className={touched && error ? 'usa-input-error' : ''}>
+  <div>
     {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-    <label htmlFor={name}>{label}</label>
-    {touched && (error && <span className="usa-input-error-message">{error}</span>)}
+    <label htmlFor={name} className="usa-label text-bold">{label}</label>
+    {touched && (error && <span className="usa-error-message">{error}</span>)}
     <select
-      {...{ name, id, className }}
+      {...{ name, id }}
       value={value}
       onChange={onChange}
+      className={`usa-select ${touched && error ? 'usa-select--error' : ''} ${className}`}
     >
       {
         mustChooseOption ? (
@@ -71,7 +72,7 @@ UserOrgSelect.propTypes = {
 };
 
 UserOrgSelect.defaultProps = {
-  className: 'form-control',
+  className: null,
   label: 'Select the site\'s organization',
   touched: false,
   error: null,

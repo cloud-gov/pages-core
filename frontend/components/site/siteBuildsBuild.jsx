@@ -210,7 +210,7 @@ export const SiteBuildsBuild = ({
           )}
           {isScannableBuild && (
             <CreateScanLink
-              className="usa-button usa-button-secondary small-button"
+              className="usa-button usa-button-secondary small-button margin-top-0"
               isDisabled={isScanActionDisabled}
               handleClick={() => startScan(build.id)}
             >
@@ -244,7 +244,7 @@ export const SiteBuildsBuild = ({
           <CreateBuildLink
             handlerParams={{ buildId: build.id, siteId }}
             handleClick={buildActions.restartBuild}
-            className="usa-button small-button rebuild-button"
+            className="usa-button small-button margin-top-1 rebuild-button"
           >
             Rebuild
           </CreateBuildLink>

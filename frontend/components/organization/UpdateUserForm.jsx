@@ -23,7 +23,7 @@ const UpdateUserForm = ({
     onSubmit={handleSubmit}
     className="update-user-form"
   >
-    <fieldset>
+    <fieldset className="usa-fieldset margin-right-1 display-inline">
       <legend className="usa-sr-only">Update user role</legend>
       <Field
         id="roleId"
@@ -35,7 +35,7 @@ const UpdateUserForm = ({
     </fieldset>
     <button
       type="submit"
-      className="usa-button usa-button-primary margin-0"
+      className="usa-button usa-button--primary margin-0"
       disabled={pristine || invalid || submitting}
     >
       Update
