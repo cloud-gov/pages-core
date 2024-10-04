@@ -4,15 +4,15 @@ import { connect } from 'react-redux';
 import { error, success } from 'react-notification-system-redux';
 import { SubmissionError } from 'redux-form';
 
-import { ORGANIZATION, SITE, USER } from '../../propTypes';
-import { userSettingsUpdated } from '../../actions/actionCreators/userActions';
-import federalistApi from '../../util/federalistApi';
-import LoadingIndicator from '../LoadingIndicator';
-import SettingsForm from './SettingsForm';
-import GithubAuthButton from '../GithubAuthButton';
-import userActions from '../../actions/userActions';
-import alertActions from '../../actions/alertActions';
-import notificationActions from '../../actions/notificationActions';
+import { ORGANIZATION, SITE, USER } from '../propTypes';
+import { userSettingsUpdated } from '../actions/actionCreators/userActions';
+import federalistApi from '../util/federalistApi';
+import LoadingIndicator from '../components/LoadingIndicator';
+import SettingsForm from '../components/user/SettingsForm';
+import GithubAuthButton from '../components/GithubAuthButton';
+import userActions from '../actions/userActions';
+import alertActions from '../actions/alertActions';
+import notificationActions from '../actions/notificationActions';
 
 function buildInitialValues(sites, user) {
   return {

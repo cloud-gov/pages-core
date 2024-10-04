@@ -4,14 +4,14 @@ import { success } from 'react-notification-system-redux';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import federalistApi from '../../util/federalistApi';
-import LoadingIndicator from '../LoadingIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator';
 import AddUserForm from './AddUserForm';
 import RemoveUserForm from './RemoveUserForm';
 import ResendInviteForm from './ResendInviteForm';
 import UpdateUserForm from './UpdateUserForm';
 import { timeFrom } from '../../util/datetime';
 import { sandboxMsg } from '../../util';
-import AlertBanner from '../alertBanner';
+import AlertBanner from '../../components/alertBanner';
 
 function successNotification(message) {
   return success({

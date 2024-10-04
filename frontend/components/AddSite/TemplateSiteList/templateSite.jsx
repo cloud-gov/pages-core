@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { ORGANIZATIONS } from '../../../propTypes';
 import { hasOrgs } from '../../../selectors/organization';
 import { getSafeRepoName } from '../../../util';
-import UserOrgSelect from '../../organization/UserOrgSelect';
+import UserOrgSelect from '../../organizations/UserOrgSelect';
 
 class TemplateSite extends React.Component {
   constructor(props) {

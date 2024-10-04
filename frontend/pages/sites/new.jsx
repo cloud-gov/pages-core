@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import TemplateSiteList from './TemplateSiteList';
-import AddRepoSiteForm from './AddRepoSiteForm';
-import AlertBanner from '../alertBanner';
-import LoadingIndicator from '../LoadingIndicator';
+import TemplateSiteList from '../AddSite/TemplateSiteList';
+import AddRepoSiteForm from '../AddSite/AddRepoSiteForm';
+import AlertBanner from '../../components/alertBanner';
+import LoadingIndicator from '../../components/LoadingIndicator';
 import globals from '../../globals';
 import siteActions from '../../actions/siteActions';
 import addNewSiteFieldsActions from '../../actions/addNewSiteFieldsActions';

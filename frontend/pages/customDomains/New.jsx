@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useSiteDomain } from '../../../hooks';
-import AlertBanner from '../../alertBanner';
+import { useSiteDomain } from '../../hooks';
+import AlertBanner from '../../components/alertBanner';
 
 const infoContent = (
   <>

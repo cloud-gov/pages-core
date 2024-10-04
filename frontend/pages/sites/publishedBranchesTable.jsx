@@ -4,10 +4,10 @@ import { Link, useParams } from 'react-router-dom';
 
 import publishedBranchActions from '../../actions/publishedBranchActions';
 import { currentSite } from '../../selectors/site';
-import LoadingIndicator from '../LoadingIndicator';
-import BranchViewLink from '../branchViewLink';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import BranchViewLink from '../../components/branchViewLink';
 import globals from '../../globals';
-import AlertBanner from '../alertBanner';
+import AlertBanner from '../../components/alertBanner';
 
 function renderBranchFilesLink(branch) {
   const href = `/sites/${branch.site.id}/published/${branch.name}`;
@@ -57,7 +57,7 @@ function renderPublishedBranchesTable(data, site) {
   );
 }
 
-function SitePublishedBranchesTable() {
+function PublishedBranchesTable() {
   const { id } = useParams();
   const site = useSelector(state => currentSite(state.sites, id));
   const publishedBranches = useSelector(state => state.publishedBranches);
@@ -82,5 +82,5 @@ function SitePublishedBranchesTable() {
   return renderPublishedBranchesTable(publishedBranches.data, site);
 }
 
-export { SitePublishedBranchesTable };
-export default SitePublishedBranchesTable;
+export { PublishedBranchesTable };
+export default PublishedBranchesTable;

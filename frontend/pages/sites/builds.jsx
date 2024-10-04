@@ -4,9 +4,9 @@ import { useParams, Link } from 'react-router-dom';
 
 import buildActions from '../../actions/buildActions';
 import { currentSite } from '../../selectors/site';
-import SiteBuildsBuild from './siteBuildsBuild';
+import SiteBuildsBuild from '../../components/site/siteBuildsBuild';
 
-import AlertBanner from '../alertBanner';
+import AlertBanner from '../../components/alertBanner';
 
 import { getOrgById } from '../../selectors/organization';
 import { sandboxMsg } from '../../util';
@@ -40,7 +40,7 @@ function siteHasBuildTasks(SiteBuildTasks = []) {
   return SiteBuildTasks.length > 0;
 }
 
-function SiteBuilds() {
+function Builds() {
   const { id } = useParams();
   const site = useSelector(state => currentSite(state.sites, id));
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId)
@@ -136,5 +136,5 @@ function SiteBuilds() {
   );
 }
 
-export { SiteBuilds };
-export default SiteBuilds;
+export { Builds };
+export default Builds;

@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 
 import publishedFileActions from '../../actions/publishedFileActions';
 import globals from '../../globals';
-import LoadingIndicator from '../LoadingIndicator';
-import AlertBanner from '../alertBanner';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import AlertBanner from '../../components/alertBanner';
 
 function renderPagingButtons(currentPage, lastPage, setCurrentPage) {
   const shouldDisableNextPage = currentPage === lastPage;
@@ -99,7 +99,7 @@ function renderPublishedFilesTable(files, name, currentPage, lastPage, setCurren
   );
 }
 
-function SitePublishedFilesTable() {
+function PublishedFilesTable() {
   const { id, name } = useParams();
   const publishedFiles = useSelector(state => state.publishedFiles);
 
@@ -146,5 +146,5 @@ function SitePublishedFilesTable() {
   );
 }
 
-export { SitePublishedFilesTable };
-export default SitePublishedFilesTable;
+export { PublishedFilesTable };
+export default PublishedFilesTable;

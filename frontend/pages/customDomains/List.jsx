@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { currentSite } from '../../../selectors/site';
-import UsaIcon from '../../UsaIcon';
-import { useSiteDomains } from '../../../hooks';
-import { capitalize } from '../../../util';
+import { currentSite } from '../../selectors/site';
+import UsaIcon from '../../components/UsaIcon';
+import { useSiteDomains } from '../../hooks';
+import { capitalize } from '../../util';
 
 function ListRow({ children, justify = 'flex-start', ...props }) {
   return (
@@ -217,7 +217,7 @@ Domains.propTypes = {
   siteId: PropTypes.number.isRequired,
 };
 
-function CustomDomains() {
+function DomainList() {
   const { id } = useParams();
   const { domains, deleteSiteDomain } = useSiteDomains(id);
   const site = useSelector(state => currentSite(state.sites, id));
@@ -254,5 +254,5 @@ function CustomDomains() {
   );
 }
 
-export { CustomDomains };
-export default CustomDomains;
+export { DomainList };
+export default DomainList;

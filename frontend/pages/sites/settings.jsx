@@ -4,15 +4,15 @@ import {
   useParams, useNavigate, useLocation,
 } from 'react-router-dom';
 
-import BranchConfigs from './BranchConfigs';
-import ReportConfigs from './ReportConfigs';
-import AdvancedSiteSettings from './AdvancedSiteSettings';
-import EnvironmentVariables from './EnvironmentVariables';
-import siteActions from '../../../actions/siteActions';
-import { currentSite } from '../../../selectors/site';
-import globals from '../../../globals';
+import BranchConfigs from '../../components/site/SiteSettings/BranchConfigs';
+import ReportConfigs from '../../components/site/SiteSettings/ReportConfigs';
+import AdvancedSiteSettings from '../../components/site/SiteSettings/AdvancedSiteSettings';
+import EnvironmentVariables from '../../components/site/SiteSettings/EnvironmentVariables';
+import siteActions from '../../actions/siteActions';
+import { currentSite } from '../../selectors/site';
+import globals from '../../globals';
 
-function SiteSettings() {
+function Settings() {
   const { id } = useParams();
   const { hash } = useLocation();
   const site = useSelector(state => currentSite(state.sites, id));
@@ -89,5 +89,5 @@ function SiteSettings() {
   );
 }
 
-export { SiteSettings };
-export default SiteSettings;
+export { Settings };
+export default Settings;

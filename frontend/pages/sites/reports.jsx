@@ -9,25 +9,25 @@ import {
   dateOnly,
 } from '../../util/datetime';
 
-import LoadingIndicator from '../LoadingIndicator';
-import GithubBuildBranchLink from '../GithubBuildBranchLink';
-import GithubBuildShaLink from '../GithubBuildShaLink';
-import AlertBanner from '../alertBanner';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import GithubBuildBranchLink from '../../components/GithubBuildBranchLink';
+import GithubBuildShaLink from '../../components/GithubBuildShaLink';
+import AlertBanner from '../../components/alertBanner';
 
 import { useSiteBuildTasks } from '../../hooks/useSiteBuildTasks';
 import { useBuildTasksForSite } from '../../hooks/useBuildTasksForSite';
 import { currentSite } from '../../selectors/site';
 import { getOrgById } from '../../selectors/organization';
-import ReportResultsSummary from '../ReportResultsSummary';
-import FilterIndicator from '../FilterIndicator';
-import ExpandableArea from '../ExpandableArea';
-import { IconX } from '../icons';
+import ReportResultsSummary from '../../components/ReportResultsSummary';
+import FilterIndicator from '../../components/FilterIndicator';
+import ExpandableArea from '../../components/ExpandableArea';
+import { IconX } from '../../components/icons';
 
 const {
   setDate, isBefore, startOfToday, addMonths,
 } = require('date-fns');
 
-function SiteReports() {
+function Reports() {
   const { id } = useParams();
   const site = useSelector(state => currentSite(state.sites, id));
   const organization = useSelector(state => getOrgById(state.organizations, site.organizationId));
@@ -259,5 +259,5 @@ function SiteReports() {
   );
 }
 
-export { SiteReports };
-export default SiteReports;
+export { Reports };
+export default Reports;

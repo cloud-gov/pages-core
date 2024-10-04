@@ -4,13 +4,13 @@ import {
   useParams, useLocation, useSearchParams, Outlet,
 } from 'react-router-dom';
 
-import { ALERT } from '../propTypes';
-import { currentSite } from '../selectors/site';
-import { getOrgById } from '../selectors/organization';
-import SideNav from './site/SideNav';
-import PagesHeader from './site/PagesHeader';
-import AlertBanner from './alertBanner';
-import LoadingIndicator from './LoadingIndicator';
+import { ALERT } from '../../propTypes';
+import { currentSite } from '../../selectors/site';
+import { getOrgById } from '../../selectors/organization';
+import SideNav from '../../components/site/SideNav';
+import PagesHeader from '../../components/site/PagesHeader';
+import AlertBanner from '../../components/alertBanner';
+import LoadingIndicator from '../../components/LoadingIndicator';
 
 export const SITE_NAVIGATION_CONFIG = [
   {

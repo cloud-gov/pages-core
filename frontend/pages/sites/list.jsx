@@ -8,12 +8,12 @@ import {
 } from '../../propTypes';
 import { getOrgById, orgFilterOptions, hasOrgs } from '../../selectors/organization';
 import { groupSitesByOrg } from '../../selectors/site';
-import AlertBanner from '../alertBanner';
-import UserOrgSelect from '../organization/UserOrgSelect';
-import SiteListItem from './siteListItem';
-import LoadingIndicator from '../LoadingIndicator';
-import GithubAuthButton from '../GithubAuthButton';
-import UsaIcon from '../UsaIcon';
+import AlertBanner from '../../components/alertBanner';
+import UserOrgSelect from '../organizations/UserOrgSelect';
+import SiteListItem from '../../components/siteList/siteListItem';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import GithubAuthButton from '../../components/GithubAuthButton';
+import UsaIcon from '../../components/UsaIcon';
 import alertActions from '../../actions/alertActions';
 import userActions from '../../actions/userActions';
 
@@ -67,7 +67,7 @@ const getSites = (organizations, sites, user) => {
   );
 };
 
-export const SiteList = ({
+export const List = ({
   organizations, sites, user, alert,
 }) => {
   const [orgFilterValue, setOrgFilterValue] = useState('all-options');
@@ -138,7 +138,7 @@ export const SiteList = ({
   );
 };
 
-SiteList.propTypes = {
+List.propTypes = {
   alert: ALERT,
   organizations: ORGANIZATIONS.isRequired,
   sites: PropTypes.shape({
@@ -148,7 +148,7 @@ SiteList.propTypes = {
   user: USER.isRequired,
 };
 
-SiteList.defaultProps = {
+List.defaultProps = {
   alert: null,
   sites: null,
 };
@@ -162,4 +162,4 @@ const mapStateToProps = ({
   user: user.data,
 });
 
-export default connect(mapStateToProps)(SiteList);
+export default connect(mapStateToProps)(List);
