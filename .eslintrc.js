@@ -60,6 +60,7 @@ const overrides = [
 
 module.exports = {
   overrides,
+  plugins: ['import'],
   extends: [
     'airbnb',
     'plugin:sonarjs/recommended',
@@ -68,5 +69,10 @@ module.exports = {
   rules: finalRules,
   parserOptions: {
     ecmaVersion: 2021,
+  },
+  settings: {
+    'import/resolver': {
+      webpack: {}
+    },
   },
 };
