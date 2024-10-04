@@ -9,7 +9,7 @@ import {
 import { getOrgById, orgFilterOptions, hasOrgs } from '../../selectors/organization';
 import { groupSitesByOrg } from '../../selectors/site';
 import AlertBanner from '../../components/alertBanner';
-import UserOrgSelect from '../organizations/UserOrgSelect';
+import UserOrgSelect from '../../components/organizations/UserOrgSelect';
 import SiteListItem from '../../components/siteList/siteListItem';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import GithubAuthButton from '../../components/GithubAuthButton';

@@ -5,7 +5,7 @@ import { Field, reduxForm } from 'redux-form';
 import globals from '../../globals';
 import { ORGANIZATIONS } from '../../propTypes';
 import GitHubRepoUrlField from '../Fields/GitHubRepoUrlField';
-import UserOrgSelect from '../../pages/organizations/UserOrgSelect';
+import UserOrgSelect from '../organizations/UserOrgSelect';
 import SelectSiteEngine from '../SelectSiteEngine';
 import AlertBanner from '../alertBanner';
 import { validAddRepoSiteForm } from '../../util/validators';

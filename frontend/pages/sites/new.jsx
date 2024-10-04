@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import TemplateSiteList from '../AddSite/TemplateSiteList';
-import AddRepoSiteForm from '../AddSite/AddRepoSiteForm';
+import TemplateSiteList from '../../components/AddSite/TemplateSiteList';
+import AddRepoSiteForm from '../../components/AddSite/AddRepoSiteForm';
 import AlertBanner from '../../components/alertBanner';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import globals from '../../globals';
