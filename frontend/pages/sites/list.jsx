@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import {
-  SITE, ALERT, USER, ORGANIZATIONS,
-} from '../../propTypes';
 import { getOrgById, orgFilterOptions, hasOrgs } from '../../selectors/organization';
 import { groupSitesByOrg } from '../../selectors/site';
 import AlertBanner from '../../components/alertBanner';
@@ -67,9 +63,12 @@ const getSites = (organizations, sites, user) => {
   );
 };
 
-export const List = ({
-  organizations, sites, user, alert,
-}) => {
+export const List = () => {
+  const alert = useSelector(state => state.alert);
+  const organizations = useSelector(state => state.organizations);
+  const sites = useSelector(state => state.sites);
+  const user = useSelector(state => state.user.data);
+
   const [orgFilterValue, setOrgFilterValue] = useState('all-options');
   const groupedSites = groupSitesByOrg(sites, orgFilterValue);
 
@@ -138,28 +137,4 @@ export const List = ({
   );
 };
 
-List.propTypes = {
-  alert: ALERT,
-  organizations: ORGANIZATIONS.isRequired,
-  sites: PropTypes.shape({
-    data: PropTypes.arrayOf(SITE),
-    isLoading: PropTypes.bool,
-  }),
-  user: USER.isRequired,
-};
-
-List.defaultProps = {
-  alert: null,
-  sites: null,
-};
-
-const mapStateToProps = ({
-  alert, organizations, sites, user,
-}) => ({
-  alert,
-  organizations,
-  sites,
-  user: user.data,
-});
-
-export default connect(mapStateToProps)(List);
+export default List;

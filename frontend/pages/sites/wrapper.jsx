@@ -63,13 +63,13 @@ function getPageTitle(pathname, buildId = null) {
   }
   return '';
 }
-export function SiteContainer(props) {
+export function SiteContainer() {
   const { id, buildId } = useParams();
   const location = useLocation();
   const params = useSearchParams();
   const sites = useSelector(state => state.sites);
   const organizations = useSelector(state => state.organizations);
-  const { alert } = props;
+  const alert = useSelector(state => state.alert);
 
   if (sites.isLoading || !sites.data) {
     return <LoadingIndicator />;
@@ -164,10 +164,6 @@ export function SiteContainer(props) {
 
 SiteContainer.propTypes = {
   alert: ALERT,
-};
-
-SiteContainer.defaultProps = {
-  alert: {},
 };
 
 export default SiteContainer;

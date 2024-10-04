@@ -1,10 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { error, success } from 'react-notification-system-redux';
 import { SubmissionError } from 'redux-form';
 
-import { ORGANIZATION, SITE, USER } from '../propTypes';
 import { userSettingsUpdated } from '../actions/actionCreators/userActions';
 import federalistApi from '../util/federalistApi';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -36,20 +34,22 @@ const onGithubAuthFailure = (_error) => {
   alertActions.alertError(_error.message);
 };
 
-function Settings({
-  actions, organizations, sites, user,
-}) {
+function Settings() {
+  const organizations = useSelector(state => state.organizations);
+  const sites = useSelector(state => state.sites);
+  const user = useSelector(state => state.user.data);
+
   if (sites?.isLoading || organizations?.isLoading || !sites || !sites.data || !organizations) {
     return <LoadingIndicator />;
   }
 
   const initialValues = buildInitialValues(sites.data, user);
 
-  const onSubmit = userSettings => actions.updateUserSettings(userSettings)
+  const onSubmit = userSettings => federalistApi.updateUserSettings(userSettings)
     .catch((e) => { throw new SubmissionError({ _error: e.message }); });
 
   const onSubmitFail = (err, dispatch) => {
-    dispatch(actions.error({
+    dispatch(error({
       message: 'Failed to update settings.',
       title: 'Error',
       position: 'tr',
@@ -58,8 +58,8 @@ function Settings({
   };
 
   const onSubmitSuccess = (updatedUser, dispatch) => {
-    dispatch(actions.userSettingsUpdated(updatedUser));
-    dispatch(actions.success({
+    dispatch(userSettingsUpdated(updatedUser));
+    dispatch(success({
       message: 'Successfully updated settings.',
       title: 'Success',
       position: 'tr',
@@ -112,40 +112,5 @@ function Settings({
   );
 }
 
-Settings.propTypes = {
-  actions: PropTypes.shape({
-    error: PropTypes.func.isRequired,
-    success: PropTypes.func.isRequired,
-    updateUserSettings: PropTypes.func.isRequired,
-    userSettingsUpdated: PropTypes.func.isRequired,
-  }),
-  organizations: PropTypes.shape({
-    data: PropTypes.arrayOf(ORGANIZATION),
-    isLoading: PropTypes.bool,
-  }),
-  sites: PropTypes.shape({
-    data: PropTypes.arrayOf(SITE),
-    isLoading: PropTypes.bool,
-  }),
-  user: USER.isRequired,
-};
-
-Settings.defaultProps = {
-  actions: {
-    error,
-    success,
-    updateUserSettings: federalistApi.updateUserSettings,
-    userSettingsUpdated,
-  },
-  organizations: null,
-  sites: null,
-};
-
-const mapStateToProps = ({ organizations, sites, user }) => ({
-  organizations,
-  sites,
-  user: user.data,
-});
-
 export { buildInitialValues, Settings, SettingsForm };
-export default connect(mapStateToProps)(Settings);
+export default Settings;
