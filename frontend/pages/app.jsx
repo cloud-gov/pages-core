@@ -4,8 +4,8 @@ import Notifications from 'react-notification-system-redux';
 import { useSelector } from 'react-redux';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import alertActions from '../actions/alertActions';
-import BuildStatusNotifier from '../util/buildStatusNotifier';
+import alertActions from '@actions/alertActions';
+import BuildStatusNotifier from '@util/buildStatusNotifier';
 
 function shouldClearAlert(alert) {
   if (alert.stale) {

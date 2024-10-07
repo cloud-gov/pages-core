@@ -3,11 +3,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useBuildLogs, useBuildDetails } from '../../hooks';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import SiteBuildLogTable from '../../components/site/siteBuildLogTable';
-import DownloadBuildLogsButton from '../../components/site/downloadBuildLogsButton';
-import CommitSummary from '../../components/site/CommitSummary';
+import { useBuildLogs, useBuildDetails } from '@hooks';
+import LoadingIndicator from '@components/LoadingIndicator';
+import SiteBuildLogTable from '@components/site/siteBuildLogTable';
+import DownloadBuildLogsButton from '@components/site/downloadBuildLogsButton';
+import CommitSummary from '@components/site/CommitSummary';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 const BUILD_LOG_RETENTION_LIMIT = 180 * 24 * 60 * 60 * 1000; // 180 days in milliseconds

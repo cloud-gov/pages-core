@@ -2,12 +2,13 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 
-import publishedBranchActions from '../../actions/publishedBranchActions';
-import { currentSite } from '../../selectors/site';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import BranchViewLink from '../../components/branchViewLink';
+import publishedBranchActions from '@actions/publishedBranchActions';
+import { currentSite } from '@selectors/site';
+import LoadingIndicator from '@components/LoadingIndicator';
+import BranchViewLink from '@components/branchViewLink';
+import AlertBanner from '@components/alertBanner';
+
 import globals from '../../globals';
-import AlertBanner from '../../components/alertBanner';
 
 function renderBranchFilesLink(branch) {
   const href = `/sites/${branch.site.id}/published/${branch.name}`;

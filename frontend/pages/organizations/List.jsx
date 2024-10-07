@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import federalistApi from '../../util/federalistApi';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import { sandboxMsg } from '../../util';
+import federalistApi from '@util/federalistApi';
+import LoadingIndicator from '@components/LoadingIndicator';
+import { sandboxMsg } from '@util';
 
 function List({ actions }) {
   const [{ isLoading, orgRoles }, setState] = useState({

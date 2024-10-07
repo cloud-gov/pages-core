@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import { getOrgById, orgFilterOptions, hasOrgs } from '../../selectors/organization';
-import { groupSitesByOrg } from '../../selectors/site';
-import AlertBanner from '../../components/alertBanner';
-import UserOrgSelect from '../../components/organizations/UserOrgSelect';
-import SiteListItem from '../../components/siteList/siteListItem';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import GithubAuthButton from '../../components/GithubAuthButton';
-import UsaIcon from '../../components/UsaIcon';
-import alertActions from '../../actions/alertActions';
-import userActions from '../../actions/userActions';
+import { getOrgById, orgFilterOptions, hasOrgs } from '@selectors/organization';
+import { groupSitesByOrg } from '@selectors/site';
+import AlertBanner from '@components/alertBanner';
+import UserOrgSelect from '@components/organizations/UserOrgSelect';
+import SiteListItem from '@components/siteList/siteListItem';
+import LoadingIndicator from '@components/LoadingIndicator';
+import GithubAuthButton from '@components/GithubAuthButton';
+import UsaIcon from '@components/UsaIcon';
+import alertActions from '@actions/alertActions';
+import userActions from '@actions/userActions';
 
 const onGithubAuthSuccess = () => {
   userActions.fetchUser();

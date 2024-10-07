@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import publishedFileActions from '../../actions/publishedFileActions';
+import publishedFileActions from '@actions/publishedFileActions';
+import LoadingIndicator from '@components/LoadingIndicator';
+import AlertBanner from '@components/alertBanner';
+
 import globals from '../../globals';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import AlertBanner from '../../components/alertBanner';
 
 function renderPagingButtons(currentPage, lastPage, setCurrentPage) {
   const shouldDisableNextPage = currentPage === lastPage;
