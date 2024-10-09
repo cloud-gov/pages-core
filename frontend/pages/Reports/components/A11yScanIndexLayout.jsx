@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import * as utils from '../../util/reports';
-import * as datetime from '../../util/datetime';
+import * as utils from '@util/reports';
+import * as datetime from '@util/datetime';
 
 import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 import ScanFindingsSummary from './ScanFindingsSummary';

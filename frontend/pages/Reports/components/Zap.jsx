@@ -2,18 +2,19 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
+import { severity, plural, getSeverityThemeToken } from '@util/reports';
+
 import About from './about';
 import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
-import * as utils from '../../util/reports';
 
 export default function Zap({ data, buildId, siteId }) {
   const scanTitle = 'Vulnerability';
   const pageTitle = `Pages | ${scanTitle} report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
 
-  const navGroups = [...utils.severity.zap].map(group => ({
+  const navGroups = [...severity.zap].map(group => ({
     ...group,
     usePill: true,
     count: data.site.groupedAlerts[group?.riskCode]?.length || 0,
@@ -34,7 +35,7 @@ export default function Zap({ data, buildId, siteId }) {
   const summarizedResults = [...data.site.alerts].map(result => ({
     ...result,
     anchor: result.alertRef,
-    severity: utils.getSeverityThemeToken(result.riskcode, 'zap'),
+    severity: getSeverityThemeToken(result.riskcode, 'zap'),
     count: result.instances.length,
   }));
 
@@ -97,7 +98,7 @@ export default function Zap({ data, buildId, siteId }) {
                     <>
                       We’ve found
                       <b>
-                        {` ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')} in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')} `}
+                        {` ${unsuppressed.length} ${plural(unsuppressed.length, 'unsuppressed result')} in ${unsuppressedLocationCount} ${plural(unsuppressedLocationCount, 'place')} `}
                       </b>
                       across this site.
                     </>
@@ -106,7 +107,7 @@ export default function Zap({ data, buildId, siteId }) {
                     <>
                       We’ve found
                       <b>
-                        {` ${summarizedResults.length} ${utils.plural(summarizedResults.length, 'suppressed or informational result')} `}
+                        {` ${summarizedResults.length} ${plural(summarizedResults.length, 'suppressed or informational result')} `}
                       </b>
                       for this site.
                     </>

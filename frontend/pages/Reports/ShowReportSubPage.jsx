@@ -1,10 +1,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import A11yScanChild from '@shared/Reports/A11yScanChildLayout';
-import ReportLoading from '@shared/Reports/Loading';
-import ReportNotFound from '@shared/Reports/ReportNotFound';
 import { useReportData } from '@hooks/useReportData';
+
+import A11yScanChild from './components/A11yScanChildLayout';
+import ReportLoading from './components/Loading';
+import ReportNotFound from './components/ReportNotFound';
 
 export default function Report() {
   const { id, subpage } = useParams();

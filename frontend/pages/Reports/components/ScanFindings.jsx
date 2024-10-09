@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { severity } from '@util/reports';
 import ScanFinding from './ScanFinding';
-import { severity } from '../../util/reports';
 
 const ScanFindings = ({
   count,

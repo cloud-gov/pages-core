@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
 import { Link, useLocation } from 'react-router-dom';
 
-import { plural, getSuccessCriteria, getWCAGRuleURLs } from '../../util/reports';
+import { plural, getSuccessCriteria, getWCAGRuleURLs } from '@util/reports';
 
 const ScanFinding = ({
   finding, groupColor, groupLabel, scanType = 'zap', siteId,

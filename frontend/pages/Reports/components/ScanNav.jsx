@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { plural } from '../../util/reports';
+import { plural } from '@util/reports';
 import BackToIndexButton from './BackToIndexButton';
 
 const ScanNav = ({

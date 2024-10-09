@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { relPath, plural } from '../../util/reports';
+import { relPath, plural } from '@util/reports';
 import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 
 function ScanFindingsSummaryTable({

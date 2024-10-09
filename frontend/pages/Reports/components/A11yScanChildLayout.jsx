@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import * as utils from '../../util/reports';
-import * as datetime from '../../util/datetime';
+import * as utils from '@util/reports';
+import * as datetime from '@util/datetime';
 import ScanNav from './ScanNav';
 import ScanFindings from './ScanFindings';
 import BackToTopButton from './BackToTopButton';
