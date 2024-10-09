@@ -5,9 +5,9 @@ import { SubmissionError } from 'redux-form';
 
 import { userSettingsUpdated } from '../actions/actionCreators/userActions';
 import federalistApi from '../util/federalistApi';
-import LoadingIndicator from '../components/LoadingIndicator';
-import SettingsForm from '../components/user/SettingsForm';
-import GithubAuthButton from '../components/GithubAuthButton';
+import LoadingIndicator from '../shared/LoadingIndicator';
+import SettingsForm from '../shared/user/SettingsForm';
+import GithubAuthButton from '../shared/GithubAuthButton';
 import userActions from '../actions/userActions';
 import alertActions from '../actions/alertActions';
 import notificationActions from '../actions/notificationActions';

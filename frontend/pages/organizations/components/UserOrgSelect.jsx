@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ORGANIZATION } from '../../propTypes';
+import { ORGANIZATION } from '../../../propTypes';
 
 function makeOptions(opts) {
   return opts.map(({ id, name }) => (

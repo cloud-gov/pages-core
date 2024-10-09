@@ -4,9 +4,9 @@ import { Link, useParams } from 'react-router-dom';
 
 import publishedBranchActions from '@actions/publishedBranchActions';
 import { currentSite } from '@selectors/site';
-import LoadingIndicator from '@components/LoadingIndicator';
-import BranchViewLink from '@components/branchViewLink';
-import AlertBanner from '@components/alertBanner';
+import LoadingIndicator from '@shared/LoadingIndicator';
+import BranchViewLink from '@shared/branchViewLink';
+import AlertBanner from '@shared/alertBanner';
 
 import globals from '../../globals';
 

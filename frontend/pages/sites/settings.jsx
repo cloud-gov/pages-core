@@ -4,10 +4,10 @@ import {
   useParams, useNavigate, useLocation,
 } from 'react-router-dom';
 
-import BranchConfigs from '@components/site/SiteSettings/BranchConfigs';
-import ReportConfigs from '@components/site/SiteSettings/ReportConfigs';
-import AdvancedSiteSettings from '@components/site/SiteSettings/AdvancedSiteSettings';
-import EnvironmentVariables from '@components/site/SiteSettings/EnvironmentVariables';
+import BranchConfigs from '@shared/site/SiteSettings/BranchConfigs';
+import ReportConfigs from '@shared/site/SiteSettings/ReportConfigs';
+import AdvancedSiteSettings from '@shared/site/SiteSettings/AdvancedSiteSettings';
+import EnvironmentVariables from '@shared/site/SiteSettings/EnvironmentVariables';
 import siteActions from '@actions/siteActions';
 import { currentSite } from '@selectors/site';
 import globals from '../../globals';

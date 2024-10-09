@@ -9,19 +9,19 @@ import {
   dateOnly,
 } from '@util/datetime';
 
-import LoadingIndicator from '@components/LoadingIndicator';
-import GithubBuildBranchLink from '@components/GithubBuildBranchLink';
-import GithubBuildShaLink from '@components/GithubBuildShaLink';
-import AlertBanner from '@components/alertBanner';
+import LoadingIndicator from '@shared/LoadingIndicator';
+import GithubBuildBranchLink from '@shared/GithubBuildBranchLink';
+import GithubBuildShaLink from '@shared/GithubBuildShaLink';
+import AlertBanner from '@shared/alertBanner';
 
 import { useSiteBuildTasks } from '@hooks/useSiteBuildTasks';
 import { useBuildTasksForSite } from '@hooks/useBuildTasksForSite';
 import { currentSite } from '@selectors/site';
 import { getOrgById } from '@selectors/organization';
-import ReportResultsSummary from '@components/ReportResultsSummary';
-import FilterIndicator from '@components/FilterIndicator';
-import ExpandableArea from '@components/ExpandableArea';
-import { IconX } from '@components/icons';
+import ReportResultsSummary from '@shared/ReportResultsSummary';
+import FilterIndicator from '@shared/FilterIndicator';
+import ExpandableArea from '@shared/ExpandableArea';
+import { IconX } from '@shared/icons';
 
 const {
   setDate, isBefore, startOfToday, addMonths,

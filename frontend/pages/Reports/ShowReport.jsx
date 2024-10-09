@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import A11yScanIndex from '@components/Reports/A11yScanIndexLayout';
-import Zap from '@components/Reports/Zap';
-import ReportLoading from '@components/Reports/Loading';
-import ReportNotFound from '@components/Reports/ReportNotFound';
+import A11yScanIndex from '@shared/Reports/A11yScanIndexLayout';
+import Zap from '@shared/Reports/Zap';
+import ReportLoading from '@shared/Reports/Loading';
+import ReportNotFound from '@shared/Reports/ReportNotFound';
 import { useReportData } from '@hooks/useReportData';
 
 export default function Report() {

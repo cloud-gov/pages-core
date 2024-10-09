@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import A11yScanChild from '@components/Reports/A11yScanChildLayout';
-import ReportLoading from '@components/Reports/Loading';
-import ReportNotFound from '@components/Reports/ReportNotFound';
+import A11yScanChild from '@shared/Reports/A11yScanChildLayout';
+import ReportLoading from '@shared/Reports/Loading';
+import ReportNotFound from '@shared/Reports/ReportNotFound';
 import { useReportData } from '@hooks/useReportData';
 
 export default function Report() {

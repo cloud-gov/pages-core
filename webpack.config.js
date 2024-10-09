@@ -113,7 +113,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
-      '@components': path.resolve(__dirname, 'frontend/components'),
+      '@shared': path.resolve(__dirname, 'frontend/shared'),
       '@actions': path.resolve(__dirname, 'frontend/actions'),
       '@hooks': path.resolve(__dirname, 'frontend/hooks'),
       '@util': path.resolve(__dirname, 'frontend/util'),

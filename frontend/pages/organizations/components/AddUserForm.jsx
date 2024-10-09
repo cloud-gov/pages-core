@@ -3,8 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
-import InputWithErrorField from '../Fields/InputWithErrorField';
-import Select from '../Fields/Select';
+import InputWithErrorField from '@shared/Fields/InputWithErrorField';
+import Select from '@shared/Fields/Select';
 
 export const validateEmail = email => (!email
   ? 'email is required'

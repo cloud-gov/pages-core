@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
-import Select from '../Fields/Select';
+import Select from '@shared/Fields/Select';
 
 function validateRole(roleId, _, { roleOptions }) {
   return roleOptions.map(opt => `${opt.value}`).includes(roleId)

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm } from 'redux-form';
-import { IconEnvelope } from '../icons';
+import { IconEnvelope } from '@shared/icons';
 
 const ResendInviteForm = ({
   handleSubmit,

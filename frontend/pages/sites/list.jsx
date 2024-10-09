@@ -4,12 +4,12 @@ import { useSelector } from 'react-redux';
 
 import { getOrgById, orgFilterOptions, hasOrgs } from '@selectors/organization';
 import { groupSitesByOrg } from '@selectors/site';
-import AlertBanner from '@components/alertBanner';
-import UserOrgSelect from '@components/organizations/UserOrgSelect';
-import SiteListItem from '@components/siteList/siteListItem';
-import LoadingIndicator from '@components/LoadingIndicator';
-import GithubAuthButton from '@components/GithubAuthButton';
-import UsaIcon from '@components/UsaIcon';
+import AlertBanner from '@shared/alertBanner';
+import UserOrgSelect from '@shared/organizations/UserOrgSelect';
+import SiteListItem from '@shared/siteList/siteListItem';
+import LoadingIndicator from '@shared/LoadingIndicator';
+import GithubAuthButton from '@shared/GithubAuthButton';
+import UsaIcon from '@shared/UsaIcon';
 import alertActions from '@actions/alertActions';
 import userActions from '@actions/userActions';
 

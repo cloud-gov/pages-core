@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import TemplateSiteList from '@components/AddSite/TemplateSiteList';
-import AddRepoSiteForm from '@components/AddSite/AddRepoSiteForm';
-import AlertBanner from '@components/alertBanner';
-import LoadingIndicator from '@components/LoadingIndicator';
+import TemplateSiteList from '@shared/AddSite/TemplateSiteList';
+import AddRepoSiteForm from '@shared/AddSite/AddRepoSiteForm';
+import AlertBanner from '@shared/alertBanner';
+import LoadingIndicator from '@shared/LoadingIndicator';
 import siteActions from '@actions/siteActions';
 import addNewSiteFieldsActions from '@actions/addNewSiteFieldsActions';
 import { hasOrgs } from '@selectors/organization';

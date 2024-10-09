@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { currentSite } from '@selectors/site';
-import UsaIcon from '@components/UsaIcon';
+import UsaIcon from '@shared/UsaIcon';
 import { useSiteDomains } from '@hooks';
 import { capitalize } from '@util';
 

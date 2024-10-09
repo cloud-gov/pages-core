@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import publishedFileActions from '@actions/publishedFileActions';
-import LoadingIndicator from '@components/LoadingIndicator';
-import AlertBanner from '@components/alertBanner';
+import LoadingIndicator from '@shared/LoadingIndicator';
+import AlertBanner from '@shared/alertBanner';
 
 import globals from '../../globals';
 

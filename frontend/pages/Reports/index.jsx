@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import AlertBanner from '@components/Reports/AlertBanner';
-import ReportNotFound from '@components/Reports/ReportNotFound';
+import AlertBanner from '@shared/Reports/AlertBanner';
+import ReportNotFound from '@shared/Reports/ReportNotFound';
 
 export default function Report() {
   const { pathname } = useLocation();

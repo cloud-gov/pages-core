@@ -3,16 +3,17 @@ import { useParams } from 'react-router-dom';
 import { success } from 'react-notification-system-redux';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+
 import federalistApi from '@util/federalistApi';
-import LoadingIndicator from '@components/LoadingIndicator';
-import AddUserForm from '@components/organizations/AddUserForm';
-import RemoveUserForm from '@components/organizations/RemoveUserForm';
-import ResendInviteForm from '@components/organizations/ResendInviteForm';
-import UpdateUserForm from '@components/organizations/UpdateUserForm';
-import AlertBanner from '@components/alertBanner';
 import { timeFrom } from '@util/datetime';
 import { sandboxMsg } from '@util';
+import LoadingIndicator from '@shared/LoadingIndicator';
+import AlertBanner from '@shared/alertBanner';
 
+import AddUserForm from './components/AddUserForm';
+import RemoveUserForm from './components/RemoveUserForm';
+import ResendInviteForm from './components/ResendInviteForm';
+import UpdateUserForm from './components/UpdateUserForm';
 
 function successNotification(message) {
   return success({
