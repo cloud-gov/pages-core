@@ -6,10 +6,11 @@ import {
 
 import { currentSite } from '@selectors/site';
 import { getOrgById } from '@selectors/organization';
-import SideNav from '@shared/site/SideNav';
-import PagesHeader from '@shared/site/PagesHeader';
 import AlertBanner from '@shared/alertBanner';
 import LoadingIndicator from '@shared/LoadingIndicator';
+
+import SideNav from './components/SideNav';
+import PagesHeader from './components/PagesHeader';
 
 export const SITE_NAVIGATION_CONFIG = [
   {

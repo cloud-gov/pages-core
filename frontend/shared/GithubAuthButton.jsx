@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import api from '@util/federalistApi';
+
 import globals from '../globals';
-import api from '../util/federalistApi';
 import { IconGitHub } from './icons';
 
 const apiUrl = globals.APP_HOSTNAME;

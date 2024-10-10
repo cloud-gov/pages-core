@@ -5,7 +5,7 @@ import App from './pages/app';
 import * as Organizations from './pages/organizations';
 import * as Sites from './pages/sites';
 import * as CustomDomains from './pages/customDomains';
-import UserSettings from './pages/Settings';
+import * as Settings from './pages/settings';
 import NotFound from './pages/NotFound';
 import Error from './pages/Error';
 
@@ -46,7 +46,7 @@ export default (
         <Route path="reports" element={<Sites.Reports />} />
       )}
     </Route>
-    <Route path="settings" element={<UserSettings />} />
+    <Route path="settings" element={<Settings.UserSettings />} />
     <Route path="*" element={<NotFound />} />
   </Route>
 );

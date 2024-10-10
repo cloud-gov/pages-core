@@ -2,13 +2,15 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import TemplateSiteList from '@shared/AddSite/TemplateSiteList';
-import AddRepoSiteForm from '@shared/AddSite/AddRepoSiteForm';
+
 import AlertBanner from '@shared/alertBanner';
 import LoadingIndicator from '@shared/LoadingIndicator';
 import siteActions from '@actions/siteActions';
 import addNewSiteFieldsActions from '@actions/addNewSiteFieldsActions';
 import { hasOrgs } from '@selectors/organization';
+
+import TemplateSiteList from './components/TemplateSiteList';
+import AddRepoSiteForm from './components/AddRepoSiteForm';
 
 import globals from '../../globals';
 

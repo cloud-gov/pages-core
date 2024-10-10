@@ -5,9 +5,9 @@ import { useParams } from 'react-router-dom';
 
 import { useBuildLogs, useBuildDetails } from '@hooks';
 import LoadingIndicator from '@shared/LoadingIndicator';
-import SiteBuildLogTable from '@shared/site/siteBuildLogTable';
-import DownloadBuildLogsButton from '@shared/site/downloadBuildLogsButton';
-import CommitSummary from '@shared/site/CommitSummary';
+import SiteBuildLogTable from './components/siteBuildLogTable';
+import DownloadBuildLogsButton from './components/downloadBuildLogsButton';
+import CommitSummary from './components/CommitSummary';
 
 export const REFRESH_INTERVAL = 15 * 1000;
 const BUILD_LOG_RETENTION_LIMIT = 180 * 24 * 60 * 60 * 1000; // 180 days in milliseconds

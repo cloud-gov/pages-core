@@ -5,13 +5,14 @@ import { useSelector } from 'react-redux';
 import { getOrgById, orgFilterOptions, hasOrgs } from '@selectors/organization';
 import { groupSitesByOrg } from '@selectors/site';
 import AlertBanner from '@shared/alertBanner';
-import UserOrgSelect from '@shared/organizations/UserOrgSelect';
-import SiteListItem from '@shared/siteList/siteListItem';
 import LoadingIndicator from '@shared/LoadingIndicator';
 import GithubAuthButton from '@shared/GithubAuthButton';
 import UsaIcon from '@shared/UsaIcon';
+import UserOrgSelect from '@shared/UserOrgSelect';
 import alertActions from '@actions/alertActions';
 import userActions from '@actions/userActions';
+
+import SiteListItem from './components/siteListItem';
 
 const onGithubAuthSuccess = () => {
   userActions.fetchUser();

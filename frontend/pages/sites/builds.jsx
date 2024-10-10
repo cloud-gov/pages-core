@@ -5,9 +5,10 @@ import { useParams, Link } from 'react-router-dom';
 import buildActions from '@actions/buildActions';
 import { currentSite } from '@selectors/site';
 import { getOrgById } from '@selectors/organization';
-import SiteBuildsBuild from '@shared/site/siteBuildsBuild';
 import AlertBanner from '@shared/alertBanner';
 import { sandboxMsg } from '@util';
+
+import SiteBuildsBuild from './components/siteBuildsBuild';
 
 export const REFRESH_INTERVAL = 1500 * 1000;
 
