@@ -1,14 +1,14 @@
 /* eslint-disable global-require */
 function devMiddleware() {
-  const webpack = require('webpack');
+  const rspack = require('@rspack/core');
   const webpackDevMiddleware = require('webpack-dev-middleware');
 
-  const webpackConfig = require('../../webpack.config');
+  const rspackConfig = require('../../rspack.config');
 
-  const compiler = webpack(webpackConfig);
+  const compiler = rspack(rspackConfig);
 
   return webpackDevMiddleware(compiler, {
-    publicPath: webpackConfig.output.publicPath,
+    publicPath: rspackConfig.output.publicPath,
   });
 }
 
