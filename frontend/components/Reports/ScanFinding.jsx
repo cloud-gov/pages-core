@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
 import { Link, useLocation } from 'react-router-dom';
+import SuppressRuleToggle from './SuppressRuleToggle';
 
 import { plural, getSuccessCriteria, getWCAGRuleURLs } from '../../util/reports';
 
@@ -20,8 +21,9 @@ const ScanFinding = ({
   let locations = [];
   let criteria = [];
   let hasMoreInfo = '';
+  let suppressId = '';
 
-  if (scanType === 'zap') {
+  if ((scanType === 'zap') || (scanType === 'owasp-zap')) {
     ({
       name: title, solution, description,
     } = finding);
@@ -30,6 +32,7 @@ const ScanFinding = ({
     count = locations.length;
     references = finding.referenceURLs || [];
     hasMoreInfo = finding.otherinfo;
+    suppressId = finding.alertRef;
   }
   if (scanType === 'a11y') {
     title = `${finding.help}.`;
@@ -40,6 +43,7 @@ const ScanFinding = ({
     solution = finding.nodes[0]?.failureSummary || [];
     criteria = getSuccessCriteria(finding);
     references = [...getWCAGRuleURLs(finding.id), ...criteria.map(c => c.url), finding.helpUrl];
+    suppressId = finding.id;
   }
 
   useEffect(() => {
@@ -63,7 +67,9 @@ const ScanFinding = ({
         scanType={scanType}
         anchor={anchor}
         criteria={criteria.map(c => c.short)}
-      />
+      >
+        {/* <SuppressRuleToggle ruleId={suppressId} /> */}
+      </FindingTitle>
       <div className="maxw-tablet-lg">
         <FindingDescription
           description={description}
@@ -99,6 +105,7 @@ const FindingTitle = ({
   criteria = [],
   scanType,
   anchor,
+  children,
 }) => (
   <div className="bg-white padding-top-05 sticky">
     <h3 className="font-serif-lg margin-y-105">
@@ -127,6 +134,7 @@ const FindingTitle = ({
         {plural(count, 'place')}
       </b>
       {'. '}
+      {children}
     </p>
   </div>
 );
@@ -140,7 +148,7 @@ FindingTitle.propTypes = {
   criteria: PropTypes.array,
   scanType: PropTypes.string.isRequired,
   anchor: PropTypes.string.isRequired,
-
+  children: PropTypes.node,
 };
 
 const FindingDescription = ({
