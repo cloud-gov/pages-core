@@ -12,14 +12,10 @@ export default function Report() {
   const { id } = useParams();
   const { data, isLoading } = useReportData(id);
 
-  // default rules for everyone, every task
-  const { defaultScanRules } = useDefaultScanRules();
-
   if (isLoading) return <ReportLoading />;
   if (!data) return <ReportNotFound />;
 
   const { report, siteId, buildId } = data;
-  // customer's rules that were active when this report ran
   const sbtCustomRules = data.SiteBuildTask?.metadata?.rules || [];
   const sbtId = data.SiteBuildTask?.id || null;
 
@@ -33,7 +29,6 @@ export default function Report() {
           sbtId={sbtId}
           sbtType={data.type}
           report={report}
-          defaultRules={defaultScanRules.filter(rule => rule.type === data.type)}
           sbtCustomRules={sbtCustomRules}
         />
       );
