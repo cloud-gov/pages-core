@@ -9,29 +9,29 @@ import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
 import * as utils from '../../util/reports';
 
-export default function Zap({ data, buildId, siteId }) {
+export default function Zap({ report, rules = [], buildId, siteId }) {
   const scanTitle = 'Vulnerability';
-  const pageTitle = `Pages | ${scanTitle} report for ${data.site['@name']} on ${data.generated} for build id ${buildId}`;
+  const pageTitle = `Pages | ${scanTitle} report for ${report.site['@name']} on ${report.generated} for build id ${buildId}`;
 
   const navGroups = [...utils.severity.zap].map(group => ({
     ...group,
     usePill: true,
-    count: data.site.groupedAlerts[group?.riskCode]?.length || 0,
+    count: report.site.groupedAlerts[group?.riskCode]?.length || 0,
   }));
 
   navGroups.push(
     {
       label: 'Total results',
-      count: data.site.alerts?.length,
+      count: report.site.alerts?.length,
     },
     {
       label: 'All unsuppressed results',
-      count: data.site?.issueCount,
+      count: report.site?.issueCount,
       boldMe: true,
     }
   );
 
-  const summarizedResults = [...data.site.alerts].map(result => ({
+  const summarizedResults = [...report.site.alerts].map(result => ({
     ...result,
     anchor: result.alertRef,
     severity: utils.getSeverityThemeToken(result.riskcode, 'zap'),
@@ -56,7 +56,7 @@ export default function Zap({ data, buildId, siteId }) {
           {' report for '}
           <br />
           <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">
-            {data.site['@name']}
+            {report.site['@name']}
           </span>
           <span className="text-italic font-sans-lg text-normal margin-left-2">(all pages)</span>
         </h1>
@@ -79,7 +79,7 @@ export default function Zap({ data, buildId, siteId }) {
       <div className="grid-row border-top-1px padding-top-1">
         <section className="tablet:grid-col-auto">
           <ScanNav
-            generated={data.generated}
+            generated={report.generated}
             buildId={buildId}
             siteId={siteId}
             groups={navGroups}
@@ -115,22 +115,23 @@ export default function Zap({ data, buildId, siteId }) {
               </div>
             </section>
             <ScanFindingsSummary
-              baseurl={data.site['@name']}
+              baseurl={report.site['@name']}
               suppressedFindings={suppressed}
               unsuppressedFindings={unsuppressed}
             />
             <ScanFindings
               siteId={siteId}
               scanType="zap"
-              count={data.site.alerts.length}
-              groupedFindings={data.site.groupedAlerts}
+              count={report.site.alerts.length}
+              groupedFindings={report.site.groupedAlerts}
+              rules={rules}
             />
           </div>
           <About scanType="zap" siteId={siteId}>
             <p className="font-body-xs line-height-body-3">
               This report was generated for
               {' '}
-              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.site['@name']}</code>
+              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{report.site['@name']}</code>
               {' from '}
               <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
                 build #
@@ -139,7 +140,7 @@ export default function Zap({ data, buildId, siteId }) {
               {' '}
               scanned on
               {' '}
-              {data.generated}
+              {report.generated}
             </p>
           </About>
         </div>
@@ -151,7 +152,9 @@ export default function Zap({ data, buildId, siteId }) {
 
 Zap.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  data: PropTypes.object.isRequired,
+  report: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  rules: PropTypes.array,
   siteId: PropTypes.number.isRequired,
   buildId: PropTypes.number.isRequired,
 };

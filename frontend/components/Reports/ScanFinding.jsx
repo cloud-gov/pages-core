@@ -68,7 +68,7 @@ const ScanFinding = ({
         anchor={anchor}
         criteria={criteria.map(c => c.short)}
       >
-        {/* <SuppressRuleToggle ruleId={suppressId} /> */}
+        <SuppressRuleToggle ruleId={suppressId} />
       </FindingTitle>
       <div className="maxw-tablet-lg">
         <FindingDescription

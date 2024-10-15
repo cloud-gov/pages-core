@@ -15,12 +15,13 @@ export default function Report() {
   if (!data) return <ReportNotFound />;
 
   const { report, siteId, buildId } = data;
+  const { rules } = data.SiteBuildTask.metadata;
 
   switch (data.type) {
     case 'owasp-zap':
-      return <Zap data={report} siteId={siteId} buildId={buildId} />;
+      return <Zap report={report} rules={rules} siteId={siteId} buildId={buildId} />;
     case 'a11y':
-      return <A11yScanIndex data={report} siteId={siteId} buildId={buildId} />;
+      return <A11yScanIndex report={report} rules={rules} siteId={siteId} buildId={buildId} />;
     default:
       return <ReportNotFound />;
   }
