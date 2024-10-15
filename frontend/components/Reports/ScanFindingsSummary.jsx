@@ -121,7 +121,7 @@ const ScanFindingsSummary = ({ suppressedFindings = [], unsuppressedFindings = [
             )
           </span>
         </h3>
-        <section className="usa-alert usa-alert--info margin-top-3">
+        <section className="usa-alert usa-alert--suppressed usa-alert--info margin-top-3">
           <div className="usa-alert__body">
             <p className="usa-alert__text">
               <b>
@@ -132,9 +132,10 @@ const ScanFindingsSummary = ({ suppressedFindings = [], unsuppressedFindings = [
                 </a>
               </b>
               , which don’t count towards your total issues.
+              <br />
               For more information about excluded results and suppression rules, review the
               {' '}
-              <Link to="https://cloud.gov/pages/documentation/automated-site-reports/" className="usa-link">
+              <Link to="https://cloud.gov/pages/documentation/automated-site-reports/#configuration" className="usa-link">
                 Automated Site Reports documentation
               </Link>
               .

@@ -9,7 +9,14 @@ import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
 import * as utils from '../../util/reports';
 
-export default function Zap({ report, rules = [], buildId, siteId }) {
+export default function Zap({
+  report,
+  sbtCustomRules = [],
+  buildId,
+  siteId,
+  sbtId,
+  sbtType,
+}) {
   const scanTitle = 'Vulnerability';
   const pageTitle = `Pages | ${scanTitle} report for ${report.site['@name']} on ${report.generated} for build id ${buildId}`;
 
@@ -121,10 +128,11 @@ export default function Zap({ report, rules = [], buildId, siteId }) {
             />
             <ScanFindings
               siteId={siteId}
-              scanType="zap"
+              sbtId={sbtId}
+              sbtType={sbtType}
+              sbtCustomRules={sbtCustomRules}
               count={report.site.alerts.length}
               groupedFindings={report.site.groupedAlerts}
-              rules={rules}
             />
           </div>
           <About scanType="zap" siteId={siteId}>
@@ -154,7 +162,9 @@ Zap.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   report: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  rules: PropTypes.array,
+  sbtCustomRules: PropTypes.array,
   siteId: PropTypes.number.isRequired,
+  sbtId: PropTypes.number.isRequired,
+  sbtType: PropTypes.string.isRequired,
   buildId: PropTypes.number.isRequired,
 };

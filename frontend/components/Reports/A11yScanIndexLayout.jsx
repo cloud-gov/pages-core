@@ -8,7 +8,7 @@ import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
 
-export default function A11yScanIndex({ report, rules = [], siteId, buildId }) {
+export default function A11yScanIndex({ report, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} report index for ${report.baseurl} on ${datetime.dateAndTimeSimple(report.reportPages[0].timestamp)} for build id #${buildId}`;
   function findReportsPerURLs(url) {
@@ -245,7 +245,6 @@ A11yScanIndex.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   report: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  rules: PropTypes.array,
   siteId: PropTypes.number.isRequired,
   buildId: PropTypes.number.isRequired,
 };

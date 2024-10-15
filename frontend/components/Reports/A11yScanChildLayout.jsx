@@ -9,11 +9,10 @@ import BackToTopButton from './BackToTopButton';
 import About from './about';
 
 export default function A11yScanChild({
-  report, reportRules = [], defaultRules = [], siteId, buildId,
+  report, sbtCustomRules = [], siteId, buildId, sbtId, sbtType,
 }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages | ${scanTitle} report for ${report.url} on ${datetime.dateAndTimeSimple(report.timestamp)} for build id ${buildId}`;
-  const rules = [...reportRules, defaultRules];
   const allResults = Object.values(report.groupedViolations).flat(1);
   const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
   // const suppressed = allResults.filter(ignoreFn);
@@ -116,16 +115,17 @@ export default function A11yScanChild({
           <div>
             <ScanFindings
               siteId={siteId}
-              scanType="a11y"
+              sbtId={sbtId}
+              sbtType={sbtType}
+              sbtCustomRules={sbtCustomRules}
               count={report.violationsCount}
               groupedFindings={report.groupedViolations}
-              rules={rules}
             />
           </div>
           <div>
             <A11yPassed passes={report.passes} />
             <hr />
-            <About scanType="a11y" siteId={siteId}>
+            <About sbtType={sbtType} siteId={siteId}>
               <p className="font-body-xs line-height-sans-3">
                 This report was generated for
                 {' '}
@@ -207,9 +207,9 @@ A11yScanChild.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   report: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  reportRules: PropTypes.array,
-  // eslint-disable-next-line react/forbid-prop-types
-  defaultRules: PropTypes.array,
+  sbtCustomRules: PropTypes.array,
   siteId: PropTypes.number.isRequired,
+  sbtId: PropTypes.number.isRequired,
+  sbtType: PropTypes.string.isRequired,
   buildId: PropTypes.number.isRequired,
 };
