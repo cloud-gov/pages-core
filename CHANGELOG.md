@@ -1,3 +1,9 @@
+## 0.13.0 (2024-10-02)
+
+### Added
+
+- Upgrade admin and app to USWDS V3
+
 ## 0.12.0 (2024-09-25)
 
 ### Added
