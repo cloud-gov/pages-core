@@ -23,7 +23,7 @@ const ScanFinding = ({
   let hasMoreInfo = '';
   let ruleId = '';
 
-  if ((sbtType === 'owasp-zap') || (sbtType === 'owasp-zap')) {
+  if ((sbtType === 'zap') || (sbtType === 'owasp-zap')) {
     ({
       name: title, solution, description,
     } = finding);

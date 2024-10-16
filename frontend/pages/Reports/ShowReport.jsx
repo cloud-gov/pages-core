@@ -6,7 +6,6 @@ import Zap from '../../components/Reports/Zap';
 import ReportLoading from '../../components/Reports/Loading';
 import ReportNotFound from '../../components/Reports/ReportNotFound';
 import { useReportData } from '../../hooks/useReportData';
-import { useDefaultScanRules } from '../../hooks/useDefaultScanRules';
 
 export default function Report() {
   const { id } = useParams();
