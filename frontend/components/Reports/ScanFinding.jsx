@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Highlight from 'react-highlight';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import FindingSuppression from './FindingSuppression';
 
 import { plural, getSuccessCriteria, getWCAGRuleURLs } from '../../util/reports';
 
 const ScanFinding = ({
-  finding, groupColor, groupLabel, scanType = 'zap', siteId,
+  finding, groupColor, groupLabel, siteId, sbtId, sbtCustomRules, sbtType,
 }) => {
   const ref = useRef(null);
   const { hash } = useLocation();
@@ -20,8 +21,9 @@ const ScanFinding = ({
   let locations = [];
   let criteria = [];
   let hasMoreInfo = '';
+  let ruleId = '';
 
-  if (scanType === 'zap') {
+  if ((sbtType === 'zap') || (sbtType === 'owasp-zap')) {
     ({
       name: title, solution, description,
     } = finding);
@@ -30,8 +32,9 @@ const ScanFinding = ({
     count = locations.length;
     references = finding.referenceURLs || [];
     hasMoreInfo = finding.otherinfo;
+    ruleId = finding.alertRef;
   }
-  if (scanType === 'a11y') {
+  if (sbtType === 'a11y') {
     title = `${finding.help}.`;
     anchor = `finding-${finding.id}${ignore ? '-suppressed' : ''}`;
     locations = finding.nodes || [];
@@ -40,6 +43,7 @@ const ScanFinding = ({
     solution = finding.nodes[0]?.failureSummary || [];
     criteria = getSuccessCriteria(finding);
     references = [...getWCAGRuleURLs(finding.id), ...criteria.map(c => c.url), finding.helpUrl];
+    ruleId = finding.id;
   }
 
   useEffect(() => {
@@ -60,21 +64,29 @@ const ScanFinding = ({
         groupColor={groupColor}
         count={count}
         references={references}
-        scanType={scanType}
+        sbtType={sbtType}
         anchor={anchor}
         criteria={criteria.map(c => c.short)}
+        suppressed={ignore}
       />
       <div className="maxw-tablet-lg">
+        <FindingSuppression
+          ruleId={ruleId}
+          suppressed={ignore}
+          suppressedBy={ignoreSource}
+          sbtType={sbtType}
+          sbtId={sbtId}
+          sbtCustomRules={sbtCustomRules}
+          siteId={siteId}
+        />
         <FindingDescription
           description={description}
-          scanType={scanType}
-          ignore={ignore}
-          ignoreSource={ignoreSource}
+          sbtType={sbtType}
           siteId={siteId}
           moreInfo={hasMoreInfo}
         />
-        <FindingRecommendation solution={solution} anchor={anchor} scanType={scanType} />
-        <FindingLocations anchor={anchor} scanType={scanType} locations={locations} />
+        <FindingRecommendation solution={solution} anchor={anchor} sbtType={sbtType} />
+        <FindingLocations anchor={anchor} sbtType={sbtType} locations={locations} />
         <FindingReferences references={references} />
       </div>
       <hr />
@@ -88,7 +100,10 @@ ScanFinding.propTypes = {
   groupColor: PropTypes.string,
   groupLabel: PropTypes.string,
   siteId: PropTypes.number.isRequired,
-  scanType: PropTypes.string,
+  sbtId: PropTypes.number.isRequired,
+  sbtType: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  sbtCustomRules: PropTypes.array,
 };
 
 const FindingTitle = ({
@@ -97,8 +112,10 @@ const FindingTitle = ({
   groupColor,
   count,
   criteria = [],
-  scanType,
+  sbtType,
   anchor,
+  children,
+  suppressed = false,
 }) => (
   <div className="bg-white padding-top-05 sticky">
     <h3 className="font-serif-lg margin-y-105">
@@ -106,13 +123,14 @@ const FindingTitle = ({
       <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">#</a>
     </h3>
     <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-sans-5 break-balance">
+      <b>{suppressed ? 'Suppressed ' : '' }</b>
       <span className={`usa-tag bg-${groupColor} radius-pill`}>
         {groupLabel}
       </span>
       {' '}
       finding
       {' '}
-      {scanType === 'a11y' && criteria.length > 0 && (
+      {sbtType === 'a11y' && criteria.length > 0 && (
         <>
           that violates&nbsp;
           <b>{ new Intl.ListFormat('en-US').format(criteria)}</b>
@@ -127,6 +145,7 @@ const FindingTitle = ({
         {plural(count, 'place')}
       </b>
       {'. '}
+      {children}
     </p>
   </div>
 );
@@ -138,60 +157,19 @@ FindingTitle.propTypes = {
   count: PropTypes.number,
   // eslint-disable-next-line react/forbid-prop-types
   criteria: PropTypes.array,
-  scanType: PropTypes.string.isRequired,
+  sbtType: PropTypes.string.isRequired,
   anchor: PropTypes.string.isRequired,
-
+  children: PropTypes.node,
+  suppressed: PropTypes.bool,
 };
 
 const FindingDescription = ({
   description,
-  scanType,
-  siteId,
-  ignore = false,
-  ignoreSource = null,
+  sbtType,
   moreInfo = null,
 }) => (
   <div className="margin-y-3">
-    {ignore && (
-      <section className="usa-alert usa-alert--info padding-y-1 margin-top-3">
-        <div className="usa-alert__body">
-          <h4 className="usa-alert__heading">
-            This result was suppressed by&nbsp;
-            {ignoreSource || 'customer criteria'}
-          </h4>
-          <div className="usa-alert__text">
-            <details className="margin-top-3">
-              <summary className="">
-                Why was this result&nbsp;
-                <b>suppressed</b>
-                ?
-              </summary>
-              <p>
-                { /* eslint-disable-next-line max-len */}
-                { ignoreSource && 'Pages automatically suppresses certain results in this report which are irrelevant for statically hosted websites, based on unconfigurable server settings, or frequently produce ‘false positive’ findings for our customers. '}
-                { /* eslint-disable-next-line max-len */}
-                { (!ignoreSource || ignoreSource === 'multiple criteria') && 'Customers can specify criteria to suppress during report generation to silence ‘false positive’ results.'}
-                { ' ' /* eslint-disable-next-line max-len */}
-                <b>While still visible in the report, the suppressed results don’t count towards your total issue count.</b>
-                { ' ' /* eslint-disable-next-line max-len */}
-                Review the report rules and criteria that are suppressed during report generation in your &nbsp;
-                <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Report Configuration</Link>
-                .
-              </p>
-              <p>
-                For a full list of what Pages excludes from your results, review the
-                {' '}
-                <Link to="https://cloud.gov/pages/documentation/automated-site-reports/" className="usa-link">
-                  Automated Site Reports documentation
-                </Link>
-                .
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-    )}
-    { scanType === 'zap' && (
+    { sbtType === 'owasp-zap' && (
       // eslint-disable-next-line react/no-danger
       <div className="usa-prose finding-description font-serif-sm margin-bottom-2" dangerouslySetInnerHTML={{ __html: description }} />
     )}
@@ -201,26 +179,23 @@ const FindingDescription = ({
         <code dangerouslySetInnerHTML={{ __html: moreInfo }} />
       </FindingLocationMoreInfo>
     )}
-    { scanType !== 'zap' && <div className="usa-prose finding-description font-serif-sm"><p>{description}</p></div> }
+    { sbtType !== 'owasp-zap' && <div className="usa-prose finding-description font-serif-sm"><p>{description}</p></div> }
   </div>
 );
 
 FindingDescription.propTypes = {
   description: PropTypes.string.isRequired,
-  scanType: PropTypes.string.isRequired,
+  sbtType: PropTypes.string.isRequired,
   moreInfo: PropTypes.string,
-  ignore: PropTypes.bool,
-  ignoreSource: PropTypes.string,
-  siteId: PropTypes.number.isRequired,
 };
 
-const FindingRecommendation = ({ anchor, solution, scanType }) => (
+const FindingRecommendation = ({ anchor, solution, sbtType }) => (
   <div
     id={`${anchor}-recommendation`}
     aria-labelledby={`${anchor}-recommendation`}
   >
     <div className="usa-summary-box margin-bottom-3" role="region">
-      { (scanType === 'zap') && (
+      { (sbtType === 'owasp-zap') && (
       <>
         <h4 className="usa-summary-box__heading">
           Recommendation(s):
@@ -232,7 +207,7 @@ const FindingRecommendation = ({ anchor, solution, scanType }) => (
         </div>
       </>
       )}
-      { (scanType === 'a11y') && (
+      { (sbtType === 'a11y') && (
       <>
         {solution.split('\n\n').map((fixList, listindex) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -264,7 +239,7 @@ const FindingRecommendation = ({ anchor, solution, scanType }) => (
 FindingRecommendation.propTypes = {
   anchor: PropTypes.string.isRequired,
   solution: PropTypes.string.isRequired,
-  scanType: PropTypes.string.isRequired,
+  sbtType: PropTypes.string.isRequired,
 };
 
 const FindingReferences = ({ references = [] }) => {
@@ -296,7 +271,7 @@ const FindingReference = ({ url }) => (
 
 FindingReference.propTypes = { url: PropTypes.string.isRequired };
 
-const FindingLocations = ({ locations = [], anchor, scanType }) => (
+const FindingLocations = ({ locations = [], anchor, sbtType }) => (
   <>
     <h3 className="font-body-md margin-y-2">
       Evidence for this result was found:
@@ -305,9 +280,9 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
       <ol className="padding-left-3">
         {locations.map((location, locationIndex) => {
           const { uri: url } = location;
-          const code = scanType === 'zap' ? location.evidence : location.html;
-          const target = scanType === 'zap' ? location.param : location.target;
-          const moreInfo = scanType === 'zap' ? location.otherinfo : null;
+          const code = sbtType === 'owasp-zap' ? location.evidence : location.html;
+          const target = sbtType === 'owasp-zap' ? location.param : location.target;
+          const moreInfo = sbtType === 'owasp-zap' ? location.otherinfo : null;
           const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
           return (
             <li key={locationAnchor} className="margin-bottom-5 margin-left-2 font-mono-md">
@@ -334,7 +309,7 @@ FindingLocations.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   locations: PropTypes.array.isRequired,
   anchor: PropTypes.string.isRequired,
-  scanType: PropTypes.string.isRequired,
+  sbtType: PropTypes.string.isRequired,
 };
 
 const FindingLocationURL = ({ url }) => (
@@ -394,7 +369,7 @@ const FindingLocationMoreInfo = ({ info = null, children = null }) => (
 
 FindingLocationMoreInfo.propTypes = {
   info: PropTypes.string,
-  children: PropTypes.string,
+  children: PropTypes.node,
 };
 
 export default ScanFinding;
