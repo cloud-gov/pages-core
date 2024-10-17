@@ -1,11 +1,11 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 
-import Report from './pages/Reports';
-import ShowReport from './pages/Reports/ShowReport';
-import ShowReportSubpage from './pages/Reports/ShowReportSubPage';
-import NotFound from './components/NotFound';
-import RouterError from './components/RouterError';
+import Report from '@pages/reports';
+import ShowReport from '@pages/reports/ShowReport';
+import ShowReportSubpage from '@pages/reports/ShowReportSubPage';
+import RouterError from '@pages/reports/RouterError';
+import NotFound from '@pages/NotFound';
 
 export default (
   <Route

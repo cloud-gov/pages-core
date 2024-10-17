@@ -1,23 +1,13 @@
 import React from 'react';
 import { Route, redirect } from 'react-router-dom';
 
-import App from './components/app';
-import * as Organization from './components/organization';
-import UserSettings from './components/user/Settings';
-import SiteList from './components/siteList/siteList';
-import SiteContainer from './components/siteContainer';
-import SiteBuilds from './components/site/siteBuilds';
-import SiteBuildLogs from './components/site/siteBuildLogs';
-import SitePublishedBranchesTable from './components/site/sitePublishedBranchesTable';
-import SitePublishedFilesTable from './components/site/SitePublishedFilesTable';
-import SiteSettings from './components/site/SiteSettings';
-import CustomDomains from './components/site/CustomDomains';
-import NewCustomDomain from './components/site/CustomDomains/New';
-import EditCustomDomain from './components/site/CustomDomains/Edit';
-import SiteReports from './components/site/SiteReports';
-import AddSite from './components/AddSite';
-import NotFound from './components/NotFound';
-import Error from './components/Error';
+import App from '@pages/app';
+import * as Organizations from '@pages/organizations';
+import * as Sites from '@pages/sites';
+import * as CustomDomains from '@pages/customDomains';
+import * as Settings from '@pages/settings';
+import NotFound from '@pages/NotFound';
+import Error from '@pages/Error';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
@@ -37,26 +27,26 @@ const fetchInitialData = () => {
 
 export default (
   <Route path="/" element={<App onEnter={fetchInitialData} />} errorElement={ErrorElement}>
-    <Route path="organizations" element={<Organization.List />} />
-    <Route path="organizations/:id" element={<Organization.Edit />} />
-    <Route path="sites" element={<SiteList />} />
-    <Route path="sites/new" element={<AddSite />} />
-    <Route path="sites/:id" element={<SiteContainer />}>
+    <Route path="organizations" element={<Organizations.List />} />
+    <Route path="organizations/:id" element={<Organizations.Edit />} />
+    <Route path="sites" element={<Sites.List />} />
+    <Route path="sites/new" element={<Sites.New />} />
+    <Route path="sites/:id" element={<Sites.Wrapper />}>
       <Route path="" loader={() => redirect('builds')} />
-      <Route path="settings" element={<SiteSettings />} />
-      <Route path="published" element={<SitePublishedBranchesTable />} />
-      <Route path="published/:name" element={<SitePublishedFilesTable />} />
-      <Route path="builds" element={<SiteBuilds />} />
-      <Route path="custom-domains" element={<CustomDomains />} />
-      <Route path="custom-domains/new" element={<NewCustomDomain />} />
-      <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
-      <Route path="builds/:buildId/logs" element={<SiteBuildLogs />} />
+      <Route path="settings" element={<Sites.Settings />} />
+      <Route path="published" element={<Sites.PublishedBranchesTable />} />
+      <Route path="published/:name" element={<Sites.PublishedFilesTable />} />
+      <Route path="builds" element={<Sites.Builds />} />
+      <Route path="custom-domains" element={<CustomDomains.List />} />
+      <Route path="custom-domains/new" element={<CustomDomains.New />} />
+      <Route path="custom-domains/:domainId/edit" element={<CustomDomains.Edit />} />
+      <Route path="builds/:buildId/logs" element={<Sites.BuildLogs />} />
       <Route path="scans" loader={() => redirect('../reports')} />
       {(process.env.FEATURE_BUILD_TASKS === 'active') && (
-        <Route path="reports" element={<SiteReports />} />
+        <Route path="reports" element={<Sites.Reports />} />
       )}
     </Route>
-    <Route path="settings" element={<UserSettings />} />
+    <Route path="settings" element={<Settings.UserSettings />} />
     <Route path="*" element={<NotFound />} />
   </Route>
 );

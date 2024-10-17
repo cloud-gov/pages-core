@@ -454,7 +454,7 @@ Major version bumps are created when `BREAKING CHANGE` is in the commit body or 
 
 The following conventions used to build and maintain the frontend UI.
 
-*NOTE: At this time, the current state of the frontend structure and conventions do not follow this documentation. This document is setting standards moving forward.
+*NOTE: At this time, the current state of the frontend structure and conventions only partially follow this documentation. This document is setting standards moving forward.
 
 ### Architecture
 
@@ -474,10 +474,13 @@ The frontend UI should be structured to improve consistency and developer experi
 #### Components (React)
 
 ##### Pure Components
-- Pure components are in the [`./frontend/components`](../frontend/components) directory.
-- These are primarily used to display information or be a general action that can be reused throughout the UI. ie:
+- Pure components are in two places:
+  - Components which are used across pages are in the [`./frontend/shared`](../frontend/shared) directory.
+  - Components which are specific to a page are in the `./pages/<page>/components/` directory.
+- Shared components are primarily used to display information or be a general action that can be reused throughout the UI. ie:
   - A title component that displays the provided string property.
   - A button component that will call a function on click.
+- Page-specific components aren't shared throughout the UI but have similar functions as enumerated below.
 - All of the component properties are passed directly to the component.
 - Property types should be booleans, numbers, strings, arrays, objects, or functions.
 - No HTTP requests should be called from within a pure component.
@@ -485,7 +488,7 @@ The frontend UI should be structured to improve consistency and developer experi
   - A menu component with a button that opens an element to display a list of links. The state of the menu being open or closed can be encapsulated within that component and its state does not effect any other components and actions.
 
 ##### Dynamic Components
-- Dynamic components are in the [`./frontend/containers`](../frontend/containers) directory.
+- Dynamic components are in the `./pages/<page>/components/` directory for a give page.
 - These are primarily used to encapsulate complex requests, actions, and state management within a specific UI component. ie.
   - A build logs component that polls the API to retrieve and append new logs.
 - The component properties passed to a dynamic component should only be used to define its initial state and/or HTTP requests.
