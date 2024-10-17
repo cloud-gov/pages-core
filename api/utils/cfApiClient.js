@@ -143,33 +143,47 @@ class CloudFoundryAPIClient {
     guid,
     { attempt = 1, totalAttempts = 240, sleepInterval = 15000 } = {}
   ) {
-    if (attempt > totalAttempts) {
-      await this.cancelTask(guid);
-      const totalMins = ((sleepInterval / 1000) * totalAttempts) / 60;
+    let current = attempt;
+    let isPolling = true;
+    let error = null;
+    let state = null;
 
-      throw new Error(`Task timed out after ${totalMins} minutes`);
+    while (isPolling) {
+      if (current > totalAttempts) {
+        // eslint-disable-next-line no-await-in-loop
+        await this.cancelTask(guid);
+        const totalMins = ((sleepInterval / 1000) * totalAttempts) / 60;
+
+        error = new Error(`Task timed out after ${totalMins} minutes`);
+        isPolling = false;
+        break;
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      const response = await this.fetchTaskByGuid(guid);
+
+      if (!response) {
+        error = new Error('Task not found');
+        isPolling = false;
+        break;
+      }
+
+      if (['SUCCEEDED', 'FAILED'].includes(response.state)) {
+        state = response.state;
+        isPolling = false;
+        break;
+      }
+
+      current += 1;
+      // eslint-disable-next-line no-await-in-loop
+      await wait(sleepInterval);
     }
 
-    const response = await this.fetchTaskByGuid(guid);
-
-    if (!response) {
-      throw new Error('Task not found');
+    if (error) {
+      throw error;
     }
 
-    if (['SUCCEEDED', 'FAILED'].includes(response.state)) {
-      return {
-        state: response.state,
-      };
-    }
-
-    const nextAttempt = attempt + 1;
-    await wait(sleepInterval);
-
-    return this.pollTaskStatus(guid, {
-      attempt: nextAttempt,
-      totalAttempts,
-      sleepInterval,
-    });
+    return { state };
   }
 
   async startBuildTask(
