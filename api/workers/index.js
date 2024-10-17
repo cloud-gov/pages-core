@@ -34,17 +34,16 @@ const Mailer = require('./Mailer');
 const QueueWorker = require('./QueueWorker');
 
 const EVERY_TEN_MINUTES_CRON = '0,10,20,30,40,50 * * * *';
-const NIGHTLY_CRON = '0 5 * * *';
 
 const everyTenMinutesJobConfig = {
   repeat: { cron: EVERY_TEN_MINUTES_CRON },
   priority: 1,
 };
 
-const nightlyJobConfig = {
-  repeat: { cron: NIGHTLY_CRON },
+const makeNightlyJobConfig = (minute = 0, hour = 5) => ({
+  repeat: { cron: `'${minute} ${hour} * * *'` },
   priority: 10,
-};
+});
 
 function pagesWorker(connection) {
   const domainJobProcessor = (job) => {
@@ -116,12 +115,12 @@ function pagesWorker(connection) {
   ];
 
   const jobs = () => Promise.all([
-    archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, nightlyJobConfig),
+    archiveBuildLogsQueue.add('archiveBuildLogsDaily', {}, makeNightlyJobConfig(30, 4)),
     failStuckBuildsQueue.add('failStuckBuilds', {}, everyTenMinutesJobConfig),
-    nightlyBuildsQueue.add('nightlyBuilds', {}, nightlyJobConfig),
-    scheduledQueue.add('sandboxNotifications', {}, nightlyJobConfig),
-    scheduledQueue.add('cleanSandboxOrganizations', {}, nightlyJobConfig),
-    scheduledQueue.add('buildTasksScheduler', {}, nightlyJobConfig),
+    nightlyBuildsQueue.add('nightlyBuilds', {}, makeNightlyJobConfig(0, 5)),
+    scheduledQueue.add('sandboxNotifications', {}, makeNightlyJobConfig(30, 5)),
+    scheduledQueue.add('cleanSandboxOrganizations', {}, makeNightlyJobConfig(30, 5)),
+    scheduledQueue.add('buildTasksScheduler', {}, makeNightlyJobConfig(0, 6)),
     timeoutBuildTasksQueue.add('timeoutBuilds', {}, everyTenMinutesJobConfig),
   ]);
 
