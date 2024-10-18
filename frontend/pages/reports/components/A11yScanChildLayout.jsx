@@ -8,11 +8,12 @@ import ScanFindings from './ScanFindings';
 import BackToTopButton from './BackToTopButton';
 import About from './about';
 
-export default function A11yScanChild({ data, siteId, buildId }) {
+export default function A11yScanChild({
+  report, sbtCustomRules = [], siteId, buildId, sbtId, sbtType,
+}) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages | ${scanTitle} report for ${data.url} on ${datetime.dateAndTimeSimple(data.timestamp)} for build id ${buildId}`;
-
-  const allResults = Object.values(data.groupedViolations).flat(1);
+  const pageTitle = `Pages | ${scanTitle} report for ${report.url} on ${datetime.dateAndTimeSimple(report.timestamp)} for build id ${buildId}`;
+  const allResults = Object.values(report.groupedViolations).flat(1);
   const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
   // const suppressed = allResults.filter(ignoreFn);
   const unsuppressed = allResults.filter(r => !ignoreFn(r));
@@ -22,14 +23,14 @@ export default function A11yScanChild({ data, siteId, buildId }) {
     ...group,
     label: group.label,
     usePill: true,
-    count: data.groupedViolations[group?.name]?.length || 0,
+    count: report.groupedViolations[group?.name]?.length || 0,
   })
   );
   navGroups.push(
     // TODO: split into suppressed/unsuppressed items
     {
       label: 'Total results',
-      count: data?.violationsCount,
+      count: report?.violationsCount,
     },
     {
       label: 'All unsuppressed results',
@@ -38,7 +39,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
     },
     {
       label: 'Total passes',
-      count: data?.passes?.length,
+      count: report?.passes?.length,
     }
   );
 
@@ -53,9 +54,9 @@ export default function A11yScanChild({ data, siteId, buildId }) {
           Accessibility report for
           {' '}
           <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">{data.url}</span>
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">{report.url}</span>
           <span className="font-sans-lg text-normal margin-left-1">
-            <a className="usa-link font-body-xs text-no-wrap margin-x-2" target="_blank" aria-label="open scanned page in a new window," title="open scanned page in a new window" href={data.url} rel="noreferrer">
+            <a className="usa-link font-body-xs text-no-wrap margin-x-2" target="_blank" aria-label="open scanned page in a new window," title="open scanned page in a new window" href={report.url} rel="noreferrer">
               open page
               <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                 <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
@@ -72,7 +73,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
       <div className="grid-row border-top-1px padding-top-1">
         <section className="tablet:grid-col-auto">
           <ScanNav
-            generated={datetime.dateAndTimeSimple(data.timestamp)}
+            generated={datetime.dateAndTimeSimple(report.timestamp)}
             buildId={buildId}
             siteId={siteId}
             groups={navGroups}
@@ -114,19 +115,21 @@ export default function A11yScanChild({ data, siteId, buildId }) {
           <div>
             <ScanFindings
               siteId={siteId}
-              scanType="a11y"
-              count={data.violationsCount}
-              groupedFindings={data.groupedViolations}
+              sbtId={sbtId}
+              sbtType={sbtType}
+              sbtCustomRules={sbtCustomRules}
+              count={report.violationsCount}
+              groupedFindings={report.groupedViolations}
             />
           </div>
           <div>
-            <A11yPassed passes={data.passes} />
+            <A11yPassed passes={report.passes} />
             <hr />
-            <About scanType="a11y" siteId={siteId}>
+            <About sbtType={sbtType} siteId={siteId}>
               <p className="font-body-xs line-height-sans-3">
                 This report was generated for
                 {' '}
-                <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.url}</code>
+                <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{report.url}</code>
                 {' from '}
                 <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
                   build #
@@ -135,7 +138,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
                 {' '}
                 scanned on
                 {' '}
-                {datetime.dateAndTimeSimple(data.timestamp)}
+                {datetime.dateAndTimeSimple(report.timestamp)}
               </p>
             </About>
           </div>
@@ -202,7 +205,11 @@ A11yPassed.propTypes = {
 
 A11yScanChild.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  data: PropTypes.object.isRequired,
+  report: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  sbtCustomRules: PropTypes.array,
   siteId: PropTypes.number.isRequired,
+  sbtId: PropTypes.number.isRequired,
+  sbtType: PropTypes.string.isRequired,
   buildId: PropTypes.number.isRequired,
 };
