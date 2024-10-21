@@ -2207,6 +2207,4 @@ const BUILD_SCAN_RULES = [
   },
 ];
 
-export default {
-  BUILD_SCAN_RULES,
-};
+export { BUILD_SCAN_RULES };

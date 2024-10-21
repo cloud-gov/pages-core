@@ -105,31 +105,13 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { task_id: taskId, sub_page: subPage } = params;
 
-    if (process.env.FEATURE_LOCAL_BUILD_REPORTS === 'active') {
-      const task = localSiteBuildTasks.find((t) => t.id.toString() === taskId);
-      const file = subPage || 'index';
-      const reportPath = join(
-        __dirname,
-        `../../services/local/tasks/${task.type}/${file}.json`,
-      );
-
-      const raw = await readFile(reportPath, 'utf-8');
-      const report = JSON.parse(raw);
-
-      return res.json({
-        type: task.type,
-        siteId: task.id,
-        buildId: task.id,
-        report,
-      });
-    }
-
     const task = await BuildTask.findOne({
       where: {
         id: taskId,
       },
       include: [
         BuildTaskType,
+        SiteBuildTask,
         {
           model: Build,
           include: Site,
@@ -144,15 +126,27 @@ module.exports = wrapHandlers({
       // return identical responses for missing tasks and unauthorized tasks
       return res.notFound();
     }
-
     const taskJSON = buildTaskSerializer.serialize(task);
 
     // add report data to the task
     let report = null;
-    const key = `${task.artifact}${subPage || 'index'}.json`;
-    const reportReponse = await getObject(task.Build.Site, key);
-    const reportString = await reportReponse.Body.transformToString();
-    report = JSON.parse(reportString);
+    // for local seeded reports
+    if (process.env.FEATURE_LOCAL_BUILD_REPORTS === 'active') {
+      const localTask = localSiteBuildTasks.find((t) => t.id.toString() === taskId);
+      const file = subPage || 'index';
+      const reportPath = join(
+        __dirname,
+        `../../services/local/tasks/${localTask.type}/${file}.json`,
+      );
+
+      const raw = await readFile(reportPath, 'utf-8');
+      report = JSON.parse(raw);
+    } else {
+      const key = `${task.artifact}${subPage || 'index'}.json`;
+      const reportReponse = await getObject(task.Build.Site, key);
+      const reportString = await reportReponse.Body.transformToString();
+      report = JSON.parse(reportString);
+    }
 
     const type = appMatch(task.BuildTaskType);
 

@@ -156,8 +156,18 @@ a.bg-risk-low:hover    { background: #7a591a}
 a.bg-risk-info:hover   { background: #00687d} 
 a.bg-risk-other:hover  { background: #565c65}  
 
-
-
+@supports ((-webkit-mask: url("")) or (mask: url(""))) {
+  .usa-alert--suppressed .usa-alert__body:before {
+    mask-image: url(../img/usa-icons/notifications_off.svg), linear-gradient(transparent, transparent);
+    background-color: #13171f77;
+  }
+  .usa-alert--suppressed,
+  .usa-alert--suppressed .usa-alert__body {
+    background-color: #f5f6f7;
+    border-left-color:#dfe1e2;
+    color: #13171f;
+  }
+}
 
 /* https://github.com/highlightjs/highlight.js/tree/main/src/styles */
 

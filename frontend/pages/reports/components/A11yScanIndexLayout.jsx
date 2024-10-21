@@ -7,17 +7,16 @@ import * as datetime from '@util/datetime';
 import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
+import GeneratedFor from './GeneratedFor';
 
-export default function A11yScanIndex({ data, siteId, buildId }) {
+export default function A11yScanIndex({ report, siteId, buildId }) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages
-    | ${scanTitle} report index for
-    ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)}
-    for build id #${buildId}`;
+  // eslint-disable-next-line max-len
+  const pageTitle = `Pages | ${scanTitle} report index for ${report.baseurl} on ${datetime.dateAndTimeSimple(report.reportPages[0].timestamp)} for build id #${buildId}`;
   function findReportsPerURLs(url) {
-    return data.reportPages.find((page) => page.absoluteURL === url)?.path || '';
+    return report.reportPages.find((page) => page.absoluteURL === url)?.path || '';
   }
-  const summarizedResults = [...data.violatedRules].map((result) => ({
+  const summarizedResults = [...report.violatedRules].map((result) => ({
     ...result,
     name: result.help,
     ref: result.helpUrl,
@@ -40,20 +39,9 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <h1 className="font-serif-xl grid-col padding-right-2">
           Accessibility reports for <br />
-          <span
-            className={`
-            font-code-lg
-            text-normal
-            text-primary-darker
-            bg-accent-cool-lighter
-            padding-x-05r narrow-mono
-            break-anywhere
-          `}
-          >
-            {data.baseurl}{' '}
-          </span>
-          <span className="text-italic font-sans-lg text-normal margin-left-2">
-            (all pages)
+          {/* eslint-disable-next-line max-len */}
+          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">
+            {report.baseurl}{' '}
           </span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
@@ -122,7 +110,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           >
             All results{' '}
             <span className="font-body-lg text-secondary-vivid">
-              ({data.violatedRules.length})
+              ({report.violatedRules.length})
             </span>
           </h2>
         </div>
@@ -130,7 +118,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col">
           <ScanFindingsSummary
-            baseurl={data.baseurl}
+            baseurl={report.baseurl}
             suppressedFindings={suppressed}
             unsuppressedFindings={unsuppressed}
           />
@@ -149,14 +137,14 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           >
             All reports{' '}
             <span className="font-body-lg text-accent-cool-darker">
-              ({data.reportPages.length})
+              ({report.reportPages.length})
             </span>
           </h2>
         </div>
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <ScanResultsChildPages pages={data.reportPages} baseurl={data.baseurl} />
+          <ScanResultsChildPages pages={report.reportPages} baseurl={report.baseurl} />
           <p className="font-body-2xs line-height-body-3">
             This report was generated for{' '}
             <Link
@@ -166,28 +154,20 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
             >
               build #{buildId}
             </Link>{' '}
-            scanned on {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}.
+            scanned on {datetime.dateAndTimeSimple(report.reportPages[0]?.timestamp)}.
           </p>
         </div>
       </div>
       <div className="grid-row">
         <div className="grid-col">
           <About scanType="a11y" siteId={siteId}>
-            <p className="font-body-xs line-height-body-3">
-              This report was generated for{' '}
-              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">
-                {data.baseurl}
-              </code>
-              {' from '}
-              <Link
-                reloadDocument
-                to={`/sites/${siteId}/builds/${buildId}/logs`}
-                className="usa-link"
-              >
-                build #{buildId}
-              </Link>{' '}
-              scanned on {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}
-            </p>
+            <GeneratedFor
+              siteId={siteId}
+              buildId={buildId}
+              url={report.baseurl}
+              timestamp={datetime.dateAndTimeSimple(report.reportPages[0]?.timestamp)}
+              topClass="line-height-body-3"
+            />
           </About>
         </div>
       </div>
@@ -294,7 +274,7 @@ ScanResultsChildPages.propTypes = {
 };
 
 A11yScanIndex.propTypes = {
-  data: PropTypes.object.isRequired,
+  report: PropTypes.object.isRequired,
   siteId: PropTypes.number.isRequired,
   buildId: PropTypes.number.isRequired,
 };
