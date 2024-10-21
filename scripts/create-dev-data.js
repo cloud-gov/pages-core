@@ -546,9 +546,20 @@ async function createData() {
     startsWhen: 'build',
     url: 'https://cloud.gov/pages/documentation/build-scans/',
   });
+
+  // task "hook" for each site
+  const sbtNodeType1 = await SiteBuildTask.create({
+    siteId: nodeSite.id,
+    buildTaskTypeId: taskType1.id,
+    branch: 'test',
+    metadata: {
+      runDay: 27, // should be a day of the month
+    },
+  });
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,
     buildTaskTypeId: taskType1.id,
+    siteBuildTaskId: sbtNodeType1.id,
     name: 'type',
     status: 'created',
     artifact: null,
@@ -557,6 +568,7 @@ async function createData() {
   await BuildTask.create({
     buildId: nodeSiteBuilds[2].id,
     buildTaskTypeId: taskType1.id,
+    siteBuildTaskId: sbtNodeType1.id,
     name: 'type',
     status: 'processing',
     artifact: null,
@@ -566,6 +578,7 @@ async function createData() {
   await BuildTask.create({
     buildId: nodeSiteBuilds[4].id,
     buildTaskTypeId: taskType1.id,
+    siteBuildTaskId: sbtNodeType1.id,
     name: 'type',
     status: 'cancelled',
     artifact: null,
@@ -575,6 +588,7 @@ async function createData() {
   const btZap1 = await BuildTask.create({
     buildId: nodeSiteBuilds[5].id,
     buildTaskTypeId: taskType1.id,
+    siteBuildTaskId: sbtNodeType1.id,
     name: 'type',
     status: 'success',
     artifact: null,
@@ -586,6 +600,7 @@ async function createData() {
   const btZap2 = await BuildTask.create({
     buildId: nodeSiteBuilds[6].id,
     buildTaskTypeId: taskType1.id,
+    siteBuildTaskId: sbtNodeType1.id,
     name: 'type',
     status: 'success',
     artifact: null,
@@ -604,9 +619,21 @@ async function createData() {
     startsWhen: 'build',
     url: 'https://cloud.gov/pages/documentation/build-scans/',
   });
+
+  // task "hook" for each site
+  const sbtNodeType2 = await SiteBuildTask.create({
+    siteId: nodeSite.id,
+    buildTaskTypeId: taskType2.id,
+    branch: 'test',
+    metadata: {
+      runDay: 1, // should be a day of the month
+    },
+  });
+
   await BuildTask.create({
     buildId: nodeSiteBuilds[0].id,
     buildTaskTypeId: taskType2.id,
+    siteBuildTaskId: sbtNodeType2.id,
     name: 'type',
     status: 'created',
     artifact: null,
@@ -615,6 +642,7 @@ async function createData() {
   await BuildTask.create({
     buildId: nodeSiteBuilds[2].id,
     buildTaskTypeId: taskType2.id,
+    siteBuildTaskId: sbtNodeType2.id,
     name: 'type',
     status: 'processing',
     artifact: null,
@@ -624,6 +652,7 @@ async function createData() {
   await BuildTask.create({
     buildId: nodeSiteBuilds[4].id,
     buildTaskTypeId: taskType2.id,
+    siteBuildTaskId: sbtNodeType2.id,
     name: 'type',
     status: 'cancelled',
     artifact: null,
@@ -633,6 +662,7 @@ async function createData() {
   await BuildTask.create({
     buildId: nodeSiteBuilds[5].id,
     buildTaskTypeId: taskType2.id,
+    siteBuildTaskId: sbtNodeType2.id,
     name: 'type',
     status: 'error',
     artifact: null,
@@ -642,6 +672,7 @@ async function createData() {
   const btA11y1 = await BuildTask.create({
     buildId: nodeSiteBuilds[6].id,
     buildTaskTypeId: taskType2.id,
+    siteBuildTaskId: sbtNodeType2.id,
     name: 'type',
     status: 'success',
     artifact: null,
@@ -652,25 +683,6 @@ async function createData() {
 
   // write localSiteBuildTasks.json file for viewing out reports
   await writeFile(localSiteBuildTasksFile, JSON.stringify(localSiteBuildTasks), 'utf-8');
-
-  // task "hook" for each site
-  await SiteBuildTask.create({
-    siteId: nodeSite.id,
-    buildTaskTypeId: taskType1.id,
-    branch: 'test',
-    metadata: {
-      runDay: 27, // should be a day of the month
-    },
-  });
-  // task "hook" for each site
-  await SiteBuildTask.create({
-    siteId: nodeSite.id,
-    buildTaskTypeId: taskType2.id,
-    branch: 'test',
-    metadata: {
-      runDay: 1, // should be a day of the month
-    },
-  });
 
   const goSiteBuilds = await Promise.all([
     Build.create({

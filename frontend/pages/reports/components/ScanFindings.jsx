@@ -6,15 +6,18 @@ import ScanFinding from './ScanFinding';
 const ScanFindings = ({
   count,
   groupedFindings,
-  scanType,
   siteId,
+  sbtId,
+  sbtType,
+  sbtCustomRules,
 }) => {
-  const groupKey = scanType === 'zap' ? 'riskCode' : 'name';
+  const scanGroup = sbtType === 'owasp-zap' ? 'zap' : 'a11y';
+  const groupKey = scanGroup === 'zap' ? 'riskCode' : 'name';
   if (count && groupedFindings) {
     return (
       <>
         {(
-          severity[scanType].map(({ [groupKey]: group, label, color }, groupIndex) => (
+          severity[scanGroup].map(({ [groupKey]: group, label, color }, groupIndex) => (
             <React.Fragment key={group}>
               {groupedFindings[group] && groupedFindings[group]?.length > 0 && (
                 <>
@@ -38,8 +41,10 @@ const ScanFindings = ({
                         groupColor={color}
                         groupLabel={label}
                         groupIndex={groupIndex}
-                        scanType={scanType}
                         siteId={siteId}
+                        sbtId={sbtId}
+                        sbtType={sbtType}
+                        sbtCustomRules={sbtCustomRules}
                       />
                     ))}
                   </div>
@@ -58,8 +63,11 @@ ScanFindings.propTypes = {
   count: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   groupedFindings: PropTypes.object.isRequired,
-  scanType: PropTypes.string.isRequired,
   siteId: PropTypes.number.isRequired,
+  sbtId: PropTypes.number.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  sbtCustomRules: PropTypes.array,
+  sbtType: PropTypes.string.isRequired,
 };
 
 export default ScanFindings;
