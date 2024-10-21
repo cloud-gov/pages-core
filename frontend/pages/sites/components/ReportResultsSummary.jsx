@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {
   IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX, IconIgnore,
-} from './icons';
+} from '../../../shared/icons';
 
 const reportResultsIcon = (status, count) => {
   let icon;

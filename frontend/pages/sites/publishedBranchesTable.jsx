@@ -1,62 +1,13 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import publishedBranchActions from '@actions/publishedBranchActions';
 import { currentSite } from '@selectors/site';
 import LoadingIndicator from '@shared/LoadingIndicator';
-import BranchViewLink from '@shared/branchViewLink';
 import AlertBanner from '@shared/alertBanner';
 
-import globals from '../../globals';
-
-function renderBranchFilesLink(branch) {
-  const href = `/sites/${branch.site.id}/published/${branch.name}`;
-  return <Link to={href}>View files</Link>;
-}
-
-function renderPublishedBranchRow(branch, site) {
-  return (
-    <tr key={branch.name}>
-      <td>{branch.name}</td>
-      <td>
-        <ul className="usa-list--unstyled">
-          <li>
-            <BranchViewLink branchName={branch.name} site={site} />
-          </li>
-          <li>
-            {renderBranchFilesLink(branch)}
-          </li>
-        </ul>
-      </td>
-    </tr>
-  );
-}
-
-function renderPublishedBranchesTable(data, site) {
-  return (
-    <div>
-      <p>
-        Use this page to see every version of your site&apos;s code published on
-        {` ${globals.APP_NAME} `}
-        and to audit the specific files that
-        {` ${globals.APP_NAME} `}
-        has published.
-      </p>
-      <table className="usa-table usa-table--borderless usa-table--stacked published-branch-table log-table width-full table-full-width">
-        <thead>
-          <tr>
-            <th>Branch</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          { data.map(d => renderPublishedBranchRow(d, site)) }
-        </tbody>
-      </table>
-    </div>
-  );
-}
+import BranchesTable from './components/BranchesTable';
 
 function PublishedBranchesTable() {
   const { id } = useParams();
@@ -80,7 +31,7 @@ function PublishedBranchesTable() {
       />
     );
   }
-  return renderPublishedBranchesTable(publishedBranches.data, site);
+  return <BranchesTable branches={publishedBranches.data} site={site} />;
 }
 
 export { PublishedBranchesTable };
