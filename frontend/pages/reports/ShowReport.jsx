@@ -21,7 +21,6 @@ export default function Report() {
 
   switch (data.type) {
     case 'owasp-zap':
-      return <Zap data={report} siteId={siteId} buildId={buildId} />;
       return (
         <Zap
           siteId={siteId}
