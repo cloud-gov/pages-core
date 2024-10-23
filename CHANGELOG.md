@@ -1,3 +1,10 @@
+## 0.13.1 (2024-10-17)
+
+### Maintenance
+
+- separate nightly tasks
+- organize react components to better match architecture guide
+
 ## 0.13.0 (2024-10-02)
 
 ### Added
