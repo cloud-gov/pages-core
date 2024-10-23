@@ -20,7 +20,7 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-svelte3": "^3.2.0",
-    "rollup": "^2.3.4",
+    "rollup": "^2.79.2",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-svelte": "6.1.1",
@@ -32,7 +32,7 @@
     "date-fns": "^2.30.0",
     "page": "^1.11.6",
     "svelecte": "^3.17.2",
-    "svelte": "^3.0.0"
+    "svelte": "^4.2.19"
   },
   "resolutions": {
     "path-to-regexp": "1.9.0"
