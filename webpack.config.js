@@ -119,6 +119,8 @@ module.exports = {
       '@util': path.resolve(__dirname, 'frontend/util'),
       '@selectors': path.resolve(__dirname, 'frontend/selectors'),
       '@pages': path.resolve(__dirname, 'frontend/pages'),
+      '@globals': path.resolve(__dirname, 'frontend/globals'),
+      '@propTypes': path.resolve(__dirname, 'frontend/propTypes'),
     },
   },
   module: {

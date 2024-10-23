@@ -11,7 +11,9 @@
             "@hooks": ["./frontend/hooks"],
             "@util": ["./frontend/util"],
             "@selectors": ["./frontend/selectors"],
-            "@pages": ["./frontend/pages"]
+            "@pages": ["./frontend/pages"],
+            "@globals": ["./frontend/globals"],
+            "@propTypes": ["./frontend/propTypes"],
         }
     }
   }
