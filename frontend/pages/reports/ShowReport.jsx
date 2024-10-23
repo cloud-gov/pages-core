@@ -16,12 +16,30 @@ export default function Report() {
   if (!data) return <ReportNotFound />;
 
   const { report, siteId, buildId } = data;
+  const sbtCustomRules = data.SiteBuildTask?.metadata?.rules || [];
+  const sbtId = data.SiteBuildTask?.id || null;
 
   switch (data.type) {
     case 'owasp-zap':
-      return <Zap data={report} siteId={siteId} buildId={buildId} />;
+      return (
+        <Zap
+          siteId={siteId}
+          buildId={buildId}
+          sbtId={sbtId}
+          sbtType={data.type}
+          report={report}
+          sbtCustomRules={sbtCustomRules}
+        />
+      );
     case 'a11y':
-      return <A11yScanIndex data={report} siteId={siteId} buildId={buildId} />;
+      return (
+        <A11yScanIndex
+          siteId={siteId}
+          buildId={buildId}
+          report={report}
+          sbtType={data.type}
+        />
+      );
     default:
       return <ReportNotFound />;
   }
