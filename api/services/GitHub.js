@@ -32,13 +32,13 @@ const parseGithubErrorMessage = (error) => {
 
   try {
     githubError = error.response.data.errors[0].message;
-  } catch (e) {
+  } catch {
     try {
       githubError = error.errors[0].message;
-    } catch (e2) {
+    } catch {
       try {
         githubError = error.message;
-      } catch (e3) { /* noop */ }
+      } catch { /* noop */ }
     }
   }
 

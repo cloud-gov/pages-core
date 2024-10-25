@@ -89,6 +89,7 @@ describe('notifyOrganizations', () => {
     const sandboxNotices = 5;
     let i;
     for (i = 0; i < sandboxNotices; i += 1) {
+      // eslint-disable-next-line
       org = await createSandboxOrgDaysRemaining();
       orgsToNotify.push(org.id);
     }

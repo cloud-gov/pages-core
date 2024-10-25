@@ -2,14 +2,12 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
 const config = require('../../../../config');
-const { logger } = require('../../../../winston');
 const { Domain, Site, SiteBranchConfig, User } = require('../../../../api/models');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const { buildViewLink } = require('../../../../api/utils/build');
 const GitHub = require('../../../../api/services/GitHub');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
-const EventCreator = require('../../../../api/services/EventCreator');
 
 const requestedCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
@@ -157,13 +155,11 @@ describe('GithubBuildHelper', () => {
 
       it("should report that the status if the build user has invalid token'", async() => {
         const repoNocks = [];
-        const errorEventSpy = sinon.spy(EventCreator, 'error');
         await user.update({ signedInAt: '1999-01-01'});
         const otherUser = await factory.user();
         await site.addUser(otherUser);
         users = await site.getUsers();
 
-        let i;
         repoNocks.push(githubAPINocks.repo({
           owner: site.owner,
           repo: site.repository,
@@ -175,7 +171,7 @@ describe('GithubBuildHelper', () => {
           repo: site.repository,
           username: otherUser.username,
         }));
-        
+
         const statusNock = githubAPINocks.status({
           owner: site.owner,
           repo: site.repository,
@@ -191,13 +187,11 @@ describe('GithubBuildHelper', () => {
 
       it("should report that the status if the build user does not have write permissions'", async() => {
         const repoNocks = [];
-        const errorEventSpy = sinon.spy(EventCreator, 'error');
         await user.update({ signedInAt: '1999-01-01'});
         const otherUser = await factory.user();
         await site.addUser(otherUser);
         users = await site.getUsers();
 
-        let i;
         repoNocks.push(githubAPINocks.repo({
           owner: site.owner,
           repo: site.repository,
@@ -209,7 +203,7 @@ describe('GithubBuildHelper', () => {
           repo: site.repository,
           username: otherUser.username,
         }));
-        
+
         const statusNock = githubAPINocks.status({
           owner: site.owner,
           repo: site.repository,
@@ -248,7 +242,7 @@ describe('GithubBuildHelper', () => {
           username: recentUser.username,
           response: [403, { permissions: {} }],
         }));
-        
+
         await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
         const err =  await GithubBuildHelper.reportBuildStatus(build).catch(e => e);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
@@ -281,7 +275,7 @@ describe('GithubBuildHelper', () => {
           username: recentUser.username,
           response: [201, { permissions: {} }],
         }));
-        
+
         await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
         const err =  await GithubBuildHelper.reportBuildStatus(build).catch(e => e);
         repoNocks.forEach(repoNock => expect(repoNock.isDone()).to.be.true);
@@ -313,7 +307,7 @@ describe('GithubBuildHelper', () => {
       let user;
       let site;
       let build;
-      let users;
+
       beforeEach(async() => {
         user = await factory.user();
         site = await factory.site({ owner: 'test-owner', repository: 'test-repo', users: [user] });
@@ -323,7 +317,7 @@ describe('GithubBuildHelper', () => {
           requestedCommitSha,
           user,
         });
-        users = await site.getUsers();
+        await site.getUsers();
       })
 
       it("should report that the status is 'pending'", async() => {
@@ -365,7 +359,7 @@ describe('GithubBuildHelper', () => {
         await  GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;
-         
+
       });
     });
 
@@ -373,7 +367,7 @@ describe('GithubBuildHelper', () => {
       let user;
       let site;
       let build;
-      let users;
+
       beforeEach(async() => {
         user = await factory.user();
         site = await factory.site({ owner: 'test-owner', repository: 'test-repo', users: [user] });
@@ -383,7 +377,7 @@ describe('GithubBuildHelper', () => {
           requestedCommitSha,
           user,
         });
-        users = await site.getUsers();
+        await site.getUsers();
       })
       it("should report that the status is 'pending'", async() => {
         const repoNock = githubAPINocks.repo({
@@ -432,7 +426,7 @@ describe('GithubBuildHelper', () => {
       let user;
       let site;
       let build;
-      let users;
+
       after(() => {
         // reset config.app.appEnv to its original value
         config.app.appEnv = origAppEnv;
@@ -448,7 +442,7 @@ describe('GithubBuildHelper', () => {
           clonedCommitSha,
           user,
         });
-        users = await site.getUsers();
+        await site.getUsers();
       })
 
       it('should set status context to "federalist/build" when APP_ENV is "production"', async() => {
@@ -477,7 +471,7 @@ describe('GithubBuildHelper', () => {
       let user;
       let site;
       let build;
-      let users;
+
       beforeEach(async() => {
         user = await factory.user();
         site = await  factory.site({ users: [user] })
@@ -488,7 +482,7 @@ describe('GithubBuildHelper', () => {
           user,
           site,
         });
-        users = await site.getUsers();
+        await site.getUsers();
       })
       it("should report that the status is 'success'", async() => {
         const repoNock = githubAPINocks.repo({
@@ -536,7 +530,7 @@ describe('GithubBuildHelper', () => {
       let user;
       let site;
       let build;
-      let users;
+
       beforeEach(async() => {
         user = await factory.user();
         site = await  factory.site({ users: [user] })
@@ -546,9 +540,9 @@ describe('GithubBuildHelper', () => {
           user,
           site,
         });
-        users = await site.getUsers();
+        await site.getUsers();
       });
-      it("should report that the status is 'error' with requestedCommitSha", async () => {        
+      it("should report that the status is 'error' with requestedCommitSha", async () => {
         const repoNock = githubAPINocks.repo({
           accessToken: user.githubAccessToken,
           owner: site.owner,
@@ -570,7 +564,7 @@ describe('GithubBuildHelper', () => {
 
       it("should report that the status is 'error' with clonedCommitSha", async () => {
         await build.update({ clonedCommitSha });
-        
+
         const repoNock = githubAPINocks.repo({
           accessToken: user.githubAccessToken,
           owner: site.owner,
@@ -594,7 +588,7 @@ describe('GithubBuildHelper', () => {
       it("should use the GitHub access token of the build's user not a site user", async () => {
         const nonSiteUser = await factory.user();
         await build.update({ user: nonSiteUser.id });
-        
+
           const repoNock = githubAPINocks.repo({
           accessToken: nonSiteUser.githubAccessToken,
           owner: site.owner,
@@ -611,7 +605,7 @@ describe('GithubBuildHelper', () => {
 
         await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
         await GithubBuildHelper.reportBuildStatus(build);
-      
+
         expect(statusNock.isDone()).to.be.true;
         expect(repoNock.isDone()).to.be.true;
       });
@@ -622,7 +616,7 @@ describe('GithubBuildHelper', () => {
     let user;
     let site;
     let build;
-    let users;
+
     const path = 'filePath.txt';
     beforeEach(async() => {
       user = await factory.user();
@@ -634,12 +628,12 @@ describe('GithubBuildHelper', () => {
         user,
         site,
       });
-      users = await site.getUsers();
+      await site.getUsers();
     });
 
     it('should fetch the content requested', async () => {
-      const fetchContentGitStub = sinon.stub(GitHub, 'getContent').resolves('testContent');
-      const checkPermissionsGitStub = sinon.stub(GitHub, 'checkPermissions').resolves({ push: true });
+      sinon.stub(GitHub, 'getContent').resolves('testContent');
+      sinon.stub(GitHub, 'checkPermissions').resolves({ push: true });
       await build.reload({ include: [{ model: Site, include: [{ model: User }] }]});
       const content = await GithubBuildHelper.fetchContent(build, path);
       expect(content).to.equal('testContent');
@@ -657,7 +651,7 @@ describe('GithubBuildHelper', () => {
     let user;
     let site;
     let build;
-    let users;
+
     beforeEach(async () => {
       user = await factory.user({ signedInAt: '1999-12-31'});
       site = await factory.site({ users: [user] });
@@ -665,7 +659,7 @@ describe('GithubBuildHelper', () => {
         site,
         user,
       });
-      users = await site.getUsers();
+      await site.getUsers();
     })
 
     it('should fetch buildUser token', async () => {
@@ -684,7 +678,7 @@ describe('GithubBuildHelper', () => {
     it('should fetch a siteUser token - build user no access to private repo', async () => {
       const siteUser = await factory.user();
       await site.addUser(siteUser);
-      users = await site.getUsers();
+      await site.getUsers();
       const repoNocks = [];
       repoNocks.push(githubAPINocks.repo({
         accessToken: user.githubAccessToken,
@@ -708,7 +702,7 @@ describe('GithubBuildHelper', () => {
     it('should fetch a siteUser token - build user no permission', async () => {
       const siteUser = await factory.user();
       await site.addUser(siteUser);
-      users = await site.getUsers();
+      await site.getUsers();
       const repoNocks = [];
       repoNocks.push(githubAPINocks.repo({
         accessToken: user.githubAccessToken,
@@ -732,7 +726,7 @@ describe('GithubBuildHelper', () => {
     it('all site user w/o permissions to private repo', async () => {
       const siteUser = await factory.user();
       await site.addUser(siteUser);
-      users = await site.getUsers();
+      await site.getUsers();
       const repoNocks = [];
       repoNocks.push(githubAPINocks.repo({
         accessToken: user.githubAccessToken,
@@ -764,7 +758,7 @@ describe('GithubBuildHelper', () => {
     it('all site users withouth write access', async () => {
       const siteUser = await factory.user();
       await site.addUser(siteUser);
-      users = await site.getUsers();
+      await site.getUsers();
       const repoNocks = [];
       repoNocks.push(githubAPINocks.repo({
         accessToken: user.githubAccessToken,

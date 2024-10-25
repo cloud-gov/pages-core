@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import _ from 'underscore';
@@ -49,12 +48,10 @@ export const useSiteDomains = (siteId, domainId) => {
     const selected = domains.data.find(d => d.id === id);
 
     if (!selected) {
-      // eslint-disable-next-line no-alert
       return window.alert('This custom domain was not found.');
     }
 
     if (selected.state !== 'pending') {
-      // eslint-disable-next-line no-alert
       window.alert(
         `You cannot delete this custom domain since it is ${selected.state}.
         Please email pages-support@cloud.gov to take down ${selected.names}`
@@ -63,7 +60,6 @@ export const useSiteDomains = (siteId, domainId) => {
 
     if (
       selected.state === 'pending'
-      // eslint-disable-next-line no-alert
       && window.confirm(
         `Are you sure you want to delete the custom domain ${selected.names}?`
       )
@@ -74,7 +70,6 @@ export const useSiteDomains = (siteId, domainId) => {
         .catch(error => setDomains({ ...domains, error }));
     }
 
-    // eslint-disable-next-line no-alert
     return window.confirm(
       `Unable to delete the custom domain ${selected.names}?`
     );
@@ -178,7 +173,7 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
         .then(() => navigate(`/sites/${siteId}/custom-domains`))
         .catch(error => setDomain({ ...domain, error }));
     }
-    // eslint-disable-next-line no-alert
+
     return window.alert(
       `You cannot edit this custom domain since it is ${domain.state}.
         Please email pages-support@cloud.gov to edit ${domain.names}`

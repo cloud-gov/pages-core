@@ -636,7 +636,6 @@ describe('GitHub', () => {
   });
 
   describe('.getTeamMembers', () => {
-    /* eslint-disable camelcase */
     it('returns a branch based on the supplied parameters', (done) => {
       const accessToken = 'token';
       const org = 'federalist-users';
@@ -669,7 +668,6 @@ describe('GitHub', () => {
           done();
         });
     });
-    /* eslint-enable camelcase */
   });
 
   describe('.sendCreateGithubStatusRequest', () => {
@@ -778,7 +776,7 @@ describe('GitHub', () => {
     const repo = 'repo-name';
     const path = 'file-path.json';
     const ref = 'theRef';
-    /* eslint-disable camelcase */
+
     it('returns a file based on the supplied parameters', async () => {
       const content = 'helloworld';
 
@@ -821,6 +819,5 @@ describe('GitHub', () => {
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('Error Encountered');
     });
-    /* eslint-enable camelcase */
   });
 });

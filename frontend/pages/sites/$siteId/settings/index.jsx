@@ -25,9 +25,7 @@ function SiteSettings() {
   }
 
   function handleDelete() {
-    // eslint-disable-next-line no-alert
     if (
-      // eslint-disable-next-line no-alert
       window.confirm(
         `${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`
       )

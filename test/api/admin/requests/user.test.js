@@ -30,8 +30,7 @@ describe('Admin - Users API', () => {
 
   describe('GET /admin/reports/users', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/users')
+      const response = await request(app)['get']('/reports/users')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -55,7 +54,7 @@ describe('Admin - Users API', () => {
         .expect(200);
 
       expect(body.data.length).to.equal(2);
-      ids = body.data.map(user => user['id']);
+      const ids = body.data.map(user => user['id']);
       expect(ids).to.include(user1.id);
       expect(ids).to.include(user2.id);
     });
@@ -63,8 +62,7 @@ describe('Admin - Users API', () => {
 
   describe('GET /admin/reports/users.csv', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/users.csv')
+      const response = await request(app)['get']('/reports/users.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -95,7 +93,7 @@ describe('Admin - Users API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="users.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"ID","Email","Organizations","Details","Created","Last Signed In"'
       );
@@ -111,8 +109,7 @@ describe('Admin - Users API', () => {
 
   describe('GET /admin/reports/active-users', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/active-users')
+      const response = await request(app)['get']('/reports/active-users')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -146,7 +143,7 @@ describe('Admin - Users API', () => {
         .expect(200);
 
       expect(body.data.length).to.equal(2);
-      ids = body.data.map(user => user['id']);
+      const ids = body.data.map(user => user['id']);
       expect(ids).to.include(user1.id);
       expect(ids).to.include(user2.id);
       expect(ids).to.not.include(user3.id);
@@ -156,8 +153,7 @@ describe('Admin - Users API', () => {
 
   describe('GET /admin/reports/active-users.csv', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/active-users.csv')
+      const response = await request(app)['get']('/reports/active-users.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -195,7 +191,7 @@ describe('Admin - Users API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="users.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"ID","Email","Organizations","Details","Created","Last Signed In"'
       );

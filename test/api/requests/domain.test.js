@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
-const yaml = require('js-yaml');
 const factory = require('../support/factory');
 const csrfToken = require('../support/csrfToken');
 const { authenticatedSession } = require('../support/session');
@@ -577,7 +576,7 @@ describe('Domain API', () => {
           context,
         });
 
-        const [_, domain2] = await Promise.all([
+        const [, domain2] = await Promise.all([
           factory.domain.create({
             siteId: site.id,
             siteBranchConfigId: site.SiteBranchConfigs[0].id,
@@ -628,7 +627,7 @@ describe('Domain API', () => {
           context,
         });
 
-        const [_, domain2] = await Promise.all([
+        const [, domain2] = await Promise.all([
           factory.domain.create({
             siteId: site.id,
             siteBranchConfigId: site.SiteBranchConfigs[0].id,

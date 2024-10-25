@@ -276,7 +276,6 @@ describe('utils', () => {
       const spy = sinon.spy();
       const error = new Error('foobar');
 
-      // eslint-disable-next-line no-unused-vars
       const handler = async (_req, _res, _next) => {
         throw error;
       };
@@ -295,7 +294,6 @@ describe('utils', () => {
       const error = new Error('foobar');
 
       const handlers = {
-        // eslint-disable-next-line no-unused-vars
         foo: async (_req, _res, _next) => {
           throw error;
         },

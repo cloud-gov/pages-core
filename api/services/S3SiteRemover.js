@@ -8,7 +8,7 @@ const handleError = (err) => {
     if (!err.message.match(/Not found/)) {
       throw err;
     }
-  } catch (e) {
+  } catch {
     throw err;
   }
 };

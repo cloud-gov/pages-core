@@ -1,6 +1,5 @@
 import Notifications from 'react-notification-system-redux';
 
-// eslint-disable-next-line import/prefer-default-export
 export const createNotifier = notificationSettings => store => next => (action) => {
   // This middleware creation function takes a notificationSettings object and
   // returns a Redux middleware. See notificationSettings.js for example settings.

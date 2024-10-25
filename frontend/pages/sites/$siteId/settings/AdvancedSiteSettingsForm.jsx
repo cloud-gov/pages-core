@@ -18,7 +18,6 @@ export const AdvancedSiteSettingsForm = ({
     onSubmit={handleSubmit}
   >
     <div className="well">
-      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
       <label className="usa-sr-only" htmlFor="engine">Site engine</label>
       <Field
         name="engine"

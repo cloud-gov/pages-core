@@ -23,7 +23,7 @@ const getAccessTokenWithCertainPermissions = async (site, siteUsers, permission)
       }
       count += 1;
       return getNextToken(users[count]);
-    } catch (err) {
+    } catch {
       count += 1;
       return getNextToken(users[count]);
     }

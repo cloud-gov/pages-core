@@ -83,7 +83,6 @@ const ScanFinding = ({
 };
 
 ScanFinding.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   finding: PropTypes.object,
   groupColor: PropTypes.string,
   groupLabel: PropTypes.string,
@@ -136,7 +135,6 @@ FindingTitle.propTypes = {
   groupLabel: PropTypes.string.isRequired,
   groupColor: PropTypes.string.isRequired,
   count: PropTypes.number,
-  // eslint-disable-next-line react/forbid-prop-types
   criteria: PropTypes.array,
   scanType: PropTypes.string.isRequired,
   anchor: PropTypes.string.isRequired,
@@ -245,9 +243,8 @@ const FindingRecommendation = ({ anchor, solution, scanType }) => (
                   <a href={`#${anchor}-recommendation`} className="usa-link target-highlight anchor-indicator">#</a>
                 </h4>
               ) : (
-                <div className="usa-summary-box__body">
-                  { /* eslint-disable-next-line react/no-array-index-key */ }
-                  <ul key={i} className="usa-list margin-bottom-2">
+                <div key={i} className="usa-summary-box__body">
+                  <ul className="usa-list margin-bottom-2">
                     <li className="font-body-md">{str}</li>
                   </ul>
                 </div>
@@ -284,7 +281,6 @@ const FindingReferences = ({ references = [] }) => {
 };
 
 FindingReferences.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   references: PropTypes.array,
 };
 
@@ -331,7 +327,6 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
 );
 
 FindingLocations.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   locations: PropTypes.array.isRequired,
   anchor: PropTypes.string.isRequired,
   scanType: PropTypes.string.isRequired,

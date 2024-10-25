@@ -18,11 +18,10 @@ function clean() {
 
 describe('Build Log API', () => {
   let userRole;
-  let managerRole;
 
   before(async () => {
     await clean();
-    [userRole, managerRole] = await Promise.all([
+    [userRole] = await Promise.all([
       Role.findOne({ where: { name: 'user' } }),
       Role.findOne({ where: { name: 'manager' } }),
     ]);

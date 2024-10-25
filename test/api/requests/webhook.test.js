@@ -1,16 +1,11 @@
 const crypto = require('crypto');
-const { expect } = require('chai');
-const nock = require('nock');
 const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
-const githubAPINocks = require('../support/githubAPINocks');
-const { Build, Site, User, Event } = require('../../../api/models');
-const SiteBuildQueue = require('../../../api/services/SiteBuildQueue');
+const { User } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
-const GithubBuildHelper = require('../../../api/services/GithubBuildHelper');
 
 const Webhooks = require('../../../api/services/Webhooks');
 
@@ -42,11 +37,9 @@ describe('Webhook API', () => {
     }
   });
 
-  let errorStub;
-  let auditStub;
   beforeEach(() => {
-    errorStub = sinon.stub(EventCreator, 'error').resolves();
-    auditStub = sinon.stub(EventCreator, 'audit').resolves();
+    sinon.stub(EventCreator, 'error').resolves();
+    sinon.stub(EventCreator, 'audit').resolves();
   });
 
   afterEach(() => {

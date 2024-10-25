@@ -47,7 +47,7 @@ describe('Build Task model', () => {
 
       // add N extra for the same site
       const N = 5;
-      // eslint-disable-next-line no-unused-vars
+
       await Promise.all(Array(N).fill(0).map(async (_) => {
         build = await factory.build({ site });
         return factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });

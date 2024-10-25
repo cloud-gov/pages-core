@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 const yaml = require('js-yaml');
 const validator = require('validator');
 
@@ -39,7 +38,7 @@ function isValidJSON(json) {
 function isValidYaml(yamlString) {
   try {
     yaml.load(yamlString);
-  } catch (e) {
+  } catch {
     // for Sequelize validators, we need to throw an error
     // on invalid values
     throw new Error('input is not valid YAML');
@@ -57,7 +56,7 @@ function parseSiteConfig(siteConfig, configName = null) {
     }
 
     if ((typeof siteConfig) === 'object') { return siteConfig; }
-  } catch (e) {
+  } catch {
     // on invalid values
     let msg = 'input is not valid YAML';
     if (configName) {

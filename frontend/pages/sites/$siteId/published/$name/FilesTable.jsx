@@ -24,7 +24,7 @@ export default function FilesTable({ files, name, children }) {
         </thead>
         <tbody>
           { files.filter(f => !!f.name).map(file => (
-            <BranchFileRow file={file} />
+            <BranchFileRow key={file} file={file} />
           ))}
         </tbody>
       </table>
@@ -34,7 +34,6 @@ export default function FilesTable({ files, name, children }) {
 }
 
 FilesTable.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   files: PropTypes.array,
   name: PropTypes.string,
   children: PropTypes.node,

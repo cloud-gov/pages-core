@@ -77,13 +77,13 @@ async function addSiteBranchConfigs(site) {
 }
 
 function site(overrides, options = {}) {
-  let site; // eslint-disable-line no-shadow
+  let site;
   let users;
 
   return Promise.props(makeAttributes(overrides))
     .then((attributes) => {
       users = attributes.users.slice();
-      delete attributes.users; // eslint-disable-line no-param-reassign
+      delete attributes.users;
 
       return Site.create(attributes);
     })

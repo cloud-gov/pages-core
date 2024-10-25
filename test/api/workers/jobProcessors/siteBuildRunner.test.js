@@ -12,10 +12,6 @@ const {
 } = require('../../../../api/models');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
-const {
-  SiteBuildsQueue,
-  SiteBuildsQueueName,
-} = require('../../../../api/queues');
 const jobProcessors = require('../../../../api/workers/jobProcessors');
 const SiteBuildQueueService = require('../../../../api/services/SiteBuildQueue');
 const factory = require('../../support/factory');

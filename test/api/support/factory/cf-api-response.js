@@ -1,8 +1,8 @@
 const crypto = require('crypto');
 
 const relationshipBuilder = (guid) => {
-  guid = guid || crypto.randomUUID()
-  return { data: { guid } };
+  const value = guid || crypto.randomUUID()
+  return { data: { guid: value  } };
 };
 
 const createCFAPIResource = ({

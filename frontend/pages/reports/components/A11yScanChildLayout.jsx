@@ -196,12 +196,10 @@ const A11yPassed = ({ passes = [] }) => (
 );
 
 A11yPassed.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   passes: PropTypes.array.isRequired,
 };
 
 A11yScanChild.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.object.isRequired,
   siteId: PropTypes.number.isRequired,
   buildId: PropTypes.number.isRequired,

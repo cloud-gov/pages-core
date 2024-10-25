@@ -24,7 +24,7 @@ export default function BranchesTable({ branches, site }) {
           </tr>
         </thead>
         <tbody>
-          { branches.map(branch => <BranchRow branch={branch} site={site} />) }
+          { branches.map((branch, index) => <BranchRow key={`branch-${index}`} branch={branch} site={site} />) }
         </tbody>
       </table>
     </div>

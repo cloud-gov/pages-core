@@ -62,7 +62,6 @@ function BranchConfig({
             <>
               {context !== 'preview' && (
                 <div className="margin-bottom-3">
-                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                   <label className="usa-label text-bold margin-top-0" htmlFor={`${branch}-input`}>Branch name:</label>
                   <input
                     className="usa-input"
@@ -78,7 +77,6 @@ function BranchConfig({
                 </div>
               )}
               <div>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label className="usa-label text-bold margin-top-0" htmlFor={`${branch}-config-input`}>Configuration:</label>
                 <p className="margin-top-0">
                   Add additional configuration in YAML to be added to your
@@ -126,7 +124,6 @@ BranchConfig.propTypes = {
   id: PropTypes.number,
   branch: PropTypes.string,
   context: PropTypes.string.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
   config: PropTypes.object,
   handleUpdate: PropTypes.func.isRequired,
   isExpanded: PropTypes.bool,

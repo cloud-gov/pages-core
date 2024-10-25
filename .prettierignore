@@ -1,0 +1,10 @@
+# Ignore artifacts:
+build
+coverage
+
+Ignore All Non JS
+**/*.yml
+**/*.md
+**/*.css
+**/*.scss
+**/*.njk

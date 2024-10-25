@@ -11,7 +11,6 @@ const Select = ({
   help,
   id,
   includeEmptyOption,
-  // eslint-disable-next-line react/prop-types
   input,
   label,
   meta: { touched, error },
@@ -23,9 +22,7 @@ const Select = ({
     { touched && (error && <span className="usa-error-message">{error}</span>) }
     <select
       className={`usa-select ${touched && error ? 'usa-select--error' : ''} ${className}`}
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...id}
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...input}
     >
       { includeEmptyOption && <option key="" value="">--</option>}
@@ -39,6 +36,7 @@ Select.propTypes = {
   help: PropTypes.node,
   id: PropTypes.string.isRequired,
   includeEmptyOption: PropTypes.bool,
+  input: PropTypes.object.isRequired,
   label: PropTypes.string,
   meta: PropTypes.shape({
     touched: PropTypes.bool,

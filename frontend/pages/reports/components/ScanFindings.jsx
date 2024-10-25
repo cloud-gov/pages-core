@@ -56,7 +56,6 @@ const ScanFindings = ({
 
 ScanFindings.propTypes = {
   count: PropTypes.number.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
   groupedFindings: PropTypes.object.isRequired,
   scanType: PropTypes.string.isRequired,
   siteId: PropTypes.number.isRequired,

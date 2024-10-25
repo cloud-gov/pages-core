@@ -36,16 +36,16 @@ describe('FailStuckBuilds', () => {
       factory.build({ state: Created })
         .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())),
       factory.build({ state: Tasked })
-        .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())), ,
+        .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())),
 
       // should be ignored
       factory.build({ state: Created }),
       factory.build({ state: Tasked }),
       factory.build({ state: Processing }),
       factory.build({ state: Processing })
-        .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())), ,
+        .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())),
       factory.build({ state: Queued })
-        .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())), ,
+        .then(build => setBuildUpdatedAt(build, now.clone().subtract(20, 'minutes').toDate())),
     ]);
 
     const results = await runFailStuckBuilds();

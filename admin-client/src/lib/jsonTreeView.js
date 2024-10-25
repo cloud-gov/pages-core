@@ -393,11 +393,6 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
       : (n >> (i + 1) << (i + 1)) | (n % (n >> i << i)) | (+b << i);
   }
 
-  function squarebracketify(exp) {
-    return typeof exp === 'string'
-      ? exp.replace(/\.([0-9]+)/g, '[$1]') : `${exp}`;
-  }
-
   function refresh(silent) {
     const expandable = type == 'object' || type == 'array';
 
@@ -487,11 +482,11 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     let child; let
       event;
 
-    while (event = domEventListeners.pop()) {
+    while (event === domEventListeners.pop()) {
       event.element.removeEventListener(event.name, event.fn);
     }
 
-    while (child = children.pop()) {
+    while (child === children.pop()) {
       removeChild(child);
     }
   }
@@ -668,7 +663,7 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     document.execCommand('selectAll', false, null);
   }
 
-  function itemClicked(field) {
+  function itemClicked() {
     self.emit('click', self,
       !self.withRootName && self.isRoot ? [''] : [self.name], self.value);
   }
@@ -705,7 +700,7 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
       const text = element.innerText;
       try {
         setValue(text === 'undefined' ? undefined : JSON.parse(text));
-      } catch (err) {
+      } catch (_) {
         setValue(text);
       }
     }
@@ -800,28 +795,28 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     }
   }
 
-  function onInsertClick() {
-    const newName = type == 'array' ? value.length : undefined;
-    const child = addChild(newName, null);
-    if (child.parent) {
-      child.parent.inserting = true;
-    }
-    if (type == 'array') {
-      value.push(null);
-      child.editValue();
-      child.emit('append', self, [value.length - 1], 'value', null, true);
-      if (child.parent) {
-        child.parent.inserting = false;
-      }
-    } else {
-      child.editName();
-    }
-  }
+  // function onInsertClick() {
+  //   const newName = type == 'array' ? value.length : undefined;
+  //   const child = addChild(newName, null);
+  //   if (child.parent) {
+  //     child.parent.inserting = true;
+  //   }
+  //   if (type == 'array') {
+  //     value.push(null);
+  //     child.editValue();
+  //     child.emit('append', self, [value.length - 1], 'value', null, true);
+  //     if (child.parent) {
+  //       child.parent.inserting = false;
+  //     }
+  //   } else {
+  //     child.editName();
+  //   }
+  // }
 
-  function onDeleteClick() {
-    self.emit('delete', self, [self.name], self.value,
-      self.parent.isRoot ? self.parent.oldType : self.parent.type, false);
-  }
+  // function onDeleteClick() {
+  //   self.emit('delete', self, [self.name], self.value,
+  //     self.parent.isRoot ? self.parent.oldType : self.parent.type, false);
+  // }
 
   function onChildRename(child, keyPath, oldName, newName, original) {
     const allow = newName && type != 'array' && !(newName in value) && original;
@@ -847,9 +842,8 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
 
     if (self.withRootName || !self.isRoot) {
       keyPath.unshift(name);
-    } else if (self.withRootName && self.isRoot) {
-      keyPath.unshift(name);
     }
+
     if (oldName !== undefined) {
       self.emit('rename', child, keyPath, oldName, newName, false);
     }

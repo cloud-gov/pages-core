@@ -43,7 +43,6 @@ function promisedQueueAllEvents(queueEvents) {
   return new Promise((resolve) => {
     events.forEach((event) =>
       queueEvents.on(event, (x) => {
-        console.log(event);
         return resolve(x);
       })
     );
