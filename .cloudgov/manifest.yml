@@ -9,7 +9,7 @@ applications:
         command: yarn start
         disk_quota: 5G
         instances: ((instances))
-        memory: ((memory))
+        memory: 512MB
       - type: worker
         command: yarn start-workers
         disk_quota: 5G
@@ -63,7 +63,7 @@ applications:
     command: yarn start-bull-board:cg
     disk_quota: 2G
     instances: 1
-    memory: ((memory))
+    memory: 512MB
     routes:
       - route: queues.((domain))
     services:

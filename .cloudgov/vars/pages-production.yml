@@ -1,13 +1,12 @@
 product: pages
 name: pages-production
 domain: pages.cloud.gov
-memory: 512MB
 instances: 4
 env: production
 env_postfix: -production
 log_level: info
-feature_auth_uaa: 'true'
-feature_bull_site_build_queue: 'true'
+feature_auth_uaa: "true"
+feature_bull_site_build_queue: "true"
 uaa_host: https://uaa.fr.cloud.gov
 uaa_login_host: https://login.fr.cloud.gov
 new_relic_app_name: web-pages-production

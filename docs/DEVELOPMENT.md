@@ -460,39 +460,41 @@ The following conventions used to build and maintain the frontend UI.
 
 The frontend UI should be structured to improve consistency and developer experience by establishing and maintaining the following standards. The frontend consists of a single page application architecture using Nunjucks templates to rendered by the server and React to render pages in the browser.
 
+### Transitional Design Notes
+- Currently much of the application state is managed via a [Redux](https://redux.js.org/) store.
+- We are intending to transition our router to [Tanstack Router](https://tanstack.com/router/latest) and use [Tanstack Query](https://tanstack.com/query/latest) to update how our data is fetched and stored in the application.
+- This latter change will likely partially supplant the Redux store as more state is maintained as [cached API requests](https://tkdodo.eu/blog/react-query-as-a-state-manager)
+
 #### Server rendered views (Nunjucks)
 - Templates in the [`./views`](../views) directory.
 
 #### Browser rendered pages (React)
 - Page template components are in the [`./frontend/pages`](../frontend/pages) directory.
+- Each page is named `index.jsx` and located in the file structure at a path matching the intended route. For example, to find the component which renders `pages.cloud.gov/sites/new`, look in `frontend/pages/sites/new`. Dynamic routes are matched using `$id`, e.g the component which renders `pages.cloud.gov/sites/2/build/3/logs` is in the folder `frontend/pages/sites/$siteId/builds/$buildId/logs`.
+- This pattern is inteded to support a future move to file-based routing, potentially [Tanstack Router](https://tanstack.com/router/latest)
 - Only page template components should be used to render the routes in the [`./frontend/routes.js`](../frontend/routes.js) file.
-- Pages are composed of two types of components: Pure components and dynamic components. The majority of components used should be written as pure components.
-- Most HTTP requests should be called from the page component with the response data being passed down to pure components. Dynamic components should be used sparingly and scoped to a specific purpose to encapsulate complexity and state to the specific dynamic component.
-- Most UI state should be defined at the page level using React hooks.
-- Global app state should only be connected to page template components.
 
 #### Components (React)
 
-##### Pure Components
-- Pure components are in two places:
+- Components can be found in two places:
   - Components which are used across pages are in the [`./frontend/shared`](../frontend/shared) directory.
-  - Components which are specific to a page are in the `./pages/<page>/components/` directory.
+  - Components which are specific to a page are co-located in the `./pages/**/<page>/` directory.
 - Shared components are primarily used to display information or be a general action that can be reused throughout the UI. ie:
   - A title component that displays the provided string property.
   - A button component that will call a function on click.
 - Page-specific components aren't shared throughout the UI but have similar functions as enumerated below.
-- All of the component properties are passed directly to the component.
-- Property types should be booleans, numbers, strings, arrays, objects, or functions.
-- No HTTP requests should be called from within a pure component.
-- No state management actions should happen within a pure component unless it is specific to that component with no external side effects. ie:
-  - A menu component with a button that opens an element to display a list of links. The state of the menu being open or closed can be encapsulated within that component and its state does not effect any other components and actions.
 
-##### Dynamic Components
-- Dynamic components are in the `./pages/<page>/components/` directory for a give page.
-- These are primarily used to encapsulate complex requests, actions, and state management within a specific UI component. ie.
-  - A build logs component that polls the API to retrieve and append new logs.
-- The component properties passed to a dynamic component should only be used to define its initial state and/or HTTP requests.
-- React hooks should manage the state and custom hook's should be created to help manage the state within the dynamic component.
+- We've mostly abandoned the distinction between pure and dynamic components. In general, it's preferred for non-page template components to be pure (the render is fuly controlled via props) but some components will receive additional inputs via `useSelector` (reading from the global redux state), a localized `useState` hook, or a custom hook. For completeness, for pure components:
+  - All of the component properties are passed directly to the component.
+  - Property types should be booleans, numbers, strings, arrays, objects, or functions.
+  - No HTTP requests should be called from within a pure component.
+  - No state management actions should happen within a pure component unless it is specific to that component with no external side effects. ie:
+    - A menu component with a button that opens an element to display a list of links. The state of the menu being open or closed can be encapsulated within that component and its state does not effect any other components and actions.
+- And for dynamic components:
+  - These are primarily used to encapsulate complex requests, actions, and state management within a specific UI component. ie.
+    - A build logs component that polls the API to retrieve and append new logs.
+  - The component properties passed to a dynamic component should only be used to define its initial state and/or HTTP requests.
+  - React hooks should manage the state and custom hook's should be created to help manage the state within the dynamic component.
 
 #### State management
 
@@ -505,6 +507,7 @@ The frontend UI should be structured to improve consistency and developer experi
 - Custom hooks using React hooks should be used in pages and dynamic components to define the specific data and actions related to their corresponding pages and dynamic components. Custom hooks should be defined in a file in the [`./frontend/hooks](../frontend/hooks/) directory. ie:
   - The `useBuildLogs` hook would define the state and effects associated with the build logs dynamic component.
   - The `useSiteBuilds` hook would define the state and effects for a site's build history
+
 
 ## Event Driven Queueing
 
