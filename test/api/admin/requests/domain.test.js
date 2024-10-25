@@ -139,7 +139,7 @@ describe('Admin - Domains API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="published-sites.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"Organization","Agency","Self Authorized","Site","Domain","Engine"'
       );

@@ -71,7 +71,7 @@ describe('Admin - Organizations API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="organizations.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"Organization","Agency","Self Authorized"'
       );

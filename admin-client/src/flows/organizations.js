@@ -3,7 +3,6 @@ import { notification } from '../stores';
 import { deactivateOrganization, activateOrganization } from '../lib/api';
 
 async function deactivate(id, redirectTo) {
-  // eslint-disable-next-line no-alert
   if (!window.confirm('Are you sure you want to deactivate this organization?')) { return null; }
   try {
     await deactivateOrganization(id);

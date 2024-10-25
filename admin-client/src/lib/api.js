@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* global API_URL */
 import { notification, session } from '../stores';
 import { logout as authLogout } from './auth';
@@ -13,18 +12,15 @@ const defaultOptions = {
   mode: 'cors',
 };
 
-// eslint-disable-next-line no-underscore-dangle
 function _setSearchString(query = {}) {
   const search = new URLSearchParams();
 
-  // eslint-disable-next-line array-callback-return
   Object.keys(query).map((key) => {
     search.set(key, query[key]);
   });
   return search.toString();
 }
 
-// eslint-disable-next-line no-underscore-dangle
 async function _fetch(path, fetchOpts = {}, apiOpts = { handleError: true }) {
   const fetchOptions = { ...defaultOptions, ...fetchOpts };
   if (!['GET', 'HEAD', 'OPTIONS'].includes(fetchOptions.method)) {
@@ -58,7 +54,6 @@ async function _fetch(path, fetchOpts = {}, apiOpts = { handleError: true }) {
   return request;
 }
 
-// eslint-disable-next-line no-underscore-dangle
 async function _fetchAttachedFile(path) {
   const fetchOptions = { ...defaultOptions };
   fetchOptions.headers['x-csrf-token'] = session.csrfToken();
@@ -125,7 +120,6 @@ function fetchBuildLogEventSource(id, onMessage) {
   const es = new EventSource(`${apiUrl}/admin/builds/${id}/log`, { withCredentials: true });
   es.addEventListener('message', onMessage);
   es.addEventListener('error', (error) => {
-    // eslint-disable-next-line no-console
     console.error('EventSource failed:', error);
     if (es) {
       es.close();

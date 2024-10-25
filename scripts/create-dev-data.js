@@ -742,7 +742,7 @@ async function createData() {
   console.log('Uploading logs to S3');
   try {
     await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
-  } catch (error) {
+  } catch (_) {
     console.error(
       'Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.'
     );

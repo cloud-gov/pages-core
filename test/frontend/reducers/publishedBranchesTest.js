@@ -48,8 +48,6 @@ describe("publishedBranchesReducer", () => {
   })
 
   it("drops the current branches when a new fetch starts", () => {
-    const BRANCHES = ["Branch 1", "Branch 2"]
-
     const actual = fixture({ isLoading: false, data: ["Branch 3"] }, {
       type: PUBLISHED_BRANCHES_FETCH_STARTED,
     })

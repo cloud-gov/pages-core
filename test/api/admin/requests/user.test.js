@@ -55,7 +55,7 @@ describe('Admin - Users API', () => {
         .expect(200);
 
       expect(body.data.length).to.equal(2);
-      ids = body.data.map(user => user['id']);
+      const ids = body.data.map(user => user['id']);
       expect(ids).to.include(user1.id);
       expect(ids).to.include(user2.id);
     });
@@ -95,7 +95,7 @@ describe('Admin - Users API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="users.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"ID","Email","Organizations","Details","Created","Last Signed In"'
       );
@@ -146,7 +146,7 @@ describe('Admin - Users API', () => {
         .expect(200);
 
       expect(body.data.length).to.equal(2);
-      ids = body.data.map(user => user['id']);
+      const ids = body.data.map(user => user['id']);
       expect(ids).to.include(user1.id);
       expect(ids).to.include(user2.id);
       expect(ids).to.not.include(user3.id);
@@ -195,7 +195,7 @@ describe('Admin - Users API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="users.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"ID","Email","Organizations","Details","Created","Last Signed In"'
       );

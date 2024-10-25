@@ -118,7 +118,7 @@ describe('mailer', () => {
         jobs.forEach((job) => {
           expect(job.name).to.eq('sandbox-reminder');
           expect(org.Users.find(u => job.data.to.includes(u.UAAIdentity.email))).to.not.be.null;
-          expect(job.data.subject).to.eq(`Your Pages sandbox organization\'s sites will be removed in ${expiryDays} days`);
+          expect(job.data.subject).to.eq(`Your Pages sandbox organization's sites will be removed in ${expiryDays} days`);
           expect(job.data.html).to.eq(Templates.sandboxReminder({
             organizationId: org.id, dateStr, organizationName: org.name, hostname, sites: org.Sites,
           }));

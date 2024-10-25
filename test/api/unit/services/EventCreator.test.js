@@ -5,7 +5,6 @@ const { audit, error } = require('../../../../api/services/EventCreator');
 const { logger } = require('../../../../winston');
 
 describe('EventCreator', () => {
-  let infoSpy;
   let errorSpy;
   beforeEach(() => {
     errorSpy = sinon.spy(logger, 'error');

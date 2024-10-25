@@ -29,11 +29,10 @@ const buildResponseExpectations = (response, build) => {
   } else {
     expect(response.completedAt).to.be.undefined;
   }
-  /* eslint-disable eqeqeq */
+
   expect(build.error == response.error).to.be.ok;
   expect(build.branch == response.branch).to.be.ok;
   expect(build.requestedCommitSha == response.requestedCommitSha).to.be.ok;
-  /* eslint-enable eqeqeq */
   expect(response.site.id).to.equal(build.site || build.Site.id);
   expect(response.user.id).to.equal(build.user || build.User.id);
   expect(response.buildLogs).to.be.undefined;
@@ -139,7 +138,7 @@ describe('Admin - Site API', () => {
           factory.user(),
           factory.build(),
         ]);
-        const logs = await BuildLog.bulkCreate(
+        await BuildLog.bulkCreate(
           Array(5).fill(0).map(() => ({
             output: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
             source: 'ALL',

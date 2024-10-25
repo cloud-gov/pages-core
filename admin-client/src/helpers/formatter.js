@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { format, formatRelative } from 'date-fns';
 
 export const formatDateTime = (date, relative = false) => {
@@ -6,7 +5,7 @@ export const formatDateTime = (date, relative = false) => {
     return relative
       ? formatRelative(new Date(date), new Date())
       : format(new Date(date), 'yyyy-MM-dd hh:mma');
-  } catch (error) {
+  } catch (_) {
     return 'N/A';
   }
 };
@@ -14,7 +13,7 @@ export const formatDateTime = (date, relative = false) => {
 export const formatSha = (commit) => {
   try {
     return commit.slice(0, 7);
-  } catch (error) {
+  } catch (_) {
     return 'N/A';
   }
 };

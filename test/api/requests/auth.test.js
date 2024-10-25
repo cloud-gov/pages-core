@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');

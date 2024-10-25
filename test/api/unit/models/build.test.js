@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
 const QueueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
-const { Build, Site, BuildTask } = require('../../../../api/models');
+const { Build, Site } = require('../../../../api/models');
 const config = require('../../../../config');
 
 describe('Build model', () => {

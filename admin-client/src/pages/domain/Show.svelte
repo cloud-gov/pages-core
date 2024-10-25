@@ -35,7 +35,6 @@
   }
 
   async function deprovision() {
-    // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to deprovision this domain?')) {
       domainPromise = deprovisionDomain(id);
       await domainPromise;
@@ -44,7 +43,6 @@
   }
 
   async function destroy() {
-    // eslint-disable-next-line no-alert
     if (!window.confirm('Are you sure you want to destroy this domain?')) { return null; }
     try {
       await destroyDomain(id);

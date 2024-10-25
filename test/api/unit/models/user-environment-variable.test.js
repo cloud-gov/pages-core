@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const factories = require('../../support/factory');
-const { UserEnvironmentVariable } = require('../../../../api/models');
 
 describe('UserEnvironmentVariable model', () => {
   describe('requires unique name per site', () => {

@@ -21,14 +21,23 @@ describe('Published Files API', () => {
     beforeEach(() => s3Mock.reset());
 
     it('should require authentication', (done) => {
-      factory.site()
-        .then(site => request(app)
-          .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
-          .expect(403))
+      factory
+        .site()
+        .then((site) =>
+          request(app)
+            .get(`/v0/site/${site.id}/published-branch/${site.defaultBranch}`)
+            .expect(403),
+        )
         .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
+          validateAgainstJSONSchema(
+            'GET',
+            '/site/{site_id}/published-branch/{branch}/published-file',
+            403,
+            response.body,
+          );
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('should list the files published to the branch for the site', (done) => {
@@ -48,50 +57,57 @@ describe('Published Files API', () => {
         user: userPromise,
         site: sitePromise,
         cookie: cookiePromise,
-      }).then((promisedValues) => {
-        ({ site } = promisedValues);
-        prefix = `site/${site.owner}/${site.repository}/`;
+      })
+        .then((promisedValues) => {
+          ({ site } = promisedValues);
+          prefix = `site/${site.owner}/${site.repository}/`;
 
-        s3Mock.on(ListObjectsV2Command).resolvesOnce({
-          IsTruncated: true,
-          Contents: [
-            { Key: `${prefix}abc`, Size: 123 },
-            { Key: `${prefix}abc/def`, Size: 456 },
-          ],
-          ContinuationToken: 'A',
-          NextContinuationToken: 'B',
-        }).resolvesOnce({
-          IsTruncated: false,
-          Contents: [
-            { Key: `${prefix}ghi`, Size: 789 },
-          ],
-          ContinuationToken: 'B',
-          NextContinuationToken: null,
-        });
+          s3Mock
+            .on(ListObjectsV2Command)
+            .resolvesOnce({
+              IsTruncated: true,
+              Contents: [
+                { Key: `${prefix}abc`, Size: 123 },
+                { Key: `${prefix}abc/def`, Size: 456 },
+              ],
+              ContinuationToken: 'A',
+              NextContinuationToken: 'B',
+            })
+            .resolvesOnce({
+              IsTruncated: false,
+              Contents: [{ Key: `${prefix}ghi`, Size: 789 }],
+              ContinuationToken: 'B',
+              NextContinuationToken: null,
+            });
 
-        return request(app)
-          .get(`/v0/site/${site.id}/published-branch/main/published-file`)
-          .set('Cookie', promisedValues.cookie)
-          .expect(200);
-      }).then((response) => {
-        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 200, response.body);
+          return request(app)
+            .get(`/v0/site/${site.id}/published-branch/main/published-file`)
+            .set('Cookie', promisedValues.cookie)
+            .expect(200);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema(
+            'GET',
+            '/site/{site_id}/published-branch/{branch}/published-file',
+            200,
+            response.body,
+          );
 
-        const { files } = response.body;
-        files.forEach((file) => {
-          delete file.publishedBranch; // eslint-disable-line no-param-reassign
-        });
-        expect(files).to.deep.equal([
-          { name: 'abc', size: 123, key: `${prefix}abc` },
-          { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
-          { name: 'ghi', size: 789, key: `${prefix}ghi` },
-        ]);
-        done();
-      }).catch(done);
+          const { files } = response.body;
+          files.forEach((file) => {
+            delete file.publishedBranch;
+          });
+          expect(files).to.deep.equal([
+            { name: 'abc', size: 123, key: `${prefix}abc` },
+            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
+            { name: 'ghi', size: 789, key: `${prefix}ghi` },
+          ]);
+          done();
+        })
+        .catch(done);
     });
 
     it('should 404 is site owner is NaN', (done) => {
-      let site;
-      let prefix;
       const userPromise = factory.user();
       const sitePromise = factory.site({
         defaultBranch: 'main',
@@ -103,23 +119,26 @@ describe('Published Files API', () => {
         user: userPromise,
         site: sitePromise,
         cookie: cookiePromise,
-      }).then((promisedValues) => {
-        ({ site } = promisedValues);
-        prefix = `site/${site.owner}/${site.repository}/`;
-
-        return request(app)
-          .get('/v0/site/NaN/published-branch/main/published-file')
-          .set('Cookie', promisedValues.cookie)
-          .expect(404);
-      }).then((response) => {
-        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 404, response.body);
-        done();
-      }).catch(done);
+      })
+        .then((promisedValues) => {
+          return request(app)
+            .get('/v0/site/NaN/published-branch/main/published-file')
+            .set('Cookie', promisedValues.cookie)
+            .expect(404);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema(
+            'GET',
+            '/site/{site_id}/published-branch/{branch}/published-file',
+            404,
+            response.body,
+          );
+          done();
+        })
+        .catch(done);
     });
 
     it('should 404 is site owner is not found', (done) => {
-      let site;
-      let prefix;
       const userPromise = factory.user();
       const sitePromise = factory.site({
         defaultBranch: 'main',
@@ -131,18 +150,23 @@ describe('Published Files API', () => {
         user: userPromise,
         site: sitePromise,
         cookie: cookiePromise,
-      }).then((promisedValues) => {
-        ({ site } = promisedValues);
-        prefix = `site/${site.owner}/${site.repository}/`;
-
-        return request(app)
-          .get('/v0/site/-1/published-branch/main/published-file')
-          .set('Cookie', promisedValues.cookie)
-          .expect(404);
-      }).then((response) => {
-        validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 404, response.body);
-        done();
-      }).catch(done);
+      })
+        .then((promisedValues) => {
+          return request(app)
+            .get('/v0/site/-1/published-branch/main/published-file')
+            .set('Cookie', promisedValues.cookie)
+            .expect(404);
+        })
+        .then((response) => {
+          validateAgainstJSONSchema(
+            'GET',
+            '/site/{site_id}/published-branch/{branch}/published-file',
+            404,
+            response.body,
+          );
+          done();
+        })
+        .catch(done);
     });
 
     it('should 403 if the user is not associated with the site', (done) => {
@@ -151,14 +175,24 @@ describe('Published Files API', () => {
       const cookie = authenticatedSession(user);
 
       Promise.props({ user, site, cookie })
-        .then(promisedValues => request(app)
-          .get(`/v0/site/${promisedValues.site.id}/published-branch/main/published-file`)
-          .set('Cookie', promisedValues.cookie)
-          .expect(403))
+        .then((promisedValues) =>
+          request(app)
+            .get(
+              `/v0/site/${promisedValues.site.id}/published-branch/main/published-file`,
+            )
+            .set('Cookie', promisedValues.cookie)
+            .expect(403),
+        )
         .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{site_id}/published-branch/{branch}/published-file', 403, response.body);
+          validateAgainstJSONSchema(
+            'GET',
+            '/site/{site_id}/published-branch/{branch}/published-file',
+            403,
+            response.body,
+          );
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
   });
 });

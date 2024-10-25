@@ -5,6 +5,6 @@ const initial = {};
 const { set, subscribe } = writable(initial);
 
 export default {
-  setContext: ({ page, ...rest }) => set(rest),
+  setContext: ({ _, ...rest }) => set(rest),
   subscribe,
 };

@@ -1,4 +1,3 @@
-/* global window */
 import chai, { expect } from 'chai';
 import chaiFetchMock from 'chai-fetch-mock';
 import fetchMock from 'fetch-mock';

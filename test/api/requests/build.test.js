@@ -33,11 +33,10 @@ describe('Build API', () => {
     } else {
       expect(response.completedAt).to.be.undefined;
     }
-    /* eslint-disable eqeqeq */
+
     expect(build.error == response.error).to.be.ok;
     expect(build.branch == response.branch).to.be.ok;
     expect(build.requestedCommitSha == response.requestedCommitSha).to.be.ok;
-    /* eslint-enable eqeqeq */
     expect(response.site.id).to.equal(build.site || build.Site.id);
     expect(response.user.id).to.equal(build.user || build.User.id);
     expect(response.buildLogs).to.be.undefined;
@@ -423,7 +422,7 @@ describe('Build API', () => {
         cookie: authenticatedSession(userPromise),
       })
         .then((promisedValues) => {
-          ({ site, build } = promisedValues);
+          ({ build } = promisedValues);
           const cookie = promisedValues.cookie;
 
           return request(app)
@@ -442,8 +441,6 @@ describe('Build API', () => {
     });
 
     it('should not return the matching build if it is not associated with the current user', (done) => {
-      let build;
-
       const userPromise = factory.user();
       const sitePromise = factory.site();
       const buildPromise = factory.build({ site: sitePromise, user: userPromise });
@@ -455,10 +452,7 @@ describe('Build API', () => {
         build: buildPromise,
         cookie: authenticatedSession(userPromise),
       })
-        .then((promisedValues) => {
-          build = promisedValues.build;
-          const cookie = promisedValues.cookie;
-
+        .then(({ cookie }) => {
           return request(app)
             .get(`/v0/build/$build.id}`)
             .set('Cookie', cookie)

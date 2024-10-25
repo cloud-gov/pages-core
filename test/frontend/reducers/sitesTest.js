@@ -16,7 +16,6 @@ describe('sitesReducer', () => {
   const BUILD_RESTARTED = 'build restarted!';
   const SITE_USER_ADDED = 'site user added';
   const SITE_USER_REMOVED = 'SITE_USER_REMOVED';
-  const SET_CURRENT_SITE = 'SET_CURRENT_SITE';
   const SITE_BASIC_AUTH_SAVED = 'SITE_BASIC_AUTH_SAVED';
   const SITE_BASIC_AUTH_REMOVED = 'SITE_BASIC_AUTH_REMOVED';
   const initialState = {

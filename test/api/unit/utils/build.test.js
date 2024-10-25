@@ -47,14 +47,13 @@ describe('build utils', () => {
 
   describe('buildUrl with other site branch context and s3Key', () => {
     let site;
-    let siteBranchConfig;
     const branch = 'other-branch';
     const context = 'other';
     const s3Key = 'test/other';
 
     before(async () => {
       const interimSite = await factory.site({}, { noSiteBranchConfig: true });
-      siteBranchConfig = await SiteBranchConfig.create({
+      await SiteBranchConfig.create({
         siteId: interimSite.id,
         context,
         branch,

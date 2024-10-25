@@ -17,7 +17,7 @@ const validateAgainstJSONSchema = (action, path, statusCode, response) => {
   const result = validate(response, responseSchema);
 
   if (result.errors.length) {
-    console.error(result.errors); // eslint-disable-line no-console
+    console.error(result.errors);
     throw new Error(
       `Failed to validate against definition: ${actionLower} ${pathLower} ${statusCodeInt}`
     );

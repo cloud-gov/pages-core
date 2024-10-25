@@ -5,7 +5,6 @@ proxyquire.noCallThru();
 
 describe("maps reducers", () => {
   let fixture;
-  const BUILD_LOGS = "build logs are here"
   const ALERT = "alerts is here";
   const PUBLISHED_BRANCHES = "published branches are here"
   const PUBLISHED_FILES = "published files are here"

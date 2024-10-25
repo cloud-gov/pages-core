@@ -117,7 +117,6 @@ describe('SiteBuildQueue', () => {
           })
         )
         .then((build) => {
-          // eslint-disable-line
           return SiteBuildQueue.messageBodyForBuild(build).then((message) => {
             const uevs = build.Site.UserEnvironmentVariables.map((uev) => ({
               name: uev.name,
@@ -147,7 +146,6 @@ describe('SiteBuildQueue', () => {
           })
         )
         .then((build) => {
-          // eslint-disable-line
           return SiteBuildQueue.messageBodyForBuild(build).then((message) => {
             expect(
               JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))
@@ -832,10 +830,10 @@ describe('SiteBuildQueue', () => {
         ],
       });
       const creds = {
-        access_key_id: 'access_key_id', // eslint-disable-line
+        access_key_id: 'access_key_id',
         bucket: build.bucket,
         region: 'region',
-        secret_access_key: 'secret', // eslint-disable-line
+        secret_access_key: 'secret',
       };
       stubCreds.resolves(creds);
       stubS3.resolves();
