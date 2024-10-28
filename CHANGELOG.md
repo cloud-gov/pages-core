@@ -1,3 +1,12 @@
+## 0.13.2 (2024-10-28)
+
+### Maintenance
+
+- remove extra quotes from cron definition
+- use consistent memory across envs
+- implement nested folder route mapping
+- improve component separation of concerns, hooks, purity
+
 ## 0.13.1 (2024-10-17)
 
 ### Maintenance
