@@ -4,6 +4,7 @@ const {
 const BuildTaskQueue = require('../../services/BuildTaskQueue');
 const { createJobLogger } = require('./utils');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
+const { States: DomainStates } = require('../../models/domain');
 
 // Add CF Task (startBuildTask method) call to retry sleep interval to 1 second
 // If it is in test environment set to 0 seconds
@@ -38,8 +39,11 @@ async function buildTaskRunner(
 
         const rawTask = buildTask.get({ plain: true });
 
-        if (siteBranchConfig?.Domains?.length) {
-          const domain = siteBranchConfig.Domains[0]; // TODO: always the first domain
+        const provisionedDomains = siteBranchConfig?.Domains
+          ?.filter(d => d.state === DomainStates.Provisioned);
+
+        if (provisionedDomains.length) {
+          const domain = provisionedDomains[0]; // TODO: always the first domain
           rawTask.Build.url = `https://${domain.names.split(',')[0]}`;
         }
 
