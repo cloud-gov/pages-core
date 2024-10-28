@@ -41,7 +41,7 @@ const everyTenMinutesJobConfig = {
 };
 
 const makeNightlyJobConfig = (minute = 0, hour = 5) => ({
-  repeat: { cron: `'${minute} ${hour} * * *'` },
+  repeat: { cron: `${minute} ${hour} * * *` },
   priority: 10,
 });
 
