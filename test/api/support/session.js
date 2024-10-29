@@ -33,7 +33,7 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
     });
 }
 
-function authenticatedSession(user, cfg = sessionConfig, role = 'pages.admin') {
+function authenticatedSession(user, cfg = sessionConfig) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   return Promise.resolve(user || factory.user())

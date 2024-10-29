@@ -3,7 +3,6 @@ const { expect } = require('chai');
 const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
-const yaml = require('js-yaml');
 
 const app = require('../../../app');
 const config = require('../../../config');
@@ -263,11 +262,6 @@ describe('Site API', () => {
 
     function cfMockServices(owner, repository) {
       const { bucketGuid, name, s3 } = createMockVariables(owner, repository);
-
-      siteParams = {
-        owner: crypto.randomBytes(10).toString('hex'),
-        repository: crypto.randomBytes(10).toString('hex'),
-      };
 
       const keyName = `${name}-key`;
       const planName = 'basic-vpc';

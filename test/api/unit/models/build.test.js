@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
 const QueueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
-const { Build, Site, BuildTask } = require('../../../../api/models');
+const { Build, Site } = require('../../../../api/models');
 const config = require('../../../../config');
 
 describe('Build model', () => {
@@ -380,17 +380,19 @@ describe('Build model', () => {
       expect(buildQuery.id).to.equal(build.id);
     });
 
-    it('throws when pk is Nan', () => {
+    it('throws when pk is Nan', async () => {
       const pk = NaN;
 
+      // eslint-disable-next-line testing-library/await-async-queries
       const buildQuery = Build.findByPk(pk);
 
       return expect(buildQuery).to.be.rejectedWith(DatabaseError);
     });
 
-    it('throws when pk is non-number string', () => {
+    it('throws when pk is non-number string', async () => {
       const pk = 'foobar';
 
+      // eslint-disable-next-line testing-library/await-async-queries
       const buildQuery = Build.findByPk(pk);
 
       return expect(buildQuery).to.be.rejectedWith(DatabaseError);

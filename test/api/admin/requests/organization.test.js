@@ -20,8 +20,7 @@ describe('Admin - Organizations API', () => {
 
   describe('GET /admin/reports/organizations', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/organizations')
+      const response = await request(app)['get']('/reports/organizations')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -47,8 +46,7 @@ describe('Admin - Organizations API', () => {
 
   describe('GET /admin/reports/organizations.csv', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/organizations.csv')
+      const response = await request(app)['get']('/reports/organizations.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -71,7 +69,7 @@ describe('Admin - Organizations API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="organizations.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"Organization","Agency","Self Authorized"'
       );

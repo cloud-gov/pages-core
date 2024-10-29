@@ -2,7 +2,6 @@ const siteFactory = require('./site');
 const userFactory = require('./user');
 const { Build } = require('../../../../api/models');
 
-// eslint-disable-next-line no-underscore-dangle
 const _attributes = (overrides = {}) => {
   let { user, site, username, branch } = overrides;
 
@@ -36,7 +35,6 @@ function build(overrides) {
     .then((attributes) => {
       Object.keys(attributes).forEach((key) => {
         if (attributes[key].sequelize) {
-        // eslint-disable-next-line no-param-reassign
           attributes[key] = attributes[key].id;
         }
       });

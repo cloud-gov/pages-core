@@ -2202,6 +2202,6 @@ const BUILD_SCAN_RULES = [
   },
 ];
 
-module.exports = {
+export default {
   BUILD_SCAN_RULES,
 };

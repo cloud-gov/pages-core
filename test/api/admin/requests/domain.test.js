@@ -42,8 +42,7 @@ describe('Admin - Domains API', () => {
     it('should block all unauthenticated actions', async () => {
       await Promise.all(
         routes.map(async (route) => {
-          const response = await request(app)
-            [route.method](route.path)
+          const response = await request(app)[route.method](route.path)
             .expect(401);
           expect(response.body.message).to.equal('Unauthorized');
         })
@@ -53,8 +52,7 @@ describe('Admin - Domains API', () => {
 
   describe('GET /admin/reports/published-sites', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/published-sites')
+      const response = await request(app)['get']('/reports/published-sites')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -99,8 +97,7 @@ describe('Admin - Domains API', () => {
 
   describe('GET /admin/reports/published-sites.csv', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)
-        ['get']('/reports/published-sites.csv')
+      const response = await request(app)['get']('/reports/published-sites.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -139,7 +136,7 @@ describe('Admin - Domains API', () => {
       expect(response.headers['content-disposition']).to.equal(
         'attachment; filename="published-sites.csv"'
       );
-      [header, ...data] = response.text.split(/\n/);
+      const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
         '"Organization","Agency","Self Authorized","Site","Domain","Engine"'
       );

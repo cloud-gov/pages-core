@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { useState } from 'react';
 import api from '../util/federalistApi';
 import alertActions from '../actions/alertActions';

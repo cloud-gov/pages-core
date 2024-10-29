@@ -56,7 +56,6 @@ function EditCustomDomain() {
       >
         <div className="well">
           <div>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="usa-label font-sans-lg text-bold" htmlFor="domain-name">Domain Name</label>
             <p>
               Enter the custom domain name you will be launching.
@@ -98,7 +97,6 @@ function EditCustomDomain() {
             />
           </div>
           <div>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="usa-label font-sans-lg text-bold" htmlFor="branch-context">Branch Context</label>
             <p>
               Select the site&apos;s branch context you will associate to the custom

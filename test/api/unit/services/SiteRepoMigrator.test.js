@@ -3,7 +3,6 @@ const { expect } = require('chai');
 const {
   getUserGHCredentials,
   setRepoWebhook,
-  siteRepoMigrator,
 } = require('../../../../api/services/SiteRepoMigrator');
 const { Site, User, UAAIdentity } = require('../../../../api/models');
 const githubAPINocks = require('../../support/githubAPINocks');

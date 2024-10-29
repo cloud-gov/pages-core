@@ -3,7 +3,6 @@ const siteFactory = require('./site');
 
 const { SiteBuildTask } = require('../../../../api/models');
 
-// eslint-disable-next-line no-underscore-dangle
 const _attributes = ({
   siteId, buildTaskTypeId, branch, metadata,
 } = {}) => ({
@@ -17,7 +16,6 @@ const siteBuildTask = overrides => Promise.props(_attributes(overrides))
   .then((attributes) => {
     Object.keys(attributes).forEach((key) => {
       if (attributes[key]?.sequelize) {
-        // eslint-disable-next-line no-param-reassign
         attributes[key] = attributes[key].id;
       }
     });

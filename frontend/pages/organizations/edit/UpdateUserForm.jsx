@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-prop-types */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
@@ -12,7 +10,6 @@ function validateRole(roleId, _, { roleOptions }) {
 }
 
 const UpdateUserForm = ({
-  initialValues, // eslint-disable-line no-unused-vars
   invalid,
   pristine,
   handleSubmit,

@@ -28,7 +28,6 @@ const UserOrgSelect = ({
   value,
 }) => (
   <div>
-    {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
     <label htmlFor={name} className="usa-label text-bold">{label}</label>
     {touched && (error && <span className="usa-error-message">{error}</span>)}
     <select

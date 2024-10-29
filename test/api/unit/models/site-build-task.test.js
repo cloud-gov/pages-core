@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const factory = require('../../support/factory');
-const { SiteBuildTask, BuildTask } = require('../../../../api/models');
+const { BuildTask } = require('../../../../api/models');
 
 describe('Build Task model', () => {
   afterEach(() => {

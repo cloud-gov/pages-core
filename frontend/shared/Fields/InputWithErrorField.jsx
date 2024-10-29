@@ -7,7 +7,6 @@ const InputWithErrorField = ({
   label,
   help,
   meta: { touched, error }, // from the Field component
-  // eslint-disable-next-line react/prop-types
   input, // from the Field component
   type,
   ...props
@@ -17,9 +16,7 @@ const InputWithErrorField = ({
     { help }
     {touched && (error && <span className="usa-error-message">{error}</span>)}
     <input
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...input}
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       className={`usa-input ${touched && error ? 'usa-input--error' : ''}`}
       placeholder={placeholder}
@@ -35,6 +32,7 @@ InputWithErrorField.propTypes = {
   placeholder: PropTypes.string,
   label: PropTypes.string,
   help: PropTypes.node,
+  input: PropTypes.object.isRequired,
   meta: PropTypes.shape({
     touched: PropTypes.bool,
     error: PropTypes.string,

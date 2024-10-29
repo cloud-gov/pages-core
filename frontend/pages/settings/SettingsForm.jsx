@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, clearSubmitErrors, reduxForm } from 'redux-form';
@@ -101,7 +100,6 @@ SettingsForm.propTypes = {
   // the following props are from reduxForm:
   handleSubmit: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
     buildNotificationSettings: PropTypes.object.isRequired,
   }).isRequired,
   invalid: PropTypes.bool.isRequired,

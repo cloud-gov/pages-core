@@ -1,6 +1,5 @@
 const { defaultContext } = require('../utils');
 
-// eslint-disable-next-line no-unused-vars
 function fourOhFourHandler(req, res) {
   const context = defaultContext(req, res);
   if (req.session.authenticated) {

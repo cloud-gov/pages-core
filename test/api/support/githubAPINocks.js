@@ -1,10 +1,10 @@
+/* eslint no-param-reassign: 0 */
 const nock = require('nock');
 const config = require('../../../config');
 
 const withAuth = (nok, accessToken) => nok.matchHeader('authorization', `token ${accessToken}`);
 
 const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
-  /* eslint-disable no-param-reassign */
   authorizationCode = authorizationCode || 'auth-code-123abc';
   accessToken = accessToken || 'access-token-123abc';
 
@@ -13,7 +13,6 @@ const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   } else {
     scope = 'user,repo';
   }
-  /* eslint-enable no-param-reassign */
 
   return nock('https://github.com')
     .post('/login/oauth/access_token', (body) => {
@@ -142,13 +141,11 @@ const createRepoUsingTemplate = ({
 const user = ({
   accessToken, githubUserID, username, email,
 } = {}) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
 
   const userID = githubUserID || Math.floor(Math.random() * 10000);
   username = (username || `user-${userID}`).toUpperCase();
   email = email || `${username}@example.com`.toLowerCase();
-  /* eslint-enable no-param-reassign */
 
   const expectedHeaders = {
     reqheaders: { authorization: `Bearer ${accessToken}` },
@@ -164,10 +161,8 @@ const user = ({
 };
 
 const userOrganizations = ({ accessToken, organizations, response } = {}) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organizations = organizations || [{ id: 123456 }];
-  /* eslint-enable no-param-reassign */
 
   let orgsNock = nock('https://api.github.com');
 
@@ -186,7 +181,6 @@ const githubAuth = (username, organizations) => {
 };
 
 const repo = ({
-  // eslint-disable-next-line no-shadow
   accessToken, owner, repo, username, defaultBranch, response,
 } = {}) => {
   let webhookNock = nock('https://api.github.com');
@@ -227,7 +221,6 @@ const repo = ({
 };
 
 const status = ({
-  // eslint-disable-next-line no-shadow
   accessToken, owner, repo, sha, state, targetURL, response,
 } = {}) => {
   let path;
@@ -238,7 +231,7 @@ const status = ({
   }
 
   let statusNock = nock('https://api.github.com').post(path, (body) => {
-    if (state && body.state != state) { return false; }// eslint-disable-line eqeqeq
+    if (state && body.state != state) { return false; }
 
     if (targetURL && body.target_url !== targetURL) { return false; }
 
@@ -272,7 +265,6 @@ const status = ({
 
 const webhook = (
   {
-    // eslint-disable-next-line no-shadow
     accessToken,
     owner,
     repo,
@@ -329,7 +321,6 @@ function listWebhooks({
 }
 
 const getBranch = ({
-  // eslint-disable-next-line no-shadow
   accessToken, owner, repo, branch, expected,
 }) => {
   let branchNock = nock('https://api.github.com');
@@ -353,17 +344,14 @@ const getBranch = ({
   return branchNock.reply(200, output);
 };
 
-/* eslint-disable camelcase */
 const getOrganizationMembers = ({
   accessToken, organization, role, per_page, page, response, responseCode,
 }) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
   per_page = per_page || 100;
   page = page || 1;
   role = role || 'all';
-  /* eslint-enable no-param-reassign */
 
   const orgMembers = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
@@ -387,12 +375,10 @@ const getOrganizationMembers = ({
 const getTeamMembers = ({
   accessToken, org, team_slug, per_page, page, response,
 } = {}) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   team_slug = team_slug || 'test-team';
   per_page = per_page || 100;
   page = page || 1;
-  /* eslint-enable no-param-reassign */
 
   const teamMembers = [];
   for (let i = 0; i < (per_page + 2); i += 1) {
@@ -407,11 +393,9 @@ const getTeamMembers = ({
 const getRepositories = ({
   accessToken, per_page, page, response,
 }) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
   page = page || 1;
-  /* eslint-enable no-param-reassign */
 
   const repos = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
@@ -430,13 +414,11 @@ const getRepositories = ({
 const getCollaborators = ({
   accessToken, owner, repository, per_page, page, response,
 }) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
   page = page || 1;
   owner = owner || 'owner';
   repository = repository || 'repo';
-  /* eslint-enable no-param-reassign */
 
   const collabs = [];
   for (let i = 0; i < (per_page + 1); i += 1) {
@@ -447,7 +429,6 @@ const getCollaborators = ({
     .get(`/repos/${owner}/${repository}/collaborators?per_page=${per_page}&page=${page}`)
     .reply(response || 200, collabs.slice(((page - 1) * per_page), (page * per_page)));
 };
-/* eslint-enable camelcase */
 
 const getMembershipForUserInOrg = ({
   accessToken = 'access-token-123abc',
@@ -476,10 +457,9 @@ const getMembershipForUserInOrg = ({
 const getContent = ({
   accessToken, owner, repo, path, ref, content, encoding, type, responseCode,
 }) => {
-  /* eslint-disable no-param-reassign */
   accessToken = accessToken || 'access-token-123abc';
   responseCode = responseCode || 200;
-  /* eslint-enable no-param-reassign */
+
   let requestPath = `/repos/${owner}/${repo}/contents/${path}`;
   if (ref) {
     requestPath = `${requestPath}?ref=${ref}`;

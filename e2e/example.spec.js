@@ -9,5 +9,6 @@ test('has title', async ({ page }) => {
 test('use cookie login', async ({ page }) => {
   await page.goto('/sites');
 
+  // eslint-disable-next-line testing-library/prefer-screen-queries
   await expect(page.getByText('Your sites')).toBeVisible();
 });

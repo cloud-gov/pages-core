@@ -66,7 +66,6 @@ function AddSite() {
     return (
       <div className="grid-row">
         <div className="page-header grid-col-12">
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
           <AlertBanner {...alert} />
           <div className="header-title">
             <h1 className="font-sans-2xl">
@@ -86,7 +85,6 @@ function AddSite() {
   return (
     <div className="grid-row">
       <div className="page-header grid-col-12">
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <AlertBanner {...alert} />
         <div className="header-title">
           <h1 className="font-sans-2xl">

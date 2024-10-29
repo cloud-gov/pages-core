@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 export const downloadCSV = async (fetchCSV, filename) => {
   const csv = await fetchCSV();
   const blob = new Blob([csv], { type: 'application/octet-stream' });

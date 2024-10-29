@@ -34,10 +34,8 @@ describe('Webhooks Service', () => {
     }
   });
 
-  let errorStub;
   let auditStub;
   beforeEach(() => {
-    errorStub = sinon.stub(EventCreator, 'error').resolves();
     auditStub = sinon.stub(EventCreator, 'audit').resolves();
   });
 

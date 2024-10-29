@@ -66,7 +66,6 @@ export const AddRepoSiteForm = ({
       <div className="add-repo-site-additional-fields">
         {showNewSiteAlert()}
         <div className="form-group margin-y-2">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="usa-label text-bold" htmlFor="engine">Site engine</label>
           <Field
             name="engine"

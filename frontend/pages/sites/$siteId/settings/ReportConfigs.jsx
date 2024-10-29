@@ -158,7 +158,6 @@ function ReportConfigs({ siteId: id }) {
           {!isPagesRule && (
             <>
               <td>
-                { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
                 <label className="usa-sr-only" htmlFor={`${rule.id}-criteria`}>Criteria to match:</label>
                 <input
                   className="usa-input"
@@ -171,7 +170,6 @@ function ReportConfigs({ siteId: id }) {
                 />
               </td>
               <td className="has-button">
-                { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
                 <label className="usa-sr-only" htmlFor={`${rule.id}-delete`}>Delete this rule</label>
                 <button id={`${rule.id}-delete`} className="margin-0 usa-button usa-button--secondary" aria-label={isPagesRule ? 'Cannot delete this rule' : 'Delete this rule'} type="button" onClick={() => deleteRule(rule)}>
                   <span className="usa-sr-only">Delete</span>

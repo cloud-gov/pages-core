@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 module.exports = (_error = {}, { res }) => {
   res.status(500);
   return res.json({
@@ -6,4 +5,3 @@ module.exports = (_error = {}, { res }) => {
     status: 500,
   });
 };
-/* eslint-enable no-unused-vars */

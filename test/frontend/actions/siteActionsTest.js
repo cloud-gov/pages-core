@@ -12,7 +12,6 @@ describe('siteActions', () => {
   let addUserToSite;
   let removeUserFromSite;
   let updateSite;
-  let updateSiteUser;
   let deleteSite;
   let saveBasicAuthToSite;
   let removeBasicAuthFromSite;
@@ -23,7 +22,6 @@ describe('siteActions', () => {
   let dispatchSitesReceivedAction;
   let dispatchSiteAddedAction;
   let dispatchSiteUpdatedAction;
-  let dispatchSiteUserUpdatedAction;
   let dispatchSiteDeletedAction;
   let dispatchSiteBranchesReceivedAction;
   let dispatchShowAddNewSiteFieldsAction;
@@ -63,7 +61,6 @@ describe('siteActions', () => {
     addUserToSite = stub();
     removeUserFromSite = stub();
     updateSite = stub();
-    updateSiteUser = stub();
     deleteSite = stub();
     saveBasicAuthToSite = stub();
     removeBasicAuthFromSite = stub();
@@ -357,8 +354,6 @@ describe('siteActions', () => {
   });
 
   describe('removeBasicAuthFromSite', () => {
-    const basicAuth = { username: 'username', password: 'password' };
-
     it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
       // const basicAuthSite = {...site, config: { basicAuth } }
       const sitePromise = Promise.resolve(site);

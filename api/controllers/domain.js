@@ -146,7 +146,7 @@ module.exports = wrapHandlers({
       });
     }
   },
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+
   async update(req, res) {
     const { params, body, user } = req;
     const siteId = parseInt(params.site_id, 10);

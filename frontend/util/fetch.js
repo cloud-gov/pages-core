@@ -25,7 +25,7 @@ function checkStatus(response) {
 
     try {
       formattedError = JSON.parse(errorText).message;
-    } catch (error) {
+    } catch {
       formattedError = errorText;
     }
 

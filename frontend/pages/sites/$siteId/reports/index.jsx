@@ -1,25 +1,20 @@
 import React from 'react';
 import { useSearchParams, Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { setDate, isBefore, startOfToday, addMonths } from 'date-fns';
+
 import { sandboxMsg } from '@util';
 import { dateOnly } from '@util/datetime';
-
-import LoadingIndicator from '@shared/LoadingIndicator';
-
-import AlertBanner from '@shared/alertBanner';
-
 import { useSiteBuildTasks } from '@hooks/useSiteBuildTasks';
 import { useBuildTasksForSite } from '@hooks/useBuildTasksForSite';
 import { currentSite } from '@selectors/site';
 import { getOrgById } from '@selectors/organization';
 
+import LoadingIndicator from '@shared/LoadingIndicator';
+import AlertBanner from '@shared/alertBanner';
 import ExpandableArea from '@shared/ExpandableArea';
-
 import ReportList from './ReportList';
 
-const {
-  setDate, isBefore, startOfToday, addMonths,
-} = require('date-fns');
 
 function Reports() {
   const { id } = useParams();
@@ -43,7 +38,6 @@ function Reports() {
   const branchToBeScanned = site?.defaultBranch || 'most recently built';
   const buildIdToFilterBy = Number(searchParams.get('build'));
   // if filter isn't set or is not set to a valid build ID (positive int), show all
-  /* eslint-disable-next-line max-len */
   const filteredScans = scans?.filter(scan => !buildIdToFilterBy || scan.buildId === buildIdToFilterBy);
   function clearParams() { setSearchParams({}); }
 
@@ -65,7 +59,6 @@ function Reports() {
           <>
             <div>
               <p className="font-body-sm line-height-sans-4 measure-6 margin-bottom-4">
-                {/* eslint-disable-next-line max-len */}
                 Pages is now offering monthly Automated Site Reports, which examine your Pages site for common website issues and provide guidance and resources for remediation. You can request an immediate report for any recent site branch from
                 {' '}
                 <Link to={`/sites/${id}/builds`}>Build history</Link>

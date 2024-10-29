@@ -3,7 +3,6 @@ const buildTaskTypeFactory = require('./build-task-type');
 const siteBuildTaskFactory = require('./site-build-task');
 const { BuildTask } = require('../../../../api/models');
 
-// eslint-disable-next-line no-underscore-dangle
 const _attributes = ({
   build,
   buildTaskTypeId,
@@ -28,7 +27,6 @@ const buildTask = overrides => Promise.props(_attributes(overrides))
   .then((attributes) => {
     Object.keys(attributes).forEach((key) => {
       if (attributes[key].sequelize) {
-        // eslint-disable-next-line no-param-reassign
         attributes[key] = attributes[key].id;
       }
     });

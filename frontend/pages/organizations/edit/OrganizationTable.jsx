@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { timeFrom } from '@util/datetime';
@@ -10,7 +9,6 @@ import ResendInviteForm from './ResendInviteForm';
 import UpdateUserForm from './UpdateUserForm';
 
 function showRemoveConfirm(member, org) {
-  // eslint-disable-next-line no-alert
   return window.confirm(`Are you sure you want to remove ${member.User.UAAIdentity.email} from ${org.name}?`);
 }
 

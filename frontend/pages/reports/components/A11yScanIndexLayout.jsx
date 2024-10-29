@@ -183,7 +183,6 @@ const IssuesCount = ({ violationsCount = 0, indexPills = [], moreCount = 0 }) =>
 
 IssuesCount.propTypes = {
   violationsCount: PropTypes.number.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
   indexPills: PropTypes.array.isRequired,
   moreCount: PropTypes.number.isRequired,
 };
@@ -236,13 +235,11 @@ const ScanResultsChildPages = ({ pages = [], baseurl }) => (
 );
 
 ScanResultsChildPages.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   pages: PropTypes.array.isRequired,
   baseurl: PropTypes.string,
 };
 
 A11yScanIndex.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.object.isRequired,
   siteId: PropTypes.number.isRequired,
   buildId: PropTypes.number.isRequired,
