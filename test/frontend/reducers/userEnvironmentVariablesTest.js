@@ -6,9 +6,7 @@ import {
   userEnvironmentVariableDeleted,
 } from '../../../frontend/actions/actionCreators/userEnvironmentVariableActions';
 
-import {
-  httpError,
-} from '../../../frontend/actions/actionCreators/alertActions';
+import { httpError } from '../../../frontend/actions/actionCreators/alertActions';
 
 import reducer from '../../../frontend/reducers/userEnvironmentVariables';
 
@@ -23,7 +21,9 @@ describe('userEnvironmentVariablesReducer', () => {
 
   describe('unhandled actions', () => {
     it('returns the passed in state', () => {
-      const state = { foo: 'bar' };
+      const state = {
+        foo: 'bar',
+      };
 
       const result = reducer(state, {});
 
@@ -90,9 +90,7 @@ describe('userEnvironmentVariablesReducer', () => {
     const action = userEnvironmentVariableDeleted(siteId, uevId);
     const state = {
       [siteId]: {
-        data: [
-          { id: uevId },
-        ],
+        data: [{ id: uevId }],
       },
     };
 
@@ -105,7 +103,9 @@ describe('userEnvironmentVariablesReducer', () => {
     it('removes the uev for the site', () => {
       const result = reducer(state, action);
 
-      expect(result[siteId].data).not.to.deep.include({ id: uevId });
+      expect(result[siteId].data).not.to.deep.include({
+        id: uevId,
+      });
     });
   });
 

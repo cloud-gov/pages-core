@@ -15,7 +15,7 @@ async function failStuckBuilds(job) {
     return message;
   }
 
-  const buildIds = results.map(r => r.id);
+  const buildIds = results.map((r) => r.id);
   const message = `The following builds were failed: ${buildIds.join(', ')}`;
   logger.log(message);
   return message;

@@ -46,7 +46,7 @@ const associate = ({
   });
 
   // Scopes
-  Build.addScope('byOrg', id => ({
+  Build.addScope('byOrg', (id) => ({
     include: [
       {
         model: Site,
@@ -61,7 +61,7 @@ const associate = ({
       },
     ],
   }));
-  Build.addScope('bySite', id => ({
+  Build.addScope('bySite', (id) => ({
     include: [
       {
         model: Site,
@@ -69,19 +69,31 @@ const associate = ({
       },
     ],
   }));
-  Build.addScope('forSiteUser', user => ({
+  Build.addScope('forSiteUser', (user) => ({
     where: {
       [Op.and]: [
         {
           [Op.or]: [
-            { '$Site.Users.id$': { [Op.not]: null } },
-            { '$Site.organizationId$': { [Op.not]: null } },
+            {
+              '$Site.Users.id$': {
+                [Op.not]: null,
+              },
+            },
+            {
+              '$Site.organizationId$': {
+                [Op.not]: null,
+              },
+            },
           ],
         },
         {
           [Op.or]: [
-            { '$Site.Users.id$': user.id },
-            { '$Site.Organization.OrganizationRoles.userId$': user.id },
+            {
+              '$Site.Users.id$': user.id,
+            },
+            {
+              '$Site.Organization.OrganizationRoles.userId$': user.id,
+            },
           ],
         },
       ],
@@ -114,23 +126,22 @@ const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 
 const beforeValidate = (build) => {
   const { token, username } = build;
-  build.token = token || generateToken(); // eslint-disable-line no-param-reassign
-  build.username = username && username.toLowerCase(); // eslint-disable-line no-param-reassign
+  build.token = token || generateToken();
+  build.username = username && username.toLowerCase();
 };
 
-const sanitizeCompleteJobErrorMessage = message => message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
+const sanitizeCompleteJobErrorMessage = (message) =>
+  message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
-const jobErrorMessage = (message = 'An unknown error occurred') => sanitizeCompleteJobErrorMessage(message);
+const jobErrorMessage = (message = 'An unknown error occurred') =>
+  sanitizeCompleteJobErrorMessage(message);
 
 const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   const atts = {
     state: buildStatus.status,
   };
 
-  if (
-    buildStatus.commitSha
-    && buildStatus.commitSha !== build.clonedCommitSha
-  ) {
+  if (buildStatus.commitSha && buildStatus.commitSha !== build.clonedCommitSha) {
     atts.clonedCommitSha = buildStatus.commitSha;
   }
 
@@ -167,13 +178,12 @@ async function enqueue() {
   const { count: priority } = await Build.findAndCountAll({
     where: {
       [Op.and]: [
-        { '$Build.site$': foundBuild.Site.id },
+        {
+          '$Build.site$': foundBuild.Site.id,
+        },
         {
           state: {
-            [Op.notIn]: [
-              Build.States.Error,
-              Build.States.Success,
-            ],
+            [Op.notIn]: [Build.States.Error, Build.States.Success],
           },
         },
       ],
@@ -182,7 +192,9 @@ async function enqueue() {
 
   try {
     await queue.startSiteBuild(foundBuild, priority);
-    await build.updateJobStatus({ status: States.Queued });
+    await build.updateJobStatus({
+      status: States.Queued,
+    });
   } catch (err) {
     const errMsg = `There was an error, adding the job to SiteBuildQueue: ${err}`;
     // logger.error(errMsg);
@@ -199,10 +211,14 @@ async function enqueue() {
 async function updateJobStatus(buildStatus) {
   const timestamp = new Date();
   const { SiteBranchConfig } = this.sequelize.models;
-  const site = await this.getSite({ include: [SiteBranchConfig] });
+  const site = await this.getSite({
+    include: [SiteBranchConfig],
+  });
   const build = await jobStateUpdate(buildStatus, this, site, timestamp);
   if (build.state === States.Success) {
-    await site.update({ publishedAt: timestamp });
+    await site.update({
+      publishedAt: timestamp,
+    });
   }
   return build;
 }
@@ -216,18 +232,15 @@ function isComplete() {
 }
 
 function isInProgress() {
-  return [
-    States.Created,
-    States.Queued,
-    States.Tasked,
-    States.Processing,
-  ].includes(this.state);
+  return [States.Created, States.Queued, States.Tasked, States.Processing].includes(
+    this.state,
+  );
 }
 
 function canStart(state) {
   return (
-    [States.Created, States.Queued, States.Tasked].includes(this.state)
-    && state === States.Processing
+    [States.Created, States.Queued, States.Tasked].includes(this.state) &&
+    state === States.Processing
   );
 }
 
@@ -307,7 +320,7 @@ module.exports = (sequelize, DataTypes) => {
         beforeValidate,
       },
       paranoid: true,
-    }
+    },
   );
 
   Build.generateToken = generateToken;
@@ -319,8 +332,15 @@ module.exports = (sequelize, DataTypes) => {
   Build.prototype.isInProgress = isInProgress;
   Build.prototype.canStart = canStart;
   Build.States = States;
-  Build.orgScope = id => ({ method: ['byOrg', id] });
-  Build.siteScope = id => ({ method: ['bySite', id] });
-  Build.forSiteUser = user => Build.scope({ method: ['forSiteUser', user] });
+  Build.orgScope = (id) => ({
+    method: ['byOrg', id],
+  });
+  Build.siteScope = (id) => ({
+    method: ['bySite', id],
+  });
+  Build.forSiteUser = (user) =>
+    Build.scope({
+      method: ['forSiteUser', user],
+    });
   return Build;
 };

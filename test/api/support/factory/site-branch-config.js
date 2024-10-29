@@ -3,7 +3,9 @@ const siteFactory = require('./site');
 
 const build = ({
   branch = 'factory',
-  config = { type: 'factory' },
+  config = {
+    type: 'factory',
+  },
   context = 'site',
   s3Key = 'path/to/site',
   ...params
@@ -23,14 +25,17 @@ const buildMany = (num) =>
 
 const create = async ({ site = null, ...params } = {}) => {
   const siteObj = site || (await siteFactory());
-  return build({ ...params, siteId: siteObj.id }).save();
+  return build({
+    ...params,
+    siteId: siteObj.id,
+  }).save();
 };
 
 const createMany = (num) =>
   Promise.all(
     Array(num)
       .fill(0)
-      .map(() => create())
+      .map(() => create()),
   );
 
 module.exports = {

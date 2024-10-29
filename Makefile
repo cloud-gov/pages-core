@@ -33,8 +33,14 @@ lint-client: ## Lint admin client code
 
 lint: lint-server lint-client ## Lint project
 
-lint-fix: ## lint and fix 
+lint-fix: ## lint and fix
 	docker compose run --rm app yarn lint --fix
+
+format:
+	docker compose run --rm app yarn format
+
+format-check:
+	docker compose run --rm app yarn format:check
 
 migrate: ## Run database migrations
 	docker compose run --rm app yarn migrate:up

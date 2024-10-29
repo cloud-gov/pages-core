@@ -10,22 +10,26 @@ import About from './about';
 
 export default function A11yScanIndex({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
-  const pageTitle = `Pages | ${scanTitle} report index for ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)} for build id #${buildId}`;
+  const pageTitle = `Pages
+    | ${scanTitle} report index for
+    ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)}
+    for build id #${buildId}`;
   function findReportsPerURLs(url) {
-    return data.reportPages.find(page => page.absoluteURL === url)?.path || '';
+    return data.reportPages.find((page) => page.absoluteURL === url)?.path || '';
   }
-  const summarizedResults = [...data.violatedRules].map(result => ({
+  const summarizedResults = [...data.violatedRules].map((result) => ({
     ...result,
     name: result.help,
     ref: result.helpUrl,
     severity: utils.getSeverityThemeToken(result.impact, 'a11y'),
     count: result.urls.length,
-    reports: result.urls.map(url => findReportsPerURLs(url)),
+    reports: result.urls.map((url) => findReportsPerURLs(url)),
   }));
 
-  const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
+  const ignoreFn = (finding) =>
+    finding.ignore || utils.getSeverityThemeToken(finding.impact, 'a11y') == null;
   const suppressed = summarizedResults.filter(ignoreFn);
-  const unsuppressed = summarizedResults.filter(r => !ignoreFn(r));
+  const unsuppressed = summarizedResults.filter((r) => !ignoreFn(r));
 
   useEffect(() => {
     document.title = pageTitle;
@@ -35,43 +39,70 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
     <>
       <div className="grid-row">
         <h1 className="font-serif-xl grid-col padding-right-2">
-          Accessibility reports for
-          {' '}
-          <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">
-            {data.baseurl}
-            {' '}
+          Accessibility reports for <br />
+          <span
+            className={`
+            font-code-lg
+            text-normal
+            text-primary-darker
+            bg-accent-cool-lighter
+            padding-x-05r narrow-mono
+            break-anywhere
+          `}
+          >
+            {data.baseurl}{' '}
           </span>
-          <span className="text-italic font-sans-lg text-normal margin-left-2">(all pages)</span>
+          <span className="text-italic font-sans-lg text-normal margin-left-2">
+            (all pages)
+          </span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
-          <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage" rel="noreferrer">
-            <img src="/images/logos/pages-logo-blue.svg" className="width-15" alt="Pages logo" />
+          <a
+            id="pages-logo"
+            href="https://cloud.gov/pages"
+            target="_blank"
+            title="link to Pages homepage"
+            rel="noreferrer"
+          >
+            <img
+              src="/images/logos/pages-logo-blue.svg"
+              className="width-15"
+              alt="Pages logo"
+            />
           </a>
         </span>
       </div>
       <div className="grid-row">
         <div className="grid-col border-top-1px">
           <section
-            className={`margin-top-4 usa-alert usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}`}
+            className={`
+              margin-top-4
+              usa-alert
+              usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}
+            `}
           >
             <div className="usa-alert__body">
               <p className="usa-alert__text">
                 We’ve found
                 <b>
                   {`
-                    ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')}
+                    ${unsuppressed.length}
+                    ${utils.plural(unsuppressed.length, 'unsuppressed result')}
                   `}
                 </b>
                 {suppressed.length > 0 && (
                   <>
                     and
                     <b>
-                      {` ${suppressed.length} ${utils.plural(suppressed.length, 'suppressed or informational result')} `}
+                      {` ${suppressed.length}
+                      ${utils.plural(
+                        suppressed.length,
+                        'suppressed or informational result',
+                      )} `}
                     </b>
                   </>
                 )}
-                for this site.  View each page report below for specific details.
+                for this site. View each page report below for specific details.
               </p>
             </div>
           </section>
@@ -79,13 +110,19 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h2 className="font-serif-xl grid-col padding-right-2 margin-bottom-0 padding-top-2 margin-top-2">
-            All results
-            {' '}
+          <h2
+            className={`
+              font-serif-xl
+              grid-col
+              padding-right-2
+              margin-bottom-0
+              padding-top-2
+              margin-top-2
+            `}
+          >
+            All results{' '}
             <span className="font-body-lg text-secondary-vivid">
-              (
-              {data.violatedRules.length}
-              )
+              ({data.violatedRules.length})
             </span>
           </h2>
         </div>
@@ -101,35 +138,35 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <h2 className="font-serif-xl grid-col padding-right-2 margin-bottom-0 margin-top-1">
-            All reports
-            {' '}
+          <h2
+            className={`
+            font-serif-xl
+            grid-col
+            padding-right-2
+            margin-bottom-0
+            margin-top-1
+          `}
+          >
+            All reports{' '}
             <span className="font-body-lg text-accent-cool-darker">
-              (
-              {data.reportPages.length}
-              )
+              ({data.reportPages.length})
             </span>
           </h2>
         </div>
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <ScanResultsChildPages
-            pages={data.reportPages}
-            baseurl={data.baseurl}
-          />
+          <ScanResultsChildPages pages={data.reportPages} baseurl={data.baseurl} />
           <p className="font-body-2xs line-height-body-3">
-            This report was generated for
-            {' '}
-            <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
-              build #
-              {buildId}
-            </Link>
-            {' '}
-            scanned on
-            {' '}
-            {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}
-            .
+            This report was generated for{' '}
+            <Link
+              reloadDocument
+              to={`/sites/${siteId}/builds/${buildId}/logs`}
+              className="usa-link"
+            >
+              build #{buildId}
+            </Link>{' '}
+            scanned on {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}.
           </p>
         </div>
       </div>
@@ -137,18 +174,19 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
         <div className="grid-col">
           <About scanType="a11y" siteId={siteId}>
             <p className="font-body-xs line-height-body-3">
-              This report was generated for
-              {' '}
-              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.baseurl}</code>
+              This report was generated for{' '}
+              <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">
+                {data.baseurl}
+              </code>
               {' from '}
-              <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
-                build #
-                {buildId}
-              </Link>
-              {' '}
-              scanned on
-              {' '}
-              {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}
+              <Link
+                reloadDocument
+                to={`/sites/${siteId}/builds/${buildId}/logs`}
+                className="usa-link"
+              >
+                build #{buildId}
+              </Link>{' '}
+              scanned on {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}
             </p>
           </About>
         </div>
@@ -162,21 +200,20 @@ const IssuesCount = ({ violationsCount = 0, indexPills = [], moreCount = 0 }) =>
   if (indexPills.length < 1) return violationsCount;
   return (
     <>
-      {indexPills.map(pill => (
-        <span key={pill.name} className={`usa-tag radius-pill bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color} margin-right-1`}>
-          {pill.count}
-          {' '}
-          {pill.name}
+      {indexPills.map((pill) => (
+        <span
+          key={pill.name}
+          className={`
+            usa-tag
+            radius-pill
+            bg-${utils.getSeverityThemeToken(pill.name, 'a11y').color}
+            margin-right-1
+          `}
+        >
+          {pill.count} {pill.name}
         </span>
       ))}
-      {moreCount > 0 && (
-        <b>
-          +
-          {moreCount}
-          {' '}
-          more
-        </b>
-      )}
+      {moreCount > 0 && <b>+{moreCount} more</b>}
     </>
   );
 };
@@ -188,16 +225,33 @@ IssuesCount.propTypes = {
 };
 
 const ScanResultsChildPages = ({ pages = [], baseurl }) => (
-  <table className="usa-table usa-table--striped usa-table--borderless usa-table--stacked usa-table--compact font-body-xs width-full" aria-label="Page list with links to detailed reports">
+  <table
+    className={`
+      usa-table
+      usa-table--striped
+      usa-table--borderless
+      usa-table--stacked
+      usa-table--compact
+      font-body-xs width-full
+    `}
+    aria-label="Page list with links to detailed reports"
+  >
     <thead>
       <tr>
-        <th scope="col" className="width-full">Page scanned</th>
-        <th scope="col" className="text-no-wrap text-right">Findings</th>
+        <th scope="col" className="width-full">
+          Page scanned
+        </th>
+        <th scope="col" className="text-no-wrap text-right">
+          Findings
+        </th>
       </tr>
     </thead>
     <tbody>
-      {pages.map(page => (
-        <tr key={page.absoluteURL} id={`jump-to-${utils.relPath(page.absoluteURL, baseurl)}`}>
+      {pages.map((page) => (
+        <tr
+          key={page.absoluteURL}
+          id={`jump-to-${utils.relPath(page.absoluteURL, baseurl)}`}
+        >
           <th data-label="Scanned URL" scope="row">
             <b className="usa-sr-only">
               Page scanned:

@@ -1,8 +1,6 @@
 const { QueryTypes } = require('sequelize');
 const config = require('../../../config');
-const {
-  Build, BuildLog, Site, sequelize,
-} = require('../../models');
+const { Build, BuildLog, Site, sequelize } = require('../../models');
 const S3Helper = require('../S3Helper');
 
 const BuildLogs = {
@@ -46,19 +44,29 @@ const BuildLogs = {
     }
 
     await this.s3().putObject(logs, key);
-    await build.update({ logsS3Key: key });
-    await BuildLog.destroy({ where: { build: build.id } });
+    await build.update({
+      logsS3Key: key,
+    });
+    await BuildLog.destroy({
+      where: {
+        build: build.id,
+      },
+    });
   },
 
   async archiveBuildLogsForBuildId(buildId) {
     const build = await Build.findOne({
-      where: { id: buildId },
-      include: [{
-        model: Site,
-        required: true,
-        // If the site has been deleted we still want to archive the logs
-        paranoid: false,
-      }],
+      where: {
+        id: buildId,
+      },
+      include: [
+        {
+          model: Site,
+          required: true,
+          // If the site has been deleted we still want to archive the logs
+          paranoid: false,
+        },
+      ],
     });
     return this.archiveBuildLogs(build.Site, build);
   },
@@ -74,10 +82,16 @@ const BuildLogs = {
       const output = bodyString.split('\n');
       const byteLength = response.ContentLength;
 
-      return { output, byteLength };
+      return {
+        output,
+        byteLength,
+      };
     } catch (error) {
       if (['InvalidRange', 'NoSuchKey'].includes(error.Code)) {
-        return { output: null, byteLength: 0 };
+        return {
+          output: null,
+          byteLength: 0,
+        };
       }
       throw error;
     }

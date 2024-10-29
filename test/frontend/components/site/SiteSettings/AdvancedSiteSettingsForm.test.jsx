@@ -3,20 +3,20 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
 
-import ReduxFormAdvancedSiteSettings, { AdvancedSiteSettingsForm } from '../../../../../frontend/components/site/SiteSettings/AdvancedSiteSettingsForm';
+import ReduxFormAdvancedSiteSettings, {
+  AdvancedSiteSettingsForm,
+} from '../../../../../frontend/components/site/SiteSettings/AdvancedSiteSettingsForm';
 
 describe('<AdvancedSiteSettingsForm/>', () => {
-  const makeProps = () => (
-    {
-      initialValues: {
-        engine: 'jekyll',
-        defaultConfig: 'boop: beep',
-      },
-      handleSubmit: spy(),
-      reset: spy(),
-      pristine: true,
-    }
-  );
+  const makeProps = () => ({
+    initialValues: {
+      engine: 'jekyll',
+      defaultConfig: 'boop: beep',
+    },
+    handleSubmit: spy(),
+    reset: spy(),
+    pristine: true,
+  });
 
   it('should export a ReduxForm-connected component', () => {
     expect(ReduxFormAdvancedSiteSettings).to.not.be.null;
@@ -35,12 +35,14 @@ describe('<AdvancedSiteSettingsForm/>', () => {
     const props = makeProps();
     let wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
     expect(wrapper.exists()).to.be.true;
-    expect(wrapper.find('button.usa-button.usa-button--outline').prop('disabled')).to.be.true;
+    expect(wrapper.find('button.usa-button.usa-button--outline').prop('disabled')).to.be
+      .true;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.true;
 
     props.pristine = false;
     wrapper = shallow(<AdvancedSiteSettingsForm {...props} />);
-    expect(wrapper.find('button.usa-button.usa-button--outline').prop('disabled')).to.be.false;
+    expect(wrapper.find('button.usa-button.usa-button--outline').prop('disabled')).to.be
+      .false;
     expect(wrapper.find('button[type="submit"]').prop('disabled')).to.be.false;
   });
 

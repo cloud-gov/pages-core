@@ -12,7 +12,7 @@ function associate({ Domain, SiteBranchConfig, Site }) {
   });
 
   // Scopes
-  SiteBranchConfig.addScope('bySite', id => ({
+  SiteBranchConfig.addScope('bySite', (id) => ({
     include: [
       {
         model: Site,
@@ -61,24 +61,27 @@ function define(sequelize, DataTypes) {
         nonPreviewBranchDefined() {
           if (this.context !== 'preview' && !this.branch) {
             throw new Error(
-              'Branch attribute cannot be null when context attribute is not preview'
+              'Branch attribute cannot be null when context attribute is not preview',
             );
           }
         },
         nonPreviewS3KeyDefined() {
           if (this.context !== 'preview' && !this.s3Key) {
             throw new Error(
-              'The s3Key attribute cannot be null when context attribute is not preview'
+              'The s3Key attribute cannot be null when context attribute is not preview',
             );
           }
         },
         isValidConfig() {},
       },
-    }
+    },
   );
 
   SiteBranchConfig.associate = associate;
-  SiteBranchConfig.siteScope = siteId => SiteBranchConfig.scope({ method: ['bySite', siteId] });
+  SiteBranchConfig.siteScope = (siteId) =>
+    SiteBranchConfig.scope({
+      method: ['bySite', siteId],
+    });
   SiteBranchConfig.getConfig = async (siteId, branch) => {
     const configs = await SiteBranchConfig.findAll({
       where: {
@@ -95,9 +98,9 @@ function define(sequelize, DataTypes) {
     });
 
     return (
-      configs.find(c => c.branch === branch)
-      || configs.find(c => c.context === 'preview')
-      || null
+      configs.find((c) => c.branch === branch) ||
+      configs.find((c) => c.context === 'preview') ||
+      null
     );
   };
 

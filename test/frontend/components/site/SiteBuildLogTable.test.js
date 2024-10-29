@@ -6,10 +6,7 @@ import SiteBuildLogTable from '../../../../frontend/components/site/siteBuildLog
 describe('<SiteBuildLogTable/>', () => {
   it('should render a table of build logs', () => {
     const props = {
-      buildLogs: [
-        '2017-06-19T14:45:12.126Z',
-        '2017-06-19T14:50:44.336Z',
-      ],
+      buildLogs: ['2017-06-19T14:45:12.126Z', '2017-06-19T14:50:44.336Z'],
     };
 
     const wrapper = shallow(<SiteBuildLogTable {...props} />);

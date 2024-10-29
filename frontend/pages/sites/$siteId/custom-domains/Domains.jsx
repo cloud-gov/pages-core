@@ -12,96 +12,99 @@ export default function Domains({ siteId, domains, handleDelete }) {
   return (
     <div className="well-gray-lightest grid-row">
       {domains.error && (
-      <div className="well grid-col-12">
-        <h3>
-          An error occurred while loading your site branch configurations.
-        </h3>
-        <p>{domains.error}</p>
-      </div>
+        <div className="well grid-col-12">
+          <h3>An error occurred while loading your site branch configurations.</h3>
+          <p>{domains.error}</p>
+        </div>
       )}
       {!domains.isLoading && !domains.error && domains.data && (
-      <ul className="usa-card-group grid-col-12">
-        {domains.data.map((domain) => {
-          const sbc = domain.SiteBranchConfig;
-          const names = domain.names.split(',');
-          const actionsDisabled = domain.state !== 'pending';
+        <ul className="usa-card-group grid-col-12">
+          {domains.data.map((domain) => {
+            const sbc = domain.SiteBranchConfig;
+            const names = domain.names.split(',');
+            const actionsDisabled = domain.state !== 'pending';
 
-          return (
-            <li className="usa-card grid-col-12" key={`domain-${domain.id}`}>
-              <div className="usa-card__container bg-base-lightest">
-                <div className="usa-card__header">
-                  <ListRow>
-                    <ContextTitle context={sbc.context} branch={sbc.branch} />
-                    <StateIndicator state={domain.state} />
-                  </ListRow>
-                </div>
-                <div className="usa-card__body">
-                  <ListRow>
-                    <span style={{ fontWeight: 'bold' }}>Branch:</span>
-                    {sbc.branch}
-                  </ListRow>
-                  <ListRow>
-                    <span style={{ fontWeight: 'bold' }}>
-                      {names.length > 1 ? 'Domains' : 'Domain'}
-                      :
-                    </span>
-                    {names.map((name, idx) => (
-                      <span key={`domain-name-${name}`}>
-                        {domain.state === 'provisioned' ? (
-                          <DomainLink domain={name} />
-                        ) : (
-                          name
-                        )}
-                        {names.length > idx + 1 && ' '}
+            return (
+              <li className="usa-card grid-col-12" key={`domain-${domain.id}`}>
+                <div className="usa-card__container bg-base-lightest">
+                  <div className="usa-card__header">
+                    <ListRow>
+                      <ContextTitle context={sbc.context} branch={sbc.branch} />
+                      <StateIndicator state={domain.state} />
+                    </ListRow>
+                  </div>
+                  <div className="usa-card__body">
+                    <ListRow>
+                      <span
+                        style={{
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Branch:
                       </span>
-                    ))}
-                  </ListRow>
+                      {sbc.branch}
+                    </ListRow>
+                    <ListRow>
+                      <span
+                        style={{
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {names.length > 1 ? 'Domains' : 'Domain'}:
+                      </span>
+                      {names.map((name, idx) => (
+                        <span key={`domain-name-${name}`}>
+                          {domain.state === 'provisioned' ? (
+                            <DomainLink domain={name} />
+                          ) : (
+                            name
+                          )}
+                          {names.length > idx + 1 && ' '}
+                        </span>
+                      ))}
+                    </ListRow>
+                  </div>
+                  <div className="usa-card__footer">
+                    <ListRow id="domain-edit-delete-actions" justify="flex-end">
+                      <button
+                        disabled={actionsDisabled}
+                        className="usa-button"
+                        onClick={() =>
+                          navigate(`/sites/${siteId}/custom-domains/${domain.id}/edit`)
+                        }
+                        alt={`Edit site domain ${domain.names}`}
+                        type="button"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        disabled={actionsDisabled}
+                        className="usa-button usa-button--secondary"
+                        onClick={() => handleDelete(domain.id)}
+                        alt={`Delete site domain ${domain.names}`}
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </ListRow>
+                    {actionsDisabled && (
+                      <ListRow justify="flex-end">
+                        <p className="margin-bottom-0">
+                          <em htmlFor="domain-edit-delete-actions">
+                            *Cannot edit or delete a {domain.state} domain.
+                          </em>
+                        </p>
+                      </ListRow>
+                    )}
+                  </div>
                 </div>
-                <div className="usa-card__footer">
-                  <ListRow id="domain-edit-delete-actions" justify="flex-end">
-                    <button
-                      disabled={actionsDisabled}
-                      className="usa-button"
-                      onClick={() => navigate(
-                        `/sites/${siteId}/custom-domains/${domain.id}/edit`
-                      )}
-                      alt={`Edit site domain ${domain.names}`}
-                      type="button"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      disabled={actionsDisabled}
-                      className="usa-button usa-button--secondary"
-                      onClick={() => handleDelete(domain.id)}
-                      alt={`Delete site domain ${domain.names}`}
-                      type="button"
-                    >
-                      Delete
-                    </button>
-                  </ListRow>
-                  {actionsDisabled && (
-                  <ListRow justify="flex-end">
-                    <p className="margin-bottom-0">
-                      <em htmlFor="domain-edit-delete-actions">
-                        *Cannot edit or delete a
-                        {' '}
-                        {domain.state}
-                        {' '}
-                        domain.
-                      </em>
-                    </p>
-                  </ListRow>
-                  )}
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
       )}
       {!domains.isLoading && !domains.error && domains?.data?.length === 0 && (
-      <p>There are no custom domains configured for this site currently.</p>
+        <p>There are no custom domains configured for this site currently.</p>
       )}
     </div>
   );
@@ -120,7 +123,7 @@ Domains.propTypes = {
           branch: PropTypes.string,
           context: PropTypes.string,
         }),
-      })
+      }),
     ),
   }).isRequired,
   handleDelete: PropTypes.func.isRequired,

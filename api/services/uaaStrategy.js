@@ -5,16 +5,13 @@ const { Event, UAAIdentity, User } = require('../models');
 const EventCreator = require('./EventCreator');
 
 function createUAAStrategy(options, verify) {
-  const {
-    logoutCallbackURL, logoutURL, userURL, ...rest
-  } = options;
+  const { logoutCallbackURL, logoutURL, userURL, ...rest } = options;
 
   const opts = rest;
 
   const strategy = new Strategy(opts, verify);
 
   strategy.userProfile = (accessToken, callback) => {
-    // eslint-disable-next-line no-underscore-dangle
     strategy._oauth2.get(userURL, accessToken, (err, body) => {
       if (err) {
         return callback(err);
@@ -43,42 +40,62 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
   const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
   if (!isVerified) {
-    EventCreator.audit(Event.labels.AUTHENTICATION, null, 'UAA profile cannot be verified,', {
-      profile,
-    });
+    EventCreator.audit(
+      Event.labels.AUTHENTICATION,
+      null,
+      'UAA profile cannot be verified,',
+      {
+        profile,
+      },
+    );
 
     return null;
   }
 
-  const identity = await UAAIdentity.findOne(
-    {
-      where: {
-        email: {
-          [Sequelize.Op.iLike]: email,
-        },
+  const identity = await UAAIdentity.findOne({
+    where: {
+      email: {
+        [Sequelize.Op.iLike]: email,
       },
-      include: User,
-    }
-  );
+    },
+    include: User,
+  });
 
   if (!identity) {
-    EventCreator.audit(Event.labels.AUTHENTICATION, null, 'UAA Identity cannot be found with email.', {
-      profile,
-    });
+    EventCreator.audit(
+      Event.labels.AUTHENTICATION,
+      null,
+      'UAA Identity cannot be found with email.',
+      {
+        profile,
+      },
+    );
     return null;
   }
 
   if (!identity.User) {
-    EventCreator.audit(Event.labels.AUTHENTICATION, null, 'User cannot be associated to UAA Identity', {
-      profile,
-      identity,
-    });
+    EventCreator.audit(
+      Event.labels.AUTHENTICATION,
+      null,
+      'User cannot be associated to UAA Identity',
+      {
+        profile,
+        identity,
+      },
+    );
     return null;
   }
 
-  await identity.update({ uaaId, accessToken, refreshToken });
+  await identity.update({
+    uaaId,
+    accessToken,
+    refreshToken,
+  });
 
   return identity.User;
 }
 
-module.exports = { createUAAStrategy, verifyUAAUser };
+module.exports = {
+  createUAAStrategy,
+  verifyUAAUser,
+};

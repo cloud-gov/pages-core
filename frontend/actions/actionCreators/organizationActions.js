@@ -5,12 +5,14 @@ const organizationsFetchStarted = () => ({
   type: organizationsFetchStartedType,
 });
 
-const organizationsReceived = organizations => ({
+const organizationsReceived = (organizations) => ({
   type: organizationsReceivedType,
   organizations,
 });
 
 export {
-  organizationsFetchStarted, organizationsFetchStartedType,
-  organizationsReceived, organizationsReceivedType,
+  organizationsFetchStarted,
+  organizationsFetchStartedType,
+  organizationsReceived,
+  organizationsReceivedType,
 };

@@ -7,13 +7,10 @@ import { mountRouter } from '../support/_mount';
 
 proxyquire.noCallThru();
 
-const { SiteContainer } = proxyquire(
-  '../../../frontend/components/siteContainer',
-  {
-    './site/SideNav': () => <div />,
-    './site/PagesHeader': () => <div />,
-  }
-);
+const { SiteContainer } = proxyquire('../../../frontend/components/siteContainer', {
+  './site/SideNav': () => <div />,
+  './site/PagesHeader': () => <div />,
+});
 
 let props;
 let state;

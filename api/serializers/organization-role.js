@@ -5,7 +5,8 @@ const userSerializer = require('./user');
 
 const attributes = {
   createdAt: 'date',
-  Organization: (org, _, isSystemAdmin) => organizationSerializer.serialize(org, isSystemAdmin),
+  Organization: (org, _, isSystemAdmin) =>
+    organizationSerializer.serialize(org, isSystemAdmin),
   Role: (role, _, isSystemAdmin) => roleSerializer.serialize(role, isSystemAdmin),
   User: (user, _, isSystemAdmin) => userSerializer.serialize(user, isSystemAdmin),
   updatedAt: 'date',

@@ -13,7 +13,9 @@ class BuildStatusNotifier {
       return false;
     }
 
-    const socket = this.io(globals.APP_HOSTNAME, { transports: ['websocket'] });
+    const socket = this.io(globals.APP_HOSTNAME, {
+      transports: ['websocket'],
+    });
 
     socket.on('build status', (build) => {
       this.notify(build);
@@ -31,8 +33,9 @@ class BuildStatusNotifier {
     this.listening = true;
 
     try {
-      return Notification.requestPermission()
-        .then(permission => this.connectSocket(permission));
+      return Notification.requestPermission().then((permission) =>
+        this.connectSocket(permission),
+      );
     } catch (error) {
       if (error instanceof TypeError) {
         return Promise.resolve(Notification.requestPermission(this.connectSocket));

@@ -24,14 +24,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "error",
-        "processing",
-        "success",
-        "queued",
-        "created",
-        "cancelled"
-      ]
+      "enum": ["error", "processing", "success", "queued", "created", "cancelled"]
     },
     "buildId": {
       "type": "number"
@@ -42,9 +35,7 @@
     "BuildTaskType": {
       "oneOf": [
         {
-          "type": [
-            "null"
-          ]
+          "type": ["null"]
         },
         {
           "$ref": "BuildTaskType.json"

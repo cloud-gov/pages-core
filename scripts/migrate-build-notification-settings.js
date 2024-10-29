@@ -8,16 +8,22 @@ async function migrateBuildNotificationSettings() {
     paranoid: false,
   });
 
-  const { errors } = await PromisePool
-    .withConcurrency(5)
+  const { errors } = await PromisePool.withConcurrency(5)
     .for(users)
     .process((user) => {
       const buildNotificationSettings = user.Sites.reduce((acc, site) => {
         const setting = site.SiteUser.buildNotificationSetting;
-        return setting ? { ...acc, [site.id]: setting } : acc;
+        return setting
+          ? {
+              ...acc,
+              [site.id]: setting,
+            }
+          : acc;
       }, {});
 
-      return user.update({ buildNotificationSettings });
+      return user.update({
+        buildNotificationSettings,
+      });
     });
 
   if (errors.length === 0) {
@@ -27,7 +33,9 @@ async function migrateBuildNotificationSettings() {
 
   errors.forEach(({ item, message }) => console.error(`${item.id}: ${message}`));
 
-  throw new Error('Migrate Build Notification Settings completed with errors, see above for details.');
+  throw new Error(
+    'Migrate Build Notification Settings completed with errors, see above for details.',
+  );
 }
 
 migrateBuildNotificationSettings()

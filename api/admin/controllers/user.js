@@ -1,10 +1,5 @@
 const json2csv = require('@json2csv/plainjs');
-const {
-  Organization,
-  Site,
-  User,
-  Event,
-} = require('../../models');
+const { Organization, Site, User, Event } = require('../../models');
 const { paginate, toInt, wrapHandlers } = require('../../utils');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const userSerializer = require('../../serializers/user');
@@ -19,7 +14,7 @@ const queueJob = new QueueJobs(connection);
 async function listForUsersReportHelper(req, res, scopes) {
   const { limit, page } = req.query;
 
-  const serialize = users => userSerializer.serializeMany(users, true);
+  const serialize = (users) => userSerializer.serializeMany(users, true);
 
   const pagination = await paginate(User.scope(scopes), serialize, {
     limit,
@@ -48,14 +43,15 @@ async function listForUsersReportCSVHelper(req, res, scopes) {
     },
     {
       label: 'Organizations',
-      value: user => user.OrganizationRoles.map(orgRole => `${orgRole.Organization.name}`)
-        .join('|'),
+      value: (user) =>
+        user.OrganizationRoles.map((orgRole) => `${orgRole.Organization.name}`).join('|'),
     },
     {
       label: 'Details',
-      value: user => user.OrganizationRoles.map(
-        orgRole => `${orgRole.Organization.name}: ${orgRole.Role.name}`)
-        .join(', '),
+      value: (user) =>
+        user.OrganizationRoles.map(
+          (orgRole) => `${orgRole.Organization.name}: ${orgRole.Role.name}`,
+        ).join(', '),
     },
     {
       label: 'Created',
@@ -67,7 +63,9 @@ async function listForUsersReportCSVHelper(req, res, scopes) {
     },
   ];
 
-  const parser = new json2csv.Parser({ fields });
+  const parser = new json2csv.Parser({
+    fields,
+  });
   const csv = parser.parse(users);
   res.attachment('users.csv');
   return res.send(csv);
@@ -82,11 +80,9 @@ module.exports = wrapHandlers({
   },
 
   async list(req, res) {
-    const {
-      limit, page, organization, search, site,
-    } = req.query;
+    const { limit, page, organization, search, site } = req.query;
 
-    const serialize = users => userSerializer.serializeMany(users, true);
+    const serialize = (users) => userSerializer.serializeMany(users, true);
 
     const scopes = ['withUAAIdentity'];
 
@@ -105,8 +101,14 @@ module.exports = wrapHandlers({
 
     const [pagination, orgs, sites] = await Promise.all([
       paginate(User.scope(scopes), serialize, { limit, page }),
-      Organization.findAll({ attributes: ['id', 'name'], raw: true }),
-      Site.findAll({ attributes: ['id', 'owner', 'repository'], raw: true }),
+      Organization.findAll({
+        attributes: ['id', 'name'],
+        raw: true,
+      }),
+      Site.findAll({
+        attributes: ['id', 'owner', 'repository'],
+        raw: true,
+      }),
     ]);
 
     const json = {
@@ -144,7 +146,7 @@ module.exports = wrapHandlers({
 
     const user = await fetchModelById(
       id,
-      User.scope(['withUAAIdentity', 'withOrganizationRoles'])
+      User.scope(['withUAAIdentity', 'withOrganizationRoles']),
     );
     if (!user) {
       return res.notFound();
@@ -170,7 +172,7 @@ module.exports = wrapHandlers({
       user,
       toInt(organizationId),
       toInt(roleId),
-      uaaEmail
+      uaaEmail,
     );
     EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invited', {
       organizationId,
@@ -180,16 +182,17 @@ module.exports = wrapHandlers({
     });
     if (link) {
       await queueJob.sendUAAInvite(email, link, origin, org.name);
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'User Invite Sent',
-        { user: { email }, link }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invite Sent', {
+        user: { email },
+        link,
+      });
     }
 
     const json = {
-      invite: { email, link },
+      invite: {
+        email,
+        link,
+      },
     };
 
     return res.json(json);
@@ -201,22 +204,24 @@ module.exports = wrapHandlers({
       user,
     } = req;
 
-    const { email, inviteLink: link, origin } = await OrganizationService.resendInvite(
-      user,
-      uaaEmail
-    );
-    EventCreator.audit(
-      Event.labels.ADMIN_ACTION,
-      req.user,
-      'User Invite Resent',
-      { user: { email }, link }
-    );
+    const {
+      email,
+      inviteLink: link,
+      origin,
+    } = await OrganizationService.resendInvite(user, uaaEmail);
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invite Resent', {
+      user: { email },
+      link,
+    });
     if (link) {
       await queueJob.sendUAAInvite(email, link, origin);
     }
 
     const json = {
-      invite: { email, link },
+      invite: {
+        email,
+        link,
+      },
     };
 
     return res.json(json);

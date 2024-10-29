@@ -16,8 +16,11 @@ function organizationAuditHook(instance, { user, event }) {
   const changes = instance.changed();
   if (changes.length > 0) {
     const changesObj = changes.reduce(
-      (agg, key) => ({ ...agg, [key]: instance.get(key) }),
-      { id: instance.id }
+      (agg, key) => ({
+        ...agg,
+        [key]: instance.get(key),
+      }),
+      { id: instance.id },
     );
 
     const tableName = instance.constructor.getTableName();
@@ -36,7 +39,10 @@ module.exports = wrapHandlers({
       scopes.push(Organization.searchScope(search));
     }
 
-    const pagination = await paginate(Organization.scope(scopes), serializeMany, { limit, page });
+    const pagination = await paginate(Organization.scope(scopes), serializeMany, {
+      limit,
+      page,
+    });
 
     const json = {
       meta: {},
@@ -51,7 +57,10 @@ module.exports = wrapHandlers({
 
     const scopes = ['byName'];
 
-    const pagination = await paginate(Organization.scope(scopes), serializeMany, { limit, page });
+    const pagination = await paginate(Organization.scope(scopes), serializeMany, {
+      limit,
+      page,
+    });
 
     const json = {
       meta: {},
@@ -79,7 +88,9 @@ module.exports = wrapHandlers({
       },
     ];
 
-    const parser = new json2csv.Parser({ fields });
+    const parser = new json2csv.Parser({
+      fields,
+    });
     const csv = parser.parse(orgs);
     res.attachment('organizations.csv');
     return res.send(csv);
@@ -99,7 +110,12 @@ module.exports = wrapHandlers({
   async create(req, res) {
     const {
       body: {
-        managerGithubUsername, managerUAAEmail, agency, name, isSandbox, isSelfAuthorized,
+        managerGithubUsername,
+        managerUAAEmail,
+        agency,
+        name,
+        isSandbox,
+        isSelfAuthorized,
       },
       user,
     } = req;
@@ -111,16 +127,23 @@ module.exports = wrapHandlers({
       isSelfAuthorized,
     };
 
-    const [org, { email, inviteLink: link, origin }] = await OrganizationService.createOrganization(
-      organizationParams, user, managerUAAEmail, managerGithubUsername
-    );
+    const [org, { email, inviteLink: link, origin }] =
+      await OrganizationService.createOrganization(
+        organizationParams,
+        user,
+        managerUAAEmail,
+        managerGithubUsername,
+      );
 
     if (link) {
       await queueJob.sendUAAInvite(email, link, origin, org.name);
     }
 
     const json = {
-      invite: { email, link },
+      invite: {
+        email,
+        link,
+      },
       org: serialize(org),
     };
 
@@ -129,9 +152,7 @@ module.exports = wrapHandlers({
 
   async update(req, res) {
     const {
-      body: {
-        agency, name, isSandbox, isSelfAuthorized, isActive,
-      },
+      body: { agency, name, isSandbox, isSelfAuthorized, isActive },
       params: { id },
     } = req;
 
@@ -151,7 +172,10 @@ module.exports = wrapHandlers({
     const hookEvent = 'afterUpdate';
     const hookKey = 'afterUpdateHook';
     Organization.addHook(hookEvent, hookKey, organizationAuditHook);
-    await org.update(orgParams, { user: req.user, event: 'Update' });
+    await org.update(orgParams, {
+      user: req.user,
+      event: 'Update',
+    });
     Organization.removeHook(hookEvent, hookKey);
 
     return res.json(serialize(org));
@@ -166,7 +190,9 @@ module.exports = wrapHandlers({
     if (!org) return res.notFound();
 
     const deactivatedOrg = await OrganizationService.deactivateOrganization(org);
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Deactivated', { organization: deactivatedOrg });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Deactivated', {
+      organization: deactivatedOrg,
+    });
     return res.json(serialize(deactivatedOrg));
   },
 
@@ -179,7 +205,9 @@ module.exports = wrapHandlers({
     if (!org) return res.notFound();
 
     const activatedOrg = await OrganizationService.activateOrganization(org);
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Activated', { organization: activatedOrg });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Organization Activated', {
+      organization: activatedOrg,
+    });
     return res.json(serialize(activatedOrg));
   },
 });

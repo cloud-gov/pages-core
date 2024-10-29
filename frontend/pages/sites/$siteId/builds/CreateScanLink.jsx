@@ -1,12 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function CreateScanLink({
-  children,
-  className,
-  isDisabled = false,
-  handleClick,
-}) {
+function CreateScanLink({ children, className, isDisabled = false, handleClick }) {
   return (
     <button
       type="button"

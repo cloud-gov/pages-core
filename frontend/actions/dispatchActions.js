@@ -52,11 +52,13 @@ const dispatchHideAddNewSiteFieldsAction = () => {
   dispatch(createHideAddNewSiteFieldsAction());
 };
 
-const dispatchSiteBasicAuthRemovedAction = site => dispatch(createSiteBasicAuthRemovedAction(site));
+const dispatchSiteBasicAuthRemovedAction = (site) =>
+  dispatch(createSiteBasicAuthRemovedAction(site));
 
-const dispatchSiteBasicAuthSavedAction = site => dispatch(createSiteBasicAuthSavedAction(site));
+const dispatchSiteBasicAuthSavedAction = (site) =>
+  dispatch(createSiteBasicAuthSavedAction(site));
 
-const dispatchResetFormAction = formName => dispatch(reset(formName));
+const dispatchResetFormAction = (formName) => dispatch(reset(formName));
 
 export {
   dispatchSitesFetchStartedAction,

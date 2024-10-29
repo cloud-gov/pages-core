@@ -17,29 +17,35 @@ const calcWindow = () => ({
 });
 
 function authorize(revokeFirst) {
-  const authPromise = () => new Promise((resolve, reject) => {
-    const url = `${apiUrl}${path}`;
+  const authPromise = () =>
+    new Promise((resolve, reject) => {
+      const url = `${apiUrl}${path}`;
 
-    const {
-      width, height, top, left,
-    } = calcWindow();
+      const { width, height, top, left } = calcWindow();
 
-    const opts = `resizable=yes,scrollbars=yes,width=${width},height=${height},top=${top},left=${left}`;
+      const opts = `
+        resizable=yes,
+        scrollbars=yes,
+        width=${width},
+        height=${height},
+        top=${top},
+        left=${left}
+      `;
 
-    const authWindow = window.open(url, 'authWindow', opts);
+      const authWindow = window.open(url, 'authWindow', opts);
 
-    const handleMessage = (e) => {
-      if (e.origin === apiUrl && e.data === 'success') {
-        authWindow.close();
-        return resolve(true);
-      }
-      return reject(new Error('Authentication failed'));
-    };
+      const handleMessage = (e) => {
+        if (e.origin === apiUrl && e.data === 'success') {
+          authWindow.close();
+          return resolve(true);
+        }
+        return reject(new Error('Authentication failed'));
+      };
 
-    window.addEventListener('message', handleMessage, { once: true });
+      window.addEventListener('message', handleMessage, { once: true });
 
-    authWindow.focus();
-  });
+      authWindow.focus();
+    });
 
   if (revokeFirst) {
     return api.revokeApplicationGrant().then(authPromise);
@@ -47,23 +53,15 @@ function authorize(revokeFirst) {
   return authPromise();
 }
 
-const GithubAuthButton = ({
-  onFailure, onSuccess, text, revokeFirst,
-}) => (
+const GithubAuthButton = ({ onFailure, onSuccess, text, revokeFirst }) => (
   <div className="bg-primary-lightest padding-2">
     <p className="usa-label margin-top-0">{text}</p>
     <button
       type="button"
       className="usa-button github-auth-button"
-      onClick={
-        () => authorize(revokeFirst)
-          .then(onSuccess)
-          .catch(onFailure)
-      }
+      onClick={() => authorize(revokeFirst).then(onSuccess).catch(onFailure)}
     >
-      <IconGitHub />
-      {' '}
-      Connect with Github
+      <IconGitHub /> Connect with Github
     </button>
   </div>
 );

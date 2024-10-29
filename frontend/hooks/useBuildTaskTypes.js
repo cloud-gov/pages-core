@@ -10,10 +10,12 @@ export const useBuildTaskTypes = () => {
   const [results, setResults] = useState(initResultsState);
 
   useEffect(() => {
-    api.getBuildTaskTypes().then(data => setResults({
-      isLoading: false,
-      buildTaskTypes: data,
-    }));
+    api.getBuildTaskTypes().then((data) =>
+      setResults({
+        isLoading: false,
+        buildTaskTypes: data,
+      }),
+    );
   }, []);
 
   return results;

@@ -3,25 +3,27 @@ const dbm = global.dbm || require('db-migrate');
 const type = dbm.dataType;
 const Promise = require('bluebird');
 
-const addPublishedAtColumn = db => new Promise((resolve, reject) => {
-  db.addColumn('site', 'publishedAt', { type: 'timestamp' }, (err) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve();
-    }
+const addPublishedAtColumn = (db) =>
+  new Promise((resolve, reject) => {
+    db.addColumn('site', 'publishedAt', { type: 'timestamp' }, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
   });
-});
 
-const fetchSiteIds = db => new Promise((resolve, reject) => {
-  db.all('SELECT id FROM site', (err, data) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(data.map(row => row.id));
-    }
+const fetchSiteIds = (db) =>
+  new Promise((resolve, reject) => {
+    db.all('SELECT id FROM site', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.map((row) => row.id));
+      }
+    });
   });
-});
 
 const fetchBuildCreatedAtForSite = (db, siteId) => {
   const sql = `
@@ -66,15 +68,24 @@ exports.up = function (db, callback) {
   let siteIds;
   const buildCreatedAts = [];
 
-  addPublishedAtColumn(db).then(() => fetchSiteIds(db)).then((ids) => {
-    siteIds = ids;
-    return Promise.each(siteIds, siteId => fetchBuildCreatedAtForSite(db, siteId).then(createdAt => buildCreatedAts.push(createdAt)));
-  }).then(() => Promise.each(siteIds, (siteId, index) => {
-    const publishedAt = buildCreatedAts[index];
-    if (publishedAt) {
-      return setPublishedAtForSite(db, siteId, publishedAt);
-    }
-  }))
+  addPublishedAtColumn(db)
+    .then(() => fetchSiteIds(db))
+    .then((ids) => {
+      siteIds = ids;
+      return Promise.each(siteIds, (siteId) =>
+        fetchBuildCreatedAtForSite(db, siteId).then((createdAt) =>
+          buildCreatedAts.push(createdAt),
+        ),
+      );
+    })
+    .then(() =>
+      Promise.each(siteIds, (siteId, index) => {
+        const publishedAt = buildCreatedAts[index];
+        if (publishedAt) {
+          return setPublishedAtForSite(db, siteId, publishedAt);
+        }
+      }),
+    )
     .then(() => {
       callback();
     })

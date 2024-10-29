@@ -13,7 +13,10 @@ function build(params = {}) {
     name = increment('org');
   }
 
-  return Organization.build({...params, name});
+  return Organization.build({
+    ...params,
+    name,
+  });
 }
 
 function create(params) {
@@ -21,7 +24,10 @@ function create(params) {
 }
 
 function truncate() {
-  return Organization.truncate({ force: true, cascade: true });
+  return Organization.truncate({
+    force: true,
+    cascade: true,
+  });
 }
 
 module.exports = {

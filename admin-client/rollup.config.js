@@ -59,10 +59,7 @@ export default {
           dest: 'public',
         },
         {
-          src: [
-            `${uswds}/css/uswds.min.css`,
-            `${uswds}/css/uswds.min.css.map`,
-          ],
+          src: [`${uswds}/css/uswds.min.css`, `${uswds}/css/uswds.min.css.map`],
           dest: 'public',
         },
       ],

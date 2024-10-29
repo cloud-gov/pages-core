@@ -11,9 +11,18 @@ const EventCreator = require('../../../api/services/EventCreator');
 
 function clean() {
   return Promise.all([
-    SiteBranchConfig.truncate({ force: true, cascade: true }),
-    Site.truncate({ force: true, cascade: true }),
-    Domain.truncate({ force: true, cascade: true }),
+    SiteBranchConfig.truncate({
+      force: true,
+      cascade: true,
+    }),
+    Site.truncate({
+      force: true,
+      cascade: true,
+    }),
+    Domain.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -42,7 +51,7 @@ describe('Domain API', () => {
           'DELETE',
           '/site/{site_id}/domain/{domain_id}',
           403,
-          body
+          body,
         );
       });
     });
@@ -65,7 +74,7 @@ describe('Domain API', () => {
           'DELETE',
           '/site/{site_id}/domain/{domain_id}',
           404,
-          body
+          body,
         );
       });
     });
@@ -73,10 +82,7 @@ describe('Domain API', () => {
     describe('when the user is not authorized to see the site', () => {
       it('returns a 404', async () => {
         const domainId = 1;
-        const [site, user] = await Promise.all([
-          factory.site(),
-          factory.user(),
-        ]);
+        const [site, user] = await Promise.all([factory.site(), factory.user()]);
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -90,7 +96,7 @@ describe('Domain API', () => {
           'DELETE',
           '/site/{site_id}/domain/{domain_id}',
           404,
-          body
+          body,
         );
       });
     });
@@ -99,7 +105,9 @@ describe('Domain API', () => {
       it('returns a 404', async () => {
         const domainId = 1;
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const cookie = await authenticatedSession(user);
 
@@ -114,7 +122,7 @@ describe('Domain API', () => {
           'DELETE',
           '/site/{site_id}/domain/{domain_id}',
           404,
-          body
+          body,
         );
       });
     });
@@ -122,7 +130,9 @@ describe('Domain API', () => {
     describe('when the parameters are valid', () => {
       it('deletes the domain when it is in a pending state', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const [user] = await Promise.all([userPromise]);
         const domain = await factory.domain.create({
           siteId: site.id,
@@ -146,10 +156,18 @@ describe('Domain API', () => {
 
       it('allows an org user to delete the domain in a pending state', async () => {
         const org = await factory.organization.create();
-        const role = await Role.findOne({ where: { name: 'user' } });
+        const role = await Role.findOne({
+          where: {
+            name: 'user',
+          },
+        });
         const user = await factory.user();
         const site = await factory.site();
-        await org.addUser(user, { through: { roleId: role.id } });
+        await org.addUser(user, {
+          through: {
+            roleId: role.id,
+          },
+        });
         await org.addSite(site);
 
         const domain = await factory.domain.create({
@@ -173,12 +191,21 @@ describe('Domain API', () => {
         expect(afterCount).to.eq(beforeCount - 1);
       });
 
-      it('does not allow a user to delete the domain when not in a pending state', async () => {
+      it(`does not allow a user to delete
+          the domain when not in a pending state`, async () => {
         const org = await factory.organization.create();
-        const role = await Role.findOne({ where: { name: 'user' } });
+        const role = await Role.findOne({
+          where: {
+            name: 'user',
+          },
+        });
         const user = await factory.user();
         const site = await factory.site();
-        await org.addUser(user, { through: { roleId: role.id } });
+        await org.addUser(user, {
+          through: {
+            roleId: role.id,
+          },
+        });
         await org.addSite(site);
 
         const domain = await factory.domain.create({
@@ -253,10 +280,7 @@ describe('Domain API', () => {
 
     describe('when the user is not authorized to see the site', () => {
       it('returns a 404', async () => {
-        const [site, user] = await Promise.all([
-          factory.site(),
-          factory.user(),
-        ]);
+        const [site, user] = await Promise.all([factory.site(), factory.user()]);
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -273,7 +297,9 @@ describe('Domain API', () => {
     describe('when the name already exists for a site domain', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const branch = 'demo';
         const context = 'demo';
@@ -298,12 +324,15 @@ describe('Domain API', () => {
           .set('Cookie', cookie)
           .set('x-csrf-token', csrfToken.getToken())
           .type('json')
-          .send({ siteBranchConfigId: sbc2.id, names })
+          .send({
+            siteBranchConfigId: sbc2.id,
+            names,
+          })
           .expect(400);
 
         validateAgainstJSONSchema('POST', '/site/{site_id}/domain', 400, body);
         expect(body.message).to.eq(
-          'A domain with the same name already exists for the site.'
+          'A domain with the same name already exists for the site.',
         );
       });
     });
@@ -311,7 +340,9 @@ describe('Domain API', () => {
     describe('when the branch config already exists for a site domain', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const names1 = 'www.agency.gov';
         const names2 = 'demo.agency.gov';
@@ -338,7 +369,7 @@ describe('Domain API', () => {
 
         validateAgainstJSONSchema('POST', '/site/{site_id}/domain', 400, body);
         expect(body.message).to.eq(
-          'A domain with the same branch config already exists for the site.'
+          'A domain with the same branch config already exists for the site.',
         );
       });
     });
@@ -346,7 +377,9 @@ describe('Domain API', () => {
     describe('when the branch config does not exist for a site', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const names = 'www.agency.gov';
 
@@ -365,15 +398,18 @@ describe('Domain API', () => {
 
         validateAgainstJSONSchema('POST', '/site/{site_id}/domain', 400, body);
         expect(body.message).to.eq(
-          'The site branch config specified for the domain does not exist.'
+          'The site branch config specified for the domain does not exist.',
         );
       });
     });
 
-    describe('when the branch config has a context of `preview` for a site domain', () => {
+    describe(`when the branch config has a context
+              of \`preview\` for a site domain`, () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const sbc = await factory.siteBranchConfig.create({
           site,
           branch: 'preview',
@@ -397,7 +433,7 @@ describe('Domain API', () => {
 
         validateAgainstJSONSchema('POST', '/site/{site_id}/domain', 400, body);
         expect(body.message).to.eq(
-          'The domain site branch config cannot have the context of "preview".'
+          'The domain site branch config cannot have the context of "preview".',
         );
       });
     });
@@ -405,7 +441,9 @@ describe('Domain API', () => {
     describe('when the parameters are valid', () => {
       it('creates and returns the site domain', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
         const user = await userPromise;
         const names = 'www.agency.gov';
@@ -437,10 +475,18 @@ describe('Domain API', () => {
 
       it('allows an org user to create the site domain', async () => {
         const org = await factory.organization.create();
-        const role = await Role.findOne({ where: { name: 'user' } });
+        const role = await Role.findOne({
+          where: {
+            name: 'user',
+          },
+        });
         const user = await factory.user();
         const site = await factory.site();
-        await org.addUser(user, { through: { roleId: role.id } });
+        await org.addUser(user, {
+          through: {
+            roleId: role.id,
+          },
+        });
         await org.addSite(site);
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
         const names = 'www.agency.gov';
@@ -483,12 +529,7 @@ describe('Domain API', () => {
           .type('json')
           .expect(403);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          403,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 403, body);
       });
     });
 
@@ -505,12 +546,7 @@ describe('Domain API', () => {
           .type('json')
           .expect(403);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          403,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 403, body);
       });
     });
 
@@ -528,21 +564,13 @@ describe('Domain API', () => {
           .type('json')
           .expect(404);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          404,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 404, body);
       });
     });
 
     describe('when the user is not authorized to see the site', () => {
       it('returns a 404', async () => {
-        const [site, user] = await Promise.all([
-          factory.site(),
-          factory.user(),
-        ]);
+        const [site, user] = await Promise.all([factory.site(), factory.user()]);
         const domainId = 1;
         const cookie = await authenticatedSession(user);
 
@@ -553,19 +581,16 @@ describe('Domain API', () => {
           .type('json')
           .expect(404);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          404,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 404, body);
       });
     });
 
     describe('when the name already exists for a site domain', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const branch = 'demo';
         const context = 'demo';
@@ -601,14 +626,9 @@ describe('Domain API', () => {
           .send({ names })
           .expect(400);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          400,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 400, body);
         expect(body.message).to.eq(
-          'A domain with the same name already exists for the site.'
+          'A domain with the same name already exists for the site.',
         );
       });
     });
@@ -616,7 +636,9 @@ describe('Domain API', () => {
     describe('when the branch config already exists for a site domain', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const branch = 'demo';
         const context = 'demo';
@@ -654,14 +676,9 @@ describe('Domain API', () => {
           })
           .expect(400);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          400,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 400, body);
         expect(body.message).to.eq(
-          'A domain with the same branch config already exists for the site.'
+          'A domain with the same branch config already exists for the site.',
         );
       });
     });
@@ -669,7 +686,9 @@ describe('Domain API', () => {
     describe('when the branch config does not exist for a site', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const names = 'www.agency.gov';
         const domain = await factory.domain.create({
@@ -691,22 +710,20 @@ describe('Domain API', () => {
           })
           .expect(400);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          400,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 400, body);
         expect(body.message).to.eq(
-          'The site branch config specified for the domain does not exist.'
+          'The site branch config specified for the domain does not exist.',
         );
       });
     });
 
-    describe('when the branch config has a context of `preview` for a site domain', () => {
+    describe(`when the branch config has a context
+              of \`preview\` for a site domain`, () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const sbc2 = await factory.siteBranchConfig.create({
           site,
@@ -731,14 +748,9 @@ describe('Domain API', () => {
           })
           .expect(400);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          400,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 400, body);
         expect(body.message).to.eq(
-          'The domain site branch config cannot have the context of "preview".'
+          'The domain site branch config cannot have the context of "preview".',
         );
       });
     });
@@ -746,7 +758,9 @@ describe('Domain API', () => {
     describe('when the domain is not in a pending state', () => {
       it('returns a 400', async () => {
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const user = await userPromise;
         const domain = await factory.domain.create({
           siteId: site.id,
@@ -766,19 +780,15 @@ describe('Domain API', () => {
           })
           .expect(400);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          400,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 400, body);
         expect(
           body.message
             .split('\n')
             .map((m) => m.trim())
-            .join('')
+            .join(''),
         ).to.eq(
-          'The domain cannot be updated because it is provisioned.Please contact cloud.gov Pages support.'
+          // eslint-disable-next-line max-len
+          'The domain cannot be updated because it is provisioned.Please contact cloud.gov Pages support.',
         );
       });
     });
@@ -787,7 +797,9 @@ describe('Domain API', () => {
       it('it updates a domain name', async () => {
         const updatedNames = 'updated.agency.gov';
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
         const user = await userPromise;
         const domain = await factory.domain.create({
@@ -811,12 +823,7 @@ describe('Domain API', () => {
           })
           .expect(200);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          200,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 200, body);
         expect(body.id).to.eq(domain.id);
         expect(body.names).to.eq(updatedNames);
         expect(body.siteBranchConfigId).to.eq(siteBranchConfigId);
@@ -826,7 +833,9 @@ describe('Domain API', () => {
       it('it updates a domain site branch config', async () => {
         const names = 'www.agency.gov';
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
         const user = await userPromise;
         const sbc2 = await factory.siteBranchConfig.create({
@@ -856,12 +865,7 @@ describe('Domain API', () => {
           })
           .expect(200);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          200,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 200, body);
         expect(body.id).to.eq(domain.id);
         expect(body.names).to.eq(names);
         expect(body.siteBranchConfigId).to.eq(sbc2.id);
@@ -870,9 +874,11 @@ describe('Domain API', () => {
 
       it('it updates a domain site branch config and names', async () => {
         const names = 'www.agency.gov';
-        const updatedNames = 'updated.agency.gov'
+        const updatedNames = 'updated.agency.gov';
         const userPromise = factory.user();
-        const site = await factory.site({ users: Promise.all([userPromise]) });
+        const site = await factory.site({
+          users: Promise.all([userPromise]),
+        });
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
         const user = await userPromise;
         const sbc2 = await factory.siteBranchConfig.create({
@@ -903,12 +909,7 @@ describe('Domain API', () => {
           })
           .expect(200);
 
-        validateAgainstJSONSchema(
-          'PUT',
-          '/site/{site_id}/domain/{domain_id}',
-          200,
-          body
-        );
+        validateAgainstJSONSchema('PUT', '/site/{site_id}/domain/{domain_id}', 200, body);
         expect(body.id).to.eq(domain.id);
         expect(body.names).to.eq(updatedNames);
         expect(body.siteBranchConfigId).to.eq(sbc2.id);

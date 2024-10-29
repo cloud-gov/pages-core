@@ -4,32 +4,33 @@ const dbm = global.dbm || require('db-migrate');
 
 const type = dbm.dataType;
 
-const addColumnsToUserTable = db => new Promise((resolve, reject) => {
-  db.addColumn('user', 'githubAccessToken', 'text', (err) => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    db.addColumn('user', 'githubUserId', 'text', (err) => {
+const addColumnsToUserTable = (db) =>
+  new Promise((resolve, reject) => {
+    db.addColumn('user', 'githubAccessToken', 'text', (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      db.addColumn('user', 'githubUserId', 'text', (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  });
+
+const loadUsers = (db) =>
+  new Promise((resolve, reject) => {
+    db.all('SELECT * FROM "user"', (err, results) => {
       if (err) {
         reject(err);
       } else {
-        resolve();
+        resolve(Object.keys(results).map((key) => results[key]));
       }
     });
   });
-});
-
-
-const loadUsers = db => new Promise((resolve, reject) => {
-  db.all('SELECT * FROM "user"', (err, results) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(Object.keys(results).map(key => results[key]));
-    }
-  });
-});
 
 const loadPassportForUser = (user, db) => {
   const sql = `
@@ -76,23 +77,25 @@ const updateUserWithPassport = (user, passport, db) => {
   });
 };
 
-const dropPassportTable = db => new Promise((reject, resolve) => {
-  db.dropTable('passport', (err) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve();
-    }
+const dropPassportTable = (db) =>
+  new Promise((reject, resolve) => {
+    db.dropTable('passport', (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
   });
-});
 
-const migrateUpUserData = (user, db) => loadPassportForUser(user, db).then((passport) => {
-  if (passport) {
-    return updateUserWithPassport(user, passport, db);
-  }
-  console.warn(`Unable to find passport for user: ${user.username}`);
-  return Promise.resolve();
-});
+const migrateUpUserData = (user, db) =>
+  loadPassportForUser(user, db).then((passport) => {
+    if (passport) {
+      return updateUserWithPassport(user, passport, db);
+    }
+    console.warn(`Unable to find passport for user: ${user.username}`);
+    return Promise.resolve();
+  });
 
 const migrateUpNextUser = (users, db) => {
   if (users.length > 0) {
@@ -106,7 +109,10 @@ const migrateUpNextUser = (users, db) => {
 };
 
 exports.up = function (db, callback) {
-  addColumnsToUserTable(db).then(() => loadUsers(db)).then(users => migrateUpNextUser(users, db)).then(() => dropPassportTable(db))
+  addColumnsToUserTable(db)
+    .then(() => loadUsers(db))
+    .then((users) => migrateUpNextUser(users, db))
+    .then(() => dropPassportTable(db))
     .then(() => {
       callback();
     })
@@ -164,21 +170,22 @@ const insertPassportRowForUser = (user, db) => {
   });
 };
 
-const removeColumsFromUserTable = db => new Promise((resolve, reject) => {
-  db.removeColumn('user', 'githubAccessToken', (err) => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    db.removeColumn('user', 'githubUserId', (err) => {
+const removeColumsFromUserTable = (db) =>
+  new Promise((resolve, reject) => {
+    db.removeColumn('user', 'githubAccessToken', (err) => {
       if (err) {
         reject(err);
-      } else {
-        resolve();
+        return;
       }
+      db.removeColumn('user', 'githubUserId', (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
   });
-});
 
 const migrateDownNextUser = (users, db) => {
   if (users.length > 0) {
@@ -192,7 +199,10 @@ const migrateDownNextUser = (users, db) => {
 };
 
 exports.down = function (db, callback) {
-  createPassportTable(db).then(() => loadUsers(db)).then(users => migrateDownNextUser(users, db)).then(() => removeColumsFromUserTable(db))
+  createPassportTable(db)
+    .then(() => loadUsers(db))
+    .then((users) => migrateDownNextUser(users, db))
+    .then(() => removeColumsFromUserTable(db))
     .then(() => {
       callback();
     })

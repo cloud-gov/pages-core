@@ -8,43 +8,63 @@ describe('CloudFoundryAPIClient', () => {
     const field = 'name';
 
     it('should filter out the named resource from an objects resources array', () => {
-      const resource1 = { [field]: name };
-      const resource2 = { [field]: 'two' };
+      const resource1 = {
+        [field]: name,
+      };
+      const resource2 = {
+        [field]: 'two',
+      };
       const resources = [resource1, resource2];
 
-      const result = CloudFoundryAPIClient.findEntity(
-        { resources },
-        name,
-        field
-      );
+      const result = CloudFoundryAPIClient.findEntity({ resources }, name, field);
 
       expect(result).to.deep.equal(resource1);
     });
 
-    it('should filter out the nested named resource when from an objects resources array', () => {
+    it(`should filter out the nested named
+        resource when from an objects resources array`, () => {
       const nestedField = ['test', 'service', 'data', 'guid'];
       const searchValue = 'test-guid';
       const otherValue = 'not-test-guid';
-      const resource1 = { test: { service: { data: { guid: searchValue } } } };
-      const resource2 = { test: { service: { data: { guid: otherValue } } } };
-      const resource3 = { data: 'different' };
+      const resource1 = {
+        test: {
+          service: {
+            data: {
+              guid: searchValue,
+            },
+          },
+        },
+      };
+      const resource2 = {
+        test: {
+          service: {
+            data: {
+              guid: otherValue,
+            },
+          },
+        },
+      };
+      const resource3 = {
+        data: 'different',
+      };
       const resources = [resource1, resource2, resource3];
 
       const result = CloudFoundryAPIClient.findEntity(
         { resources },
         searchValue,
-        nestedField
+        nestedField,
       );
 
       expect(result).to.deep.equal(resource1);
     });
 
     it('should throw an error if entity not found', () => {
-      const resource = { not: 'real' };
+      const resource = {
+        not: 'real',
+      };
       const resources = [resource];
 
-      const fn = () =>
-        CloudFoundryAPIClient.findEntity({ resources }, name, field);
+      const fn = () => CloudFoundryAPIClient.findEntity({ resources }, name, field);
 
       expect(fn).to.throw(Error, `Not found: Entity @${field} = ${name}`);
     });
@@ -54,21 +74,27 @@ describe('CloudFoundryAPIClient', () => {
     it('should return first entity from an objects resources array', () => {
       const name = 'one';
       const field = 'name';
-      const entity = { [field]: name };
+      const entity = {
+        [field]: name,
+      };
       const resources = {
         resources: [
           {
             entity,
           },
           {
-            entity: { [field]: 'two' },
+            entity: {
+              [field]: 'two',
+            },
           },
         ],
       };
 
       const result = CloudFoundryAPIClient.firstEntity(resources, name);
 
-      expect(result).to.deep.equal({ entity });
+      expect(result).to.deep.equal({
+        entity,
+      });
     });
 
     it('should throw an error if no resources returned', () => {
@@ -85,7 +111,10 @@ describe('CloudFoundryAPIClient', () => {
 
   describe('.objToQueryParams', () => {
     it('returns an instance of URLSearchParams with the correct values', () => {
-      const obj = { foo: 'bar', baz: 'foo' };
+      const obj = {
+        foo: 'bar',
+        baz: 'foo',
+      };
 
       const result = CloudFoundryAPIClient.objToQueryParams(obj);
 
@@ -134,9 +163,7 @@ describe('CloudFoundryAPIClient', () => {
       expect(result.type).to.equal('managed');
       expect(result.parameters).to.be.undefined;
       expect(result.relationships).to.have.keys([relationship]);
-      expect(result.relationships[relationship].data.guid).to.equal(
-        servicePlanGuid
-      );
+      expect(result.relationships[relationship].data.guid).to.equal(servicePlanGuid);
     });
 
     it('returns a name and relationship for a space guid', () => {
@@ -170,12 +197,11 @@ describe('CloudFoundryAPIClient', () => {
       expect(result.type).to.equal('managed');
       expect(result.parameters).to.be.undefined;
       expect(result.relationships).to.have.keys([relationship]);
-      expect(result.relationships[relationship].data.guid).to.equal(
-        serviceInstanceGuid
-      );
+      expect(result.relationships[relationship].data.guid).to.equal(serviceInstanceGuid);
     });
 
-    it('returns a name and relationship for service_instance, space, and service plan guids', () => {
+    it(`returns a name and relationship for service_instance,
+        space, and service plan guids`, () => {
       const name = 'test';
       const servicePlanGuid = 'service-plan-guid';
       const spaceGuid = 'space-guid';
@@ -207,7 +233,10 @@ describe('CloudFoundryAPIClient', () => {
 
     it('returns a name and parameters', () => {
       const name = 'test';
-      const parameters = { test: 'test', value: 1 };
+      const parameters = {
+        test: 'test',
+        value: 1,
+      };
 
       const result = CloudFoundryAPIClient.buildRequestBody({
         name,
@@ -226,7 +255,9 @@ describe('CloudFoundryAPIClient', () => {
       const otherProps = {
         test: 'test',
         value: 1,
-        example: { test: 'example' },
+        example: {
+          test: 'example',
+        },
       };
 
       const result = CloudFoundryAPIClient.buildRequestBody({
@@ -238,8 +269,8 @@ describe('CloudFoundryAPIClient', () => {
       expect(result.type).to.equal('managed');
       expect(result.relationships).to.be.undefined;
       expect(result.parameters).to.be.undefined;
-      expect(result.test).to.equal(otherProps.test)
-      expect(result.value).to.equal(otherProps.value)
+      expect(result.test).to.equal(otherProps.test);
+      expect(result.value).to.equal(otherProps.value);
       expect(result.example).to.deep.equal(otherProps.example);
     });
   });

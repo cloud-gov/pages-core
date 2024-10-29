@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function UsaIcon({
-  focusable = false,
-  role = 'img',
-  name,
-  size = null,
-}) {
+function UsaIcon({ focusable = false, role = 'img', name, size = null }) {
   return (
-    <svg className={size ? `usa-icon usa-icon--size-${size}` : 'usa-icon'} aria-hidden="true" focusable={focusable} role={role}>
+    <svg
+      className={size ? `usa-icon usa-icon--size-${size}` : 'usa-icon'}
+      aria-hidden="true"
+      focusable={focusable}
+      role={role}
+    >
       <use xlinkHref={`/img/sprite.svg#${name}`} />
     </svg>
   );

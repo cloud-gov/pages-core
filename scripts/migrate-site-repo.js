@@ -16,9 +16,7 @@ async function main() {
 
     await siteRepoMigrator(siteId, email, { owner, repository });
 
-    console.log(
-      `Site Id: ${siteId} migrated to new repo ${owner}/${repository}`
-    );
+    console.log(`Site Id: ${siteId} migrated to new repo ${owner}/${repository}`);
 
     process.exit(0);
   } catch (error) {

@@ -6,8 +6,14 @@ const createUser = require('../../support/factory/user');
 function clean() {
   return Promise.all([
     orgFactory.truncate(),
-    OrganizationRole.truncate({ force: true, cascade: true }),
-    User.truncate({ force: true, cascade: true }),
+    OrganizationRole.truncate({
+      force: true,
+      cascade: true,
+    }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -18,8 +24,16 @@ describe('Sequelize', () => {
   before(async () => {
     await clean();
     [userRole, managerRole] = await Promise.all([
-      Role.findOne({ where: { name: 'user' } }),
-      Role.findOne({ where: { name: 'manager' } }),
+      Role.findOne({
+        where: {
+          name: 'user',
+        },
+      }),
+      Role.findOne({
+        where: {
+          name: 'manager',
+        },
+      }),
     ]);
   });
 
@@ -36,9 +50,21 @@ describe('Sequelize', () => {
       ]);
 
       await Promise.all([
-        org1.addUser(user1, { through: { roleId: managerRole.id } }),
-        org1.addUser(user2, { through: { roleId: userRole.id } }),
-        org2.addUser(user1, { through: { roleId: userRole.id } }),
+        org1.addUser(user1, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        org1.addUser(user2, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
+        org2.addUser(user1, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
       const model = User.scope('withOrganizationRoles');

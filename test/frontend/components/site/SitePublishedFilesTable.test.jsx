@@ -18,7 +18,7 @@ const { SitePublishedFilesTable } = proxyquire(
   '../../../../frontend/components/site/SitePublishedFilesTable',
   {
     '../../actions/publishedFileActions': publishedFileActions,
-  }
+  },
 );
 
 let state;
@@ -42,25 +42,43 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('calls fetchPublishedFiles on mount', () => {
-    mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/funkyBranch', state);
+    mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/funkyBranch',
+      state,
+    );
     expect(fetchPublishedFiles.calledOnce).to.be.true;
     expect(fetchPublishedFiles.calledWith('11', 'funkyBranch', null)).to.be.true;
   });
 
   it('should render the branch name', () => {
-    const publishedBranch = { name: 'main', site: { viewLink: 'www.example.gov/main' } };
+    const publishedBranch = {
+      name: 'main',
+      site: {
+        viewLink: 'www.example.gov/main',
+      },
+    };
     state.publishedFiles = {
       isLoading: false,
       data: {
         isTruncated: false,
         files: [
           {
-            name: 'abc', size: 123, key: 'prefix/abc', publishedBranch,
+            name: 'abc',
+            size: 123,
+            key: 'prefix/abc',
+            publishedBranch,
           },
         ],
       },
     };
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/main', state);
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/main',
+      state,
+    );
     expect(wrapper.find('h3').contains('main')).to.be.true;
   });
 
@@ -79,14 +97,28 @@ describe('<SitePublishedFilesTable/>', () => {
       data: {
         isTruncated: false,
         files: [
-          { name: 'abc', publishedBranch: correctBranch },
-          { name: 'abc/def', publishedBranch: correctBranch },
-          { name: null, publishedBranch: correctBranch }, // shouldn't be rendered b/c no name
+          {
+            name: 'abc',
+            publishedBranch: correctBranch,
+          },
+          {
+            name: 'abc/def',
+            publishedBranch: correctBranch,
+          },
+          {
+            name: null,
+            publishedBranch: correctBranch,
+          }, // shouldn't be rendered b/c no name
         ],
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/demo', state);
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/demo',
+      state,
+    );
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
     expect(wrapper.find('table').contains('abc')).to.be.true;
@@ -112,14 +144,28 @@ describe('<SitePublishedFilesTable/>', () => {
       data: {
         isTruncated: false,
         files: [
-          { name: 'abc', publishedBranch: correctBranch },
-          { name: 'abc/def', publishedBranch: correctBranch },
-          { name: null, publishedBranch: correctBranch }, // shouldn't be rendered b/c no name
+          {
+            name: 'abc',
+            publishedBranch: correctBranch,
+          },
+          {
+            name: 'abc/def',
+            publishedBranch: correctBranch,
+          },
+          {
+            name: null,
+            publishedBranch: correctBranch,
+          }, // shouldn't be rendered b/c no name
         ],
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/preview', state);
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/preview',
+      state,
+    );
 
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
@@ -146,14 +192,28 @@ describe('<SitePublishedFilesTable/>', () => {
       data: {
         isTruncated: false,
         files: [
-          { name: 'abc', publishedBranch: correctBranch },
-          { name: 'abc/def', publishedBranch: correctBranch },
-          { name: null, publishedBranch: correctBranch }, // shouldn't be rendered b/c no name
+          {
+            name: 'abc',
+            publishedBranch: correctBranch,
+          },
+          {
+            name: 'abc/def',
+            publishedBranch: correctBranch,
+          },
+          {
+            name: null,
+            publishedBranch: correctBranch,
+          }, // shouldn't be rendered b/c no name
         ],
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/main', state);
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/main',
+      state,
+    );
 
     expect(wrapper.find('table')).to.have.length(1);
     expect(wrapper.find('tbody > tr')).to.have.length(2);
@@ -167,7 +227,12 @@ describe('<SitePublishedFilesTable/>', () => {
   });
 
   it('should render previous and next buttons if files are truncated', () => {
-    const publishedBranch = { name: 'main', site: { viewLink: 'www.example.gov/main' } };
+    const publishedBranch = {
+      name: 'main',
+      site: {
+        viewLink: 'www.example.gov/main',
+      },
+    };
 
     state.publishedFiles = {
       isLoading: false,
@@ -175,13 +240,21 @@ describe('<SitePublishedFilesTable/>', () => {
         isTruncated: true,
         files: [
           {
-            name: 'abc', size: 123, key: 'prefix/abc', publishedBranch,
+            name: 'abc',
+            size: 123,
+            key: 'prefix/abc',
+            publishedBranch,
           },
         ],
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/main', state);
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/main',
+      state,
+    );
 
     const buttons = wrapper.find('button');
     expect(buttons).to.have.length(2);
@@ -198,7 +271,12 @@ describe('<SitePublishedFilesTable/>', () => {
   it('should render a loading state if the files are loading', () => {
     state.publishedFiles.isLoading = true;
 
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/demo', state);
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/demo',
+      state,
+    );
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
 
@@ -211,8 +289,15 @@ describe('<SitePublishedFilesTable/>', () => {
       },
     };
 
-    const wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/11/published/demo', state);
-    expect(wrapper.find('AlertBanner').prop('message')).to.equal('No published branch files available.');
+    const wrapper = mountRouter(
+      <SitePublishedFilesTable />,
+      '/site/:id/published/:name',
+      '/site/11/published/demo',
+      state,
+    );
+    expect(wrapper.find('AlertBanner').prop('message')).to.equal(
+      'No published branch files available.',
+    );
   });
 
   describe('paging', () => {
@@ -222,7 +307,9 @@ describe('<SitePublishedFilesTable/>', () => {
 
     const publishedBranch = {
       name: 'main',
-      site: { viewLink: 'https://example.com/' },
+      site: {
+        viewLink: 'https://example.com/',
+      },
     };
 
     const publishedFiles = {
@@ -231,25 +318,39 @@ describe('<SitePublishedFilesTable/>', () => {
         isTruncated: true,
         files: [
           {
-            name: 'a', size: 1, key: 'prefix/a', publishedBranch,
+            name: 'a',
+            size: 1,
+            key: 'prefix/a',
+            publishedBranch,
           },
           {
-            name: 'b', size: 2, key: 'prefix/b', publishedBranch,
+            name: 'b',
+            size: 2,
+            key: 'prefix/b',
+            publishedBranch,
           },
           {
-            name: 'c', size: 3, key: 'prefix/c', publishedBranch,
+            name: 'c',
+            size: 3,
+            key: 'prefix/c',
+            publishedBranch,
           },
         ],
       },
     };
 
-    const getPrevButton = w => w.find('nav.pagination button').at(0);
-    const getNextButton = w => w.find('nav.pagination button').at(1);
+    const getPrevButton = (w) => w.find('nav.pagination button').at(0);
+    const getNextButton = (w) => w.find('nav.pagination button').at(1);
 
     beforeEach(() => {
       state = lodashClonedeep(defaultState);
       state.publishedFiles = publishedFiles;
-      wrapper = mountRouter(<SitePublishedFilesTable />, '/site/:id/published/:name', '/site/1/published/main', state);
+      wrapper = mountRouter(
+        <SitePublishedFilesTable />,
+        '/site/:id/published/:name',
+        '/site/1/published/main',
+        state,
+      );
       prevButton = getPrevButton(wrapper);
       nextButton = getNextButton(wrapper);
     });

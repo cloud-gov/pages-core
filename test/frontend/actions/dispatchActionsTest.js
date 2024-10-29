@@ -19,8 +19,12 @@ describe('dispatchActions', () => {
   let hideAddNewSiteFieldsActionCreator;
   let reset;
 
-  const action = { whatever: 'bub' };
-  const site = { site: 'site1' };
+  const action = {
+    whatever: 'bub',
+  };
+  const site = {
+    site: 'site1',
+  };
 
   beforeEach(() => {
     dispatch = spy();

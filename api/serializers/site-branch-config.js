@@ -1,12 +1,6 @@
 const { pick } = require('../utils');
 
-const allowedAttributes = [
-  'id',
-  'branch',
-  'config',
-  'context',
-  's3Key',
-];
+const allowedAttributes = ['id', 'branch', 'config', 'context', 's3Key'];
 
 function serialize(sbc) {
   const object = sbc.get({
@@ -19,4 +13,7 @@ function serializeMany(sbc) {
   return sbc.map(serialize);
 }
 
-module.exports = { serialize, serializeMany };
+module.exports = {
+  serialize,
+  serializeMany,
+};

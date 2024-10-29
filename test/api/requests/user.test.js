@@ -18,26 +18,25 @@ describe('User API', () => {
 
   describe('GET /v0/me', () => {
     it('should require authentication', (done) => {
-      factory.user().then(() => request(app)
-        .get('/v0/me')
-        .expect(403)).then((response) => {
-        validateAgainstJSONSchema('GET', '/me', 403, response.body);
-        done();
-      });
+      factory
+        .user()
+        .then(() => request(app).get('/v0/me').expect(403))
+        .then((response) => {
+          validateAgainstJSONSchema('GET', '/me', 403, response.body);
+          done();
+        });
     });
 
     it('should render the current user', (done) => {
       let user;
 
-      factory.user()
+      factory
+        .user()
         .then((model) => {
           user = model;
           return authenticatedSession(user);
         })
-        .then(cookie => request(app)
-          .get('/v0/me')
-          .set('Cookie', cookie)
-          .expect(200))
+        .then((cookie) => request(app).get('/v0/me').set('Cookie', cookie).expect(200))
         .then((response) => {
           validateAgainstJSONSchema('GET', '/me', 200, response.body);
           userResponseExpectations(response.body, user);
@@ -49,9 +48,7 @@ describe('User API', () => {
 
   describe('PUT /v0/me/settings', () => {
     it('should require authentication', async () => {
-      const response = await request(app)
-        .put('/v0/me/settings')
-        .expect(403);
+      const response = await request(app).put('/v0/me/settings').expect(403);
 
       validateAgainstJSONSchema('PUT', '/me/settings', 403, response.body);
     });

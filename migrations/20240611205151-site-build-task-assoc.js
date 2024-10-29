@@ -1,17 +1,17 @@
-const TABLE = 'build_task'
-const COLUMN_NAME = 'siteBuildTaskId'
+const TABLE = 'build_task';
+const COLUMN_NAME = 'siteBuildTaskId';
 const COLUMN_TYPE = {
-  type: "int",
+  type: 'int',
   foreignKey: {
-    name: "build_task_site_build_task_id_fk",
-    table: "site_build_task",
+    name: 'build_task_site_build_task_id_fk',
+    table: 'site_build_task',
     rules: {
-      onDelete: "CASCADE",
-      onUpdate: "RESTRICT"
+      onDelete: 'CASCADE',
+      onUpdate: 'RESTRICT',
     },
-    mapping: "id"
-  }
-}
+    mapping: 'id',
+  },
+};
 
 exports.up = async (db) => {
   await db.addColumn(TABLE, COLUMN_NAME, COLUMN_TYPE);

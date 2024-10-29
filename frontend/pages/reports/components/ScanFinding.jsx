@@ -5,9 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { plural, getSuccessCriteria, getWCAGRuleURLs } from '@util/reports';
 
-const ScanFinding = ({
-  finding, groupColor, groupLabel, scanType = 'zap', siteId,
-}) => {
+const ScanFinding = ({ finding, groupColor, groupLabel, scanType = 'zap', siteId }) => {
   const ref = useRef(null);
   const { hash } = useLocation();
   const { ignore, ignoreSource } = finding;
@@ -22,9 +20,7 @@ const ScanFinding = ({
   let hasMoreInfo = '';
 
   if (scanType === 'zap') {
-    ({
-      name: title, solution, description,
-    } = finding);
+    ({ name: title, solution, description } = finding);
     anchor = `finding-${finding.alertRef}${ignore ? '-suppressed' : ''}`;
     locations = finding.instances || [];
     count = locations.length;
@@ -39,13 +35,19 @@ const ScanFinding = ({
     description = `${finding.description}.`;
     solution = finding.nodes[0]?.failureSummary || [];
     criteria = getSuccessCriteria(finding);
-    references = [...getWCAGRuleURLs(finding.id), ...criteria.map(c => c.url), finding.helpUrl];
+    references = [
+      ...getWCAGRuleURLs(finding.id),
+      ...criteria.map((c) => c.url),
+      finding.helpUrl,
+    ];
   }
 
   useEffect(() => {
     async function scrollToAnchor() {
       if (ref && hash?.slice(1) === anchor) {
-        ref.current.scrollIntoView({ behavior: 'smooth' });
+        ref.current.scrollIntoView({
+          behavior: 'smooth',
+        });
       }
     }
 
@@ -62,7 +64,7 @@ const ScanFinding = ({
         references={references}
         scanType={scanType}
         anchor={anchor}
-        criteria={criteria.map(c => c.short)}
+        criteria={criteria.map((c) => c.short)}
       />
       <div className="maxw-tablet-lg">
         <FindingDescription
@@ -102,28 +104,38 @@ const FindingTitle = ({
   <div className="bg-white padding-top-05 sticky">
     <h3 className="font-serif-lg margin-y-105">
       {title}
-      <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">#</a>
+      <a href={`#${anchor}`} className="usa-link target-highlight anchor-indicator">
+        #
+      </a>
     </h3>
-    <p className="font-body-md padding-bottom-2 border-bottom-2px line-height-sans-5 break-balance">
-      <span className={`usa-tag bg-${groupColor} radius-pill`}>
+    <p
+      className={`
+        font-body-md
+        padding-bottom-2
+        border-bottom-2px
+        line-height-sans-5
+        break-balance
+      `}
+    >
+      <span
+        className={`
+          usa-tag
+          bg-${groupColor}
+          radius-pill
+        `}
+      >
         {groupLabel}
       </span>
-      {' '}
-      finding
-      {' '}
+      finding{' '}
       {scanType === 'a11y' && criteria.length > 0 && (
         <>
           that violates&nbsp;
-          <b>{ new Intl.ListFormat('en-US').format(criteria)}</b>
+          <b>{new Intl.ListFormat('en-US').format(criteria)}</b>
         </>
-      )}
-      {' '}
-      was identified in
-      {' '}
+      )}{' '}
+      was identified in{' '}
       <b>
-        {count}
-        {' '}
-        {plural(count, 'place')}
+        {count} {plural(count, 'place')}
       </b>
       {'. '}
     </p>
@@ -138,7 +150,6 @@ FindingTitle.propTypes = {
   criteria: PropTypes.array,
   scanType: PropTypes.string.isRequired,
   anchor: PropTypes.string.isRequired,
-
 };
 
 const FindingDescription = ({
@@ -161,25 +172,36 @@ const FindingDescription = ({
             <details className="margin-top-3">
               <summary className="">
                 Why was this result&nbsp;
-                <b>suppressed</b>
-                ?
+                <b>suppressed</b>?
               </summary>
               <p>
-                { /* eslint-disable-next-line max-len */}
-                { ignoreSource && 'Pages automatically suppresses certain results in this report which are irrelevant for statically hosted websites, based on unconfigurable server settings, or frequently produce ‘false positive’ findings for our customers. '}
-                { /* eslint-disable-next-line max-len */}
-                { (!ignoreSource || ignoreSource === 'multiple criteria') && 'Customers can specify criteria to suppress during report generation to silence ‘false positive’ results.'}
-                { ' ' /* eslint-disable-next-line max-len */}
-                <b>While still visible in the report, the suppressed results don’t count towards your total issue count.</b>
-                { ' ' /* eslint-disable-next-line max-len */}
-                Review the report rules and criteria that are suppressed during report generation in your &nbsp;
-                <Link reloadDocument to={`/sites/${siteId}/settings`} className="usa-link">Site Settings Report Configuration</Link>
+                {ignoreSource &&
+                  // eslint-disable-next-line max-len
+                  'Pages automatically suppresses certain results in this report which are irrelevant for statically hosted websites, based on unconfigurable server settings, or frequently produce ‘false positive’ findings for our customers. '}
+                {(!ignoreSource || ignoreSource === 'multiple criteria') &&
+                  // eslint-disable-next-line max-len
+                  'Customers can specify criteria to suppress during report generation to silence ‘false positive’ results.'}{' '}
+                <b>
+                  While still visible in the report, the suppressed results don’t count
+                  towards your total issue count.
+                </b>{' '}
+                Review the report rules and criteria that are suppressed during report
+                generation in your &nbsp;
+                <Link
+                  reloadDocument
+                  to={`/sites/${siteId}/settings`}
+                  className="usa-link"
+                >
+                  Site Settings Report Configuration
+                </Link>
                 .
               </p>
               <p>
-                For a full list of what Pages excludes from your results, review the
-                {' '}
-                <Link to="https://cloud.gov/pages/documentation/automated-site-reports/" className="usa-link">
+                For a full list of what Pages excludes from your results, review the{' '}
+                <Link
+                  to="https://cloud.gov/pages/documentation/automated-site-reports/"
+                  className="usa-link"
+                >
                   Automated Site Reports documentation
                 </Link>
                 .
@@ -189,17 +211,28 @@ const FindingDescription = ({
         </div>
       </section>
     )}
-    { scanType === 'zap' && (
-      // eslint-disable-next-line react/no-danger
-      <div className="usa-prose finding-description font-serif-sm margin-bottom-2" dangerouslySetInnerHTML={{ __html: description }} />
+    {scanType === 'zap' && (
+      <div
+        className="usa-prose finding-description font-serif-sm margin-bottom-2"
+        dangerouslySetInnerHTML={{
+          __html: description,
+        }}
+      />
     )}
-    { moreInfo && (
+    {moreInfo && (
       <FindingLocationMoreInfo>
-        { /* eslint-disable-next-line react/no-danger */}
-        <code dangerouslySetInnerHTML={{ __html: moreInfo }} />
+        <code
+          dangerouslySetInnerHTML={{
+            __html: moreInfo,
+          }}
+        />
       </FindingLocationMoreInfo>
     )}
-    { scanType !== 'zap' && <div className="usa-prose finding-description font-serif-sm"><p>{description}</p></div> }
+    {scanType !== 'zap' && (
+      <div className="usa-prose finding-description font-serif-sm">
+        <p>{description}</p>
+      </div>
+    )}
   </div>
 );
 
@@ -213,46 +246,54 @@ FindingDescription.propTypes = {
 };
 
 const FindingRecommendation = ({ anchor, solution, scanType }) => (
-  <div
-    id={`${anchor}-recommendation`}
-    aria-labelledby={`${anchor}-recommendation`}
-  >
+  <div id={`${anchor}-recommendation`} aria-labelledby={`${anchor}-recommendation`}>
     <div className="usa-summary-box margin-bottom-3" role="region">
-      { (scanType === 'zap') && (
-      <>
-        <h4 className="usa-summary-box__heading">
-          Recommendation(s):
-          <a href={`#${anchor}-recommendation`} className="usa-link target-highlight anchor-indicator">#</a>
-        </h4>
-        <div className="usa-summary-box__body margin-bottom-neg-2">
-          { /* eslint-disable-next-line react/no-danger */ }
-          <div dangerouslySetInnerHTML={{ __html: solution }} />
-        </div>
-      </>
-      )}
-      { (scanType === 'a11y') && (
-      <>
-        {solution.split('\n\n').map((fixList, listindex) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <div key={`${anchor}-location-${listindex}`}>
-            {fixList.split('\n').map((str, i) => (
-              i === 0 ? (
-                // eslint-disable-next-line react/no-array-index-key
-                <h4 key={i} className="usa-summary-box__heading">
-                  {str}
-                  <a href={`#${anchor}-recommendation`} className="usa-link target-highlight anchor-indicator">#</a>
-                </h4>
-              ) : (
-                <div key={i} className="usa-summary-box__body">
-                  <ul className="usa-list margin-bottom-2">
-                    <li className="font-body-md">{str}</li>
-                  </ul>
-                </div>
-              )
-            ))}
+      {scanType === 'zap' && (
+        <>
+          <h4 className="usa-summary-box__heading">
+            Recommendation(s):
+            <a
+              href={`#${anchor}-recommendation`}
+              className="usa-link target-highlight anchor-indicator"
+            >
+              #
+            </a>
+          </h4>
+          <div className="usa-summary-box__body margin-bottom-neg-2">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: solution,
+              }}
+            />
           </div>
-        ))}
-      </>
+        </>
+      )}
+      {scanType === 'a11y' && (
+        <>
+          {solution.split('\n\n').map((fixList, listindex) => (
+            <div key={`${anchor}-location-${listindex}`}>
+              {fixList.split('\n').map((str, i) =>
+                i === 0 ? (
+                  <h4 key={i} className="usa-summary-box__heading">
+                    {str}
+                    <a
+                      href={`#${anchor}-recommendation`}
+                      className="usa-link target-highlight anchor-indicator"
+                    >
+                      #
+                    </a>
+                  </h4>
+                ) : (
+                  <div key={i} className="usa-summary-box__body">
+                    <ul className="usa-list margin-bottom-2">
+                      <li className="font-body-md">{str}</li>
+                    </ul>
+                  </div>
+                ),
+              )}
+            </div>
+          ))}
+        </>
       )}
     </div>
   </div>
@@ -270,7 +311,7 @@ const FindingReferences = ({ references = [] }) => {
       <div className="usa-prose font-serif-xs line-height-serif-6 margin-y-3">
         <h4 className="margin-bottom-05">References</h4>
         <ul className="margin-top-05">
-          {references.map(ref => (
+          {references.map((ref) => (
             <FindingReference url={ref} key={ref} />
           ))}
         </ul>
@@ -286,17 +327,19 @@ FindingReferences.propTypes = {
 
 const FindingReference = ({ url }) => (
   <li className="font-body-2xs">
-    <a target="_blank" rel="noreferrer" className="usa-link" href={url}>{url}</a>
+    <a target="_blank" rel="noreferrer" className="usa-link" href={url}>
+      {url}
+    </a>
   </li>
 );
 
-FindingReference.propTypes = { url: PropTypes.string.isRequired };
+FindingReference.propTypes = {
+  url: PropTypes.string.isRequired,
+};
 
 const FindingLocations = ({ locations = [], anchor, scanType }) => (
   <>
-    <h3 className="font-body-md margin-y-2">
-      Evidence for this result was found:
-    </h3>
+    <h3 className="font-body-md margin-y-2">Evidence for this result was found:</h3>
     <div className="">
       <ol className="padding-left-3">
         {locations.map((location, locationIndex) => {
@@ -306,14 +349,17 @@ const FindingLocations = ({ locations = [], anchor, scanType }) => (
           const moreInfo = scanType === 'zap' ? location.otherinfo : null;
           const locationAnchor = `${anchor}-location-${locationIndex + 1}`;
           return (
-            <li key={locationAnchor} className="margin-bottom-5 margin-left-2 font-mono-md">
+            <li
+              key={locationAnchor}
+              className="margin-bottom-5 margin-left-2 font-mono-md"
+            >
               {/* TODO: Review this one */}
               {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
               <a id={locationAnchor} href={`#${locationAnchor}`} label="anchor" />
               {url && (
-              <h4 className="font-body-md text-normal margin-bottom-0">
-                <FindingLocationURL url={url} />
-              </h4>
+                <h4 className="font-body-md text-normal margin-bottom-0">
+                  <FindingLocationURL url={url} />
+                </h4>
               )}
               {code && <FindingLocationEvidence code={code} />}
               {target && <FindingLocationTarget target={target} />}
@@ -334,12 +380,21 @@ FindingLocations.propTypes = {
 
 const FindingLocationURL = ({ url }) => (
   <>
-    On
-    {' '}
+    On{' '}
     <a href={url} className="usa-link" target="_blank" rel="noopener noreferrer">
       {url}
-      <svg className="usa-icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-        <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+      <svg
+        className="usa-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+      >
+        <path
+          fill="currentColor"
+          // eslint-disable-next-line max-len
+          d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"
+        />
       </svg>
     </a>
   </>
@@ -351,8 +406,21 @@ FindingLocationURL.propTypes = {
 
 const FindingLocationTarget = ({ target }) => (
   <>
-    <h5 className="margin-bottom-2 margin-top-0 font-body-sm text-normal">Related to this element:</h5>
-    <code className="css text-normal narrow-mono font-mono-sm line-height-mono-4 bg-accent-warm-lighter padding-05 break-anywhere">
+    <h5 className="margin-bottom-2 margin-top-0 font-body-sm text-normal">
+      Related to this element:
+    </h5>
+    <code
+      className={`
+        css
+        text-normal
+        narrow-mono
+        font-mono-sm
+        line-height-mono-4
+        bg-accent-warm-lighter
+        padding-05
+        break-anywhere
+      `}
+    >
       {target}
     </code>
   </>
@@ -364,8 +432,21 @@ FindingLocationTarget.propTypes = {
 
 const FindingLocationEvidence = ({ code }) => (
   <>
-    <h5 className="margin-bottom-0 margin-top-3 font-body-sm text-normal">Within this code:</h5>
-    <Highlight className="html text-wrap width-full font-mono-xs line-height-mono-4 narrow-mono padding-2 display-inline-block">
+    <h5 className="margin-bottom-0 margin-top-3 font-body-sm text-normal">
+      Within this code:
+    </h5>
+    <Highlight
+      className={`
+        html
+        text-wrap
+        width-full
+        font-mono-xs
+        line-height-mono-4
+        narrow-mono
+        padding-2
+        display-inline-block
+      `}
+    >
       {code}
     </Highlight>
   </>
@@ -380,7 +461,19 @@ const FindingLocationMoreInfo = ({ info = null, children = null }) => (
     <summary className="margin-bottom-0 margin-top-1 font-body-sm text-normal">
       <b>More information:</b>
     </summary>
-    <pre className="hljs html text-wrap width-full font-mono-xs line-height-mono-4 narrow-mono padding-2 display-inline-block">
+    <pre
+      className={`
+        hljs
+        html
+        text-wrap
+        width-full
+        font-mono-xs
+        line-height-mono-4
+        narrow-mono
+        padding-2
+        display-inline-block
+      `}
+    >
       {info}
       {children}
     </pre>

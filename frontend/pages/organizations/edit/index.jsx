@@ -24,16 +24,11 @@ function successNotification(message) {
 function getInvitationSentMsg(mostRecentlyAddedUser) {
   return (
     <span>
-      The new member must create a Pages account to accept the invitation to this organization.
-      They may check their inbox at
-      {' '}
-      {mostRecentlyAddedUser.email}
-      {' '}
-      for an invitation by email or visit
-      {' '}
-      <a href={`${mostRecentlyAddedUser.link}`}>{mostRecentlyAddedUser.link}</a>
-      {' '}
-      to get started.
+      The new member must create a Pages account to accept the invitation to this
+      organization. They may check their inbox at {mostRecentlyAddedUser.email} for an
+      invitation by email or visit{' '}
+      <a href={`${mostRecentlyAddedUser.link}`}>{mostRecentlyAddedUser.link}</a> to get
+      started.
     </span>
   );
 }
@@ -59,12 +54,15 @@ function reducer(state, { type, payload }) {
     case 'removeMember':
       return {
         ...state,
-        members: state.members.filter(member => member.User.id !== payload),
+        members: state.members.filter((member) => member.User.id !== payload),
       };
     case 'updateMember':
       return {
         ...state,
-        members: [...state.members.filter(member => member.User.id !== payload.User.id), payload],
+        members: [
+          ...state.members.filter((member) => member.User.id !== payload.User.id),
+          payload,
+        ],
       };
     default:
       return state;
@@ -91,14 +89,19 @@ function OrganizationEdit() {
         federalistApi.fetchOrganization(id),
         federalistApi.fetchRoles(),
       ]);
-      dispatch({ type: 'init', payload: { members, org, roles } });
+      dispatch({
+        type: 'init',
+        payload: {
+          members,
+          org,
+          roles,
+        },
+      });
     };
     fetchInitialData();
   }, ['1']);
 
-  const {
-    isLoading, members, org, roles, mostRecentlyAddedUser,
-  } = state;
+  const { isLoading, members, org, roles, mostRecentlyAddedUser } = state;
 
   if (isLoading) {
     return <LoadingIndicator />;
@@ -112,11 +115,14 @@ function OrganizationEdit() {
     );
   }
 
-  const roleOptions = roles.map(role => ({ value: role.id, label: role.name }));
+  const roleOptions = roles.map((role) => ({
+    value: role.id,
+    label: role.name,
+  }));
 
-  const currentMember = members.find(member => member.User.id === currentUser.id);
+  const currentMember = members.find((member) => member.User.id === currentUser.id);
   const sortedMembers = members
-    .filter(member => member.User.id !== currentUser.id)
+    .filter((member) => member.User.id !== currentUser.id)
     .sort((a, b) => a.User.UAAIdentity.email > b.User.UAAIdentity.email);
 
   return (
@@ -128,39 +134,42 @@ function OrganizationEdit() {
       </div>
 
       <div className="well">
-        { org.isSandbox
-          && (
+        {org.isSandbox && (
           <AlertBanner
             status="warning"
             message={sandboxMsg(org.daysUntilSandboxCleaning)}
             alertRole={false}
           />
-          )}
-        { mostRecentlyAddedUser
-          && (
+        )}
+        {mostRecentlyAddedUser && (
           <AlertBanner
             status="info"
             header="Sent invitation to create a Pages account"
             message={getInvitationSentMsg(mostRecentlyAddedUser)}
             alertRole={false}
           />
-          )}
+        )}
         <h3 className="font-heading-xl">Members</h3>
         <AddUserForm
           className="well"
           roleOptions={roleOptions}
-          onSubmit={
-            data => federalistApi.inviteToOrganization(org.id, data)
-          }
-          onSubmitSuccess={
-            ({ member, invite: { email, link } }, reduxDispatch) => {
-              dispatch({ type: 'addMember', payload: member });
-              if (link) {
-                dispatch({ type: 'invitationSent', payload: { email, link } });
-              }
-              reduxDispatch(successNotification('Successfully added user.'));
+          onSubmit={(data) => federalistApi.inviteToOrganization(org.id, data)}
+          onSubmitSuccess={({ member, invite: { email, link } }, reduxDispatch) => {
+            dispatch({
+              type: 'addMember',
+              payload: member,
+            });
+            if (link) {
+              dispatch({
+                type: 'invitationSent',
+                payload: {
+                  email,
+                  link,
+                },
+              });
             }
-          }
+            reduxDispatch(successNotification('Successfully added user.'));
+          }}
         />
         <OrganizationTable
           org={org}

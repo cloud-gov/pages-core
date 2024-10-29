@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 
 const mapOption = (option) => {
   const value = option.value || option;
-  return <option key={value} value={value}>{option.label || value}</option>;
+  return (
+    <option key={value} value={value}>
+      {option.label || value}
+    </option>
+  );
 };
 
 const Select = ({
@@ -17,15 +21,23 @@ const Select = ({
   options,
 }) => (
   <div>
-    { label && <label className="usa-label text-bold" htmlFor={id}>{ label }</label> }
-    { help }
-    { touched && (error && <span className="usa-error-message">{error}</span>) }
+    {label && (
+      <label className="usa-label text-bold" htmlFor={id}>
+        {label}
+      </label>
+    )}
+    {help}
+    {touched && error && <span className="usa-error-message">{error}</span>}
     <select
       className={`usa-select ${touched && error ? 'usa-select--error' : ''} ${className}`}
       {...id}
       {...input}
     >
-      { includeEmptyOption && <option key="" value="">--</option>}
+      {includeEmptyOption && (
+        <option key="" value="">
+          --
+        </option>
+      )}
       {options.map(mapOption)}
     </select>
   </div>
@@ -49,7 +61,7 @@ Select.propTypes = {
         label: PropTypes.string,
         value: PropTypes.string.isRequired,
       }),
-    ])
+    ]),
   ),
 };
 

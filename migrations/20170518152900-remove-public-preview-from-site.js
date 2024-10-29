@@ -7,8 +7,13 @@ exports.up = function (db, callback) {
 };
 
 exports.down = function (db, callback) {
-  db.addColumn('site', 'publicPreview', {
-    type: 'boolean',
-    defaultValue: false,
-  }, callback);
+  db.addColumn(
+    'site',
+    'publicPreview',
+    {
+      type: 'boolean',
+      defaultValue: false,
+    },
+    callback,
+  );
 };

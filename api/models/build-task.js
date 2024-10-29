@@ -37,7 +37,7 @@ const associate = ({
   BuildTask.belongsTo(SiteBuildTask, {
     foreignKey: 'siteBuildTaskId',
   });
-  BuildTask.addScope('bySite', id => ({
+  BuildTask.addScope('bySite', (id) => ({
     where: {
       '$Build.site$': id,
     },
@@ -47,12 +47,15 @@ const associate = ({
         model: Build,
         required: true,
         include: [
-          { model: Site, required: true },
+          {
+            model: Site,
+            required: true,
+          },
         ],
       },
     ],
   }));
-  BuildTask.addScope('byStartsWhen', startsWhen => ({
+  BuildTask.addScope('byStartsWhen', (startsWhen) => ({
     where: {
       '$BuildTaskType.startsWhen$': startsWhen,
     },
@@ -80,22 +83,29 @@ const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 
 const beforeValidate = (buildTask) => {
   const { token } = buildTask;
-  buildTask.token = token || generateToken(); // eslint-disable-line no-param-reassign
+  buildTask.token = token || generateToken();
 };
 
 async function enqueue() {
   const buildTask = this;
-  const {
-    BuildTask,
-    BuildTaskType,
-    Build,
-    Site,
-  } = this.sequelize.models;
+  const { BuildTask, BuildTaskType, Build, Site } = this.sequelize.models;
 
   const fullBuildTask = await BuildTask.findByPk(buildTask.id, {
     include: [
-      { model: BuildTaskType, required: true },
-      { model: Build, required: true, include: [{ model: Site, required: true }] },
+      {
+        model: BuildTaskType,
+        required: true,
+      },
+      {
+        model: Build,
+        required: true,
+        include: [
+          {
+            model: Site,
+            required: true,
+          },
+        ],
+      },
     ],
   });
 
@@ -105,22 +115,26 @@ async function enqueue() {
   const { count: priority } = await BuildTask.findAndCountAll({
     where: {
       [Op.and]: [
-        { '$Build.site$': fullBuildTask.Build.Site.id },
+        {
+          '$Build.site$': fullBuildTask.Build.Site.id,
+        },
         {
           status: {
-            [Op.notIn]: [
-              BuildTask.Statuses.Error,
-              BuildTask.Statuses.Success,
-            ],
+            [Op.notIn]: [BuildTask.Statuses.Error, BuildTask.Statuses.Success],
           },
         },
       ],
     },
-    include: { model: Build, required: true },
+    include: {
+      model: Build,
+      required: true,
+    },
   });
 
   await queue.startBuildTask(fullBuildTask, priority);
-  await this.update({ status: Statuses.Queued });
+  await this.update({
+    status: Statuses.Queued,
+  });
 }
 
 module.exports = (sequelize, DataTypes) => {
@@ -167,16 +181,27 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeValidate,
       },
-    }
+    },
   );
 
   BuildTask.generateToken = generateToken;
   BuildTask.associate = associate;
   BuildTask.Statuses = Statuses;
-  BuildTask.siteScope = id => ({ method: ['bySite', id] });
-  BuildTask.bySite = id => BuildTask.scope({ method: ['bySite', id] });
-  BuildTask.byStartsWhen = startsWhen => BuildTask.scope({ method: ['byStartsWhen', startsWhen] });
-  BuildTask.forRunner = () => BuildTask.scope({ method: ['forRunner'] });
+  BuildTask.siteScope = (id) => ({
+    method: ['bySite', id],
+  });
+  BuildTask.bySite = (id) =>
+    BuildTask.scope({
+      method: ['bySite', id],
+    });
+  BuildTask.byStartsWhen = (startsWhen) =>
+    BuildTask.scope({
+      method: ['byStartsWhen', startsWhen],
+    });
+  BuildTask.forRunner = () =>
+    BuildTask.scope({
+      method: ['forRunner'],
+    });
   BuildTask.prototype.enqueue = enqueue;
   return BuildTask;
 };

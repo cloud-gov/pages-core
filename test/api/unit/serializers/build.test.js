@@ -22,7 +22,11 @@ describe('BuildSerializer', () => {
     });
 
     it('should serialize an array correctly', async () => {
-      const builds = await Promise.all(Array(3).fill(0).map(() => factory.build()));
+      const builds = await Promise.all(
+        Array(3)
+          .fill(0)
+          .map(() => factory.build()),
+      );
       const object = await BuildSerializer.serialize(builds);
 
       const result = validateJSONSchema(object, arraySchema);
@@ -33,7 +37,10 @@ describe('BuildSerializer', () => {
       const longString = Array(10).fill('abcdefghij').toString();
       expect(longString.length).to.be.greaterThan(80);
 
-      const build = await factory.build({ state: 'error', error: longString });
+      const build = await factory.build({
+        state: 'error',
+        error: longString,
+      });
       const object = await BuildSerializer.serialize(build);
 
       const result = validateJSONSchema(object, buildSchema);

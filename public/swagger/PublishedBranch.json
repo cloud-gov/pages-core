@@ -1,9 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "name",
-    "site"
-  ],
+  "required": ["name", "site"],
   "properties": {
     "name": {
       "type": "string"

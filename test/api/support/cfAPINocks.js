@@ -15,13 +15,9 @@ const mockDeleteRoute = (host, guid, exists = true) => {
   });
 
   if (exists) {
-    nock(url, reqheaders)
-      .get(`/v3/routes?hosts=${host}`)
-      .reply(200, listRoutesResponse);
+    nock(url, reqheaders).get(`/v3/routes?hosts=${host}`).reply(200, listRoutesResponse);
 
-    nock(url, reqheaders)
-      .delete(`/v3/routes/${guid}`)
-      .reply(200, routeResource);
+    nock(url, reqheaders).delete(`/v3/routes/${guid}`).reply(200, routeResource);
   } else {
     nock(url, reqheaders).get(`/v3/routes?hosts=${host}`).reply(200, {
       resources: [],
@@ -43,11 +39,9 @@ const mockDeleteService = (name, guid, exists = true) => {
       .delete(`/v3/service_instances/${guid}`)
       .reply(200, serviceResource);
   } else {
-    nock(url, reqheaders)
-      .get(`/v3/service_instances?names=${name}`)
-      .reply(200, {
-        resources: [],
-      });
+    nock(url, reqheaders).get(`/v3/service_instances?names=${name}`).reply(200, {
+      resources: [],
+    });
   }
 };
 
@@ -58,7 +52,7 @@ const mockFetchServiceInstancesRequest = (resources, name = null) =>
 
 const mockFetchServiceInstanceCredentialsRequest = (
   serviceInstanceName,
-  { guid, credentials }
+  { guid, credentials },
 ) => {
   const credentialsServiceInstance = factory.createCFAPIResource({ guid });
   const listCredentialServices = factory.createCFAPIResourceList({
@@ -67,21 +61,19 @@ const mockFetchServiceInstanceCredentialsRequest = (
 
   nock(url, reqheaders)
     .persist()
-    .get(
-      `/v3/service_credential_bindings?service_instance_names=${serviceInstanceName}`
-    )
+    .get(`/v3/service_credential_bindings?service_instance_names=${serviceInstanceName}`)
     .reply(200, listCredentialServices);
 
   nock(url, reqheaders)
     .persist()
     .get(`/v3/service_credential_bindings/${guid}/details`)
-    .reply(200, { credentials });
+    .reply(200, {
+      credentials,
+    });
 };
 
 const mockFetchS3ServicePlanGUID = (resources, name) =>
-  nock(url, reqheaders)
-    .get(`/v3/service_plans?names=${name}`)
-    .reply(200, resources);
+  nock(url, reqheaders).get(`/v3/service_plans?names=${name}`).reply(200, resources);
 
 const mockFetchSpacesRequest = (name, resources) =>
   nock(url, reqheaders).get(`/v3/spaces?names=${name}`).reply(200, resources);
@@ -97,10 +89,7 @@ const mockDefaultCredentials = (exists = true) => {
   });
 };
 
-const mockCreateS3ServiceInstance = (
-  { name, service_plan_guid },
-  resources
-) => {
+const mockCreateS3ServiceInstance = ({ name, service_plan_guid }, resources) => {
   const matcher = (body) => {
     return (
       body.name === name &&
@@ -131,13 +120,13 @@ const mockCreateServiceKey = ({ name, serviceInstanceGuid }, resources) => {
     body.name === name &&
     body.relationships.service_instance.data.guid === serviceInstanceGuid;
 
-  nock(url, reqheaders)
-    .post('/v3/service_credential_bindings', matcher)
-    .reply(200, '');
+  nock(url, reqheaders).post('/v3/service_credential_bindings', matcher).reply(200, '');
 
   nock(url, reqheaders)
     .get(`/v3/service_credential_bindings?names=${name}`)
-    .reply(200, { resources: [resources] });
+    .reply(200, {
+      resources: [resources],
+    });
 };
 
 const mockCreateServiceKeyPost = ({ name, serviceInstanceGuid }) => {
@@ -146,9 +135,7 @@ const mockCreateServiceKeyPost = ({ name, serviceInstanceGuid }) => {
     body.name === name &&
     body.relationships.service_instance.data.guid === serviceInstanceGuid;
 
-  nock(url, reqheaders)
-    .post('/v3/service_credential_bindings', matcher)
-    .reply(200);
+  nock(url, reqheaders).post('/v3/service_credential_bindings', matcher).reply(200);
 };
 
 const mockDeleteCredentialBindingsInstance = (guid) => {
@@ -206,13 +193,11 @@ const mockBucketKeyRotator = ({
   }
 
   const matcher = (body) =>
-    body.type === "key" &&
+    body.type === 'key' &&
     body.name === credentialsName &&
     body.relationships.service_instance.data.guid === serviceInstanceGuid;
 
-  nock(url, reqheaders)
-    .post("/v3/service_credential_bindings", matcher)
-    .reply(200, "");
+  nock(url, reqheaders).post('/v3/service_credential_bindings', matcher).reply(200, '');
 };
 
 module.exports = {

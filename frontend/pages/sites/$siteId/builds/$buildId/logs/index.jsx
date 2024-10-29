@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-prop-types */
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -31,11 +29,7 @@ function getSiteBuildLogTable(buildDetails, logs, state) {
     return <SiteBuildLogTable buildLogs={logs} buildState={state} />;
   }
 
-  return (
-    <SiteBuildLogTable
-      buildLogs={['This build does not have any build logs.']}
-    />
-  );
+  return <SiteBuildLogTable buildLogs={['This build does not have any build logs.']} />;
 }
 
 const BuildLogs = () => {

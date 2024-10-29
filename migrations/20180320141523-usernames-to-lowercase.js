@@ -1,13 +1,14 @@
 const lowercaseUsernames = (db, callback) => {
-  const getUsers = () => new Promise((resolve, reject) => {
-    db.all('select * from "user"', (err, results) => {
-      if (err) {
-        reject(err);
-      }
+  const getUsers = () =>
+    new Promise((resolve, reject) => {
+      db.all('select * from "user"', (err, results) => {
+        if (err) {
+          reject(err);
+        }
 
-      resolve(results);
+        resolve(results);
+      });
     });
-  });
 
   const setUsernameToLowercase = (user) => {
     const { username, id } = user;
@@ -30,16 +31,14 @@ const lowercaseUsernames = (db, callback) => {
       return Promise.resolve();
     }
 
-    return setUsernameToLowercase(users.pop())
-      .then(() => lowercaseAll(users));
+    return setUsernameToLowercase(users.pop()).then(() => lowercaseAll(users));
   };
 
   getUsers()
     .then(lowercaseAll)
     .then(() => callback())
-    .catch(error => callback(error));
+    .catch((error) => callback(error));
 };
-
 
 exports.up = lowercaseUsernames;
 

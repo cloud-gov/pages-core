@@ -25,15 +25,27 @@ describe('userReducer', () => {
       hello: 'alijasfjir',
     });
 
-    expect(actual).to.deep.equal({ isLoading: false, data: {} });
+    expect(actual).to.deep.equal({
+      isLoading: false,
+      data: {},
+    });
   });
 
   it('sets isLoading to true when USER_FETCH_STARTED', () => {
-    const actual = fixture({ isLoading: false, data: {} }, {
-      type: USER_FETCH_STARTED,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: {},
+      },
+      {
+        type: USER_FETCH_STARTED,
+      },
+    );
 
-    expect(actual).to.deep.equal({ isLoading: true, data: {} });
+    expect(actual).to.deep.equal({
+      isLoading: true,
+      data: {},
+    });
   });
 
   it('returns false when USER_RECEIVED with no user', () => {
@@ -53,10 +65,15 @@ describe('userReducer', () => {
       updatedAt: 'Thursday, late in the afternoon.',
     };
 
-    const actual = fixture({ anything: 'goes here' }, {
-      type: USER_RECEIVED,
-      user,
-    });
+    const actual = fixture(
+      {
+        anything: 'goes here',
+      },
+      {
+        type: USER_RECEIVED,
+        user,
+      },
+    );
 
     expect(actual).to.deep.equal({
       isLoading: false,
@@ -73,10 +90,15 @@ describe('userReducer', () => {
       updatedAt: 'Thursday, late in the afternoon.',
     };
 
-    const actual = fixture({ anything: 'goes here' }, {
-      type: USER_SETTINGS_UPDATED,
-      user,
-    });
+    const actual = fixture(
+      {
+        anything: 'goes here',
+      },
+      {
+        type: USER_SETTINGS_UPDATED,
+        user,
+      },
+    );
 
     expect(actual).to.deep.equal({
       isLoading: false,

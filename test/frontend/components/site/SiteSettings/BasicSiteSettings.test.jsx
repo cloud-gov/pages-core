@@ -3,22 +3,22 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
 
-import ReduxFormBasicSiteSettings, { BasicSiteSettings } from '../../../../../frontend/components/site/SiteSettings/BasicSiteSettings';
+import ReduxFormBasicSiteSettings, {
+  BasicSiteSettings,
+} from '../../../../../frontend/components/site/SiteSettings/BasicSiteSettings';
 
 describe('<BasicSiteSettings/>', () => {
-  const makeProps = () => (
-    {
-      initialValues: {
-        defaultBranch: 'main',
-        domain: 'https://example.gov',
-        canEditLiveUrl: false,
-        canEditDemoUrl: true,
-      },
-      handleSubmit: spy(),
-      reset: spy(),
-      pristine: true,
-    }
-  );
+  const makeProps = () => ({
+    initialValues: {
+      defaultBranch: 'main',
+      domain: 'https://example.gov',
+      canEditLiveUrl: false,
+      canEditDemoUrl: true,
+    },
+    handleSubmit: spy(),
+    reset: spy(),
+    pristine: true,
+  });
 
   it('should export a ReduxForm-connected component', () => {
     expect(ReduxFormBasicSiteSettings).to.not.be.null;
@@ -58,7 +58,10 @@ describe('<BasicSiteSettings/>', () => {
 
   it('should not render url fields if sandbox org', () => {
     const props = makeProps();
-    const sandboxProps = { ...props, isSandbox: true };
+    const sandboxProps = {
+      ...props,
+      isSandbox: true,
+    };
     const wrapper = shallow(<BasicSiteSettings {...sandboxProps} />);
     expect(wrapper.exists()).to.be.true;
     expect(wrapper.find('HttpsUrlField')).to.have.length(0);

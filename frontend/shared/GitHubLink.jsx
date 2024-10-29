@@ -6,7 +6,14 @@ import { IconGitHub, IconBranch } from './icons';
 const BASE = 'https://github.com';
 
 const GitHubLink = ({
-  owner, repository, text, branch, sha, icon, isButton = false, ...props
+  owner,
+  repository,
+  text,
+  branch,
+  sha,
+  icon,
+  isButton = false,
+  ...props
 }) => {
   const baseHref = `${BASE}/${owner}/${repository}`;
 
@@ -23,31 +30,28 @@ const GitHubLink = ({
   function chooseIcon(iconStr) {
     switch (iconStr) {
       case 'branch':
-        return (
-          <IconBranch />
-        );
+        return <IconBranch />;
       case 'commit':
       case 'sha':
         // use no icon for these types of links
         return '';
       case 'repo':
       default:
-        return (
-          <IconGitHub />
-        );
+        return <IconGitHub />;
     }
   }
 
+  const isButtonClassName = isButton ? 'usa-button usa-button--outline' : 'usa-link';
+
   return (
     <a
-      className={`${icon}-link ${isButton ? 'usa-button usa-button--outline' : 'usa-link'}`}
+      className={`${icon}-link ${isButtonClassName}`}
       href={href}
       title={title}
       target="_blank"
       rel="noopener noreferrer"
     >
-
-      { (chooseIcon(icon))}
+      {chooseIcon(icon)}
       {text}
     </a>
   );

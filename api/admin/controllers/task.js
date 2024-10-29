@@ -1,19 +1,9 @@
-/* eslint-disable no-await-in-loop */
-
-const {
-  BuildTask,
-  Build,
-  BuildTaskType,
-  SiteBuildTask,
-  Site,
-} = require('../../models');
+const { BuildTask, Build, BuildTaskType, SiteBuildTask, Site } = require('../../models');
 const { paginate, wrapHandlers } = require('../../utils');
 
 module.exports = wrapHandlers({
   async list(req, res) {
-    const {
-      limit, page, site,
-    } = req.query;
+    const { limit, page, site } = req.query;
 
     const scopes = [];
     let query = {};
@@ -30,7 +20,10 @@ module.exports = wrapHandlers({
             model: Build,
             required: true,
             include: [
-              { model: Site, required: true },
+              {
+                model: Site,
+                required: true,
+              },
             ],
           },
         ],
@@ -39,9 +32,9 @@ module.exports = wrapHandlers({
 
     const pagination = await paginate(
       BuildTask.scope(scopes),
-      a => a,
+      (a) => a,
       { limit, page },
-      query
+      query,
     );
 
     const json = {
@@ -76,7 +69,12 @@ module.exports = wrapHandlers({
 
     const sbt = await SiteBuildTask.findByPk(id);
 
-    await sbt.update({ metadata: { ...sbt.metadata, runDay } });
+    await sbt.update({
+      metadata: {
+        ...sbt.metadata,
+        runDay,
+      },
+    });
 
     return res.json({});
   },

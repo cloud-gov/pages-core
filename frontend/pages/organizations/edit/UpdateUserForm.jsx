@@ -4,22 +4,13 @@ import { Field, reduxForm } from 'redux-form';
 import Select from '@shared/Fields/Select';
 
 function validateRole(roleId, _, { roleOptions }) {
-  return roleOptions.map(opt => `${opt.value}`).includes(roleId)
+  return roleOptions.map((opt) => `${opt.value}`).includes(roleId)
     ? undefined
     : 'Please select a role';
 }
 
-const UpdateUserForm = ({
-  invalid,
-  pristine,
-  handleSubmit,
-  roleOptions,
-  submitting,
-}) => (
-  <form
-    onSubmit={handleSubmit}
-    className="update-user-form"
-  >
+const UpdateUserForm = ({ invalid, pristine, handleSubmit, roleOptions, submitting }) => (
+  <form onSubmit={handleSubmit} className="update-user-form">
     <fieldset className="usa-fieldset margin-right-1 display-inline">
       <legend className="usa-sr-only">Update user role</legend>
       <Field
@@ -48,9 +39,7 @@ UpdateUserForm.propTypes = {
   }).isRequired,
   invalid: PropTypes.bool.isRequired,
   pristine: PropTypes.bool.isRequired,
-  roleOptions: PropTypes.arrayOf(
-    PropTypes.object
-  ).isRequired,
+  roleOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
   submitting: PropTypes.bool.isRequired,
 };
 

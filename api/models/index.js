@@ -2,9 +2,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const { postgres } = require('../../config');
 const { databaseLogger } = require('../../winston');
 
-const {
-  database, host, password, port, ssl, user: username, retry,
-} = postgres;
+const { database, host, password, port, ssl, user: username, retry } = postgres;
 
 const sequelize = new Sequelize(database, username, password, {
   dialect: 'postgres',
@@ -17,9 +15,7 @@ const sequelize = new Sequelize(database, username, password, {
 
 // Add a permanent global hook to prevent unknowingly hitting this Sequelize bug:
 //   https://github.com/sequelize/sequelize/issues/10557#issuecomment-481399247
-// eslint-disable-next-line func-names
 sequelize.addHook('beforeCount', function (options) {
-  /* eslint-disable no-underscore-dangle, no-param-reassign */
   if (this._scope.include && this._scope.include.length > 0) {
     options.distinct = true;
     options.col = this._scope.col || options.col || `"${this.options.name.singular}".id`;
@@ -28,7 +24,6 @@ sequelize.addHook('beforeCount', function (options) {
   if (options.include && options.include.length > 0) {
     options.include = null;
   }
-  /* eslint-enable no-underscore-dangle, no-param-reassign */
 });
 
 require('./build')(sequelize, DataTypes);
@@ -50,10 +45,12 @@ require('./organization-role')(sequelize, DataTypes);
 require('./uaa-identity')(sequelize, DataTypes);
 require('./domain')(sequelize, DataTypes);
 
-Object
-  .keys(sequelize.models)
-  .map(key => sequelize.models[key])
-  .filter(model => model.associate)
-  .forEach(model => model.associate(sequelize.models));
+Object.keys(sequelize.models)
+  .map((key) => sequelize.models[key])
+  .filter((model) => model.associate)
+  .forEach((model) => model.associate(sequelize.models));
 
-module.exports = { sequelize, ...sequelize.models };
+module.exports = {
+  sequelize,
+  ...sequelize.models,
+};

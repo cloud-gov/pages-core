@@ -28,7 +28,7 @@ const uaaOptions = config.passport.uaa;
 class UAAClient {
   constructor(
     clientID = uaaOptions.options.clientID,
-    clientSecret = uaaOptions.options.clientSecret
+    clientSecret = uaaOptions.options.clientSecret,
   ) {
     this.clientId = clientID;
     this.clientSecret = clientSecret;
@@ -116,7 +116,7 @@ class UAAClient {
    * @param {[string]} groupNames - allowed UAA group names, ex: ['pages.user']
    */
   userInGroup(userGroups, groupNames) {
-    return userGroups.some(group => groupNames.includes(group.display));
+    return userGroups.some((group) => groupNames.includes(group.display));
   }
 
   /**
@@ -128,15 +128,21 @@ class UAAClient {
 
   /**
    * @param {string} groupId - a UAA group id
-   * @param {{origin: string, userId: string}} userInfo - the origin and user id of the uaa user
+   * @param {{origin: string, userId: string}} userInfo
+   * - the origin and user id of the uaa user
    * @param {string} clientToken - a client token with the `scim.write` scope
    *
-   * Adds the UAA user to the specific UAA group, ignores an error if the user is a member.
+   * Adds the UAA user to the specific UAA group,
+   * ignores an error if the user is a member.
    */
   async addUserToGroup(groupId, { userId }, clientToken) {
     const path = `/Groups/${groupId}/members`;
     const options = {
-      body: { origin: 'uaa', type: 'USER', value: userId },
+      body: {
+        origin: 'uaa',
+        type: 'USER',
+        value: userId,
+      },
       method: 'POST',
       token: clientToken,
     };
@@ -187,11 +193,15 @@ class UAAClient {
   async fetchGroupId(groupName, clientToken) {
     const path = '/Groups';
     const options = {
-      params: { filter: `displayName eq "${groupName}"` },
+      params: {
+        filter: `displayName eq "${groupName}"`,
+      },
       token: clientToken,
     };
 
-    const { resources: [{ id }] } = await this.request(path, options);
+    const {
+      resources: [{ id }],
+    } = await this.request(path, options);
 
     return id;
   }
@@ -206,7 +216,9 @@ class UAAClient {
   async fetchGroupMembers(groupId, clientToken) {
     const path = `/Groups/${groupId}/members`;
     const options = {
-      params: { returnEntities: true },
+      params: {
+        returnEntities: true,
+      },
       token: clientToken,
     };
 
@@ -223,11 +235,15 @@ class UAAClient {
   async fetchUserByEmail(email, clientToken) {
     const path = '/Users';
     const options = {
-      params: { filter: `email eq "${email}"` },
+      params: {
+        filter: `email eq "${email}"`,
+      },
       token: clientToken,
     };
 
-    const { resources: [user] } = await this.request(path, options);
+    const {
+      resources: [user],
+    } = await this.request(path, options);
 
     return user;
   }
@@ -240,7 +256,9 @@ class UAAClient {
    */
   async fetchUser(userId, clientToken) {
     const path = `/Users/${userId}`;
-    const options = { token: clientToken };
+    const options = {
+      token: clientToken,
+    };
 
     return this.request(path, options);
   }
@@ -253,13 +271,19 @@ class UAAClient {
   async inviteUser(targetUserEmail, userToken) {
     const path = '/invite_users';
     const options = {
-      body: { emails: [targetUserEmail] },
+      body: {
+        emails: [targetUserEmail],
+      },
       method: 'POST',
-      params: { redirect_uri: config.app.hostname },
+      params: {
+        redirect_uri: config.app.hostname,
+      },
       token: userToken,
     };
 
-    const { new_invites: [invite] } = await this.request(path, options);
+    const {
+      new_invites: [invite],
+    } = await this.request(path, options);
     return invite;
   }
 
@@ -280,32 +304,30 @@ class UAAClient {
       },
     };
 
-    const {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    } = await this.request(path, options);
+    const { access_token: accessToken, refresh_token: refreshToken } = await this.request(
+      path,
+      options,
+    );
 
-    return { accessToken, refreshToken };
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   request(path, opts = {}) {
-    const {
-      body,
-      form,
-      method = 'get',
-      params,
-      token,
-    } = opts;
+    const { body, form, method = 'get', params, token } = opts;
 
-    return this.httpClient.request({
-      data: body || (form && new URLSearchParams(form).toString()),
-      headers: token && {
-        Authorization: `Bearer ${token}`,
-      },
-      method,
-      params,
-      url: path,
-    })
+    return this.httpClient
+      .request({
+        data: body || (form && new URLSearchParams(form).toString()),
+        headers: token && {
+          Authorization: `Bearer ${token}`,
+        },
+        method,
+        params,
+        url: path,
+      })
       .then((response) => {
         if (response.data.error) {
           const msg = `${response.data.error}
@@ -315,7 +337,9 @@ class UAAClient {
         }
         return response.data;
       })
-      .catch((e) => { throw new Error(e); });
+      .catch((e) => {
+        throw new Error(e);
+      });
   }
 }
 

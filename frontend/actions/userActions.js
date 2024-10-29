@@ -12,11 +12,12 @@ const dispatchUserFetchStartedAction = () => {
   dispatch(createUserFetchStartedAction());
 };
 
-const dispatchUserReceivedAction = user => dispatch(createUserReceivedAction(user));
+const dispatchUserReceivedAction = (user) => dispatch(createUserReceivedAction(user));
 
 const dispatchUserActionFetchStarted = () => dispatch(createUserActionFetchStarted());
 
-const dispatchUserActionReceived = userActions => dispatch(createUserActionReceived(userActions));
+const dispatchUserActionReceived = (userActions) =>
+  dispatch(createUserActionReceived(userActions));
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
@@ -26,15 +27,12 @@ const alertError = (error) => {
 export default {
   fetchUser() {
     dispatchUserFetchStartedAction();
-    return federalist.fetchUser()
-      .then(dispatchUserReceivedAction)
-      .catch(alertError);
+    return federalist.fetchUser().then(dispatchUserReceivedAction).catch(alertError);
   },
 
   fetchUserActions(siteId) {
     dispatchUserActionFetchStarted();
 
-    return federalist.fetchUserActions(siteId)
-      .then(dispatchUserActionReceived);
+    return federalist.fetchUserActions(siteId).then(dispatchUserActionReceived);
   },
 };

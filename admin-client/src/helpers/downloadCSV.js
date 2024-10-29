@@ -1,6 +1,8 @@
 export const downloadCSV = async (fetchCSV, filename) => {
   const csv = await fetchCSV();
-  const blob = new Blob([csv], { type: 'application/octet-stream' });
+  const blob = new Blob([csv], {
+    type: 'application/octet-stream',
+  });
   const aElement = document.createElement('a');
   aElement.setAttribute('download', filename);
   const href = URL.createObjectURL(blob);

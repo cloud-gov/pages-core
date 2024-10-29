@@ -9,7 +9,11 @@ const RoleSerializer = require('../../../../api/serializers/role');
 describe('RoleSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize a role object correctly', async () => {
-      const role = await Role.findOne({ where: { name: 'user' } });
+      const role = await Role.findOne({
+        where: {
+          name: 'user',
+        },
+      });
 
       const roleJson = RoleSerializer.serialize(role);
 

@@ -6,7 +6,7 @@ const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
 const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
 
-class ValidationError extends Error { }
+class ValidationError extends Error {}
 
 class CustomError extends Error {
   constructor(message, status = 400) {
@@ -51,11 +51,13 @@ function parseSiteConfig(siteConfig, configName = null) {
   let obj = null;
 
   try {
-    if ((typeof siteConfig) === 'string' && siteConfig.length > 0) {
+    if (typeof siteConfig === 'string' && siteConfig.length > 0) {
       obj = yaml.load(siteConfig);
     }
 
-    if ((typeof siteConfig) === 'object') { return siteConfig; }
+    if (typeof siteConfig === 'object') {
+      return siteConfig;
+    }
   } catch {
     // on invalid values
     let msg = 'input is not valid YAML';
@@ -99,7 +101,10 @@ function isEmptyOrBranch(value) {
   }
 
   if (value && value.length && !branchRegex.test(value)) {
-    throw new Error('Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.');
+    throw new Error(
+      // eslint-disable-next-line max-len
+      'Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.',
+    );
   }
 }
 
@@ -121,13 +126,13 @@ function isValidSubdomain(value) {
   }
 }
 
-const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s);
+const validBasicAuthUsername = (s) => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s);
 
-const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
+const validBasicAuthPassword = (s) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
 
 const isDelimitedFQDN = (str) => {
   const msg = 'must be a comma-separated list of valid fully qualified domain names';
-  const isValid = str.split(',').every(s => validator.isFQDN(s));
+  const isValid = str.split(',').every((s) => validator.isFQDN(s));
   if (!isValid) {
     throw new Error(msg);
   }

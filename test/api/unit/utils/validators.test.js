@@ -18,36 +18,45 @@ function multiExpect(testFn, testCases, expectedVerb = 'equal') {
   });
 }
 
-
 describe('validators', () => {
   describe('.isValidYaml', () => {
     it('properly validates', () => {
-      const goodYaml = [
-        '---',
-        'hi: james',
-        'you_are:',
-        '  - cool',
-        '  - awesome',
-      ].join('\n');
+      const goodYaml = ['---', 'hi: james', 'you_are:', '  - cool', '  - awesome'].join(
+        '\n',
+      );
 
-      const badYaml = [
-        '---',
-        'this_is_not_valid:',
-        '-:boop',
-      ].join('\n');
+      const badYaml = ['---', 'this_is_not_valid:', '-:boop'].join('\n');
 
       const goodTestCases = [
-        { args: [null], result: true },
-        { args: [''], result: true },
-        { args: ['one-line'], result: true },
-        { args: [goodYaml], result: true },
+        {
+          args: [null],
+          result: true,
+        },
+        {
+          args: [''],
+          result: true,
+        },
+        {
+          args: ['one-line'],
+          result: true,
+        },
+        {
+          args: [goodYaml],
+          result: true,
+        },
       ];
 
       multiExpect(validators.isValidYaml, goodTestCases);
 
       const badTestCases = [
-        { args: [': funky-line: boop'], result: 'input is not valid YAML' },
-        { args: [badYaml], result: 'input is not valid YAML' },
+        {
+          args: [': funky-line: boop'],
+          result: 'input is not valid YAML',
+        },
+        {
+          args: [badYaml],
+          result: 'input is not valid YAML',
+        },
       ];
 
       multiExpect(validators.isValidYaml, badTestCases, 'throw');
@@ -65,7 +74,10 @@ describe('validators', () => {
       expect(validators.isEmptyOrUrl('https://hello.world')).to.be.undefined;
     });
     it('should not allow non url', () => {
-      expect(() => validators.isEmptyOrUrl('hu')).to.throw(Error, 'URL must start with https://');
+      expect(() => validators.isEmptyOrUrl('hu')).to.throw(
+        Error,
+        'URL must start with https://',
+      );
     });
   });
 
@@ -75,7 +87,8 @@ describe('validators', () => {
     });
 
     it('accepts valid username with symbols that arenot semicolons', () => {
-      expect(validators.validBasicAuthUsername('username1!@#$%^&*()-_+=<>?,./~`{}[]|\\')).to.be.true;
+      expect(validators.validBasicAuthUsername('username1!@#$%^&*()-_+=<>?,./~`{}[]|\\'))
+        .to.be.true;
     });
 
     it('must contain at least 1 alphanumeric char', () => {
@@ -97,7 +110,8 @@ describe('validators', () => {
     });
 
     it('at least 1 uppercase, 1 lowercase and one number required w/ symbols', () => {
-      expect(validators.validBasicAuthPassword('paSsw0rd!@#$%^&*()-_+=<>?,./~`{}[]|\\')).to.be.true;
+      expect(validators.validBasicAuthPassword('paSsw0rd!@#$%^&*()-_+=<>?,./~`{}[]|\\'))
+        .to.be.true;
     });
 
     it('at least 1 uppercase char required', () => {

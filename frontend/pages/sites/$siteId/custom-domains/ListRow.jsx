@@ -19,9 +19,7 @@ export default function ListRow({ children, justify = 'flex-start', ...props }) 
 }
 
 ListRow.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
+    .isRequired,
   justify: PropTypes.string,
 };

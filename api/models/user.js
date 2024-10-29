@@ -53,62 +53,81 @@ const associate = ({
     } else {
       query.where = {
         [Op.or]: [
-          { username: { [Op.substring]: search } },
-          { email: { [Op.substring]: search } },
-          { '$UAAIdentity.email$': { [Op.substring]: search } },
+          {
+            username: {
+              [Op.substring]: search,
+            },
+          },
+          {
+            email: {
+              [Op.substring]: search,
+            },
+          },
+          {
+            '$UAAIdentity.email$': {
+              [Op.substring]: search,
+            },
+          },
         ],
       };
       query.include = UAAIdentity;
     }
     return query;
   });
-  User.addScope('byOrg', id => ({
-    include: [{
-      model: Organization,
-      where: { id },
-    }],
+  User.addScope('byOrg', (id) => ({
+    include: [
+      {
+        model: Organization,
+        where: { id },
+      },
+    ],
   }));
-  User.addScope('bySite', id => ({
-    include: [{
-      model: Site,
-      where: { id },
-    }],
+  User.addScope('bySite', (id) => ({
+    include: [
+      {
+        model: Site,
+        where: { id },
+      },
+    ],
   }));
   User.addScope('withUAAIdentity', {
     include: UAAIdentity,
   });
   User.addScope('havingUAAIdentity', {
-    include: [{
-      model: UAAIdentity,
-      required: true,
-    }],
+    include: [
+      {
+        model: UAAIdentity,
+        required: true,
+      },
+    ],
   });
   User.addScope('withOrganizationRoles', {
     include: {
       model: OrganizationRole,
-      include: [
-        Organization,
-        Role,
-      ],
+      include: [Organization, Role],
     },
     order: [[OrganizationRole, Organization, 'name', 'ASC']],
   });
-  User.addScope('byUAAEmail', uaaEmail => ({
-    include: [{
-      model: UAAIdentity,
-      where: { email: uaaEmail },
-      required: true,
-    }],
+  User.addScope('byUAAEmail', (uaaEmail) => ({
+    include: [
+      {
+        model: UAAIdentity,
+        where: {
+          email: uaaEmail,
+        },
+        required: true,
+      },
+    ],
   }));
 };
 
 function beforeValidate(user) {
   const { username } = user;
   const safeUsername = username && username.toLowerCase();
-  user.username = safeUsername || null; // eslint-disable-line no-param-reassign
+  user.username = safeUsername || null;
 }
 
-const attributes = DataTypes => ({
+const attributes = (DataTypes) => ({
   email: {
     type: DataTypes.STRING,
     validate: {
@@ -148,7 +167,10 @@ const attributes = DataTypes => ({
       return this.settings.buildNotificationSettings || {};
     },
     set(buildNotificationSettings) {
-      this.setDataValue('settings', { ...this.settings, buildNotificationSettings });
+      this.setDataValue('settings', {
+        ...this.settings,
+        buildNotificationSettings,
+      });
     },
   },
 });
@@ -162,7 +184,9 @@ const options = {
   scopes: {
     withGithub: {
       where: {
-        githubAccessToken: { [Op.ne]: null },
+        githubAccessToken: {
+          [Op.ne]: null,
+        },
       },
     },
   },
@@ -171,9 +195,18 @@ const options = {
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', attributes(DataTypes), options);
   User.associate = associate;
-  User.orgScope = id => ({ method: ['byOrg', id] });
-  User.siteScope = id => ({ method: ['bySite', id] });
-  User.searchScope = search => ({ method: ['byIdOrText', search] });
-  User.byUAAEmail = id => User.scope({ method: ['byUAAEmail', id] });
+  User.orgScope = (id) => ({
+    method: ['byOrg', id],
+  });
+  User.siteScope = (id) => ({
+    method: ['bySite', id],
+  });
+  User.searchScope = (search) => ({
+    method: ['byIdOrText', search],
+  });
+  User.byUAAEmail = (id) =>
+    User.scope({
+      method: ['byUAAEmail', id],
+    });
   return User;
 };

@@ -34,26 +34,30 @@ module.exports = wrapHandlers({
 
   async update(req, res) {
     const {
-      body: {
-        organizationId,
-        roleId,
-        userId,
-      },
+      body: { organizationId, roleId, userId },
       user,
     } = req;
 
     const org = await fetchModelById(organizationId, Organization.forManagerRole(user));
     if (!org) return res.notFound();
 
-    await OrganizationRole.update({ roleId: toInt(roleId) }, {
+    await OrganizationRole.update(
+      {
+        roleId: toInt(roleId),
+      },
+      {
+        where: {
+          organizationId: toInt(organizationId),
+          userId: toInt(userId),
+        },
+      },
+    );
+
+    const member = await OrganizationRole.forOrganization(org).findOne({
       where: {
-        organizationId: toInt(organizationId),
         userId: toInt(userId),
       },
     });
-
-    const member = await OrganizationRole.forOrganization(org)
-      .findOne({ where: { userId: toInt(userId) } });
 
     const json = organizationRoleSerializer.serialize(member);
     return res.json(json);

@@ -5,9 +5,7 @@ import {
   userEnvironmentVariableDeletedType as DELETED,
 } from '../actions/actionCreators/userEnvironmentVariableActions';
 
-import {
-  httpErrorType as HTTP_ERROR,
-} from '../actions/actionCreators/alertActions';
+import { httpErrorType as HTTP_ERROR } from '../actions/actionCreators/alertActions';
 
 /*
   Contains nested user environment variables keyed by site Id, Ex.
@@ -76,7 +74,7 @@ export default function userEnvironmentVariables(state = initialState, action) {
         ...state,
         [siteId]: {
           isLoading: false,
-          data: state[siteId].data.filter(uev => uev.id !== uevId),
+          data: state[siteId].data.filter((uev) => uev.id !== uevId),
         },
       };
     }

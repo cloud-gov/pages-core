@@ -10,29 +10,38 @@ const attributes = (overrides = {}) => {
   }
 
   if (!site) {
-    site = Promise.resolve(user).then(siteUser =>
-      siteFactory({ users: [siteUser] })
+    site = Promise.resolve(user).then((siteUser) =>
+      siteFactory({
+        users: [siteUser],
+      }),
     );
   }
 
   if (!actionType) {
-    actionType = ActionType.findOne({ where: { action: 'remove' } });
+    actionType = ActionType.findOne({
+      where: {
+        action: 'remove',
+      },
+    });
   }
 
   if (!target) {
     target = userFactory();
   }
 
-  return Object.assign({
-    site,
-    user,
-    actionType,
-    target,
-    targetType: 'user',
-  }, overrides);
+  return Object.assign(
+    {
+      site,
+      user,
+      actionType,
+      target,
+      targetType: 'user',
+    },
+    overrides,
+  );
 };
 
-const prepareAttributes = attrs => ({
+const prepareAttributes = (attrs) => ({
   userId: attrs.user.id,
   targetId: attrs.target.id,
   targetType: attrs.targetType,
@@ -40,19 +49,23 @@ const prepareAttributes = attrs => ({
   siteId: attrs.site.id,
 });
 
-const build = overrides => (
-  Promise.props(attributes(overrides))
-  .then(attrs => UserAction.create(prepareAttributes(attrs)))
-);
+const build = (overrides) =>
+  Promise.props(attributes(overrides)).then((attrs) =>
+    UserAction.create(prepareAttributes(attrs)),
+  );
 
 const buildMany = (count, overrides = {}) =>
-  Promise.props(attributes(overrides))
-  .then((attrs) => {
+  Promise.props(attributes(overrides)).then((attrs) => {
     const finalAttributes = prepareAttributes(attrs);
 
     return Promise.all(
-      Array(count).fill(0).map(() => UserAction.create(finalAttributes))
+      Array(count)
+        .fill(0)
+        .map(() => UserAction.create(finalAttributes)),
     );
   });
 
-module.exports = { build, buildMany };
+module.exports = {
+  build,
+  buildMany,
+};

@@ -20,7 +20,10 @@ describe('<EnvironmentVariables/>', () => {
     stubs.deleteUserEnvironmentVariable = sinon.stub();
     defaultProps = {
       siteId,
-      userEnvironmentVariables: { isLoading: false, data: [] },
+      userEnvironmentVariables: {
+        isLoading: false,
+        data: [],
+      },
       actions: {
         fetchUserEnvironmentVariables: stubs.fetchUserEnvironmentVariables,
         addUserEnvironmentVariable: stubs.addUserEnvironmentVariable,
@@ -45,33 +48,49 @@ describe('<EnvironmentVariables/>', () => {
 
   it('renders an informational alert', () => {
     const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'info');
+    const alert = wrapper.findWhere(
+      (n) => n.name() === 'AlertBanner' && n.prop('status') === 'info',
+    );
     expect(alert).to.have.lengthOf(1);
   });
 
   it('renders a warning alert', () => {
     const wrapper = shallow(<EnvironmentVariables {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
+    const alert = wrapper.findWhere(
+      (n) => n.name() === 'AlertBanner' && n.prop('status') === 'warning',
+    );
     expect(alert).to.have.lengthOf(1);
   });
 
   it('warning contains FISMA Moderate on Pages', () => {
     const { EnvironmentVariables: PagesEnvironmentVariables } = proxyquire(
       '../../../../../frontend/components/site/SiteSettings/EnvironmentVariables',
-      { '../../../globals': { PRODUCT: "pages" }}
+      {
+        '../../../globals': {
+          PRODUCT: 'pages',
+        },
+      },
     );
 
     const wrapper = shallow(<PagesEnvironmentVariables {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
+    const alert = wrapper.findWhere(
+      (n) => n.name() === 'AlertBanner' && n.prop('status') === 'warning',
+    );
 
-    expect(alert.render().text()).to.contain('FISMA Moderate')
+    expect(alert.render().text()).to.contain('FISMA Moderate');
   });
 
   describe('when loading', () => {
     let props;
 
     beforeEach(() => {
-      props = { ...defaultProps, userEnvironmentVariables: { isLoading: true, data: [] } };
+      props = {
+        ...defaultProps,
+        userEnvironmentVariables: {
+          isLoading: true,
+          data: [],
+        },
+      };
     });
 
     it('renders a loading spinner', () => {
@@ -95,7 +114,13 @@ describe('<EnvironmentVariables/>', () => {
     let props;
 
     beforeEach(() => {
-      props = { ...defaultProps, userEnvironmentVariables: { isLoading: false, data: [] } };
+      props = {
+        ...defaultProps,
+        userEnvironmentVariables: {
+          isLoading: false,
+          data: [],
+        },
+      };
     });
 
     it('does not render a loading spinner', () => {
@@ -105,7 +130,11 @@ describe('<EnvironmentVariables/>', () => {
 
     it('renders the "new environment variable" section', () => {
       const wrapper = shallow(<EnvironmentVariables {...props} />);
-      const section = wrapper.findWhere(n => n.name() === 'ExpandableArea' && n.prop('title') === 'Add a new environment variable');
+      const section = wrapper.findWhere(
+        (n) =>
+          n.name() === 'ExpandableArea' &&
+          n.prop('title') === 'Add a new environment variable',
+      );
       expect(section).to.have.lengthOf(1);
     });
 
@@ -116,12 +145,22 @@ describe('<EnvironmentVariables/>', () => {
   });
 
   describe('when not loading with uevs', () => {
-    const uev = { id: 1, name: 'name', hint: '1234' };
+    const uev = {
+      id: 1,
+      name: 'name',
+      hint: '1234',
+    };
 
     let props;
 
     beforeEach(() => {
-      props = { ...defaultProps, userEnvironmentVariables: { isLoading: false, data: [uev] } };
+      props = {
+        ...defaultProps,
+        userEnvironmentVariables: {
+          isLoading: false,
+          data: [uev],
+        },
+      };
     });
 
     it('does not render a loading spinner', () => {
@@ -131,7 +170,11 @@ describe('<EnvironmentVariables/>', () => {
 
     it('renders the "new environment variable" section', () => {
       const wrapper = shallow(<EnvironmentVariables {...props} />);
-      const section = wrapper.findWhere(n => n.name() === 'ExpandableArea' && n.prop('title') === 'Add a new environment variable');
+      const section = wrapper.findWhere(
+        (n) =>
+          n.name() === 'ExpandableArea' &&
+          n.prop('title') === 'Add a new environment variable',
+      );
       expect(section).to.have.lengthOf(1);
     });
 

@@ -7,9 +7,7 @@ const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
-const {
-  Organization, OrganizationRole, Role, User,
-} = require('../../../api/models');
+const { Organization, OrganizationRole, Role, User } = require('../../../api/models');
 const OrganizationService = require('../../../api/services/organization');
 const QueueJobs = require('../../../api/queue-jobs');
 
@@ -22,9 +20,18 @@ function organizationResponseExpectations(response, org) {
 
 function clean() {
   return Promise.all([
-    Organization.truncate({ force: true, cascade: true }),
-    OrganizationRole.truncate({ force: true, cascade: true }),
-    User.truncate({ force: true, cascade: true }),
+    Organization.truncate({
+      force: true,
+      cascade: true,
+    }),
+    OrganizationRole.truncate({
+      force: true,
+      cascade: true,
+    }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -37,8 +44,16 @@ describe('Organization API', () => {
   before(async () => {
     await clean();
     [userRole, managerRole] = await Promise.all([
-      Role.findOne({ where: { name: 'user' } }),
-      Role.findOne({ where: { name: 'manager' } }),
+      Role.findOne({
+        where: {
+          name: 'user',
+        },
+      }),
+      Role.findOne({
+        where: {
+          name: 'manager',
+        },
+      }),
     ]);
   });
 
@@ -61,8 +76,16 @@ describe('Organization API', () => {
       ]);
 
       await Promise.all([
-        currentUser.addOrganization(org1, { through: { roleId: userRole.id } }),
-        currentUser.addOrganization(org2, { through: { roleId: managerRole.id } }),
+        currentUser.addOrganization(org1, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
+        currentUser.addOrganization(org2, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
       ]);
 
       const response = await authenticatedRequest.get('/v0/organization');
@@ -73,18 +96,24 @@ describe('Organization API', () => {
       expect(response.body).to.have.length(2);
 
       const foundOrganizations = await Promise.all(
-        response.body.map(org => Organization.findByPk(org.id, { include: [User] }))
+        response.body.map((org) =>
+          Organization.findByPk(org.id, {
+            include: [User],
+          }),
+        ),
       );
 
       return foundOrganizations.forEach((org) => {
-        const responseOrg = response.body.find(candidate => candidate.id === org.id);
+        const responseOrg = response.body.find((candidate) => candidate.id === org.id);
         expect(responseOrg).not.to.be.undefined;
         organizationResponseExpectations(responseOrg, org);
       });
     });
 
     it('should not render any organizations not associated with the user', async () => {
-      const organizationPromises = Array(3).fill(0).map(() => factory.organization.create());
+      const organizationPromises = Array(3)
+        .fill(0)
+        .map(() => factory.organization.create());
       const organizations = await Promise.all(organizationPromises);
 
       expect(organizations).to.have.length(3);
@@ -104,7 +133,11 @@ describe('Organization API', () => {
 
     it('returns a 404 if the user is not a manager of the organization', async () => {
       const org = await factory.organization.create();
-      await currentUser.addOrganization(org, { through: { roleId: userRole.id } });
+      await currentUser.addOrganization(org, {
+        through: {
+          roleId: userRole.id,
+        },
+      });
 
       const response = await authenticatedRequest.get(`/v0/organization/${org.id}`);
       validateAgainstJSONSchema('GET', '/organization/{id}', 404, response.body);
@@ -113,7 +146,11 @@ describe('Organization API', () => {
 
     it('returns the organization', async () => {
       const org = await factory.organization.create();
-      await currentUser.addOrganization(org, { through: { roleId: managerRole.id } });
+      await currentUser.addOrganization(org, {
+        through: {
+          roleId: managerRole.id,
+        },
+      });
 
       const response = await authenticatedRequest.get(`/v0/organization/${org.id}`);
 
@@ -123,7 +160,11 @@ describe('Organization API', () => {
 
     it('returns a 404 if the user is a manager of an inactive organization', async () => {
       const org = await factory.organization.create({ isActive: false });
-      await currentUser.addOrganization(org, { through: { roleId: managerRole.id } });
+      await currentUser.addOrganization(org, {
+        through: {
+          roleId: managerRole.id,
+        },
+      });
 
       const response = await authenticatedRequest.get(`/v0/organization/${org.id}`);
 
@@ -137,24 +178,35 @@ describe('Organization API', () => {
 
     afterEach(sinon.restore);
 
-    it('returns a 400 error if the user is not a manager of the organization', async () => {
+    it(`returns a 400 error
+        if the user is not a manager of the organization`, async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
       const org = await factory.organization.create();
       await Promise.all([
-        currentUser.addOrganization(org, { through: { roleId: userRole.id } }),
-        factory.uaaIdentity({ userId: currentUser.id }),
+        currentUser.addOrganization(org, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
+        factory.uaaIdentity({
+          userId: currentUser.id,
+        }),
       ]);
 
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
         .set('x-csrf-token', csrfToken.getToken())
-        .send({ roleId, uaaEmail });
+        .send({
+          roleId,
+          uaaEmail,
+        });
 
       validateAgainstJSONSchema('POST', '/organization/{id}/invite', 400, response.body);
     });
 
-    it('returns the member and the invitation details for cloud.gov origin upon invitation', async () => {
+    it(`returns the member and the invitation details
+        for cloud.gov origin upon invitation`, async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
       const origin = 'cloud.gov';
@@ -165,16 +217,28 @@ describe('Organization API', () => {
       ]);
 
       await Promise.all([
-        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
-        targetUser.addOrganization(org, { through: { roleId } }),
-        factory.uaaIdentity({ userId: currentUser.id }),
-        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+        currentUser.addOrganization(org, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        targetUser.addOrganization(org, {
+          through: {
+            roleId,
+          },
+        }),
+        factory.uaaIdentity({
+          userId: currentUser.id,
+        }),
+        factory.uaaIdentity({
+          userId: targetUser.id,
+          email: uaaEmail,
+        }),
       ]);
 
       const inviteLink = 'https://example.com';
 
-      sinon.stub(OrganizationService, 'inviteUserToOrganization')
-        .resolves({
+      sinon.stub(OrganizationService, 'inviteUserToOrganization').resolves({
         email: uaaEmail,
         inviteLink,
         origin,
@@ -185,7 +249,10 @@ describe('Organization API', () => {
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
         .set('x-csrf-token', csrfToken.getToken())
-        .send({ roleId, uaaEmail });
+        .send({
+          roleId,
+          uaaEmail,
+        });
 
       validateAgainstJSONSchema('POST', '/organization/{id}/invite', 200, response.body);
       const { member, invite } = response.body;
@@ -197,14 +264,15 @@ describe('Organization API', () => {
         uaaEmail,
         inviteLink,
         origin,
-        org.name
+        org.name,
       );
     });
 
-    it('returns the member and the invitation details for cloud.gov origin upon resent invitation', async () => {
+    it(`returns the member and the invitation details
+        for cloud.gov origin upon resent invitation`, async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
-      const origin = 'cloud.gov'
+      const origin = 'cloud.gov';
       const isResend = true;
 
       const [targetUser, org] = await Promise.all([
@@ -213,16 +281,28 @@ describe('Organization API', () => {
       ]);
 
       await Promise.all([
-        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
-        targetUser.addOrganization(org, { through: { roleId } }),
-        factory.uaaIdentity({ userId: currentUser.id }),
-        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+        currentUser.addOrganization(org, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        targetUser.addOrganization(org, {
+          through: {
+            roleId,
+          },
+        }),
+        factory.uaaIdentity({
+          userId: currentUser.id,
+        }),
+        factory.uaaIdentity({
+          userId: targetUser.id,
+          email: uaaEmail,
+        }),
       ]);
 
       const inviteLink = 'https://example.com';
 
-      sinon.stub(OrganizationService, 'resendInvite')
-        .resolves({
+      sinon.stub(OrganizationService, 'resendInvite').resolves({
         email: uaaEmail,
         inviteLink,
         origin,
@@ -233,7 +313,11 @@ describe('Organization API', () => {
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
         .set('x-csrf-token', csrfToken.getToken())
-        .send({ roleId, uaaEmail, isResend });
+        .send({
+          roleId,
+          uaaEmail,
+          isResend,
+        });
 
       validateAgainstJSONSchema('POST', '/organization/{id}/invite', 200, response.body);
       const { invite } = response.body;
@@ -243,12 +327,12 @@ describe('Organization API', () => {
         uaaEmail,
         inviteLink,
         origin,
-        org.name
+        org.name,
       );
     });
 
-
-    it('returns a 400 error if the user is a manager of an inactive organization', async () => {
+    it(`returns a 400 error if the user is
+        a manager of an inactive organization`, async () => {
       const uaaEmail = 'foo@bar.com';
       const roleId = userRole.id;
 
@@ -258,16 +342,28 @@ describe('Organization API', () => {
       ]);
 
       await Promise.all([
-        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
-        targetUser.addOrganization(org, { through: { roleId } }),
-        factory.uaaIdentity({ userId: currentUser.id }),
-        factory.uaaIdentity({ userId: targetUser.id, email: uaaEmail }),
+        currentUser.addOrganization(org, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        targetUser.addOrganization(org, {
+          through: {
+            roleId,
+          },
+        }),
+        factory.uaaIdentity({
+          userId: currentUser.id,
+        }),
+        factory.uaaIdentity({
+          userId: targetUser.id,
+          email: uaaEmail,
+        }),
       ]);
 
       const inviteLink = 'https://example.com';
 
-      sinon.stub(OrganizationService, 'inviteUserToOrganization')
-        .resolves({
+      sinon.stub(OrganizationService, 'inviteUserToOrganization').resolves({
         email: uaaEmail,
         inviteLink,
       });
@@ -277,20 +373,33 @@ describe('Organization API', () => {
       const response = await authenticatedRequest
         .post(`/v0/organization/${org.id}/invite`)
         .set('x-csrf-token', csrfToken.getToken())
-        .send({ roleId, uaaEmail });
+        .send({
+          roleId,
+          uaaEmail,
+        });
 
       validateAgainstJSONSchema('POST', '/organization/{id}/invite', 400, response.body);
     });
   });
 
   describe('GET /v0/organization/:id/members', () => {
-    requiresAuthentication('GET', '/organization/1/members', '/organization/{id}/members');
+    requiresAuthentication(
+      'GET',
+      '/organization/1/members',
+      '/organization/{id}/members',
+    );
 
     it('returns a 404 if the user is not a manager of the organization', async () => {
       const org = await factory.organization.create();
-      await currentUser.addOrganization(org, { through: { roleId: userRole.id } });
+      await currentUser.addOrganization(org, {
+        through: {
+          roleId: userRole.id,
+        },
+      });
 
-      const response = await authenticatedRequest.get(`/v0/organization/${org.id}/members`);
+      const response = await authenticatedRequest.get(
+        `/v0/organization/${org.id}/members`,
+      );
 
       validateAgainstJSONSchema('GET', '/organization/{id}/members', 404, response.body);
     });
@@ -302,29 +411,51 @@ describe('Organization API', () => {
       ]);
 
       await Promise.all([
-        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
-        user.addOrganization(org, { through: { roleId: userRole.id } }),
+        currentUser.addOrganization(org, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        user.addOrganization(org, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const response = await authenticatedRequest.get(`/v0/organization/${org.id}/members`);
+      const response = await authenticatedRequest.get(
+        `/v0/organization/${org.id}/members`,
+      );
 
       validateAgainstJSONSchema('GET', '/organization/{id}/members', 200, response.body);
       const orgRoles = response.body;
-      expect(orgRoles.map(or => or.User.id)).to.have.members([currentUser.id, user.id]);
+      expect(orgRoles.map((or) => or.User.id)).to.have.members([currentUser.id, user.id]);
     });
 
     it('returns a 404 if the user is a manager of an inactive organization', async () => {
       const [user, org] = await Promise.all([
         factory.user(),
-        factory.organization.create({ isActive: false }),
+        factory.organization.create({
+          isActive: false,
+        }),
       ]);
 
       await Promise.all([
-        currentUser.addOrganization(org, { through: { roleId: managerRole.id } }),
-        user.addOrganization(org, { through: { roleId: userRole.id } }),
+        currentUser.addOrganization(org, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        user.addOrganization(org, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const response = await authenticatedRequest.get(`/v0/organization/${org.id}/members`);
+      const response = await authenticatedRequest.get(
+        `/v0/organization/${org.id}/members`,
+      );
 
       validateAgainstJSONSchema('GET', '/organization/{id}/members', 404, response.body);
     });

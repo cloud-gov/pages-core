@@ -4,17 +4,24 @@ const { Organization, Site } = require('../models');
 const { fetchModelById } = require('../utils/queryDatabase');
 
 const authorize = async ({ id: userId }, { id: siteId }) => {
-  const site = await fetchModelById(siteId, Site.forUser({ id: userId }));
+  const site = await fetchModelById(
+    siteId,
+    Site.forUser({
+      id: userId,
+    }),
+  );
 
   if (!site) {
     throw 403;
   }
 
-  if (!site.isActive) { // if site is not active
+  if (!site.isActive) {
+    // if site is not active
     throw 403;
   }
 
-  if (site.organizationId) { // if site exists in an org
+  if (site.organizationId) {
+    // if site exists in an org
     const org = await site.getOrganization();
     if (!org.isActive) {
       throw 403;
@@ -24,7 +31,7 @@ const authorize = async ({ id: userId }, { id: siteId }) => {
   return site;
 };
 
-const authorizeRepositoryAdmin = (user, site) => (
+const authorizeRepositoryAdmin = (user, site) =>
   GitHub.checkPermissions(user, site.owner, site.repository)
     .then((permissions) => {
       if (!permissions.admin) {
@@ -46,8 +53,7 @@ const authorizeRepositoryAdmin = (user, site) => (
         message: siteErrors.ADMIN_ACCESS_REQUIRED,
         status: 403,
       };
-    })
-);
+    });
 
 const createWithOrgs = (organizations, organizationId) => {
   if (!organizationId) {
@@ -56,7 +62,7 @@ const createWithOrgs = (organizations, organizationId) => {
     };
   }
 
-  const hasOrg = organizations.find(org => org.id === organizationId);
+  const hasOrg = organizations.find((org) => org.id === organizationId);
 
   if (!hasOrg) {
     throw {
@@ -105,8 +111,8 @@ const findOne = (user, site) => authorize(user, site);
 
 const update = (user, site) => authorize(user, site);
 
-const destroy = (user, site) => authorize(user, site)
-  .then(() => authorizeRepositoryAdmin(user, site));
+const destroy = (user, site) =>
+  authorize(user, site).then(() => authorizeRepositoryAdmin(user, site));
 
 const removeUser = (user, site) => authorize(user, site);
 

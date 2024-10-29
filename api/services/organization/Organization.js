@@ -1,9 +1,4 @@
-const {
-  Organization,
-  OrganizationRole,
-  Role,
-  User,
-} = require('../../models');
+const { Organization, OrganizationRole, Role, User } = require('../../models');
 const { CustomError } = require('../../utils/validators');
 const UAAClient = require('../../utils/uaaClient');
 
@@ -27,7 +22,7 @@ function throwError(message) {
 
 function hasManager(org, user) {
   return org.OrganizationRoles.some(
-    or => or.User.id === user.id && or.Role.name === 'manager'
+    (or) => or.User.id === user.id && or.Role.name === 'manager',
   );
 }
 
@@ -41,10 +36,13 @@ module.exports = {
     const uaaClient = new UAAClient();
 
     const { accessToken, refreshToken } = await uaaClient.refreshToken(
-      currentUserUAAIdentity.refreshToken
+      currentUserUAAIdentity.refreshToken,
     );
 
-    await currentUserUAAIdentity.update({ accessToken, refreshToken });
+    await currentUserUAAIdentity.update({
+      accessToken,
+      refreshToken,
+    });
 
     return accessToken;
   },
@@ -91,16 +89,23 @@ module.exports = {
     let user = await this.findUserByUAAIdentity(targetUserEmail);
 
     if (user) {
-      return [user, { email: user.UAAIdentity.email }];
+      return [
+        user,
+        {
+          email: user.UAAIdentity.email,
+        },
+      ];
     }
 
     const uaaUserAttributes = await this.inviteUAAUser(
       currentUserUAAIdentity,
-      targetUserEmail
+      targetUserEmail,
     );
 
     if (!user) {
-      user = await User.create({ username: uaaUserAttributes.email });
+      user = await User.create({
+        username: uaaUserAttributes.email,
+      });
     }
 
     await user.createUAAIdentity({
@@ -123,7 +128,7 @@ module.exports = {
 
     if (!currentUserUAAIdentity) {
       throwError(
-        `Current user ${currentUser.username} must have a UAA Identity to invite a user.`
+        `Current user ${currentUser.username} must have a UAA Identity to invite a user.`,
       );
     }
 
@@ -140,24 +145,22 @@ module.exports = {
    * @param {string} targetUserEmail - the email address of the user to invite
    * @returns {Promise<UAAClient.UAAUserAttributes>}
    */
-  async inviteUserToOrganization(
-    currentUser,
-    organizationId,
-    roleId,
-    targetUserEmail
-  ) {
+  async inviteUserToOrganization(currentUser, organizationId, roleId, targetUserEmail) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
 
     if (!currentUserUAAIdentity) {
       throwError(
-        `Current user ${currentUser.username} must have a UAA Identity to invite a user to an organization.`
+        // eslint-disable-next-line max-len
+        `Current user ${currentUser.username} must have a UAA Identity to invite a user to an organization.`,
       );
     }
 
     const [isAdmin, org] = await Promise.all([
       this.isUAAAdmin(currentUserUAAIdentity),
       Organization.findOne({
-        where: { id: organizationId },
+        where: {
+          id: organizationId,
+        },
         include: [
           {
             model: OrganizationRole,
@@ -169,7 +172,8 @@ module.exports = {
 
     if (!isAdmin && !hasManager(org, currentUser)) {
       throwError(
-        `Current user ${currentUser.username} must be a Pages admin in UAA OR a manager of the target organization to invite a user.`
+        // eslint-disable-next-line max-len
+        `Current user ${currentUser.username} must be a Pages admin in UAA OR a manager of the target organization to invite a user.`,
       );
     }
 
@@ -181,10 +185,14 @@ module.exports = {
 
     const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
       currentUserUAAIdentity,
-      targetUserEmail
+      targetUserEmail,
     );
 
-    await org.addUser(user, { through: { roleId: role.id } });
+    await org.addUser(user, {
+      through: {
+        roleId: role.id,
+      },
+    });
 
     return uaaUserAttributes;
   },
@@ -200,7 +208,8 @@ module.exports = {
 
     if (!currentUserUAAIdentity) {
       throwError(
-        `Current user ${currentUser.username} must have a UAA Identity to create an organization.`
+        // eslint-disable-next-line max-len
+        `Current user ${currentUser.username} must have a UAA Identity to create an organization.`,
       );
     }
 
@@ -208,19 +217,28 @@ module.exports = {
 
     if (!isAdmin) {
       throwError(
-        `Current user ${currentUser.username} must be a Pages admin in UAA to create an organization.`
+        // eslint-disable-next-line max-len
+        `Current user ${currentUser.username} must be a Pages admin in UAA to create an organization.`,
       );
     }
 
     const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
       currentUserUAAIdentity,
-      targetUserEmail
+      targetUserEmail,
     );
 
-    const managerRole = await Role.findOne({ where: { name: 'manager' } });
+    const managerRole = await Role.findOne({
+      where: {
+        name: 'manager',
+      },
+    });
 
     const org = await Organization.create(organizationParams);
-    await org.addUser(user, { through: { roleId: managerRole.id } });
+    await org.addUser(user, {
+      through: {
+        roleId: managerRole.id,
+      },
+    });
 
     return [org, uaaUserAttributes];
   },

@@ -15,7 +15,8 @@ describe('<List />', () => {
 
     const wrapper = shallow(<List {...props} />);
 
-    expect(wrapper.contains(<h1 className="font-sans-2xl">Your organizations</h1>)).to.be.true;
+    expect(wrapper.contains(<h1 className="font-sans-2xl">Your organizations</h1>)).to.be
+      .true;
   });
 
   it('shows the loading indicator when data is loading', () => {

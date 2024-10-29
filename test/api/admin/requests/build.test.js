@@ -16,8 +16,7 @@ const app = require('../../../../api/admin');
 
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
   it('should require admin authentication', async () => {
-    const response = await request(app)[method](path)
-      .expect(401);
+    const response = await request(app)[method](path).expect(401);
     validateAgainstJSONSchema('GET', schema, 401, response.body);
     expect(response.body.message).to.equal('Unauthorized');
   });
@@ -41,10 +40,7 @@ const buildResponseExpectations = (response, build) => {
 const s3Mock = mockClient(S3Client);
 
 describe('Admin - Site API', () => {
-  afterEach(() => Promise.all([
-    User.truncate(),
-    Site.truncate(),
-  ]));
+  afterEach(() => Promise.all([User.truncate(), Site.truncate()]));
 
   describe('GET /admin/builds', () => {
     itShouldRequireAdminAuthentication('/builds', '/site/{site_id}/build');
@@ -53,9 +49,15 @@ describe('Admin - Site API', () => {
       const user = await factory.user();
       const site = await factory.site();
       const [...builds] = await Promise.all([
-        factory.build({ site: site.id }),
-        factory.build({ site: site.id }),
-        factory.build({ site: site.id }),
+        factory.build({
+          site: site.id,
+        }),
+        factory.build({
+          site: site.id,
+        }),
+        factory.build({
+          site: site.id,
+        }),
       ]);
 
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
@@ -66,13 +68,15 @@ describe('Admin - Site API', () => {
         .expect(200);
 
       builds.forEach((build) => {
-        const responseBuild = response.body.data.find(candidate => candidate.id === build.id);
+        const responseBuild = response.body.data.find(
+          (candidate) => candidate.id === build.id,
+        );
         buildResponseExpectations(responseBuild, build);
       });
 
       validateAgainstJSONSchema('GET', '/site/{site_id}/build', 200, response.body.data);
       expect(response.body.data.length).equal(builds.length);
-      response.body.data.forEach(d => expect(builds.map(b => b.id)).include(d.id));
+      response.body.data.forEach((d) => expect(builds.map((b) => b.id)).include(d.id));
     });
   });
 
@@ -81,7 +85,7 @@ describe('Admin - Site API', () => {
 
     it('returns the site with admin serialization', async () => {
       const user = await factory.user();
-      const build = await factory.build();//.{ site: site.id });
+      const build = await factory.build(); //.{ site: site.id });
 
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { body } = await request(app)
@@ -102,7 +106,9 @@ describe('Admin - Site API', () => {
 
     it('updates allowed fields', async () => {
       const user = await factory.user();
-      const build = await factory.build({ state: origState });
+      const build = await factory.build({
+        state: origState,
+      });
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const putResponse = await request(app)
         .put(`/builds/${build.id}`)
@@ -134,16 +140,17 @@ describe('Admin - Site API', () => {
 
     describe('from database', () => {
       it('gets the following site build logs', async () => {
-        const [user, build] = await Promise.all([
-          factory.user(),
-          factory.build(),
-        ]);
+        const [user, build] = await Promise.all([factory.user(), factory.build()]);
         await BuildLog.bulkCreate(
-          Array(5).fill(0).map(() => ({
-            output: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
-            source: 'ALL',
-            build: build.id,
-          }))
+          Array(5)
+            .fill(0)
+            .map(() => ({
+              output:
+                // eslint-disable-next-line max-len
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
+              source: 'ALL',
+              build: build.id,
+            })),
         );
 
         const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
@@ -166,7 +173,6 @@ describe('Admin - Site API', () => {
       beforeEach(() => s3Mock.reset());
 
       it('gets the following site build logs', async () => {
-
         const body = 'this\nis a\n test\n response\n body.';
         const stream = new Readable();
         stream.push(body);
@@ -182,7 +188,9 @@ describe('Admin - Site API', () => {
 
         const [user, build] = await Promise.all([
           factory.user(),
-          factory.build({ logsS3Key: 's3-logs-key' }),
+          factory.build({
+            logsS3Key: 's3-logs-key',
+          }),
         ]);
 
         const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);

@@ -2,7 +2,8 @@
 const nock = require('nock');
 const config = require('../../../config');
 
-const withAuth = (nok, accessToken) => nok.matchHeader('authorization', `token ${accessToken}`);
+const withAuth = (nok, accessToken) =>
+  nok.matchHeader('authorization', `token ${accessToken}`);
 
 const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
   authorizationCode = authorizationCode || 'auth-code-123abc';
@@ -21,9 +22,11 @@ const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
         client_secret: config.passport.github.options.clientSecret,
         code: authorizationCode,
       };
-      return body.client_id === expectedBody.client_id
-        && body.client_secret === expectedBody.client_secret
-        && body.code === expectedBody.code;
+      return (
+        body.client_id === expectedBody.client_id &&
+        body.client_secret === expectedBody.client_secret &&
+        body.code === expectedBody.code
+      );
     })
     .reply(200, {
       token_type: 'bearer',
@@ -32,9 +35,7 @@ const getAccessToken = ({ authorizationCode, accessToken, scope } = {}) => {
     });
 };
 
-const createRepoForOrg = ({
-  accessToken, org, repo, response,
-} = {}) => {
+const createRepoForOrg = ({ accessToken, org, repo, response } = {}) => {
   let createRepoNock = nock('https://api.github.com');
 
   if (org && repo) {
@@ -84,7 +85,9 @@ const createRepoForUser = ({ accessToken, repo, response } = {}) => {
   createRepoNock = createRepoNock.query(true);
 
   const typicalResponse = {
-    owner: { login: 'your-name-here' },
+    owner: {
+      login: 'your-name-here',
+    },
     name: repo,
   };
 
@@ -99,7 +102,11 @@ const createRepoForUser = ({ accessToken, repo, response } = {}) => {
 };
 
 const createRepoUsingTemplate = ({
-  accessToken, repo, owner, template, response,
+  accessToken,
+  repo,
+  owner,
+  template,
+  response,
 } = {}) => {
   let createRepoNock = nock('https://api.github.com');
 
@@ -112,7 +119,10 @@ const createRepoUsingTemplate = ({
       params.owner = owner;
     }
 
-    createRepoNock = createRepoNock.post(`/repos/${template.owner}/${template.repo}/generate`, params);
+    createRepoNock = createRepoNock.post(
+      `/repos/${template.owner}/${template.repo}/generate`,
+      params,
+    );
   } else {
     createRepoNock = createRepoNock.post(/\/repos\/.+\/.+\/generate/);
   }
@@ -124,7 +134,9 @@ const createRepoUsingTemplate = ({
   createRepoNock = createRepoNock.query(true);
 
   const typicalResponse = {
-    owner: { login: 'your-name-here' },
+    owner: {
+      login: 'your-name-here',
+    },
     name: repo,
   };
 
@@ -138,9 +150,7 @@ const createRepoUsingTemplate = ({
   return createRepoNock.reply(...resp);
 };
 
-const user = ({
-  accessToken, githubUserID, username, email,
-} = {}) => {
+const user = ({ accessToken, githubUserID, username, email } = {}) => {
   accessToken = accessToken || 'access-token-123abc';
 
   const userID = githubUserID || Math.floor(Math.random() * 10000);
@@ -148,16 +158,16 @@ const user = ({
   email = email || `${username}@example.com`.toLowerCase();
 
   const expectedHeaders = {
-    reqheaders: { authorization: `Bearer ${accessToken}` },
+    reqheaders: {
+      authorization: `Bearer ${accessToken}`,
+    },
   };
 
-  return nock('https://api.github.com', expectedHeaders)
-    .get('/user')
-    .reply(200, {
-      email,
-      login: username,
-      id: githubUserID,
-    });
+  return nock('https://api.github.com', expectedHeaders).get('/user').reply(200, {
+    email,
+    login: username,
+    id: githubUserID,
+  });
 };
 
 const userOrganizations = ({ accessToken, organizations, response } = {}) => {
@@ -170,19 +180,18 @@ const userOrganizations = ({ accessToken, organizations, response } = {}) => {
     orgsNock = withAuth(orgsNock, accessToken);
   }
 
-  return orgsNock.get('/user/orgs')
-    .reply(response || 200, organizations);
+  return orgsNock.get('/user/orgs').reply(response || 200, organizations);
 };
 
 const githubAuth = (username, organizations) => {
   getAccessToken();
   user({ username });
-  userOrganizations({ organizations });
+  userOrganizations({
+    organizations,
+  });
 };
 
-const repo = ({
-  accessToken, owner, repo, username, defaultBranch, response,
-} = {}) => {
+const repo = ({ accessToken, owner, repo, username, defaultBranch, response } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -196,7 +205,9 @@ const repo = ({
   }
 
   if (username) {
-    webhookNock = webhookNock.query({ username });
+    webhookNock = webhookNock.query({
+      username,
+    });
   } else {
     webhookNock = webhookNock.query(true);
   }
@@ -220,9 +231,7 @@ const repo = ({
   return webhookNock.reply(...resp);
 };
 
-const status = ({
-  accessToken, owner, repo, sha, state, targetURL, response,
-} = {}) => {
+const status = ({ accessToken, owner, repo, sha, state, targetURL, response } = {}) => {
   let path;
   if (owner && repo && sha) {
     path = `/repos/${owner}/${repo}/statuses/${sha}`;
@@ -231,14 +240,19 @@ const status = ({
   }
 
   let statusNock = nock('https://api.github.com').post(path, (body) => {
-    if (state && body.state != state) { return false; }
+    if (state && body.state != state) {
+      return false;
+    }
 
-    if (targetURL && body.target_url !== targetURL) { return false; }
+    if (targetURL && body.target_url !== targetURL) {
+      return false;
+    }
 
     const { appEnv, product } = config.app;
     if (appEnv === 'production' && body.context !== `${product}/build`) {
       return false;
-    } if (appEnv !== 'production' && body.context !== `${product}-${appEnv}/build`) {
+    }
+    if (appEnv !== 'production' && body.context !== `${product}-${appEnv}/build`) {
       return false;
     }
 
@@ -251,7 +265,9 @@ const status = ({
 
   statusNock = statusNock.query(true);
 
-  const typicalResponse = { id: 1 };
+  const typicalResponse = {
+    id: 1,
+  };
 
   let resp = response || 201;
   if (typeof resp === 'number') {
@@ -263,15 +279,7 @@ const status = ({
   return statusNock.reply(...resp);
 };
 
-const webhook = (
-  {
-    accessToken,
-    owner,
-    repo,
-    response,
-  } = {},
-  { id = 1 } = {}
-) => {
+const webhook = ({ accessToken, owner, repo, response } = {}, { id = 1 } = {}) => {
   let webhookNock = nock('https://api.github.com');
 
   if (owner && repo) {
@@ -302,27 +310,21 @@ const webhook = (
   return webhookNock.reply(...resp);
 };
 
-function deleteWebhook({
-  accessToken, owner, repo: repository, webhookId, response,
-}) {
+function deleteWebhook({ accessToken, owner, repo: repository, webhookId, response }) {
   return nock('https://api.github.com')
     .matchHeader('authorization', `token ${accessToken}`)
     .delete(`/repos/${owner}/${repository}/hooks/${webhookId}`)
     .reply(...response);
 }
 
-function listWebhooks({
-  accessToken, owner, repo: repository, response,
-}) {
+function listWebhooks({ accessToken, owner, repo: repository, response }) {
   return nock('https://api.github.com')
     .matchHeader('authorization', `token ${accessToken}`)
     .get(`/repos/${owner}/${repository}/hooks`)
     .reply(...response);
 }
 
-const getBranch = ({
-  accessToken, owner, repo, branch, expected,
-}) => {
+const getBranch = ({ accessToken, owner, repo, branch, expected }) => {
   let branchNock = nock('https://api.github.com');
   const path = `/repos/${owner}/${repo}/branches/${branch}`;
 
@@ -345,7 +347,13 @@ const getBranch = ({
 };
 
 const getOrganizationMembers = ({
-  accessToken, organization, role, per_page, page, response, responseCode,
+  accessToken,
+  organization,
+  role,
+  per_page,
+  page,
+  response,
+  responseCode,
 }) => {
   accessToken = accessToken || 'access-token-123abc';
   organization = organization || 'test-org';
@@ -354,13 +362,17 @@ const getOrganizationMembers = ({
   role = role || 'all';
 
   const orgMembers = [];
-  for (let i = 0; i < (per_page + 1); i += 1) {
-    if ((i % 50) === 0) {
+  for (let i = 0; i < per_page + 1; i += 1) {
+    if (i % 50 === 0) {
       if (role !== 'member') {
-        orgMembers.push({ login: `admin-${organization}-${i}` });
+        orgMembers.push({
+          login: `admin-${organization}-${i}`,
+        });
       }
     } else if (role !== 'admin') {
-      orgMembers.push({ login: `user-${organization}-${i}` });
+      orgMembers.push({
+        login: `user-${organization}-${i}`,
+      });
     }
   }
 
@@ -368,12 +380,17 @@ const getOrganizationMembers = ({
     .get(`/orgs/${organization}/members?per_page=${per_page}&page=${page}&role=${role}`)
     .reply(
       responseCode || 200,
-      response || orgMembers.slice(((page - 1) * per_page), (page * per_page))
+      response || orgMembers.slice((page - 1) * per_page, page * per_page),
     );
 };
 
 const getTeamMembers = ({
-  accessToken, org, team_slug, per_page, page, response,
+  accessToken,
+  org,
+  team_slug,
+  per_page,
+  page,
+  response,
 } = {}) => {
   accessToken = accessToken || 'access-token-123abc';
   team_slug = team_slug || 'test-team';
@@ -381,38 +398,45 @@ const getTeamMembers = ({
   page = page || 1;
 
   const teamMembers = [];
-  for (let i = 0; i < (per_page + 2); i += 1) {
-    teamMembers.push({ login: `user-${team_slug}-${i}` });
+  for (let i = 0; i < per_page + 2; i += 1) {
+    teamMembers.push({
+      login: `user-${team_slug}-${i}`,
+    });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
     .get(`/orgs/${org}/teams/${team_slug}/members?per_page=${per_page}&page=${page}`)
-    .reply(response || 200, teamMembers.slice(((page - 1) * per_page), page * per_page));
+    .reply(response || 200, teamMembers.slice((page - 1) * per_page, page * per_page));
 };
 
-const getRepositories = ({
-  accessToken, per_page, page, response,
-}) => {
+const getRepositories = ({ accessToken, per_page, page, response }) => {
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
   page = page || 1;
 
   const repos = [];
-  for (let i = 0; i < (per_page + 1); i += 1) {
+  for (let i = 0; i < per_page + 1; i += 1) {
     repos.push({
       full_name: `owner/repo-${i}`,
       default_branch: 'main',
-      permissions: { push: true },
+      permissions: {
+        push: true,
+      },
     });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
     .get(`/user/repos?per_page=${per_page}&page=${page}`)
-    .reply(response || 200, repos.slice(((page - 1) * per_page), (page * per_page)));
+    .reply(response || 200, repos.slice((page - 1) * per_page, page * per_page));
 };
 
 const getCollaborators = ({
-  accessToken, owner, repository, per_page, page, response,
+  accessToken,
+  owner,
+  repository,
+  per_page,
+  page,
+  response,
 }) => {
   accessToken = accessToken || 'access-token-123abc';
   per_page = per_page || 100;
@@ -421,13 +445,18 @@ const getCollaborators = ({
   repository = repository || 'repo';
 
   const collabs = [];
-  for (let i = 0; i < (per_page + 1); i += 1) {
-    collabs.push({ login: `collaborator-${i}`, permissions: { push: true } });
+  for (let i = 0; i < per_page + 1; i += 1) {
+    collabs.push({
+      login: `collaborator-${i}`,
+      permissions: {
+        push: true,
+      },
+    });
   }
 
   return withAuth(nock('https://api.github.com'), accessToken)
     .get(`/repos/${owner}/${repository}/collaborators?per_page=${per_page}&page=${page}`)
-    .reply(response || 200, collabs.slice(((page - 1) * per_page), (page * per_page)));
+    .reply(response || 200, collabs.slice((page - 1) * per_page, page * per_page));
 };
 
 const getMembershipForUserInOrg = ({
@@ -435,27 +464,45 @@ const getMembershipForUserInOrg = ({
   username = 'some-user',
   state,
 }) => {
-  const nok = withAuth(nock('https://api.github.com'), accessToken)
-    .get(`/orgs/18f/teams/federalist-admins/memberships/${username}`);
+  const nok = withAuth(nock('https://api.github.com'), accessToken).get(
+    `/orgs/18f/teams/federalist-admins/memberships/${username}`,
+  );
 
   switch (state) {
     case 'pending':
-      nok.reply(200, { state: 'pending', role: 'member' });
+      nok.reply(200, {
+        state: 'pending',
+        role: 'member',
+      });
       break;
     case 'maintainer':
-      nok.reply(200, { state: 'active', role: 'maintainer' });
+      nok.reply(200, {
+        state: 'active',
+        role: 'maintainer',
+      });
       break;
     case 'unknown':
       nok.reply(404);
       break;
     default:
-      nok.reply(200, { state: 'active', role: 'member' });
+      nok.reply(200, {
+        state: 'active',
+        role: 'member',
+      });
   }
   return nok;
 };
 
 const getContent = ({
-  accessToken, owner, repo, path, ref, content, encoding, type, responseCode,
+  accessToken,
+  owner,
+  repo,
+  path,
+  ref,
+  content,
+  encoding,
+  type,
+  responseCode,
 }) => {
   accessToken = accessToken || 'access-token-123abc';
   responseCode = responseCode || 200;
@@ -464,11 +511,12 @@ const getContent = ({
   if (ref) {
     requestPath = `${requestPath}?ref=${ref}`;
   }
-  const nok = withAuth(nock('https://api.github.com'), accessToken)
-    .get(requestPath);
+  const nok = withAuth(nock('https://api.github.com'), accessToken).get(requestPath);
 
   if (responseCode >= 400) {
-    nok.reply(responseCode, { message: 'Error Encountered' });
+    nok.reply(responseCode, {
+      message: 'Error Encountered',
+    });
   } else if (Array.isArray(content)) {
     nok.reply(responseCode, content);
   } else {

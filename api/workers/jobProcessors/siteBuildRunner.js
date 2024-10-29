@@ -22,27 +22,20 @@ const sleepInterval = process.env.NODE_ENV === 'test' ? 0 : 1000;
  * @param {number} [options.sleepNumber=15000] - The milliseconds
  * @return {Promise<{Object}>} The bullmq's queue add job response
  */
-async function siteBuildRunner(
-  job,
-  { sleepNumber = 15000, totalAttempts = 180 } = {}
-) {
+async function siteBuildRunner(job, { sleepNumber = 15000, totalAttempts = 180 } = {}) {
   const logger = createJobLogger(job);
   const { buildId } = job.data;
 
   logger.log(`Running site build: ${buildId}`);
   try {
-    const { build, message } = await SiteBuildQueueService.setupTaskEnv(
-      buildId
-    );
+    const { build, message } = await SiteBuildQueueService.setupTaskEnv(buildId);
 
     const {
       branch,
       Site: { owner, repository },
     } = build;
 
-    logger.log(
-      `Starting site build for ${owner}/${repository} on branch ${branch}`
-    );
+    logger.log(`Starting site build for ${owner}/${repository} on branch ${branch}`);
 
     const cfResponse = await apiClient.startSiteBuildTask(message, job.id, {
       sleepInterval,
@@ -66,15 +59,17 @@ async function siteBuildRunner(
     await build.reload();
 
     if (
-      hasCompleted.state === 'FAILED'
-      && [
+      hasCompleted.state === 'FAILED' &&
+      [
         Build.States.Processing,
         Build.States.Queued,
         Build.States.Created,
         Build.States.Tasked,
       ].includes(build.state)
     ) {
-      await build.update({ state: Build.States.Error });
+      await build.update({
+        state: Build.States.Error,
+      });
     }
 
     logger.log(`Site build completed with ${build.state}`);

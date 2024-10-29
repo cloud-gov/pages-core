@@ -13,13 +13,14 @@ const sessionConfig = require('./init/sessionConfig');
 let socketIO;
 
 function handleError(message, body = {}) {
-  return err => EventCreator.error(Event.labels.SOCKET_IO, err, {
-    message,
-    ...body,
-  });
+  return (err) =>
+    EventCreator.error(Event.labels.SOCKET_IO, err, {
+      message,
+      ...body,
+    });
 }
 
-const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+const wrap = (middleware) => (socket, next) => middleware(socket.request, {}, next);
 
 function init(server) {
   socketIO = new Server(server);
@@ -49,9 +50,11 @@ function init(server) {
   });
 
   socketIO.on('connection', (socket) => {
-    SocketIOSubscriber
-      .joinRooms(socket)
-      .catch(handleError('socketIO subscription join room error', { userId: socket.request.user?.id }));
+    SocketIOSubscriber.joinRooms(socket).catch(
+      handleError('socketIO subscription join room error', {
+        userId: socket.request.user?.id,
+      }),
+    );
   });
 
   socketIO.on('error', handleError('socket auth/subscribe error'));

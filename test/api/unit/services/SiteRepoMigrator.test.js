@@ -10,9 +10,18 @@ const factory = require('../../support/factory');
 
 async function cleanDb() {
   return await Promise.all([
-    User.truncate({ force: true, cascade: true }),
-    Site.truncate({ force: true, cascade: true }),
-    UAAIdentity.truncate({ force: true, cascade: true }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
+    Site.truncate({
+      force: true,
+      cascade: true,
+    }),
+    UAAIdentity.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -22,10 +31,14 @@ describe('SiteRepoMigrator', () => {
   afterEach(async () => await cleanDb);
 
   describe('getUserGHCredentials', () => {
-    it('Should get the Github credentials of a user based on their UAA email', async () => {
+    it(`Should get the Github credentials
+        of a user based on their UAA email`, async () => {
       const githubAccessToken = crypto.randomUUID();
       const githubUserId = crypto.randomUUID();
-      const user = await factory.user({ githubAccessToken, githubUserId });
+      const user = await factory.user({
+        githubAccessToken,
+        githubUserId,
+      });
       const uaaId = await factory.uaaIdentity({
         userId: user.id,
       });
@@ -37,7 +50,8 @@ describe('SiteRepoMigrator', () => {
       expect(creds.githubUserId).to.equal(githubUserId);
     });
 
-    it('Should throw an error if UAA Identity does not exist with the email', async () => {
+    it(`Should throw an error if UAA
+        Identity does not exist with the email`, async () => {
       const nonExistingEmail = 'does.not.exist@agency.gov';
       const user = await factory.user();
       await factory.uaaIdentity({
@@ -48,21 +62,25 @@ describe('SiteRepoMigrator', () => {
         await getUserGHCredentials(nonExistingEmail);
       } catch (error) {
         expect(error).to.throw;
-        expect(error.message).to.equal(
-          'No UAA Identity exists with that email.'
-        );
+        expect(error.message).to.equal('No UAA Identity exists with that email.');
       }
     });
   });
 
   describe('setRepoWebhook', () => {
-    it('should set a webhook on the repository and return the site instance', async () => {
+    it(`should set a webhook on the
+        repository and return the site instance`, async () => {
       const oldWebhookId = 90210;
       const webhookId = 8675309;
       const githubAccessToken = crypto.randomUUID();
       const githubUserId = crypto.randomUUID();
-      const site = await factory.site({ webhookId: oldWebhookId });
-      const user = await factory.user({ githubAccessToken, githubUserId });
+      const site = await factory.site({
+        webhookId: oldWebhookId,
+      });
+      const user = await factory.user({
+        githubAccessToken,
+        githubUserId,
+      });
       const uaaId = await factory.uaaIdentity({
         userId: user.id,
       });
@@ -74,19 +92,25 @@ describe('SiteRepoMigrator', () => {
           repo: site.repository,
           response: 201,
         },
-        { id: webhookId }
+        { id: webhookId },
       );
 
       const updatedSite = await setRepoWebhook(site, uaaId.email);
       expect(updatedSite.webhookId).to.equal(webhookId);
     });
 
-    it('should resolve if the webhook already exists on the site repository', async () => {
+    it(`should resolve if the webhook
+        already exists on the site repository`, async () => {
       const oldWebhookId = 90210;
       const githubAccessToken = crypto.randomUUID();
       const githubUserId = crypto.randomUUID();
-      const site = await factory.site({ webhookId: oldWebhookId });
-      const user = await factory.user({ githubAccessToken, githubUserId });
+      const site = await factory.site({
+        webhookId: oldWebhookId,
+      });
+      const user = await factory.user({
+        githubAccessToken,
+        githubUserId,
+      });
       const uaaId = await factory.uaaIdentity({
         userId: user.id,
       });
@@ -98,7 +122,11 @@ describe('SiteRepoMigrator', () => {
         response: [
           400,
           {
-            errors: [{ message: 'Hook already exists on this repository' }],
+            errors: [
+              {
+                message: 'Hook already exists on this repository',
+              },
+            ],
           },
         ],
       });

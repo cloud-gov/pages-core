@@ -12,9 +12,13 @@ const InputWithErrorField = ({
   ...props
 }) => (
   <div className="padding-y-2 margin-y-neg-2 padding-x-2 margin-x-neg-2">
-    { label && <label className="usa-label text-bold" htmlFor={id}>{ label }</label> }
-    { help }
-    {touched && (error && <span className="usa-error-message">{error}</span>)}
+    {label && (
+      <label className="usa-label text-bold" htmlFor={id}>
+        {label}
+      </label>
+    )}
+    {help}
+    {touched && error && <span className="usa-error-message">{error}</span>}
     <input
       {...input}
       {...props}

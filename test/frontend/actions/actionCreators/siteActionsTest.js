@@ -1,14 +1,23 @@
 import { expect } from 'chai';
 import {
-  sitesFetchStarted, sitesFetchStartedType,
-  sitesReceived, sitesReceivedType,
-  siteAdded, siteAddedType,
-  siteUpdated, siteUpdatedType,
-  siteDeleted, siteDeletedType,
-  siteUserAdded, siteUserAddedType,
-  siteUserRemoved, siteUserRemovedType,
-  siteBasicAuthSaved, siteBasicAuthSavedType,
-  siteBasicAuthRemoved, siteBasicAuthRemovedType,
+  sitesFetchStarted,
+  sitesFetchStartedType,
+  sitesReceived,
+  sitesReceivedType,
+  siteAdded,
+  siteAddedType,
+  siteUpdated,
+  siteUpdatedType,
+  siteDeleted,
+  siteDeletedType,
+  siteUserAdded,
+  siteUserAddedType,
+  siteUserRemoved,
+  siteUserRemovedType,
+  siteBasicAuthSaved,
+  siteBasicAuthSavedType,
+  siteBasicAuthRemoved,
+  siteBasicAuthRemovedType,
 } from '../../../../frontend/actions/actionCreators/siteActions';
 
 describe('siteActions actionCreators', () => {
@@ -27,9 +36,11 @@ describe('siteActions actionCreators', () => {
 
   describe('sitesReceived', () => {
     it('constructs properly', () => {
-      const sites = [{
-        something: 'here',
-      }];
+      const sites = [
+        {
+          something: 'here',
+        },
+      ];
 
       const actual = sitesReceived(sites);
 
@@ -140,7 +151,10 @@ describe('siteActions actionCreators', () => {
         owner: 'someone',
         repository: 'something',
       };
-      const basicAuth = { username: 'username', password: 'password' };
+      const basicAuth = {
+        username: 'username',
+        password: 'password',
+      };
 
       const actual = siteBasicAuthSaved(site, basicAuth);
       expect(actual).to.deep.equal({

@@ -1,9 +1,6 @@
 const { expect } = require('chai');
 const { QueueEvents } = require('bullmq');
-const {
-  BuildTasksQueueName,
-  SiteBuildsQueueName,
-} = require('../../../../api/queues');
+const { BuildTasksQueueName, SiteBuildsQueueName } = require('../../../../api/queues');
 const QueueJobs = require('../../../../api/queue-jobs');
 const { Build, BuildTask, Site } = require('../../../../api/models');
 const factory = require('../../support/factory');
@@ -12,7 +9,10 @@ const { connection } = require('../../support/queues');
 async function cleanDb() {
   return Promise.all([
     Build.truncate(),
-    Site.truncate({ force: true, cascade: true }),
+    Site.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -41,9 +41,12 @@ describe('QueueJobs', () => {
       expect(response.name).to.eq(jobname);
     });
 
-    it('should start a site build successfully and truncate long branch name', async () => {
+    it(`should start a site build successfully
+        and truncate long branch name`, async () => {
       const branch = Array(100).fill('b').join('');
-      const factoryBuild = await factory.build({ branch });
+      const factoryBuild = await factory.build({
+        branch,
+      });
       const build = await Build.findByPk(factoryBuild.id, { include: [Site] });
       const jobname = `${build.Site.owner}/${
         build.Site.repository
@@ -68,9 +71,7 @@ describe('QueueJobs', () => {
 
     it('should start a site build successfully', async () => {
       const buildTask = await factory.buildTask();
-      const setupTaskEnvBuildTask = await BuildTask.forRunner().findByPk(
-        buildTask.id
-      );
+      const setupTaskEnvBuildTask = await BuildTask.forRunner().findByPk(buildTask.id);
       const jobname = setupTaskEnvBuildTask.BuildTaskType.name;
 
       const response = await queue.startBuildTask(setupTaskEnvBuildTask);

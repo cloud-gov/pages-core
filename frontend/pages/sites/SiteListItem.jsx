@@ -17,7 +17,8 @@ function getSiteName(site) {
 
 const handleRemoveSite = (site, user, navigate) => (event) => {
   event.preventDefault();
-  siteActions.removeUserFromSite(site.id, user.id)
+  siteActions
+    .removeUserFromSite(site.id, user.id)
     .then(() => siteActions.fetchSites())
     .then(() => navigate('/sites'));
 };
@@ -29,47 +30,44 @@ function SiteListItem({ organization, site, user }) {
       <div className="usa-card__container bg-base-lightest">
         <div className="usa-card__header">
           <h2 className="usa-card__heading text-normal">
-            {(!site.isActive || (organization && !organization.isActive))
-              ? `${getSiteName(site)} (Inactive)`
-              : (
-                <Link to={`/sites/${site.id}`} title="View site settings">
-                  {getSiteName(site)}
-                </Link>
-              )}
-            {' '}
+            {!site.isActive || (organization && !organization.isActive) ? (
+              `${getSiteName(site)} (Inactive)`
+            ) : (
+              <Link to={`/sites/${site.id}`} title="View site settings">
+                {getSiteName(site)}
+              </Link>
+            )}{' '}
           </h2>
         </div>
         <div className="usa-card__body">
-          {
-            organization && (
-              <h3>
-                {`organization - ${organization.name}`}
-              </h3>
-            )
-          }
+          {organization && <h3>{`organization - ${organization.name}`}</h3>}
           <RepoLastVerified site={site} userUpdated={user.updatedAt} />
-          { organization?.isSandbox
-              && (
-              <p>
-                <em>
-                  {sandboxMsg(organization.daysUntilSandboxCleaning, 'site')}
-                </em>
-              </p>
-              )}
+          {organization?.isSandbox && (
+            <p>
+              <em>{sandboxMsg(organization.daysUntilSandboxCleaning, 'site')}</em>
+            </p>
+          )}
           <PublishedState site={site} />
         </div>
         <div className="usa-card__footer usa-button-group">
           <div className="usa-button-group__item">
-            <GitHubLink text="View repo" owner={site.owner} repository={site.repository} isButton />
+            <GitHubLink
+              text="View repo"
+              owner={site.owner}
+              repository={site.repository}
+              isButton
+            />
           </div>
-          {
-            !organization
-            && (
+          {!organization && (
             <div className="usa-button-group__item">
-              <ButtonLink className="usa-button--secondary" clickHandler={handleRemoveSite(site, user, navigate)}>Remove</ButtonLink>
+              <ButtonLink
+                className="usa-button--secondary"
+                clickHandler={handleRemoveSite(site, user, navigate)}
+              >
+                Remove
+              </ButtonLink>
             </div>
-            )
-          }
+          )}
         </div>
       </div>
     </li>

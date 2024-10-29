@@ -1,12 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "id",
-    "names",
-    "context",
-    "createdAt",
-    "updatedAt"
-  ],
+  "required": ["id", "names", "context", "createdAt", "updatedAt"],
   "properties": {
     "id": {
       "type": "integer"

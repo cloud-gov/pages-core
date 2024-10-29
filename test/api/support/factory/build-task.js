@@ -23,8 +23,8 @@ const _attributes = ({
   message: message || 'build task message',
 });
 
-const buildTask = overrides => Promise.props(_attributes(overrides))
-  .then((attributes) => {
+const buildTask = (overrides) =>
+  Promise.props(_attributes(overrides)).then((attributes) => {
     Object.keys(attributes).forEach((key) => {
       if (attributes[key].sequelize) {
         attributes[key] = attributes[key].id;

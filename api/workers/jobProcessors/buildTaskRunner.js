@@ -1,6 +1,4 @@
-const {
-  BuildTask, BuildTaskType,
-} = require('../../models');
+const { BuildTask, BuildTaskType } = require('../../models');
 const BuildTaskQueue = require('../../services/BuildTaskQueue');
 const { createJobLogger } = require('./utils');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
@@ -9,10 +7,7 @@ const CloudFoundryAPIClient = require('../../utils/cfApiClient');
 // If it is in test environment set to 0 seconds
 const sleepInterval = process.env.NODE_ENV === 'test' ? 0 : 1000;
 
-async function buildTaskRunner(
-  job,
-  { sleepNumber = 15000, totalAttempts = 240 } = {}
-) {
+async function buildTaskRunner(job, { sleepNumber = 15000, totalAttempts = 240 } = {}) {
   const logger = createJobLogger(job);
   const { buildTaskId } = job.data;
 
@@ -29,14 +24,19 @@ async function buildTaskRunner(
     // TODO: rewrite; some tasks rely on scanning the final build url:
     // for non-production sites, this is buildTaskId.Build.url
     // for production sites, we overwrite that value with the production domain
-    const siteBranchConfig = site.SiteBranchConfigs
-      .find(sbc => sbc.branch === buildTask.Build.branch);
+    const siteBranchConfig = site.SiteBranchConfigs.find(
+      (sbc) => sbc.branch === buildTask.Build.branch,
+    );
 
     if (taskTypeRunner === BuildTaskType.Runners.Cf_task) {
       try {
-        logger.log(`Starting ${taskTypeRunner} for ${owner}/${repository} on branch ${branch}`);
+        logger.log(
+          `Starting ${taskTypeRunner} for ${owner}/${repository} on branch ${branch}`,
+        );
 
-        const rawTask = buildTask.get({ plain: true });
+        const rawTask = buildTask.get({
+          plain: true,
+        });
 
         if (siteBranchConfig?.Domains?.length) {
           const domain = siteBranchConfig.Domains[0]; // TODO: always the first domain
@@ -76,7 +76,9 @@ async function buildTaskRunner(
             BuildTask.Statuses.Created,
           ].includes(failedTask.status)
         ) {
-          await failedTask.update({ status: BuildTask.Statuses.Error });
+          await failedTask.update({
+            status: BuildTask.Statuses.Error,
+          });
         }
       }
 
@@ -85,7 +87,7 @@ async function buildTaskRunner(
           state: hasCompleted.state,
           id: buildTask.id,
           type: buildTask.BuildTaskType.name,
-        })
+        }),
       );
 
       return true;
@@ -101,7 +103,10 @@ async function buildTaskRunner(
   } catch (err) {
     logger.log(`An error occured: ${err?.message}`);
     const errorTask = await BuildTask.findByPk(buildTaskId);
-    await errorTask.update({ status: BuildTask.Statuses.Error, message: err?.message });
+    await errorTask.update({
+      status: BuildTask.Statuses.Error,
+      message: err?.message,
+    });
     throw err;
   }
 }

@@ -3,7 +3,8 @@ const router = require('express').Router();
 const config = require('../../config');
 const WebhookController = require('../controllers/webhook');
 
-const signBlob = (key, blob) => `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
+const signBlob = (key, blob) =>
+  `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
 
 const signWebhookRequest = (payload, headers) => {
   const webhookSecret = config.webhook.secret;

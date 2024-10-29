@@ -15,7 +15,10 @@ const COLUMN_INTERIM_SPEC = {
     mapping: 'id',
   },
 };
-const COLUMN_FINAL_SPEC = { ...COLUMN_INTERIM_SPEC, notNull: true };
+const COLUMN_FINAL_SPEC = {
+  ...COLUMN_INTERIM_SPEC,
+  notNull: true,
+};
 
 const SELECT_DOMAINS = `
 SELECT
@@ -54,14 +57,9 @@ const updateDomainQuery = (id, sbcId) => {
 
 exports.up = async function (db) {
   try {
-    await db.addColumn(
-      TABLE_NAME,
-      COLUMN_NAME,
-      COLUMN_INTERIM_SPEC,
-      (error) => {
-        if (error) throw error;
-      }
-    );
+    await db.addColumn(TABLE_NAME, COLUMN_NAME, COLUMN_INTERIM_SPEC, (error) => {
+      if (error) throw error;
+    });
 
     const { rows: domains } = await db.runSql(SELECT_DOMAINS);
 
@@ -75,17 +73,12 @@ exports.up = async function (db) {
         const { rows } = await db.runSql(updateQuery);
 
         return rows;
-      })
+      }),
     );
 
-    await db.changeColumn(
-      TABLE_NAME,
-      COLUMN_NAME,
-      COLUMN_FINAL_SPEC,
-      (error) => {
-        if (error) throw error;
-      }
-    );
+    await db.changeColumn(TABLE_NAME, COLUMN_NAME, COLUMN_FINAL_SPEC, (error) => {
+      if (error) throw error;
+    });
 
     console.log(`Updated ${migrated.length} domains.`);
     return null;

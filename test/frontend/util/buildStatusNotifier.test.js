@@ -24,24 +24,31 @@ describe('buildStatusNotifier', () => {
         socketIOEventSubscriptions[message] = cb;
       };
 
-      ioMock.returns({ on: onMock });
+      ioMock.returns({
+        on: onMock,
+      });
     });
 
     context('when notification permissions are granted', () => {
       it('adds a socket io listener that forward to BuildStatusNotifier.notify', (done) => {
-        buildStatusNotifier.listen().then(() => {
-          expect(ioMock.called).to.eq(true);
-          expect(socketIOEventSubscriptions['build status']).to.be.a('Function');
-          expect(buildStatusNotifier.notify.called).to.eq(false);
+        buildStatusNotifier
+          .listen()
+          .then(() => {
+            expect(ioMock.called).to.eq(true);
+            expect(socketIOEventSubscriptions['build status']).to.be.a('Function');
+            expect(buildStatusNotifier.notify.called).to.eq(false);
 
-          // Call the build status event that listen registered
-          const build = { asdf: 1234 };
-          socketIOEventSubscriptions['build status'].call(buildStatusNotifier, build);
+            // Call the build status event that listen registered
+            const build = {
+              asdf: 1234,
+            };
+            socketIOEventSubscriptions['build status'].call(buildStatusNotifier, build);
 
-          expect(buildStatusNotifier.notify.called).to.eq(true);
-          expect(buildStatusNotifier.notify.firstCall.args[0]).to.eq(build);
-          done();
-        }).catch(done);
+            expect(buildStatusNotifier.notify.called).to.eq(true);
+            expect(buildStatusNotifier.notify.firstCall.args[0]).to.eq(build);
+            done();
+          })
+          .catch(done);
       });
     });
 
@@ -55,11 +62,14 @@ describe('buildStatusNotifier', () => {
       });
 
       it('does not add a socket io listener', (done) => {
-        buildStatusNotifier.listen().then(() => {
-          expect(ioMock.called).to.eq(false);
-          expect(socketIOEventSubscriptions).to.deep.equal({});
-          done();
-        }).catch(done);
+        buildStatusNotifier
+          .listen()
+          .then(() => {
+            expect(ioMock.called).to.eq(false);
+            expect(socketIOEventSubscriptions).to.deep.equal({});
+            done();
+          })
+          .catch(done);
       });
     });
 
@@ -69,11 +79,14 @@ describe('buildStatusNotifier', () => {
       });
 
       it('does not add a socket io listener', (done) => {
-        buildStatusNotifier.listen().then(() => {
-          expect(ioMock.called).to.eq(false);
-          expect(socketIOEventSubscriptions).to.deep.equal({});
-          done();
-        }).catch(done);
+        buildStatusNotifier
+          .listen()
+          .then(() => {
+            expect(ioMock.called).to.eq(false);
+            expect(socketIOEventSubscriptions).to.deep.equal({});
+            done();
+          })
+          .catch(done);
       });
     });
   });
@@ -85,9 +98,15 @@ describe('buildStatusNotifier', () => {
     const icon = '/images/favicons/favicon.ico';
     beforeEach(() => {
       msg = {
-        state: 'state', owner: 'owner', repository: 'repository', branch: 'branch',
+        state: 'state',
+        owner: 'owner',
+        repository: 'repository',
+        branch: 'branch',
       };
-      options = { body: `Site: ${msg.owner}/${msg.repository}   Branch: ${msg.branch}`, icon };
+      options = {
+        body: `Site: ${msg.owner}/${msg.repository}   Branch: ${msg.branch}`,
+        icon,
+      };
     });
 
     it('build state is neither queued, success nor error', (done) => {

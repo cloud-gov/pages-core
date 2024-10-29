@@ -1,4 +1,4 @@
-export const getOrgById = (state, id) => state.data.find(org => org.id === Number(id));
+export const getOrgById = (state, id) => state.data.find((org) => org.id === Number(id));
 
 export const getOrgData = (state) => {
   const { data } = state;
@@ -20,9 +20,18 @@ export const orgFilterOptions = (state) => {
 
   if (!data) return null;
 
-  const keyValues = data.map(org => ({ id: org.id, name: org.name }));
-  keyValues.unshift({ id: 'all-options', name: 'All' });
-  keyValues.push({ id: 'unassociated', name: 'Sites without an organization' });
+  const keyValues = data.map((org) => ({
+    id: org.id,
+    name: org.name,
+  }));
+  keyValues.unshift({
+    id: 'all-options',
+    name: 'All',
+  });
+  keyValues.push({
+    id: 'unassociated',
+    name: 'Sites without an organization',
+  });
 
   return keyValues;
 };

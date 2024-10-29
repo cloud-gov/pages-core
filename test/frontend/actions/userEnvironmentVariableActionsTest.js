@@ -1,8 +1,6 @@
 import sinon from 'sinon';
 import federalistApi from '../../../frontend/util/federalistApi';
-import {
-  httpError,
-} from '../../../frontend/actions/actionCreators/alertActions';
+import { httpError } from '../../../frontend/actions/actionCreators/alertActions';
 
 import {
   userEnvironmentVariableAdded,
@@ -48,13 +46,13 @@ describe('useEnvironmentVariableActions', () => {
 
       it('1) dispatches `userEnvironmentVariablesFetchStarted` action with the site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall,
-            userEnvironmentVariablesFetchStarted(siteId));
+          sinon.assert.calledWith(
+            stubs.dispatch.firstCall,
+            userEnvironmentVariablesFetchStarted(siteId),
+          );
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
 
       it('2) successfully fetches the uevs using the federalist api with the site id', (done) => {
@@ -62,20 +60,18 @@ describe('useEnvironmentVariableActions', () => {
           sinon.assert.calledWith(stubs.fedApi, siteId);
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
 
       it('3) dispatches `userEnvironmentVariablesReceived` with the site id and received uevs', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.secondCall,
-            userEnvironmentVariablesReceived(siteId, uevs));
+          sinon.assert.calledWith(
+            stubs.dispatch.secondCall,
+            userEnvironmentVariablesReceived(siteId, uevs),
+          );
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
     });
 
@@ -86,13 +82,13 @@ describe('useEnvironmentVariableActions', () => {
 
       it('1) dispatches `userEnvironmentVariablesFetchStarted` action with the site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall,
-            userEnvironmentVariablesFetchStarted(siteId));
+          sinon.assert.calledWith(
+            stubs.dispatch.firstCall,
+            userEnvironmentVariablesFetchStarted(siteId),
+          );
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
 
       it('2) unsuccessfully fetches the uevs using the federalist api with the site id', (done) => {
@@ -100,20 +96,18 @@ describe('useEnvironmentVariableActions', () => {
           sinon.assert.calledWith(stubs.fedApi, siteId);
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
 
       it('3) dispatches `httpError` action with the error message and site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.secondCall,
-            httpError(error.message, { siteId }));
+          sinon.assert.calledWith(
+            stubs.dispatch.secondCall,
+            httpError(error.message, { siteId }),
+          );
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
 
       it('4) scrolls to the top of the screen', (done) => {
@@ -121,20 +115,18 @@ describe('useEnvironmentVariableActions', () => {
           sinon.assert.calledWith(stubs.scrollTo, 0, 0);
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
 
       it('does NOT dispatch `userEnvironmentVariablesReceived`', (done) => {
         const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch,
-            userEnvironmentVariablesReceived(siteId, uevs));
+          sinon.assert.neverCalledWith(
+            stubs.dispatch,
+            userEnvironmentVariablesReceived(siteId, uevs),
+          );
         };
 
-        fetchUserEnvironmentVariables(siteId)(stubs.dispatch)
-          .then(assertion)
-          .then(done);
+        fetchUserEnvironmentVariables(siteId)(stubs.dispatch).then(assertion).then(done);
       });
     });
   });
@@ -166,8 +158,10 @@ describe('useEnvironmentVariableActions', () => {
 
       it('2) dispatches `userEnvironmentVariableDeleted` with the site id and uev id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall,
-            userEnvironmentVariableDeleted(siteId, uevId));
+          sinon.assert.calledWith(
+            stubs.dispatch.firstCall,
+            userEnvironmentVariableDeleted(siteId, uevId),
+          );
         };
 
         deleteUserEnvironmentVariable(siteId, uevId)(stubs.dispatch)
@@ -193,7 +187,10 @@ describe('useEnvironmentVariableActions', () => {
 
       it('2) dispatches `httpError` action with the error message and site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall, httpError(error.message, { siteId }));
+          sinon.assert.calledWith(
+            stubs.dispatch.firstCall,
+            httpError(error.message, { siteId }),
+          );
         };
 
         deleteUserEnvironmentVariable(siteId, uevId)(stubs.dispatch)
@@ -213,8 +210,10 @@ describe('useEnvironmentVariableActions', () => {
 
       it('does NOT dispatch `userEnvironmentVariableDeleted`', (done) => {
         const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch,
-            userEnvironmentVariableDeleted(siteId, uevId));
+          sinon.assert.neverCalledWith(
+            stubs.dispatch,
+            userEnvironmentVariableDeleted(siteId, uevId),
+          );
         };
 
         deleteUserEnvironmentVariable(siteId, uevId)(stubs.dispatch)
@@ -251,8 +250,10 @@ describe('useEnvironmentVariableActions', () => {
 
       it('2) dispatches `userEnvironmentVariableDeleted` with the site id and uev id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall,
-            userEnvironmentVariableAdded(siteId, uev));
+          sinon.assert.calledWith(
+            stubs.dispatch.firstCall,
+            userEnvironmentVariableAdded(siteId, uev),
+          );
         };
 
         addUserEnvironmentVariable(siteId, uev)(stubs.dispatch)
@@ -278,7 +279,10 @@ describe('useEnvironmentVariableActions', () => {
 
       it('2) dispatches `httpError` action with the error message and site id', (done) => {
         const assertion = () => {
-          sinon.assert.calledWith(stubs.dispatch.firstCall, httpError(error.message, { siteId }));
+          sinon.assert.calledWith(
+            stubs.dispatch.firstCall,
+            httpError(error.message, { siteId }),
+          );
         };
 
         addUserEnvironmentVariable(siteId, uev)(stubs.dispatch)
@@ -298,7 +302,10 @@ describe('useEnvironmentVariableActions', () => {
 
       it('does NOT dispatch `userEnvironmentVariableAdded`', (done) => {
         const assertion = () => {
-          sinon.assert.neverCalledWith(stubs.dispatch, userEnvironmentVariableAdded(siteId, uev));
+          sinon.assert.neverCalledWith(
+            stubs.dispatch,
+            userEnvironmentVariableAdded(siteId, uev),
+          );
         };
 
         addUserEnvironmentVariable(siteId, uev)(stubs.dispatch)

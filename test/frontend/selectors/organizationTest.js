@@ -9,8 +9,14 @@ import {
 describe('organzizationSelectors', () => {
   const state = {
     data: [
-      { id: 1, name: 'org-1' },
-      { id: 2, name: 'org-2' },
+      {
+        id: 1,
+        name: 'org-1',
+      },
+      {
+        id: 2,
+        name: 'org-2',
+      },
     ],
   };
 
@@ -33,7 +39,9 @@ describe('organzizationSelectors', () => {
     });
 
     it('returns the null if there are no organizations in the data array', () => {
-      const orglessState = { data: [] };
+      const orglessState = {
+        data: [],
+      };
       const data = getOrgData(orglessState);
       expect(data).to.be.null;
     });
@@ -51,7 +59,9 @@ describe('organzizationSelectors', () => {
     });
 
     it('returns false if organizations data is an empty array', () => {
-      const noOrgState = { data: [] };
+      const noOrgState = {
+        data: [],
+      };
       expect(hasOrgs(noOrgState)).to.be.false;
     });
 
@@ -64,12 +74,15 @@ describe('organzizationSelectors', () => {
   describe('.orgFilterOptions', () => {
     it('returns array of objects with id and name while adding the "All" and "Unassociated" options', () => {
       const grouped = orgFilterOptions(state);
-      expect(grouped[0]).to.deep.equal({ id: 'all-options', name: 'All' });
+      expect(grouped[0]).to.deep.equal({
+        id: 'all-options',
+        name: 'All',
+      });
       expect(grouped[grouped.length - 1]).to.deep.equal({
         id: 'unassociated',
         name: 'Sites without an organization',
       });
-      grouped.map(group => expect(group).to.have.keys(['id', 'name']));
+      grouped.map((group) => expect(group).to.have.keys(['id', 'name']));
     });
 
     it('returns null if there is not organizations', () => {

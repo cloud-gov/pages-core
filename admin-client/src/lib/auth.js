@@ -19,9 +19,7 @@ function externalAuth(path, action, hidden = false) {
     if (hidden) {
       opts = 'width=1,height=1,top=0,left=0';
     } else {
-      const {
-        width, height, top, left,
-      } = calcWindow();
+      const { width, height, top, left } = calcWindow();
       opts = `resizable=yes,scrollbars=yes,width=${width},height=${height},top=${top},left=${left}`;
     }
 
@@ -76,10 +74,4 @@ function logout() {
   page('/login');
 }
 
-export {
-  authenticate,
-  deauthenticate,
-  init,
-  login,
-  logout,
-};
+export { authenticate, deauthenticate, init, login, logout };

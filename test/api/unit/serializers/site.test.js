@@ -10,8 +10,14 @@ const SiteSerializer = require('../../../../api/serializers/site');
 describe('SiteSerializer', () => {
   describe('.serialize(serializable)', () => {
     it('should serialize an object correctly', (done) => {
-      factory.site({ basicAuth: { username: 'username', password: 'password' } })
-        .then(site => SiteSerializer.serialize(site))
+      factory
+        .site({
+          basicAuth: {
+            username: 'username',
+            password: 'password',
+          },
+        })
+        .then((site) => SiteSerializer.serialize(site))
         .then((object) => {
           const result = validateJSONSchema(object, siteSchema);
           expect(result.errors).to.be.empty;
@@ -22,7 +28,9 @@ describe('SiteSerializer', () => {
     });
 
     it('should serialize an array correctly', (done) => {
-      const sites = Array(3).fill(0).map(() => factory.site());
+      const sites = Array(3)
+        .fill(0)
+        .map(() => factory.site());
 
       Promise.all(sites)
         .then(SiteSerializer.serialize)
@@ -40,11 +48,19 @@ describe('SiteSerializer', () => {
 
     it('excludes users without a federalist account', (done) => {
       const authUserCount = 3;
-      const nonGithubUser = factory.user({ githubAccessToken: null });
-      const otherUsers = Array(authUserCount).fill(0).map(() => factory.user());
+      const nonGithubUser = factory.user({
+        githubAccessToken: null,
+      });
+      const otherUsers = Array(authUserCount)
+        .fill(0)
+        .map(() => factory.user());
 
       Promise.all(otherUsers.concat(nonGithubUser))
-        .then(users => factory.site({ users }))
+        .then((users) =>
+          factory.site({
+            users,
+          }),
+        )
         .then(SiteSerializer.serialize)
         .then((object) => {
           expect(object.users.length).to.equal(authUserCount);
@@ -54,7 +70,12 @@ describe('SiteSerializer', () => {
     });
 
     it('includes organization name when associated to site', async () => {
-      const site = await factory.site({ basicAuth: { username: 'username', password: 'password' } });
+      const site = await factory.site({
+        basicAuth: {
+          username: 'username',
+          password: 'password',
+        },
+      });
       const org = await factory.organization.create();
       await org.addSite(site.id);
       await site.reload();
@@ -67,15 +88,25 @@ describe('SiteSerializer', () => {
     });
 
     it('includes URL editability when associated to domain', async () => {
-      const site = await factory.site({ domain: 'https://www.agency.gov', demoDomain: null });
-      await factory.domain.create({ siteId: site.id, names: 'www.agency.gov', context: Domain.Contexts.Site });
-      await site.reload({ include: [ Domain ] });
+      const site = await factory.site({
+        domain: 'https://www.agency.gov',
+        demoDomain: null,
+      });
+      await factory.domain.create({
+        siteId: site.id,
+        names: 'www.agency.gov',
+        context: Domain.Contexts.Site,
+      });
+      await site.reload({
+        include: [Domain],
+      });
       const object = await SiteSerializer.serializeObject(site);
 
       const result = validateJSONSchema(object, siteSchema);
       expect(result.errors).to.be.empty;
 
-      expect(object.canEditLiveUrl).to.equal(false); // Because there is an associated site domain with a non-conflicting URL
+      // Because there is an associated site domain with a non-conflicting URL
+      expect(object.canEditLiveUrl).to.equal(false);
       expect(object.canEditDemoUrl).to.equal(false); // Because the demo domain is null
     });
   });
@@ -84,10 +115,16 @@ describe('SiteSerializer', () => {
     it('includes domains array when associated to site', async () => {
       const site = await factory.site();
       const domains = await Promise.all([
-        factory.domain.create({ siteId: site.id }),
-        factory.domain.create({ siteId: site.id }),
+        factory.domain.create({
+          siteId: site.id,
+        }),
+        factory.domain.create({
+          siteId: site.id,
+        }),
       ]);
-      await site.reload({ include: [Domain] });
+      await site.reload({
+        include: [Domain],
+      });
       const object = await SiteSerializer.serializeObject(site);
       const result = validateJSONSchema(object, siteSchema);
       expect(result.errors).to.be.empty;
@@ -98,7 +135,12 @@ describe('SiteSerializer', () => {
     });
 
     it('includes site branch config array when associated to site', async () => {
-      const site = await factory.site({}, { noSiteBranchConfig: true });
+      const site = await factory.site(
+        {},
+        {
+          noSiteBranchConfig: true,
+        },
+      );
       const sbcs = await Promise.all([
         factory.siteBranchConfig.create({
           site,
@@ -111,21 +153,27 @@ describe('SiteSerializer', () => {
           context: 'demo',
         }),
       ]);
-      await site.reload({ include: [SiteBranchConfig] });
+      await site.reload({
+        include: [SiteBranchConfig],
+      });
       const object = await SiteSerializer.serializeObject(site);
       const result = validateJSONSchema(object, siteSchema);
       expect(result.errors).to.be.empty;
       expect(object.siteBranchConfigs).to.have.length(2);
       sbcs.map((sbc) => {
-        expect(object.siteBranchConfigs.find((c) => c.id === sbc.id)).to.not.be
-          .null;
+        expect(object.siteBranchConfigs.find((c) => c.id === sbc.id)).to.not.be.null;
       });
     });
   });
 
   describe('.serializeNew(serializable)', () => {
     it('should serialize an object correctly', async () => {
-      const site = await factory.site({ basicAuth: { username: 'username', password: 'password' } });
+      const site = await factory.site({
+        basicAuth: {
+          username: 'username',
+          password: 'password',
+        },
+      });
 
       const serialized = SiteSerializer.serializeNew(site);
 
@@ -137,8 +185,13 @@ describe('SiteSerializer', () => {
     });
 
     it('includes admin attributes', async () => {
-      const containerConfig = { name: 'name', size: 'size' };
-      const site = await factory.site({ containerConfig });
+      const containerConfig = {
+        name: 'name',
+        size: 'size',
+      };
+      const site = await factory.site({
+        containerConfig,
+      });
 
       const serialized = SiteSerializer.serializeNew(site, true);
 

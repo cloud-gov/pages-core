@@ -21,6 +21,6 @@ describe('<LoadingIndicator/>', () => {
   });
   it('renders custom loading text if provided', () => {
     const wrapper = shallow(<LoadingIndicator text="custom loading message" />);
-    expect(wrapper.text()).to.contain("custom loading message");
+    expect(wrapper.text()).to.contain('custom loading message');
   });
 });

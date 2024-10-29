@@ -5,13 +5,13 @@ describe('UserEnvironmentVariable model', () => {
   describe('requires unique name per site', () => {
     it('allows the same name for different sites', async () => {
       const name = 'foobarbaz';
-      const [site1, site2] = await Promise.all([
-        factories.site(),
-        factories.site(),
-      ]);
+      const [site1, site2] = await Promise.all([factories.site(), factories.site()]);
 
       await factories.userEnvironmentVariable.create({ name, site: site1 });
-      const uev = await factories.userEnvironmentVariable.create({ name, site: site2 });
+      const uev = await factories.userEnvironmentVariable.create({
+        name,
+        site: site2,
+      });
 
       expect(uev.name).to.equal(name); // A surrogate for not throwing
     });
@@ -21,7 +21,12 @@ describe('UserEnvironmentVariable model', () => {
       const site = await factories.site();
 
       await factories.userEnvironmentVariable.create({ name, site });
-      const error = await factories.userEnvironmentVariable.create({ name, site }).catch(e => e);
+      const error = await factories.userEnvironmentVariable
+        .create({
+          name,
+          site,
+        })
+        .catch((e) => e);
       expect(error).to.be.an('error');
       expect(error.name).to.equal('SequelizeUniqueConstraintError');
     });
@@ -32,7 +37,10 @@ describe('UserEnvironmentVariable model', () => {
       const site = await factories.site();
 
       await factories.userEnvironmentVariable.create({ name: name1, site });
-      const uev = await factories.userEnvironmentVariable.create({ name: name2, site });
+      const uev = await factories.userEnvironmentVariable.create({
+        name: name2,
+        site,
+      });
 
       expect(uev.name).to.equal(name2); // A surrogate for not throwing
     });

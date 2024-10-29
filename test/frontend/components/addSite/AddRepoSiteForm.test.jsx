@@ -10,7 +10,9 @@ describe('<AddRepoSiteForm />', () => {
   it('renders', () => {
     const props = {
       showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
+      initialValues: {
+        engine: 'jekyll',
+      },
       handleSubmit: () => {},
       organizations: {
         data: null,
@@ -27,7 +29,9 @@ describe('<AddRepoSiteForm />', () => {
   it('renders additional fields when showAddNewSiteFields is true', () => {
     const props = {
       showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
+      initialValues: {
+        engine: 'jekyll',
+      },
       handleSubmit: () => {},
       organizations: {
         data: null,
@@ -53,7 +57,9 @@ describe('<AddRepoSiteForm />', () => {
   it('makes GitHubRepoUrlField readOnly when showAddNewSiteFields is true', () => {
     const props = {
       showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
+      initialValues: {
+        engine: 'jekyll',
+      },
       handleSubmit: () => {},
       organizations: {
         data: null,
@@ -63,17 +69,21 @@ describe('<AddRepoSiteForm />', () => {
     };
 
     let wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]').props().readOnly).to.be.false;
+    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]').props().readOnly).to.be
+      .false;
 
     props.showAddNewSiteFields = true;
     wrapper = shallow(<AddRepoSiteForm {...props} />);
-    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]').props().readOnly).to.be.true;
+    expect(wrapper.find('GitHubRepoUrlField[name="repoUrl"]').props().readOnly).to.be
+      .true;
   });
 
   it('disables submit when pristine is true', () => {
     const props = {
       showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
+      initialValues: {
+        engine: 'jekyll',
+      },
       handleSubmit: () => {},
       organizations: {
         data: null,
@@ -93,7 +103,9 @@ describe('<AddRepoSiteForm />', () => {
   it('calls handleSubmit when submitted', () => {
     const props = {
       showAddNewSiteFields: false,
-      initialValues: { engine: 'jekyll' },
+      initialValues: {
+        engine: 'jekyll',
+      },
       handleSubmit: spy(),
       organizations: {
         data: null,

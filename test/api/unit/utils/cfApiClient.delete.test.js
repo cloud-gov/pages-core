@@ -17,7 +17,8 @@ describe('CloudFoundryAPIClient Delete', () => {
 
       const cfApiClient = new CloudFoundryAPIClient();
 
-      cfApiClient.deleteRoute(routeName)
+      cfApiClient
+        .deleteRoute(routeName)
         .then((res) => {
           expect(res.guid).to.equal(guid);
           done();
@@ -36,7 +37,8 @@ describe('CloudFoundryAPIClient Delete', () => {
 
       const cfApiClient = new CloudFoundryAPIClient();
 
-      cfApiClient.deleteServiceInstance(s3Service)
+      cfApiClient
+        .deleteServiceInstance(s3Service)
         .then((res) => {
           expect(res.guid).to.equal(guid);
           done();

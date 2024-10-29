@@ -172,13 +172,7 @@
     {
       "id": "listitem",
       "impact": "serious",
-      "tags": [
-        "cat.structure",
-        "wcag2a",
-        "wcag131",
-        "EN-301-549",
-        "EN-9.1.3.1"
-      ],
+      "tags": ["cat.structure", "wcag2a", "wcag131", "EN-301-549", "EN-9.1.3.1"],
       "description": "Ensure <li> elements are used semantically",
       "help": "<li> elements must be contained in a <ul> or <ol>",
       "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/listitem?application=webdriverjs",
@@ -268,8 +262,18 @@
       "relativeURL": "/blog/",
       "timestamp": "2024-08-28T20:39:49.295Z",
       "violationsCount": 2,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 2 }],
-      "indexPills": [{ "name": "serious", "count": 2 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 2
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 2
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -278,8 +282,18 @@
       "relativeURL": "/document-with-sidenav/",
       "timestamp": "2024-08-28T20:39:47.416Z",
       "violationsCount": 2,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 2 }],
-      "indexPills": [{ "name": "serious", "count": 2 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 2
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 2
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -288,8 +302,18 @@
       "relativeURL": "/document/",
       "timestamp": "2024-08-28T20:39:45.507Z",
       "violationsCount": 2,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 2 }],
-      "indexPills": [{ "name": "serious", "count": 2 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 2
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 2
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -298,8 +322,18 @@
       "relativeURL": "/posts/2019-01-13-an-extra/",
       "timestamp": "2024-08-28T20:39:56.752Z",
       "violationsCount": 1,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
-      "indexPills": [{ "name": "serious", "count": 1 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -308,8 +342,18 @@
       "relativeURL": "/posts/2021-01-16-third-post/",
       "timestamp": "2024-08-28T20:39:55.130Z",
       "violationsCount": 1,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
-      "indexPills": [{ "name": "serious", "count": 1 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -318,8 +362,18 @@
       "relativeURL": "/posts/2022-01-14-hello-world/",
       "timestamp": "2024-08-28T20:39:53.217Z",
       "violationsCount": 1,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
-      "indexPills": [{ "name": "serious", "count": 1 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -328,8 +382,18 @@
       "relativeURL": "/posts/2020-01-15-second-post/",
       "timestamp": "2024-08-28T20:39:51.184Z",
       "violationsCount": 1,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
-      "indexPills": [{ "name": "serious", "count": 1 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
       "moreCount": 0
     },
     {
@@ -338,8 +402,18 @@
       "relativeURL": "/",
       "timestamp": "2024-08-28T20:39:43.681Z",
       "violationsCount": 1,
-      "groupedViolationsCounts": [{ "name": "serious", "count": 1 }],
-      "indexPills": [{ "name": "serious", "count": 1 }],
+      "groupedViolationsCounts": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
+      "indexPills": [
+        {
+          "name": "serious",
+          "count": 1
+        }
+      ],
       "moreCount": 0
     }
   ]

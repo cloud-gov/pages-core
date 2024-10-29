@@ -12,7 +12,6 @@ function BranchFilesLink({ branch }) {
 }
 
 BranchFilesLink.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   branch: PropTypes.object,
 };
 
@@ -35,7 +34,6 @@ export default function BranchRow({ branch, site }) {
 }
 
 BranchRow.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   branch: PropTypes.object,
   site: SITE,
 };

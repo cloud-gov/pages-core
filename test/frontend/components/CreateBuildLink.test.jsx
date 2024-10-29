@@ -6,7 +6,10 @@ import CreateBuildLink from '../../../frontend/components/CreateBuildLink';
 
 describe('<CreateBuildLink />', () => {
   const props = {
-    handlerParams: { dish: 'tacos', cuisine: 'mexican' },
+    handlerParams: {
+      dish: 'tacos',
+      cuisine: 'mexican',
+    },
     handleClick: spy(),
     children: 'hey there',
   };
@@ -25,6 +28,7 @@ describe('<CreateBuildLink />', () => {
     wrapper.simulate('click', { preventDefault });
 
     expect(handler.calledOnce).to.be.true;
-    expect(handler.calledWith(...Object.keys(params).map(key => params[key]))).to.be.true;
+    expect(handler.calledWith(...Object.keys(params).map((key) => params[key]))).to.be
+      .true;
   });
 });

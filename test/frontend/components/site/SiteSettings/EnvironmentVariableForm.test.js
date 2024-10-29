@@ -3,7 +3,9 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 
-import ReduxFormEnvironmentVariableForm, { EnvironmentVariableForm } from '../../../../../frontend/components/site/SiteSettings/EnvironmentVariableForm';
+import ReduxFormEnvironmentVariableForm, {
+  EnvironmentVariableForm,
+} from '../../../../../frontend/components/site/SiteSettings/EnvironmentVariableForm';
 
 const stubs = {};
 
@@ -39,12 +41,20 @@ describe('<EnvironmentVariableForm/>', () => {
 
     it('a `name` Field', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      expect(wrapper.find({ name: 'name' })).to.have.lengthOf(1);
+      expect(
+        wrapper.find({
+          name: 'name',
+        }),
+      ).to.have.lengthOf(1);
     });
 
     it('a `value` Field', () => {
       const wrapper = shallow(<EnvironmentVariableForm {...defaultProps} />);
-      expect(wrapper.find({ name: 'value' })).to.have.lengthOf(1);
+      expect(
+        wrapper.find({
+          name: 'value',
+        }),
+      ).to.have.lengthOf(1);
     });
 
     it('an enabled submit button', () => {
@@ -64,7 +74,10 @@ describe('<EnvironmentVariableForm/>', () => {
 
     describe('when `pristine` is false', () => {
       it('a enabled clear button', () => {
-        const props = { ...defaultProps, pristine: false };
+        const props = {
+          ...defaultProps,
+          pristine: false,
+        };
         const wrapper = shallow(<EnvironmentVariableForm {...props} />);
         const clearButton = wrapper.find('button[type="button"]');
         expect(clearButton).to.have.lengthOf(1);
@@ -75,7 +88,10 @@ describe('<EnvironmentVariableForm/>', () => {
 
     describe('when `submitting` is true', () => {
       it('a disabled submit button', () => {
-        const props = { ...defaultProps, submitting: true };
+        const props = {
+          ...defaultProps,
+          submitting: true,
+        };
         const wrapper = shallow(<EnvironmentVariableForm {...props} />);
         const submitButton = wrapper.find('button[type="submit"]');
         expect(submitButton).to.have.lengthOf(1);
@@ -84,7 +100,10 @@ describe('<EnvironmentVariableForm/>', () => {
 
       describe('and `pristine` is true', () => {
         it('a disabled clear button', () => {
-          const props = { ...defaultProps, submitting: true };
+          const props = {
+            ...defaultProps,
+            submitting: true,
+          };
           const wrapper = shallow(<EnvironmentVariableForm {...props} />);
           const clearButton = wrapper.find('button[type="button"]');
           expect(clearButton).to.have.lengthOf(1);
@@ -95,7 +114,11 @@ describe('<EnvironmentVariableForm/>', () => {
 
       describe('and `pristine` is false', () => {
         it('a disabled clear button', () => {
-          const props = { ...defaultProps, submitting: true, pristine: false };
+          const props = {
+            ...defaultProps,
+            submitting: true,
+            pristine: false,
+          };
           const wrapper = shallow(<EnvironmentVariableForm {...props} />);
           const clearButton = wrapper.find('button[type="button"]');
           expect(clearButton).to.have.lengthOf(1);

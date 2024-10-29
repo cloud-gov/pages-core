@@ -17,10 +17,13 @@ describe('UserAction model', () => {
     it('creates a new UserAction record', (done) => {
       const model = UserAction.build(props);
 
-      model.validate().then(() => {
-        expect(model).to.exist;
-        done();
-      }).catch(done);
+      model
+        .validate()
+        .then(() => {
+          expect(model).to.exist;
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -28,18 +31,21 @@ describe('UserAction model', () => {
     it('requires userId, targetId, targetType, actionId, siteId', (done) => {
       const requiredFields = ['userId', 'targetId', 'targetType', 'actionId', 'siteId'];
 
-      UserAction.create().then(() => {
-        done();
-      }).catch((error) => {
-        const { errors } = error;
-        const errorList = errors.reduce((memo, e) => [...memo, e.path], []);
+      UserAction.create()
+        .then(() => {
+          done();
+        })
+        .catch((error) => {
+          const { errors } = error;
+          const errorList = errors.reduce((memo, e) => [...memo, e.path], []);
 
-        errorList.forEach((field) => {
-          expect(requiredFields.indexOf(field)).to.not.equal(-1);
-        });
+          errorList.forEach((field) => {
+            expect(requiredFields.indexOf(field)).to.not.equal(-1);
+          });
 
-        done();
-      }).catch(done);
+          done();
+        })
+        .catch(done);
     });
 
     it('fails validation if targetType is not `site` or `build`', (done) => {
@@ -52,11 +58,13 @@ describe('UserAction model', () => {
         targetType: 'notSiteNorBuild',
       };
 
-      UserAction.build(goodProps).validate()
+      UserAction.build(goodProps)
+        .validate()
         .catch((e) => {
           expect(e.errors[0].path).to.equal('targetType');
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('fails validation if targetType is not null', (done) => {
@@ -68,18 +76,22 @@ describe('UserAction model', () => {
         actionType: 'penguin',
       };
 
-      UserAction.build(goodProps).validate()
+      UserAction.build(goodProps)
+        .validate()
         .catch((e) => {
           expect(e.errors[0].path).to.equal('targetType');
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
   });
 
   describe('.toJSON', () => {
     it('returns an object with a formatted createdAt date', () => {
       const model = UserAction.build(props);
-      expect(userActionSerializer.toJSON(model).createdAt).to.equal(props.createdAt.toISOString());
+      expect(userActionSerializer.toJSON(model).createdAt).to.equal(
+        props.createdAt.toISOString(),
+      );
     });
   });
 });

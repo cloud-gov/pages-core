@@ -1,10 +1,5 @@
 {
-  "reporter": [
-    "lcov",
-    "html"
-  ],
-  "extension": [
-    ".jsx"
-  ],
+  "reporter": ["lcov", "html"],
+  "extension": [".jsx"],
   "cache": true
 }

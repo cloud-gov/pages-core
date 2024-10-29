@@ -10,21 +10,24 @@ import About from './about';
 
 export default function A11yScanChild({ data, siteId, buildId }) {
   const scanTitle = 'Accessibility';
+  // eslint-disable-next-line max-len
   const pageTitle = `Pages | ${scanTitle} report for ${data.url} on ${datetime.dateAndTimeSimple(data.timestamp)} for build id ${buildId}`;
 
   const allResults = Object.values(data.groupedViolations).flat(1);
-  const ignoreFn = finding => finding.ignore || (utils.getSeverityThemeToken(finding.impact, 'a11y') == null);
+  const ignoreFn = (finding) =>
+    finding.ignore || utils.getSeverityThemeToken(finding.impact, 'a11y') == null;
   // const suppressed = allResults.filter(ignoreFn);
-  const unsuppressed = allResults.filter(r => !ignoreFn(r));
-  const unsuppressedLocationCount = unsuppressed.map(i => i.total).reduce((a, b) => a + b, 0);
+  const unsuppressed = allResults.filter((r) => !ignoreFn(r));
+  const unsuppressedLocationCount = unsuppressed
+    .map((i) => i.total)
+    .reduce((a, b) => a + b, 0);
 
-  const navGroups = [...utils.severity.a11y].map(group => ({
+  const navGroups = [...utils.severity.a11y].map((group) => ({
     ...group,
     label: group.label,
     usePill: true,
     count: data.groupedViolations[group?.name]?.length || 0,
-  })
-  );
+  }));
   navGroups.push(
     // TODO: split into suppressed/unsuppressed items
     {
@@ -39,7 +42,7 @@ export default function A11yScanChild({ data, siteId, buildId }) {
     {
       label: 'Total passes',
       count: data?.passes?.length,
-    }
+    },
   );
 
   useEffect(() => {
@@ -50,22 +53,59 @@ export default function A11yScanChild({ data, siteId, buildId }) {
     <>
       <div className="grid-row">
         <h1 className="font-serif-xl grid-col padding-right-2">
-          Accessibility report for
-          {' '}
-          <br />
-          <span className="font-code-lg text-normal text-primary-darker bg-accent-cool-lighter padding-x-05r narrow-mono break-anywhere">{data.url}</span>
+          Accessibility report for <br />
+          <span
+            className={`
+              font-code-lg
+              text-normal
+              text-primary-darker
+              bg-accent-cool-lighter
+              padding-x-05r
+              narrow-mono
+              break-anywhere
+            `}
+          >
+            {data.url}
+          </span>
           <span className="font-sans-lg text-normal margin-left-1">
-            <a className="usa-link font-body-xs text-no-wrap margin-x-2" target="_blank" aria-label="open scanned page in a new window," title="open scanned page in a new window" href={data.url} rel="noreferrer">
+            <a
+              className="usa-link font-body-xs text-no-wrap margin-x-2"
+              target="_blank"
+              aria-label="open scanned page in a new window,"
+              title="open scanned page in a new window"
+              href={data.url}
+              rel="noreferrer"
+            >
               open page
-              <svg className="usa-icon text-ttop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+              <svg
+                className="usa-icon text-ttop"
+                xmlns="http://www.w3.org/2000/svg"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+              >
+                <path
+                  fill="currentColor"
+                  // eslint-disable-next-line max-len
+                  d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"
+                />
               </svg>
             </a>
           </span>
         </h1>
         <span className="grid-col-auto inline-block margin-y-4">
-          <a id="pages-logo" href="https://cloud.gov/pages" target="_blank" title="link to Pages homepage" rel="noreferrer">
-            <img src="/images/logos/pages-logo-blue.svg" className="width-15" alt="Pages logo" />
+          <a
+            id="pages-logo"
+            href="https://cloud.gov/pages"
+            target="_blank"
+            title="link to Pages homepage"
+            rel="noreferrer"
+          >
+            <img
+              src="/images/logos/pages-logo-blue.svg"
+              className="width-15"
+              alt="Pages logo"
+            />
           </a>
         </span>
       </div>
@@ -82,7 +122,10 @@ export default function A11yScanChild({ data, siteId, buildId }) {
         <div className="tablet:grid-col tablet:margin-left-4">
           <div className="margin-bottom-2 margin-top-4">
             <section
-              className={`usa-alert usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}`}
+              className={`
+                usa-alert
+                usa-alert--${unsuppressed.length > 0 ? 'warning' : 'success'}
+              `}
             >
               <div className="usa-alert__body">
                 <p className="usa-alert__text">
@@ -91,19 +134,19 @@ export default function A11yScanChild({ data, siteId, buildId }) {
                       We’ve found
                       <b>
                         {`
-                          ${unsuppressed.length} ${utils.plural(unsuppressed.length, 'unsuppressed result')}
-                          in ${unsuppressedLocationCount} ${utils.plural(unsuppressedLocationCount, 'place')}
+                          ${unsuppressed.length}
+                          ${utils.plural(unsuppressed.length, 'unsuppressed result')}
+                          in ${unsuppressedLocationCount}
+                          ${utils.plural(unsuppressedLocationCount, 'place')}
                         `}
                       </b>
                       on this page.
                     </>
                   )}
-                  { (unsuppressed.length < 1) && (
+                  {unsuppressed.length < 1 && (
                     <>
                       We’ve found
-                      <b>
-                        {` ${unsuppressed.length} unsuppressed results `}
-                      </b>
+                      <b>{` ${unsuppressed.length} unsuppressed results `}</b>
                       on this page.
                     </>
                   )}
@@ -124,18 +167,19 @@ export default function A11yScanChild({ data, siteId, buildId }) {
             <hr />
             <About scanType="a11y" siteId={siteId}>
               <p className="font-body-xs line-height-sans-3">
-                This report was generated for
-                {' '}
-                <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">{data.url}</code>
+                This report was generated for{' '}
+                <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">
+                  {data.url}
+                </code>
                 {' from '}
-                <Link reloadDocument to={`/sites/${siteId}/builds/${buildId}/logs`} className="usa-link">
-                  build #
-                  {buildId}
-                </Link>
-                {' '}
-                scanned on
-                {' '}
-                {datetime.dateAndTimeSimple(data.timestamp)}
+                <Link
+                  reloadDocument
+                  to={`/sites/${siteId}/builds/${buildId}/logs`}
+                  className="usa-link"
+                >
+                  build #{buildId}
+                </Link>{' '}
+                scanned on {datetime.dateAndTimeSimple(data.timestamp)}
               </p>
             </About>
           </div>
@@ -150,48 +194,50 @@ const A11yPassed = ({ passes = [] }) => (
   <div>
     <h3 className="font-serif-lg">
       Passed checks &nbsp;
-      <span className="font-body-lg text-accent-cool-darker">
-        (
-        {passes.length}
-        )
-      </span>
+      <span className="font-body-lg text-accent-cool-darker">({passes.length})</span>
     </h3>
     <details className="margin-y-3">
       <summary>
-        This page passed
-        {' '}
-        <b>{passes.length}</b>
-        {' '}
-        WCAG accessibility
-        {' '}
-        {utils.plural(passes.length, 'check')}
-        .
+        This page passed <b>{passes.length}</b> WCAG accessibility{' '}
+        {utils.plural(passes.length, 'check')}.
       </summary>
-      <table className="usa-table usa-table--striped usa-table--compact usa-table--borderless font-body-xs width-full">
+      <table
+        className={`
+          usa-table
+          usa-table--striped
+          usa-table--compact
+          usa-table--borderless
+          font-body-xs
+          width-full
+        `}
+      >
         <thead>
           <tr>
             <th scope="col">Description</th>
             <th scope="col">Criteria</th>
-            <th scope="col" className="text-right">Places found</th>
+            <th scope="col" className="text-right">
+              Places found
+            </th>
           </tr>
         </thead>
         <tbody>
-          {passes.map(check => (
+          {passes.map((check) => (
             <tr key={check.help}>
-              <th scope="row">
-                {check.help}
-                .
-              </th>
+              <th scope="row">{check.help}.</th>
               <td className="font-body-xs">
-                {utils.getSuccessCriteria(check).map(c => c.short).join(', ')}
+                {utils
+                  .getSuccessCriteria(check)
+                  .map((c) => c.short)
+                  .join(', ')}
               </td>
-              <td className="font-mono-sm text-tabular text-right">{check.nodes.length}</td>
+              <td className="font-mono-sm text-tabular text-right">
+                {check.nodes.length}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
     </details>
-
   </div>
 );
 

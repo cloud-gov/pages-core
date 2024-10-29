@@ -9,8 +9,9 @@ const attributes = {
   state: '',
   siteId: '',
   siteBranchConfigId: '',
-  SiteBranchConfig: sbc => sbc && sbcSerializer.serialize(sbc),
-  Site: (site, _, isSystemAdmin) => site && siteSerializer.serializeNew(site, isSystemAdmin),
+  SiteBranchConfig: (sbc) => sbc && sbcSerializer.serialize(sbc),
+  Site: (site, _, isSystemAdmin) =>
+    site && siteSerializer.serializeNew(site, isSystemAdmin),
   createdAt: 'date',
   updatedAt: 'date',
 };

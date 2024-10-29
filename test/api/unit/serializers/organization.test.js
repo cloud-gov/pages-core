@@ -8,7 +8,10 @@ const { Organization } = require('../../../../api/models');
 const OrganizationSerializer = require('../../../../api/serializers/organization');
 
 function clean() {
-  return Organization.truncate({ force: true, cascade: true });
+  return Organization.truncate({
+    force: true,
+    cascade: true,
+  });
 }
 
 describe('OrganizationSerializer', () => {

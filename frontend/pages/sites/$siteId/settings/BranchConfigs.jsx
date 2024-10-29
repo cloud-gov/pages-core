@@ -17,9 +17,7 @@ function getHashContext(hash) {
 }
 
 function handleUpdate(siteId) {
-  return ({
-    id, branch, config, context,
-  }) => {
+  return ({ id, branch, config, context }) => {
     if (!id) {
       return api.createSiteBranchConfig(siteId, branch, config, context);
     }
@@ -34,12 +32,12 @@ function BranchConfigs({ siteId, hash }) {
 
   return (
     <div className="grid-col-12">
-      <h3 className="font-heading-xl margin-top-0 margin-bottom-2">Branch Configurations</h3>
+      <h3 className="font-heading-xl margin-top-0 margin-bottom-2">
+        Branch Configurations
+      </h3>
       {configs.error && (
         <div className="well">
-          <h4>
-            An error occurred while loading your site branch configurations.
-          </h4>
+          <h4>An error occurred while loading your site branch configurations.</h4>
           <p>{configs.error}</p>
         </div>
       )}
@@ -48,12 +46,10 @@ function BranchConfigs({ siteId, hash }) {
           <LoadingIndicator />
         </div>
       )}
-      {!configs.isLoading
-        && !configs.error
-        && defaultContexts.map((context) => {
-          const branchConfig = configs.data.find(
-            conf => conf.context === context
-          );
+      {!configs.isLoading &&
+        !configs.error &&
+        defaultContexts.map((context) => {
+          const branchConfig = configs.data.find((conf) => conf.context === context);
 
           const isExpanded = context === hashContext;
 

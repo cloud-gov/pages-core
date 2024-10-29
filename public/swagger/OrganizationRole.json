@@ -1,9 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "createdAt",
-    "updatedAt"
-  ],
+  "required": ["createdAt", "updatedAt"],
   "properties": {
     "createdAt": {
       "type": "string",
@@ -16,19 +13,25 @@
     "Organization": {
       "oneOf": [
         { "type": ["null"] },
-        { "$ref": "Organization.json" }
+        {
+          "$ref": "Organization.json"
+        }
       ]
     },
     "Role": {
       "oneOf": [
         { "type": ["null"] },
-        { "$ref": "Role.json" }
+        {
+          "$ref": "Role.json"
+        }
       ]
     },
     "User": {
       "oneOf": [
         { "type": ["null"] },
-        { "$ref": "User.json" }
+        {
+          "$ref": "User.json"
+        }
       ]
     }
   }

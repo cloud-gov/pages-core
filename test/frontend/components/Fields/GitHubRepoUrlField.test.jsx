@@ -2,7 +2,9 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
 
-import GitHubRepoUrlField, { githubRepoUrl } from '../../../../frontend/components/Fields/GitHubRepoUrlField';
+import GitHubRepoUrlField, {
+  githubRepoUrl,
+} from '../../../../frontend/components/Fields/GitHubRepoUrlField';
 
 describe('<GitHubRepoUrlField />', () => {
   it('renders', () => {
@@ -45,8 +47,13 @@ describe('<GitHubRepoUrlField />', () => {
       expect(githubRepoUrl('https://github.com/org/b')).to.equal(msg);
 
       expect(githubRepoUrl('https://github.com/org/repo')).to.be.undefined;
-      expect(githubRepoUrl('https://github.com/org_with-special_chars11/repo22_with-special_chars')).to.be.undefined;
-      expect(githubRepoUrl('https://github.com/org.with.periods/repo.com')).to.be.undefined;
+      expect(
+        githubRepoUrl(
+          'https://github.com/org_with-special_chars11/repo22_with-special_chars',
+        ),
+      ).to.be.undefined;
+      expect(githubRepoUrl('https://github.com/org.with.periods/repo.com')).to.be
+        .undefined;
     });
   });
 });

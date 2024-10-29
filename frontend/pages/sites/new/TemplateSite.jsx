@@ -28,17 +28,25 @@ class TemplateSite extends React.Component {
   handleChange(event) {
     const { name, value } = event.target;
     const orgValidation = this.validateOrgSelect(name, value);
-    this.setState({ [name]: value, ...orgValidation });
+    this.setState({
+      [name]: value,
+      ...orgValidation,
+    });
   }
 
   handleSubmit(event) {
     event.preventDefault();
     const { handleSubmit, organizations } = this.props;
     const { repository, templateOrganizationId, ...rest } = this.state;
-    const validOrg = this.validateOrgSelect('templateOrganizationId', templateOrganizationId);
+    const validOrg = this.validateOrgSelect(
+      'templateOrganizationId',
+      templateOrganizationId,
+    );
 
     if (!validOrg.touched || validOrg.error) {
-      return this.setState({ ...validOrg });
+      return this.setState({
+        ...validOrg,
+      });
     }
 
     const organizationId = hasOrgs(organizations) ? templateOrganizationId : null;
@@ -66,22 +74,31 @@ class TemplateSite extends React.Component {
     const { organizations } = this.props;
 
     if (name === 'templateOrganizationId' && hasOrgs(organizations) && !value) {
-      return { touched: true, error: 'Please select an organization' };
+      return {
+        touched: true,
+        error: 'Please select an organization',
+      };
     }
 
-    return { touched: true, error: null };
+    return {
+      touched: true,
+      error: null,
+    };
   }
 
   render() {
-    const {
-      description, example, organizations, thumb, title,
-    } = this.props;
-    const {
-      error, owner, templateOrganizationId, repository, touched,
-    } = this.state;
+    const { description, example, organizations, thumb, title } = this.props;
+    const { error, owner, templateOrganizationId, repository, touched } = this.state;
 
     return (
-      <li className="federalist-template-list-item usa-card usa-card--flag flex-1 tablet-lg:grid-col-6">
+      <li
+        className={`
+          federalist-template-list-item
+          usa-card usa-card--flag
+          flex-1
+          tablet-lg:grid-col-6
+        `}
+      >
         <div className="usa-card__container bg-base-lightest">
           <div className="federalist-template-list-item-img usa-card__media">
             <div className="usa-card__img">
@@ -98,54 +115,54 @@ class TemplateSite extends React.Component {
           </div>
           <div className="usa-card__body federalist-template-list-item-content">
             <p>{description}</p>
-            {this.getFormVisible()
-              ? (
-                <form
-                  className="new-site-form"
-                  onSubmit={this.handleSubmit}
-                >
-                  <label className="usa-label text-bold" htmlFor="owner">What GitHub account will own your site?</label>
-                  <input
-                    id="owner"
-                    name="owner"
-                    type="text"
-                    value={owner}
-                    className="usa-input"
-                    onChange={this.handleChange}
-                  />
-                  {
-                    hasOrgs(organizations) ? (
-                      <div className="form-group">
-                        <UserOrgSelect
-                          error={error}
-                          id="templateOrganizationId"
-                          name="templateOrganizationId"
-                          value={templateOrganizationId}
-                          onChange={this.handleChange}
-                          orgData={organizations.data}
-                          mustChooseOption
-                          touched={touched}
-                        />
-                      </div>
-                    ) : null
-                  }
-                  <label className="usa-label text-bold" htmlFor="repository">Name your new site</label>
-                  <input
-                    className="usa-input"
-                    id="repository"
-                    name="repository"
-                    type="text"
-                    value={repository}
-                    onChange={this.handleChange}
-                  />
-                  <input type="submit" className="usa-button usa-button-primary margin-top-1" value="Create site" />
-                </form>
-              )
-              : null}
+            {this.getFormVisible() ? (
+              <form className="new-site-form" onSubmit={this.handleSubmit}>
+                <label className="usa-label text-bold" htmlFor="owner">
+                  What GitHub account will own your site?
+                </label>
+                <input
+                  id="owner"
+                  name="owner"
+                  type="text"
+                  value={owner}
+                  className="usa-input"
+                  onChange={this.handleChange}
+                />
+                {hasOrgs(organizations) ? (
+                  <div className="form-group">
+                    <UserOrgSelect
+                      error={error}
+                      id="templateOrganizationId"
+                      name="templateOrganizationId"
+                      value={templateOrganizationId}
+                      onChange={this.handleChange}
+                      orgData={organizations.data}
+                      mustChooseOption
+                      touched={touched}
+                    />
+                  </div>
+                ) : null}
+                <label className="usa-label text-bold" htmlFor="repository">
+                  Name your new site
+                </label>
+                <input
+                  className="usa-input"
+                  id="repository"
+                  name="repository"
+                  type="text"
+                  value={repository}
+                  onChange={this.handleChange}
+                />
+                <input
+                  type="submit"
+                  className="usa-button usa-button-primary margin-top-1"
+                  value="Create site"
+                />
+              </form>
+            ) : null}
           </div>
           <div className="usa-card__footer">
-            {!this.getFormVisible()
-              && (
+            {!this.getFormVisible() && (
               <div>
                 <p>
                   <a
@@ -166,7 +183,7 @@ class TemplateSite extends React.Component {
                   Use this template
                 </button>
               </div>
-              )}
+            )}
           </div>
         </div>
       </li>

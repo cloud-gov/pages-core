@@ -1,9 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "status",
-    "message"
-  ],
+  "required": ["status", "message"],
   "properties": {
     "status": {
       "type": "number"

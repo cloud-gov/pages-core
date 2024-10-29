@@ -8,7 +8,10 @@ const { Domain, Site } = require('../../../../api/models');
 const DomainSerializer = require('../../../../api/serializers/domain');
 
 function clean() {
-  return Domain.truncate({ force: true, cascade: true });
+  return Domain.truncate({
+    force: true,
+    cascade: true,
+  });
 }
 
 describe('DomainSerializer', () => {
@@ -31,7 +34,9 @@ describe('DomainSerializer', () => {
     it('includes `Site` if present', async () => {
       const domain = await DomainFactory.create();
       const site = await domain.getSite();
-      const domainWithSite = await domain.reload({ include: [Site] });
+      const domainWithSite = await domain.reload({
+        include: [Site],
+      });
 
       const domainJson = DomainSerializer.serialize(domainWithSite);
 

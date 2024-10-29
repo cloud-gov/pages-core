@@ -10,4 +10,4 @@ async function run() {
   });
 }
 
-run().catch(e => logger.error(e));
+run().catch((e) => logger.error(e));

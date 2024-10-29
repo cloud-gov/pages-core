@@ -2,9 +2,8 @@ const _ = require('underscore');
 const { logger } = require('../../winston');
 const { Event } = require('../models');
 
-const createEvent = obj => Event
-  .create(obj)
-  .catch((err) => {
+const createEvent = (obj) =>
+  Event.create(obj).catch((err) => {
     logger.error([`Failed to create Event(${JSON.stringify(obj)}`, err.stack].join('\n'));
   });
 
@@ -17,16 +16,17 @@ const createEvent = obj => Event
  *
  * @return {Promise<Event>}
  */
-const audit = (label, model, message, body = {}) => createEvent({
-  type: Event.types.AUDIT,
-  label,
-  model: model?.constructor?.name || null,
-  modelId: model?.id || null,
-  body: {
-    message,
-    ...body,
-  },
-});
+const audit = (label, model, message, body = {}) =>
+  createEvent({
+    type: Event.types.AUDIT,
+    label,
+    model: model?.constructor?.name || null,
+    modelId: model?.id || null,
+    body: {
+      message,
+      ...body,
+    },
+  });
 
 /**
  * Create an error event
@@ -36,15 +36,16 @@ const audit = (label, model, message, body = {}) => createEvent({
  *
  * @return {Promise<Event>}
  */
-const error = (label, err, body = {}) => createEvent({
-  type: Event.types.ERROR,
-  label,
-  body: {
-    error: err.stack,
-    message: err.message,
-    ...body,
-  },
-});
+const error = (label, err, body = {}) =>
+  createEvent({
+    type: Event.types.ERROR,
+    label,
+    body: {
+      error: err.stack,
+      message: err.message,
+      ...body,
+    },
+  });
 
 const requestDenyList = [
   'accessToken', // Github access token
@@ -60,9 +61,7 @@ const requestDenyList = [
  * @return {Promise<Event>}
  */
 const handlerError = async (request, err) => {
-  const {
-    body, method, params, path,
-  } = request;
+  const { body, method, params, path } = request;
 
   const errBody = {
     request: {

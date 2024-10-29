@@ -8,7 +8,16 @@ describe('<AddUserForm />', () => {
   it('renders', () => {
     const props = {
       handleSubmit: () => Promise.resolve(),
-      roleOptions: [{ label: 'role1', value: 1 }, { label: 'role2', value: 2 }],
+      roleOptions: [
+        {
+          label: 'role1',
+          value: 1,
+        },
+        {
+          label: 'role2',
+          value: 2,
+        },
+      ],
       invalid: true,
       pristine: true,
       reset: () => {},

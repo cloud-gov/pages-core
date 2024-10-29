@@ -3,7 +3,9 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { spy } from 'sinon';
 
-import ReduxFormDeleteForm, { DeleteSiteForm } from '../../../../../frontend/components/site/SiteSettings/DeleteSiteForm';
+import ReduxFormDeleteForm, {
+  DeleteSiteForm,
+} from '../../../../../frontend/components/site/SiteSettings/DeleteSiteForm';
 
 describe('<DeleteSiteForm/>', () => {
   it('should export a ReduxForm-connected component', () => {
@@ -11,13 +13,11 @@ describe('<DeleteSiteForm/>', () => {
   });
 
   describe('given default props', () => {
-    const makeProps = () => (
-      {
-        handleSubmit: spy(),
-        siteId: 1,
-        submitting: false,
-      }
-    );
+    const makeProps = () => ({
+      handleSubmit: spy(),
+      siteId: 1,
+      submitting: false,
+    });
 
     let props;
     let wrapper;

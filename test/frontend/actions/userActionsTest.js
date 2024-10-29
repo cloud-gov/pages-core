@@ -63,7 +63,9 @@ describe('userActions', () => {
         favoritePancake: 'buttermilk',
       };
       const fetchStartedAction = { action: 'started' };
-      const receivedAction = { action: 'received' };
+      const receivedAction = {
+        action: 'received',
+      };
       fetchUser.withArgs().resolves(user);
       userFetchStartedActionCreator.withArgs().returns(fetchStartedAction);
       userReceivedActionCreator.withArgs(user).returns(receivedAction);
@@ -78,7 +80,9 @@ describe('userActions', () => {
     });
 
     it('does nothing when fetching the user fails', () => {
-      fetchUser.withArgs().rejects({ message: 'errorMessage' });
+      fetchUser.withArgs().rejects({
+        message: 'errorMessage',
+      });
 
       const actual = fixture.fetchUser();
 
@@ -105,15 +109,11 @@ describe('userActions', () => {
     });
 
     it('calls the corresponding federalist api method', () => {
-      actual.then(() =>
-        expect(fetchUserActions.calledWith(siteId)).to.be.true
-      );
+      actual.then(() => expect(fetchUserActions.calledWith(siteId)).to.be.true);
     });
 
     it('dispatches a userActionReceived actionwhen complete', () => {
-      actual.then(() =>
-        expect(dispatch.called).to.be.true
-      );
+      actual.then(() => expect(dispatch.called).to.be.true);
     });
   });
 });

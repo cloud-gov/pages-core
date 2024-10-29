@@ -7,7 +7,7 @@ const { ValidationError } = require('../utils/validators');
 const { Site, UserEnvironmentVariable, Event } = require('../models');
 
 function validate({ name, value }) {
-  if (name && name.length && value && (value.length >= 4)) {
+  if (name && name.length && value && value.length >= 4) {
     return { name, value };
   }
 
@@ -25,8 +25,11 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const uevs = await UserEnvironmentVariable
-      .findAll({ where: { siteId: site.id } });
+    const uevs = await UserEnvironmentVariable.findAll({
+      where: {
+        siteId: site.id,
+      },
+    });
 
     const json = serializeMany(uevs);
 
@@ -47,13 +50,24 @@ module.exports = wrapHandlers({
     const { ciphertext, hint } = encrypt(value, userEnvVar.key);
 
     try {
-      const uev = await UserEnvironmentVariable
-        .create({
-          siteId: site.id, name, ciphertext, hint,
-        });
-      EventCreator.audit(Event.labels.USER_ACTION, req.user, 'UserEnvironmentVariable Created', {
-        userEnvironmentVariable: { id: uev.id, siteId: uev.siteId, name: uev.name },
+      const uev = await UserEnvironmentVariable.create({
+        siteId: site.id,
+        name,
+        ciphertext,
+        hint,
       });
+      EventCreator.audit(
+        Event.labels.USER_ACTION,
+        req.user,
+        'UserEnvironmentVariable Created',
+        {
+          userEnvironmentVariable: {
+            id: uev.id,
+            siteId: uev.siteId,
+            name: uev.name,
+          },
+        },
+      );
       const json = serialize(uev);
 
       return res.ok(json);
@@ -62,6 +76,7 @@ module.exports = wrapHandlers({
         throw err;
       }
       return res.badRequest({
+        // eslint-disable-next-line max-len
         message: `A user environment variable with name: "${name}" already exists for this site.`,
       });
     }
@@ -71,29 +86,38 @@ module.exports = wrapHandlers({
     const { params, user } = req;
     const { id, site_id: siteId } = params;
 
-    const site = await Site.forUser(user).findByPk(siteId)
+    const site = await Site.forUser(user)
+      .findByPk(siteId)
       .catch(() => null);
 
     if (!site) {
       return res.notFound();
     }
 
-    const uev = await UserEnvironmentVariable
-      .findOne({
-        where: {
-          id,
-          siteId: site.id,
-        },
-      });
+    const uev = await UserEnvironmentVariable.findOne({
+      where: {
+        id,
+        siteId: site.id,
+      },
+    });
 
     if (!uev) {
       return res.notFound();
     }
 
     await uev.destroy();
-    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'UserEnvironmentVariable Destroyed', {
-      userEnvironmentVariable: { id: uev.id, siteId: uev.siteId, name: uev.name },
-    });
+    EventCreator.audit(
+      Event.labels.USER_ACTION,
+      req.user,
+      'UserEnvironmentVariable Destroyed',
+      {
+        userEnvironmentVariable: {
+          id: uev.id,
+          siteId: uev.siteId,
+          name: uev.name,
+        },
+      },
+    );
 
     return res.ok({});
   },

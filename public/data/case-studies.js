@@ -14,14 +14,14 @@ module.exports = {
     {
       heading: 'College Scorecard',
       subheading: null,
-      copy: 'The U.S. Department of Education uses Federalist to host College Scorecard. Combined with an API server, College Scorecard provides important information on everything from financial aid to expected earnings. Federalist\'s cloud infrastructure helps manage site traffic during spikes in visitors, making sure College Scorecard is always available.',
+      copy: "The U.S. Department of Education uses Federalist to host College Scorecard. Combined with an API server, College Scorecard provides important information on everything from financial aid to expected earnings. Federalist's cloud infrastructure helps manage site traffic during spikes in visitors, making sure College Scorecard is always available.",
       image: '/images/thumbs/cs-preview-college.png',
       imageCaption: null,
       agency: null,
       date: null,
       templateUsed: null,
     },
-    
+
     {
       heading: 'Department of Homeland Security',
       subheading: null,

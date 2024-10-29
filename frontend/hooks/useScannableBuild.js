@@ -7,12 +7,10 @@ const initialState = () => ({
 });
 
 export const useScannableBuild = (build) => {
-  const [state, setState] = useState(
-    initialState()
-  );
+  const [state, setState] = useState(initialState());
 
   async function startScan(buildId) {
-    setState(currentState => ({
+    setState((currentState) => ({
       ...currentState,
       isScanActionDisabled: true,
     }));
@@ -22,15 +20,18 @@ export const useScannableBuild = (build) => {
       alertActions.alertSuccess(`Report generation queued for build # ${buildId}`);
       return window.location.replace(`/sites/${build.site.id}/reports?build=${build.id}`);
     } catch (error) {
-      setState(currentState => ({
+      setState((currentState) => ({
         ...currentState,
         isScanActionDisabled: false,
       }));
       return alertActions.alertError(
-        `An error occured when attempting to start report: ${error.message}`
+        `An error occured when attempting to start report: ${error.message}`,
       );
     }
   }
 
-  return { ...state, startScan };
+  return {
+    ...state,
+    startScan,
+  };
 };

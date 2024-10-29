@@ -1,5 +1,8 @@
 exports.up = (db, callback) => {
-  const newColConfig = { type: 'timestamp', notNull: true };
+  const newColConfig = {
+    type: 'timestamp',
+    notNull: true,
+  };
 
   db.changeColumn('user_action', 'createdAt', newColConfig, (err) => {
     if (err) {
@@ -11,7 +14,10 @@ exports.up = (db, callback) => {
 };
 
 exports.down = (db, callback) => {
-  const oldColConfig = { type: 'date', notNull: true };
+  const oldColConfig = {
+    type: 'date',
+    notNull: true,
+  };
 
   db.changeColumn('user_action', 'createdAt', oldColConfig, (err) => {
     if (err) {

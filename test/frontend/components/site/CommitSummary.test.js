@@ -5,14 +5,11 @@ import { mount } from 'enzyme';
 
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
-const CommitSummary = proxyquire(
-  '../../../../frontend/components/site/CommitSummary',
-  {
-    '../icons': {
-      IconBranch: () => <span />,
-    },
-  }
-).default;
+const CommitSummary = proxyquire('../../../../frontend/components/site/CommitSummary', {
+  '../icons': {
+    IconBranch: () => <span />,
+  },
+}).default;
 
 const defaultProps = {
   buildDetails: {
@@ -24,7 +21,7 @@ const defaultProps = {
     username: 'username',
     clonedCommitSha: 'sha4567890abcdef',
     createdAt: new Date(),
-  }
+  },
 };
 
 describe('<CommitSummary />', () => {
@@ -33,7 +30,13 @@ describe('<CommitSummary />', () => {
   });
 
   it('renders a loading state while loading', () => {
-    const wrapper = mount(<CommitSummary { ...{ buildDetails: null } } />);
+    const wrapper = mount(
+      <CommitSummary
+        {...{
+          buildDetails: null,
+        }}
+      />,
+    );
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });
 

@@ -4,9 +4,7 @@ const domainContext = (domain) => domain.SiteBranchConfig.context;
 export const selectSiteDomains = (site) => {
   const { Domains: domains, SiteBranchConfigs: siteBranchConfigs } = site;
   return domains.map((domain) => {
-    const {
-      id, names, state, siteBranchConfigId, createdAt, updatedAt,
-    } = domain;
+    const { id, names, state, siteBranchConfigId, createdAt, updatedAt } = domain;
     const { branch, context } = siteBranchConfigs.find(
       (sbc) => sbc.id === siteBranchConfigId,
     );
@@ -25,11 +23,7 @@ export const selectSiteDomains = (site) => {
 };
 
 export const selectSiteLinks = (site) => {
-  const {
-    Domains: domains,
-    SiteBranchConfigs: siteBranchConfigs,
-    siteOrigin,
-  } = site;
+  const { Domains: domains, SiteBranchConfigs: siteBranchConfigs, siteOrigin } = site;
 
   return siteBranchConfigs.map((sbc) => {
     const { id, context, s3Key } = sbc;
@@ -51,18 +45,25 @@ export const selectSiteLinks = (site) => {
   });
 };
 
-const stateColor = (state) => ({
-  pending: 'bg-gray-30',
-  provisioning: 'bg-gold',
-  failed: 'bg-red',
-  provisioned: 'bg-mint',
-  deprovisioning: 'bg-gold',
-}[state] || 'bg-gray-30');
+const stateColor = (state) =>
+  ({
+    pending: 'bg-gray-30',
+    provisioning: 'bg-gold',
+    failed: 'bg-red',
+    provisioned: 'bg-mint',
+    deprovisioning: 'bg-gold',
+  })[state] || 'bg-gray-30';
 
 function formToObj(form) {
   return [...form.elements]
     .filter((e) => e.name)
-    .reduce((acc, e) => ({ ...acc, [e.name]: e.value }), {});
+    .reduce(
+      (acc, e) => ({
+        ...acc,
+        [e.name]: e.value,
+      }),
+      {},
+    );
 }
 
 function objToQueryString(obj = {}) {
@@ -77,11 +78,4 @@ function siteName(site) {
   return `${site.owner}/${site.repository}`;
 }
 
-export {
-  domainBranch,
-  domainContext,
-  formToObj,
-  objToQueryString,
-  siteName,
-  stateColor,
-};
+export { domainBranch, domainContext, formToObj, objToQueryString, siteName, stateColor };

@@ -30,7 +30,10 @@ const { fetchModelById } = require('../utils/queryDatabase');
 
 const stripCredentials = ({ username, password }) => {
   if (validBasicAuthUsername(username) && validBasicAuthPassword(password)) {
-    return { username, password };
+    return {
+      username,
+      password,
+    };
   }
 
   throw new ValidationError('username or password is not valid.');
@@ -108,7 +111,10 @@ module.exports = wrapHandlers({
       siteParams: body,
     });
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteUser Created', {
-      siteUser: { siteId: site.id, userId: user.id },
+      siteUser: {
+        siteId: site.id,
+        userId: user.id,
+      },
     });
     const siteJSON = await siteSerializer.serialize(site);
     return res.json(siteJSON);
@@ -128,7 +134,9 @@ module.exports = wrapHandlers({
     }
 
     if (site.Users.length === 1) {
-      return res.badRequest({ message: siteErrors.USER_REQUIRED });
+      return res.badRequest({
+        message: siteErrors.USER_REQUIRED,
+      });
     }
 
     await authorizer.removeUser(req.user, site);
@@ -138,7 +146,10 @@ module.exports = wrapHandlers({
       userId,
     });
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteUser Removed', {
-      siteUser: { siteId: site.id, userId },
+      siteUser: {
+        siteId: site.id,
+        userId,
+      },
     });
     // UserActionCreator to be deleted
     await UserActionCreator.addRemoveAction({
@@ -153,9 +164,7 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: {
-        owner, template, organizationId, repository, engine,
-      },
+      body: { owner, template, organizationId, repository, engine },
       user,
     } = req;
 
@@ -175,7 +184,9 @@ module.exports = wrapHandlers({
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Created', {
       site,
     });
-    await site.reload({ include: [Organization, User] });
+    await site.reload({
+      include: [Organization, User],
+    });
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
   },
@@ -204,7 +215,10 @@ module.exports = wrapHandlers({
 
     await site.update(updateParams);
     EventCreator.audit(Event.labels.USER_ACTION, req.user, 'Site Updated', {
-      site: { ...updateParams, id: site.id },
+      site: {
+        ...updateParams,
+        id: site.id,
+      },
     });
 
     const siteJSON = siteSerializer.serializeNew(site);
@@ -224,7 +238,9 @@ module.exports = wrapHandlers({
 
     const credentials = stripCredentials(body);
 
-    await site.update({ basicAuth: credentials });
+    await site.update({
+      basicAuth: credentials,
+    });
 
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
@@ -240,7 +256,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    await site.update({ basicAuth: {} });
+    await site.update({
+      basicAuth: {},
+    });
 
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
@@ -252,7 +270,9 @@ module.exports = wrapHandlers({
       params: { site_id: siteId },
     } = req;
 
-    const site = await Site.findByPk(siteId, { include: [Domain] });
+    const site = await Site.findByPk(siteId, {
+      include: [Domain],
+    });
 
     if (!site) {
       return res.notFound();
@@ -275,8 +295,14 @@ module.exports = wrapHandlers({
       params: { site_id: siteId },
     } = req;
 
-    const site = await Site
-      .findByPk(siteId, { include: [{ model: SiteBuildTask, include: [BuildTaskType] }] });
+    const site = await Site.findByPk(siteId, {
+      include: [
+        {
+          model: SiteBuildTask,
+          include: [BuildTaskType],
+        },
+      ],
+    });
 
     if (!site) {
       return res.notFound();
@@ -285,7 +311,7 @@ module.exports = wrapHandlers({
     await authorizer.findOne(user, site);
 
     // add app shortname as id
-    const siteBuildTasks = site.SiteBuildTasks.map(sbt => ({
+    const siteBuildTasks = site.SiteBuildTasks.map((sbt) => ({
       id: appMatch(sbt.BuildTaskType),
       sbtId: sbt.id,
       metadata: sbt.metadata,
@@ -304,7 +330,9 @@ module.exports = wrapHandlers({
       body,
     } = req;
 
-    const { metadata: { rules } } = body;
+    const {
+      metadata: { rules },
+    } = body;
 
     // check Site for authorizer's sake
     const site = await Site.findByPk(siteId);
@@ -323,7 +351,12 @@ module.exports = wrapHandlers({
 
     const { metadata } = siteBuildTask.dataValues;
 
-    await siteBuildTask.update({ metadata: { ...metadata, rules } });
+    await siteBuildTask.update({
+      metadata: {
+        ...metadata,
+        rules,
+      },
+    });
 
     return res.ok({});
   },

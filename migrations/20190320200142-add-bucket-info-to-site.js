@@ -22,21 +22,25 @@ const cmdUpdateSiteRecords = `
 
 const insertIfMissing = (db) => {
   db.runSql(cmdCountRecords)
-    .then(res => res.rows[0].count)
+    .then((res) => res.rows[0].count)
     .then((count) => {
       if (count !== '0') db.runSql(cmdUpdateSiteRecords);
     });
 };
 
-exports.up = (db, callback) => db.addColumn('site', 's3ServiceName', dataType)
-  .then(() => db.addColumn('site', 'awsBucketName', dataType))
-  .then(() => db.addColumn('site', 'awsBucketRegion', dataType))
-  .then(() => insertIfMissing(db))
-  .then(() => callback())
-  .catch(callback);
+exports.up = (db, callback) =>
+  db
+    .addColumn('site', 's3ServiceName', dataType)
+    .then(() => db.addColumn('site', 'awsBucketName', dataType))
+    .then(() => db.addColumn('site', 'awsBucketRegion', dataType))
+    .then(() => insertIfMissing(db))
+    .then(() => callback())
+    .catch(callback);
 
-exports.down = (db, callback) => db.removeColumn('site', 's3ServiceName')
-  .then(() => db.removeColumn('site', 'awsBucketName'))
-  .then(() => db.removeColumn('site', 'awsBucketRegion'))
-  .then(() => callback())
-  .catch(callback);
+exports.down = (db, callback) =>
+  db
+    .removeColumn('site', 's3ServiceName')
+    .then(() => db.removeColumn('site', 'awsBucketName'))
+    .then(() => db.removeColumn('site', 'awsBucketRegion'))
+    .then(() => callback())
+    .catch(callback);

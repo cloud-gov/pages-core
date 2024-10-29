@@ -269,7 +269,9 @@ describe('siteActions', () => {
 
     it('triggers showing additional add site fields when adding the user fails with 404', () => {
       const rejectWith404Error = {
-        response: { status: 404 },
+        response: {
+          status: 404,
+        },
         message: 'Not found',
       };
 
@@ -325,10 +327,16 @@ describe('siteActions', () => {
   });
 
   describe('addBasicAuthToSite', () => {
-    const basicAuth = { username: 'username', password: 'password' };
+    const basicAuth = {
+      username: 'username',
+      password: 'password',
+    };
 
     it('triggers the updating of a site and dispatches a site updated action to the store when successful', () => {
-      const basicAuthSite = { ...site, config: { basicAuth } };
+      const basicAuthSite = {
+        ...site,
+        config: { basicAuth },
+      };
       const sitePromise = Promise.resolve(basicAuthSite);
       saveBasicAuthToSite.withArgs(siteId, basicAuth).returns(sitePromise);
 

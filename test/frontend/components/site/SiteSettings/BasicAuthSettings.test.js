@@ -36,13 +36,17 @@ describe('<BasicAuthSettings />', () => {
 
   it('renders an informational alert', () => {
     const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'info');
+    const alert = wrapper.findWhere(
+      (n) => n.name() === 'AlertBanner' && n.prop('status') === 'info',
+    );
     expect(alert).to.have.lengthOf(1);
   });
 
   it('renders a warning alert', () => {
     const wrapper = shallow(<BasicAuthSettings {...defaultProps} />);
-    const alert = wrapper.findWhere(n => n.name() === 'AlertBanner' && n.prop('status') === 'warning');
+    const alert = wrapper.findWhere(
+      (n) => n.name() === 'AlertBanner' && n.prop('status') === 'warning',
+    );
     expect(alert).to.have.lengthOf(1);
   });
 
@@ -52,12 +56,18 @@ describe('<BasicAuthSettings />', () => {
   });
 
   describe('when not loading with credentials', () => {
-    const credentials = { username: 'username', password: 'password' };
+    const credentials = {
+      username: 'username',
+      password: 'password',
+    };
 
     let props;
 
     beforeEach(() => {
-      props = { ...defaultProps, basicAuth: credentials } ;
+      props = {
+        ...defaultProps,
+        basicAuth: credentials,
+      };
     });
 
     it('does not render the basic auth credentials form', () => {

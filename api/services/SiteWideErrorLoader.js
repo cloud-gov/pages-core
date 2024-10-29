@@ -12,4 +12,6 @@ const loadSiteWideError = () => {
   return null;
 };
 
-module.exports = { loadSiteWideError };
+module.exports = {
+  loadSiteWideError,
+};

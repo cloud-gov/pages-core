@@ -28,11 +28,18 @@ function siteViewLink(site, deployment = 'site') {
 
 const hideBasicAuthPassword = ({ username, password }) => {
   if (password && password.length) {
-    return { username, password: '**********' };
+    return {
+      username,
+      password: '**********',
+    };
   }
   return {};
 };
 
 module.exports = {
-  path, siteViewLink, siteViewDomain, siteViewOrigin, hideBasicAuthPassword,
+  path,
+  siteViewLink,
+  siteViewDomain,
+  siteViewOrigin,
+  hideBasicAuthPassword,
 };

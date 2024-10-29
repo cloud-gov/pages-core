@@ -4,7 +4,11 @@ import { capitalize } from '@util';
 
 export default function ContextTitle({ context }) {
   return (
-    <div style={{ display: 'inline-block' }}>
+    <div
+      style={{
+        display: 'inline-block',
+      }}
+    >
       <h4 className="font-sans-lg margin-0">
         {context === 'site' ? 'Live Site' : `${capitalize(context)} Site`}
       </h4>

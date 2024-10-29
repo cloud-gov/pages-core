@@ -7,7 +7,10 @@ const EventCreator = require('../services/EventCreator');
 const passport = new Passport.Passport();
 
 passport.serializeUser((user, next) => {
-  next(null, { id: user.id, role: user.role });
+  next(null, {
+    id: user.id,
+    role: user.role,
+  });
 });
 
 passport.deserializeUser(({ id }, next) => {
@@ -28,22 +31,25 @@ const uaaOptions = {
 
 const verify = async (req, accessToken, refreshToken, profile, callback) => {
   try {
-    const supportUser = await verifyUAAUser(
-      accessToken,
-      refreshToken,
-      profile,
-      ['pages.support']
-    );
+    const supportUser = await verifyUAAUser(accessToken, refreshToken, profile, [
+      'pages.support',
+    ]);
 
     if (supportUser) {
-      return callback(null, { ...supportUser.dataValues, role: 'pages.support' });
+      return callback(null, {
+        ...supportUser.dataValues,
+        role: 'pages.support',
+      });
     }
 
     const adminUser = await verifyUAAUser(accessToken, refreshToken, profile, [
       'pages.admin',
     ]);
     if (adminUser) {
-      return callback(null, { ...adminUser.dataValues, role: 'pages.admin' });
+      return callback(null, {
+        ...adminUser.dataValues,
+        role: 'pages.admin',
+      });
     }
 
     return callback(null, false);

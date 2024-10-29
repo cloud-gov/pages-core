@@ -34,26 +34,12 @@ module.exports = {
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        'script-src': [
-          "'self'",
-        ],
-        'font-src': [
-          "'self'",
-          'https://fonts.gstatic.com',
-        ],
-        'style-src': [
-          "'self'",
-          'https://fonts.googleapis.com/css2',
-        ],
-        'child-src': [
-          "'none'",
-        ],
-        'frame-src': [
-          "'none'",
-        ],
-        'worker-src': [
-          "'none'",
-        ],
+        'script-src': ["'self'"],
+        'font-src': ["'self'", 'https://fonts.gstatic.com'],
+        'style-src': ["'self'", 'https://fonts.googleapis.com/css2'],
+        'child-src': ["'none'"],
+        'frame-src': ["'none'"],
+        'worker-src': ["'none'"],
       },
     },
     frameguard: {

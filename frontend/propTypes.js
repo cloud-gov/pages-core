@@ -38,7 +38,7 @@ export const SITE = PropTypes.shape({
       createdAt: PropTypes.string,
       updatedAt: PropTypes.string,
       siteBranchConfigId: PropTypes.number,
-    })
+    }),
   ),
   SiteBranchConfigs: PropTypes.arrayOf(
     PropTypes.shape({
@@ -49,7 +49,7 @@ export const SITE = PropTypes.shape({
       context: PropTypes.string,
       createdAt: PropTypes.string,
       updatedAt: PropTypes.string,
-    })
+    }),
   ),
   users: PropTypes.arrayOf(USER),
 });
@@ -115,7 +115,9 @@ export const USER_ACTION = PropTypes.shape({
   targetType: PropTypes.string,
   createdAt: PropTypes.string,
   actionTarget: USER,
-  actionType: PropTypes.shape({ action: PropTypes.string }),
+  actionType: PropTypes.shape({
+    action: PropTypes.string,
+  }),
   initiator: USER,
 });
 

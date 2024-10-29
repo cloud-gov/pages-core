@@ -1,11 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "name",
-    "size",
-    "key",
-    "publishedBranch"
-  ],
+  "required": ["name", "size", "key", "publishedBranch"],
   "properties": {
     "name": {
       "type": "string"

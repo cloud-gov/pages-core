@@ -34,15 +34,13 @@ function CommitSummary({ buildDetails }) {
   return (
     <div className="commit-summary">
       <h3 className="commit-branch margin-bottom-1">
-        <IconBranch className="usa-icon text-bottom" />
-        {' '}
-        {buildDetails?.branch}
+        <IconBranch className="usa-icon text-bottom" /> {buildDetails?.branch}
       </h3>
       <p className="commit-details margin-top-1 margin-left-205">
         {buildShaLink(
           buildDetails?.site?.owner,
           buildDetails?.site?.repository,
-          buildDetails?.clonedCommitSha
+          buildDetails?.clonedCommitSha,
         )}
         &nbsp;by&nbsp;
         <b className="commit-username">{buildDetails?.username}</b>

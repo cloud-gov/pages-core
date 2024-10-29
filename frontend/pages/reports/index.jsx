@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-has-content */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import AlertBanner from './components/AlertBanner';
@@ -9,10 +11,9 @@ export default function Report() {
   return (
     <>
       {onReportPage && <AlertBanner />}
-      { /* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */ }
       <a name="top" />
       <main className="grid-container">
-        {onReportPage ? <Outlet /> : <ReportNotFound /> }
+        {onReportPage ? <Outlet /> : <ReportNotFound />}
       </main>
     </>
   );

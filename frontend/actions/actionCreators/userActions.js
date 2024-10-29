@@ -8,7 +8,7 @@ const userFetchStarted = () => ({
   type: userFetchStartedType,
 });
 
-const userReceived = user => ({
+const userReceived = (user) => ({
   type: userReceivedType,
   user,
 });
@@ -17,20 +17,25 @@ const userActionFetchStarted = () => ({
   type: userActionFetchStartedType,
 });
 
-const userActionReceived = userActions => ({
+const userActionReceived = (userActions) => ({
   type: userActionReceivedType,
   userActions,
 });
 
-const userSettingsUpdated = user => ({
+const userSettingsUpdated = (user) => ({
   type: userSettingsUpdatedType,
   user,
 });
 
 export {
-  userFetchStarted, userFetchStartedType,
-  userReceived, userReceivedType,
-  userActionFetchStarted, userActionFetchStartedType,
-  userActionReceived, userActionReceivedType,
-  userSettingsUpdated, userSettingsUpdatedType,
+  userFetchStarted,
+  userFetchStartedType,
+  userReceived,
+  userReceivedType,
+  userActionFetchStarted,
+  userActionFetchStartedType,
+  userActionReceived,
+  userActionReceivedType,
+  userSettingsUpdated,
+  userSettingsUpdatedType,
 };

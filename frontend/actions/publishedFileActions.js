@@ -17,7 +17,8 @@ const dispatchPublishedFilesReceivedAction = (files) => {
 export default {
   fetchPublishedFiles(id, branch, startAtKey) {
     dispatchPublishedfilesFetchStartedAction();
-    return api.fetchPublishedFiles(id, branch, startAtKey)
+    return api
+      .fetchPublishedFiles(id, branch, startAtKey)
       .then(dispatchPublishedFilesReceivedAction);
   },
 };

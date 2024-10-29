@@ -16,15 +16,28 @@ describe('Webhook API', () => {
     return `sha1=${crypto.createHmac('sha1', secret).update(blob).digest('hex')}`;
   };
 
-  const buildWebhookPayload = (user, site, pushedAt = new Date().getTime()/1000) => ({
+  const buildWebhookPayload = (user, site, pushedAt = new Date().getTime() / 1000) => ({
     ref: 'refs/heads/main',
-    commits: [{ id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7' }],
+    commits: [
+      {
+        id: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
+      },
+    ],
     after: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-    sender: { login: user.username },
-    repository: { full_name: `${site.owner}/${site.repository}`, pushed_at: pushedAt },
+    sender: {
+      login: user.username,
+    },
+    repository: {
+      full_name: `${site.owner}/${site.repository}`,
+      pushed_at: pushedAt,
+    },
   });
 
-  const organizationWebhookPayload = (action, login, organization='federalist-users') => ({
+  const organizationWebhookPayload = (
+    action,
+    login,
+    organization = 'federalist-users',
+  ) => ({
     action,
     membership: {
       user: {
@@ -34,7 +47,7 @@ describe('Webhook API', () => {
     organization: {
       login: organization,
       id: 123,
-    }
+    },
   });
 
   beforeEach(() => {
@@ -54,7 +67,9 @@ describe('Webhook API', () => {
 
     it('should respond with a 400 if the signature is invalid', async () => {
       const site = await factory.site();
-      await site.reload({ include: [User] });
+      await site.reload({
+        include: [User],
+      });
 
       const payload = buildWebhookPayload(site.Users[0], site);
       const signature = '123abc';
@@ -75,7 +90,9 @@ describe('Webhook API', () => {
     context('should call `pushWebhookRequest` with the payload if ok', () => {
       it('site is in not in an organization', async () => {
         const user = await factory.user();
-        const site = await factory.site({ users: [user] });
+        const site = await factory.site({
+          users: [user],
+        });
 
         const payload = buildWebhookPayload(user, site);
         const signature = signWebhookPayload(payload);
@@ -95,7 +112,9 @@ describe('Webhook API', () => {
 
       it('site does not exist', async () => {
         const user = await factory.user();
-        const site = await factory.site({ users: [user] });
+        const site = await factory.site({
+          users: [user],
+        });
 
         const payload = buildWebhookPayload(user, site);
         const signature = signWebhookPayload(payload);
@@ -117,7 +136,10 @@ describe('Webhook API', () => {
     it('site is in an active organization', async () => {
       const org = await factory.organization.create();
       const user = await factory.user();
-      const site = await factory.site({ users: [user], organizationId: org.id });
+      const site = await factory.site({
+        users: [user],
+        organizationId: org.id,
+      });
 
       const payload = buildWebhookPayload(user, site);
       const signature = signWebhookPayload(payload);
@@ -138,7 +160,10 @@ describe('Webhook API', () => {
     it('site is in an inactive organization', async () => {
       const org = await factory.organization.create();
       const user = await factory.user();
-      const site = await factory.site({ users: [user], organizationId: org.id });
+      const site = await factory.site({
+        users: [user],
+        organizationId: org.id,
+      });
 
       const payload = buildWebhookPayload(user, site);
       const signature = signWebhookPayload(payload);
@@ -158,7 +183,10 @@ describe('Webhook API', () => {
 
     it('site is inactive', async () => {
       const user = await factory.user();
-      const site = await factory.site({ users: [user], isActive: false });
+      const site = await factory.site({
+        users: [user],
+        isActive: false,
+      });
 
       const payload = buildWebhookPayload(user, site);
       const signature = signWebhookPayload(payload);
@@ -180,7 +208,9 @@ describe('Webhook API', () => {
   describe('POST /webhook/organization', () => {
     let organizationWebhookRequestStub;
     beforeEach(() => {
-      organizationWebhookRequestStub = sinon.stub(Webhooks, 'organizationWebhookRequest').resolves();
+      organizationWebhookRequestStub = sinon
+        .stub(Webhooks, 'organizationWebhookRequest')
+        .resolves();
     });
 
     it('should respond with a 400 if the signature is invalid', async () => {

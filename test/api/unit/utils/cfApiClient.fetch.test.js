@@ -101,7 +101,7 @@ describe('CloudFoundryAPIClient', () => {
       mockTokenRequest();
       apiNocks.mockFetchServiceInstanceCredentialsRequest(
         serviceInstanceName,
-        keyResponse
+        keyResponse,
       );
 
       const apiClient = new CloudFoundryAPIClient();
@@ -122,7 +122,10 @@ describe('CloudFoundryAPIClient', () => {
 
       const response = factory.createCFAPIResourceList({
         resources: [
-          factory.createCFAPIResource({ guid, name }),
+          factory.createCFAPIResource({
+            guid,
+            name,
+          }),
           factory.createCFAPIResource(),
           factory.createCFAPIResource(),
         ],
@@ -132,12 +135,10 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockFetchS3ServicePlanGUID(response, name);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient
-        .fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
-        .then((res) => {
-          expect(res).to.deep.equal(guid);
-          done();
-        });
+      apiClient.fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId).then((res) => {
+        expect(res).to.deep.equal(guid);
+        done();
+      });
     });
 
     it('should reject when service plan is not found', (done) => {
@@ -151,12 +152,10 @@ describe('CloudFoundryAPIClient', () => {
       apiNocks.mockFetchS3ServicePlanGUID(response, name);
 
       const apiClient = new CloudFoundryAPIClient();
-      apiClient
-        .fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId)
-        .catch((err) => {
-          expect(err.name).to.equal(message);
-          done();
-        });
+      apiClient.fetchS3ServicePlanGUID(name, config.env.s3ServicePlanId).catch((err) => {
+        expect(err.name).to.equal(message);
+        done();
+      });
     });
   });
 
@@ -172,10 +171,7 @@ describe('CloudFoundryAPIClient', () => {
 
       const result = await apiClient.fetchBuildTask(buildId);
 
-      sinon.assert.calledOnceWithExactly(
-        fetchTaskByNameStub,
-        `build-${buildId}`
-      );
+      sinon.assert.calledOnceWithExactly(fetchTaskByNameStub, `build-${buildId}`);
       expect(result).to.equal(stubResult);
     });
   });
@@ -186,7 +182,9 @@ describe('CloudFoundryAPIClient', () => {
         const guid = 'foo';
         const stubArg1 = 'GET';
         const stubArg2 = `/v3/tasks/${guid}`;
-        const stubResult = { guid };
+        const stubResult = {
+          guid,
+        };
 
         const apiClient = new CloudFoundryAPIClient();
 
@@ -195,7 +193,9 @@ describe('CloudFoundryAPIClient', () => {
 
         const result = await apiClient.fetchTaskByGuid(guid);
 
-        expect(result).to.deep.equal({ guid });
+        expect(result).to.deep.equal({
+          guid,
+        });
         sinon.assert.calledOnceWithExactly(fetchTasksStub, stubArg1, stubArg2);
       });
     });
@@ -205,7 +205,9 @@ describe('CloudFoundryAPIClient', () => {
         const guid = 'foo';
         const stubArg1 = 'GET';
         const stubArg2 = `/v3/tasks/${guid}`;
-        const stubResult = { errors: [] };
+        const stubResult = {
+          errors: [],
+        };
 
         const apiClient = new CloudFoundryAPIClient();
 
@@ -233,7 +235,9 @@ describe('CloudFoundryAPIClient', () => {
 
         const result = await apiClient.fetchTaskByName(name);
 
-        expect(result).to.deep.equal({ name });
+        expect(result).to.deep.equal({
+          name,
+        });
         sinon.assert.calledOnceWithExactly(fetchTasksStub, { names: name });
       });
     });
@@ -257,9 +261,12 @@ describe('CloudFoundryAPIClient', () => {
   });
 
   describe('.fetchTasks', () => {
-    it('makes an authenticated request to the GET tasks endpoint with appropriate query parameters', async () => {
+    it(`makes an authenticated request to the GET tasks
+        endpoint with appropriate query parameters`, async () => {
       const tasks = [{ name: 'foo' }, { name: 'bar' }];
-      const stubResult = { resources: tasks };
+      const stubResult = {
+        resources: tasks,
+      };
 
       const apiClient = new CloudFoundryAPIClient();
 
@@ -268,11 +275,7 @@ describe('CloudFoundryAPIClient', () => {
 
       const result = await apiClient.fetchTasks({ names: 'foo' });
 
-      sinon.assert.calledOnceWithExactly(
-        authRequestStub,
-        'GET',
-        '/v3/tasks?names=foo'
-      );
+      sinon.assert.calledOnceWithExactly(authRequestStub, 'GET', '/v3/tasks?names=foo');
       expect(result).to.deep.equal(tasks);
     });
   });
@@ -308,7 +311,7 @@ describe('CloudFoundryAPIClient', () => {
         const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
         cancelTaskStub.resolves();
 
-        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
+        const error = await apiClient.cancelBuildTask(buildId).catch((e) => e);
 
         sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
         sinon.assert.notCalled(cancelTaskStub);
@@ -328,7 +331,7 @@ describe('CloudFoundryAPIClient', () => {
         const cancelTaskStub = sinon.stub(apiClient, 'cancelTask');
         cancelTaskStub.rejects();
 
-        const error = await apiClient.cancelBuildTask(buildId).catch(e => e);
+        const error = await apiClient.cancelBuildTask(buildId).catch((e) => e);
 
         sinon.assert.calledOnceWithExactly(fetchBuildTaskStub, buildId);
         sinon.assert.calledOnceWithExactly(cancelTaskStub, taskGuid);
@@ -351,7 +354,7 @@ describe('CloudFoundryAPIClient', () => {
       sinon.assert.calledOnceWithExactly(
         authRequestStub,
         'POST',
-        `/v3/tasks/${taskGuid}/actions/cancel`
+        `/v3/tasks/${taskGuid}/actions/cancel`,
       );
     });
   });
@@ -364,9 +367,7 @@ describe('CloudFoundryAPIClient', () => {
       const stub = sinon.stub(apiClient, 'fetchTaskByGuid');
       stub.resolves(null);
 
-      const response = await apiClient
-        .pollTaskStatus(taskGuid)
-        .catch(err => err);
+      const response = await apiClient.pollTaskStatus(taskGuid).catch((err) => err);
 
       expect(response).to.throw;
       expect(response.message).to.equal('Task not found');
@@ -375,7 +376,9 @@ describe('CloudFoundryAPIClient', () => {
 
     it('throws an error if pollTaskStatus times out', async () => {
       const taskGuid = 'abc123';
-      const status = { state: 'PENDING' };
+      const status = {
+        state: 'PENDING',
+      };
       const apiClient = new CloudFoundryAPIClient();
 
       const stubStatus = sinon.stub(apiClient, 'fetchTaskByGuid');
@@ -385,8 +388,11 @@ describe('CloudFoundryAPIClient', () => {
       stubCancelTask.resolves();
 
       const response = await apiClient
-        .pollTaskStatus(taskGuid, { totalAttempts: 5, sleepInterval: 0 })
-        .catch(err => err);
+        .pollTaskStatus(taskGuid, {
+          totalAttempts: 5,
+          sleepInterval: 0,
+        })
+        .catch((err) => err);
 
       expect(response).to.throw;
       expect(response.message).to.equal('Task timed out after 0 minutes');
@@ -398,8 +404,12 @@ describe('CloudFoundryAPIClient', () => {
     it('should return the state of a SUCCEEDED task', async () => {
       const taskGuid = 'abc123';
       const state = 'SUCCEEDED';
-      const statusPending = { state: 'PENDING' };
-      const statusComplete = { state };
+      const statusPending = {
+        state: 'PENDING',
+      };
+      const statusComplete = {
+        state,
+      };
 
       const apiClient = new CloudFoundryAPIClient();
 
@@ -412,8 +422,10 @@ describe('CloudFoundryAPIClient', () => {
         .onThirdCall()
         .resolves(statusComplete);
 
-      const response = await apiClient
-        .pollTaskStatus(taskGuid, { totalAttempts: 5, sleepInterval: 0 });
+      const response = await apiClient.pollTaskStatus(taskGuid, {
+        totalAttempts: 5,
+        sleepInterval: 0,
+      });
 
       expect(response.state).to.equal(state);
       expect(stubStatus.callCount).to.equal(3);
@@ -423,8 +435,12 @@ describe('CloudFoundryAPIClient', () => {
     it('should return the state of a FAILED task', async () => {
       const taskGuid = 'abc123';
       const state = 'FAILED';
-      const statusPending = { state: 'PENDING' };
-      const statusComplete = { state };
+      const statusPending = {
+        state: 'PENDING',
+      };
+      const statusComplete = {
+        state,
+      };
 
       const apiClient = new CloudFoundryAPIClient();
 
@@ -437,8 +453,10 @@ describe('CloudFoundryAPIClient', () => {
         .onThirdCall()
         .resolves(statusComplete);
 
-      const response = await apiClient
-        .pollTaskStatus(taskGuid, { totalAttempts: 5, sleepInterval: 0 });
+      const response = await apiClient.pollTaskStatus(taskGuid, {
+        totalAttempts: 5,
+        sleepInterval: 0,
+      });
 
       expect(response.state).to.equal(state);
       expect(stubStatus.callCount).to.equal(3);
@@ -452,15 +470,21 @@ describe('CloudFoundryAPIClient', () => {
       const method = 'fetchServiceInstances';
       const resource1stCall = factory.createCFAPIResource({
         name,
-        last_operation: { state: 'initial' },
+        last_operation: {
+          state: 'initial',
+        },
       });
       const resource2ndCall = factory.createCFAPIResource({
         name,
-        last_operation: { state: 'in progress' },
+        last_operation: {
+          state: 'in progress',
+        },
       });
       const resource3rdCall = factory.createCFAPIResource({
         name,
-        last_operation: { state: 'succeeded' },
+        last_operation: {
+          state: 'succeeded',
+        },
       });
       const apiClient = new CloudFoundryAPIClient();
 
@@ -481,13 +505,16 @@ describe('CloudFoundryAPIClient', () => {
       expect(response).to.deep.equal(resource3rdCall);
     });
 
-    it('should retry fetching up to 5 times and returns last fetched result', async () => {
+    it(`should retry fetching up to 5
+        times and returns last fetched result`, async () => {
       const name = 'instance-name';
       const totalRetries = 5;
       const method = 'fetchServiceInstances';
       const resource = factory.createCFAPIResource({
         name,
-        last_operation: { state: 'initial' },
+        last_operation: {
+          state: 'initial',
+        },
       });
       const apiClient = new CloudFoundryAPIClient();
 

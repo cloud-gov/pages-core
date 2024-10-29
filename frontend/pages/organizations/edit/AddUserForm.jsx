@@ -4,12 +4,10 @@ import { Field, reduxForm } from 'redux-form';
 import InputWithErrorField from '@shared/Fields/InputWithErrorField';
 import Select from '@shared/Fields/Select';
 
-export const validateEmail = email => (!email
-  ? 'email is required'
-  : undefined);
+export const validateEmail = (email) => (!email ? 'email is required' : undefined);
 
 function validateRole(roleId, _, { roleOptions }) {
-  return roleOptions.map(opt => `${opt.value}`).includes(roleId)
+  return roleOptions.map((opt) => `${opt.value}`).includes(roleId)
     ? undefined
     : 'Please select a role';
 }
@@ -23,9 +21,11 @@ const AddUserForm = ({
   roleOptions,
   submitting,
 }) => (
-  <form className={className} onSubmit={data => handleSubmit(data).then(reset)}>
+  <form className={className} onSubmit={(data) => handleSubmit(data).then(reset)}>
     <fieldset className="usa-fieldset">
-      <legend className="font-heading-md text-bold margin-bottom-2">Add new organization member</legend>
+      <legend className="font-heading-md text-bold margin-bottom-2">
+        Add new organization member
+      </legend>
       <Field
         id="uaaEmail"
         name="uaaEmail"
@@ -73,9 +73,7 @@ AddUserForm.propTypes = {
   invalid: PropTypes.bool.isRequired,
   pristine: PropTypes.bool.isRequired,
   reset: PropTypes.func.isRequired,
-  roleOptions: PropTypes.arrayOf(
-    PropTypes.object
-  ).isRequired,
+  roleOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
   submitting: PropTypes.bool.isRequired,
 };
 

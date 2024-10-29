@@ -7,20 +7,29 @@ const associate = ({ ActionType, UserAction }) => {
 };
 
 module.exports = (sequelize, DataTypes) => {
-  const createDefaultActionTypes = () => Promise.all(
-    defaultTypes.map(type => sequelize.models.ActionType.create({ action: type }))
-  );
+  const createDefaultActionTypes = () =>
+    Promise.all(
+      defaultTypes.map((type) =>
+        sequelize.models.ActionType.create({
+          action: type,
+        }),
+      ),
+    );
 
-  const ActionType = sequelize.define('ActionType', {
-    action: {
-      type: DataTypes.STRING,
-      length: 20,
-      allowNull: false,
+  const ActionType = sequelize.define(
+    'ActionType',
+    {
+      action: {
+        type: DataTypes.STRING,
+        length: 20,
+        allowNull: false,
+      },
     },
-  }, {
-    tableName: 'action_type',
-    timestamps: false,
-  });
+    {
+      tableName: 'action_type',
+      timestamps: false,
+    },
+  );
 
   ActionType.associate = associate;
   ActionType.createDefaultActionTypes = createDefaultActionTypes;

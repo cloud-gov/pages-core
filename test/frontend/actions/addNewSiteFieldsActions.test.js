@@ -6,12 +6,11 @@ proxyquire.noCallThru();
 
 const dispatchHideAddNewSiteFieldsAction = spy();
 
-const actions = proxyquire(
-  '../../../frontend/actions/addNewSiteFieldsActions', {
-    './dispatchActions': {
-      dispatchHideAddNewSiteFieldsAction,
-    },
-  }).default;
+const actions = proxyquire('../../../frontend/actions/addNewSiteFieldsActions', {
+  './dispatchActions': {
+    dispatchHideAddNewSiteFieldsAction,
+  },
+}).default;
 
 describe('addNewSiteFieldsActions', () => {
   it('hideAddNewSiteFields()', () => {

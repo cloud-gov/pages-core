@@ -5,14 +5,17 @@ async function nightlyBuilds() {
   const results = await NightlyBuildsHelper.nightlyBuilds();
 
   const successes = results
-    .filter(result => result.status === 'fulfilled')
-    .map(result => result.value);
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => result.value);
 
   const failures = results
-    .filter(result => result.status === 'rejected')
-    .map(result => result.reason);
+    .filter((result) => result.status === 'rejected')
+    .map((result) => result.reason);
 
-  const msg = [`Queued nightly builds with ${successes.length} successes and ${failures.length} failures.`];
+  const msg = [
+    `Queued nightly builds with ${successes.length} successes` +
+      ` and ${failures.length} failures.`,
+  ];
   if (successes.length) {
     msg.push(`   Successes:\n      ${successes.join('\n      ')}`);
   }

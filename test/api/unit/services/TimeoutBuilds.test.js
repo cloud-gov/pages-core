@@ -10,10 +10,11 @@ const CFApi = require('../../../../api/utils/cfApiClient');
 const { Processing, Queued, Tasked } = Build.States;
 
 function setBuildUpdatedAt(build, date) {
-  return sequelize.query(
-    'UPDATE build set "updatedAt" = ? WHERE id = ?',
-    { replacements: [date, build.id] }
-  ).then(() => build.reload());
+  return sequelize
+    .query('UPDATE build set "updatedAt" = ? WHERE id = ?', {
+      replacements: [date, build.id],
+    })
+    .then(() => build.reload());
 }
 
 describe('TimeoutBuilds', () => {
@@ -43,30 +44,75 @@ describe('TimeoutBuilds', () => {
 
     const [b1, b2] = await Promise.all([
       // should be timed out
-      factory.build({ state: Processing, startedAt: now.clone().subtract(timeout + 22, 'minutes').toDate() }),
-      factory.build({ state: Processing, startedAt: now.clone().subtract(timeout + 20, 'minutes').toDate() }),
-      factory.build({ state: Tasked })
-        .then(build => setBuildUpdatedAt(build, now.clone().subtract(6, 'minutes').toDate())),
+      factory.build({
+        state: Processing,
+        startedAt: now
+          .clone()
+          .subtract(timeout + 22, 'minutes')
+          .toDate(),
+      }),
+      factory.build({
+        state: Processing,
+        startedAt: now
+          .clone()
+          .subtract(timeout + 20, 'minutes')
+          .toDate(),
+      }),
+      factory
+        .build({
+          state: Tasked,
+        })
+        .then((build) =>
+          setBuildUpdatedAt(build, now.clone().subtract(6, 'minutes').toDate()),
+        ),
 
       // other
       factory.build(),
-      factory.build({ state: Processing, startedAt: now.toDate() }),
-      factory.build({ state: Processing, startedAt: now.clone().subtract(timeout - 1, 'minutes').toDate() }),
-      factory.build({ state: Tasked })
-        .then(build => setBuildUpdatedAt(build, now.clone().subtract(3, 'minutes').toDate())),
+      factory.build({
+        state: Processing,
+        startedAt: now.toDate(),
+      }),
+      factory.build({
+        state: Processing,
+        startedAt: now
+          .clone()
+          .subtract(timeout - 1, 'minutes')
+          .toDate(),
+      }),
+      factory
+        .build({
+          state: Tasked,
+        })
+        .then((build) =>
+          setBuildUpdatedAt(build, now.clone().subtract(3, 'minutes').toDate()),
+        ),
 
       // invalid states
-      factory.build({ state: Queued, startedAt: now.clone().subtract(timeout + 20, 'minutes').toDate() }),
-      factory.build({ state: Processing }),
+      factory.build({
+        state: Queued,
+        startedAt: now
+          .clone()
+          .subtract(timeout + 20, 'minutes')
+          .toDate(),
+      }),
+      factory.build({
+        state: Processing,
+      }),
     ]);
 
     const results = await timeoutBuilds(now);
 
     expect(results.length).to.equal(2);
-    expect(results.map(r => r[0])).to.have.members([b1.id, b2.id]);
-    expect(results.map(r => r[1])).to.have.deep.members([
-      { status: 'fulfilled', value: undefined },
-      { status: 'rejected', reason: error },
+    expect(results.map((r) => r[0])).to.have.members([b1.id, b2.id]);
+    expect(results.map((r) => r[1])).to.have.deep.members([
+      {
+        status: 'fulfilled',
+        value: undefined,
+      },
+      {
+        status: 'rejected',
+        reason: error,
+      },
     ]);
 
     await Promise.all([b1.reload(), b2.reload()]);

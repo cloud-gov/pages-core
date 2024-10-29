@@ -14,19 +14,26 @@ module.exports = {
 
     fetchModelById(req.params.site_id, Site)
       .then((model) => {
-        if (!model) { throw 404; }
+        if (!model) {
+          throw 404;
+        }
 
         site = model;
         return siteAuthorizer.findOne(req.user, site);
       })
-      .then(() => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey))
+      .then(() =>
+        S3PublishedFileLister.listPagedPublishedFilesForBranch(site, branch, startAtKey),
+      )
       .then((response) => {
         pagedFilesResponse = response;
         return PublishedBranchSerializer.serialize(site, branch);
       })
       .then((branchJSON) => {
-        pagedFilesResponse.files = pagedFilesResponse.files
-          .map(file => Object.assign(file, { publishedBranch: branchJSON }));
+        pagedFilesResponse.files = pagedFilesResponse.files.map((file) =>
+          Object.assign(file, {
+            publishedBranch: branchJSON,
+          }),
+        );
 
         res.json(pagedFilesResponse);
       })

@@ -115,7 +115,9 @@
           "any": [
             {
               "id": "color-contrast",
-              "data": { "messageKey": "hidden" },
+              "data": {
+                "messageKey": "hidden"
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Element is hidden"
@@ -535,13 +537,7 @@
     {
       "id": "listitem",
       "impact": null,
-      "tags": [
-        "cat.structure",
-        "wcag2a",
-        "wcag131",
-        "EN-301-549",
-        "EN-9.1.3.1"
-      ],
+      "tags": ["cat.structure", "wcag2a", "wcag131", "EN-301-549", "EN-9.1.3.1"],
       "description": "Ensure <li> elements are used semantically",
       "help": "<li> elements must be contained in a <ul> or <ol>",
       "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/listitem?application=webdriverjs",
@@ -668,14 +664,21 @@
           "any": [
             {
               "id": "target-size",
-              "data": { "minSize": 24, "width": 184.4, "height": 41.6 },
+              "data": {
+                "minSize": 24,
+                "width": 184.4,
+                "height": 41.6
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Control has sufficient size (184.4px by 41.6px, should be at least 24px by 24px)"
             },
             {
               "id": "target-offset",
-              "data": { "closestOffset": 24, "minOffset": 24 },
+              "data": {
+                "closestOffset": 24,
+                "minOffset": 24
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Target has sufficient space from its closest neighbors. Safe clickable space has a diameter of 24px which is at least 24px."
@@ -691,7 +694,10 @@
           "any": [
             {
               "id": "target-offset",
-              "data": { "closestOffset": 24, "minOffset": 24 },
+              "data": {
+                "closestOffset": 24,
+                "minOffset": 24
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Target has sufficient space from its closest neighbors. Safe clickable space has a diameter of 24px which is at least 24px."
@@ -707,7 +713,10 @@
           "any": [
             {
               "id": "target-offset",
-              "data": { "closestOffset": 24, "minOffset": 24 },
+              "data": {
+                "closestOffset": 24,
+                "minOffset": 24
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Target has sufficient space from its closest neighbors. Safe clickable space has a diameter of 24px which is at least 24px."
@@ -723,14 +732,21 @@
           "any": [
             {
               "id": "target-size",
-              "data": { "minSize": 24, "width": 62.4, "height": 48 },
+              "data": {
+                "minSize": 24,
+                "width": 62.4,
+                "height": 48
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Control has sufficient size (62.4px by 48px, should be at least 24px by 24px)"
             },
             {
               "id": "target-offset",
-              "data": { "closestOffset": 24, "minOffset": 24 },
+              "data": {
+                "closestOffset": 24,
+                "minOffset": 24
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Target has sufficient space from its closest neighbors. Safe clickable space has a diameter of 24px which is at least 24px."
@@ -746,7 +762,10 @@
           "any": [
             {
               "id": "target-offset",
-              "data": { "closestOffset": 24, "minOffset": 24 },
+              "data": {
+                "closestOffset": 24,
+                "minOffset": 24
+              },
               "relatedNodes": [],
               "impact": "serious",
               "message": "Target has sufficient space from its closest neighbors. Safe clickable space has a diameter of 24px which is at least 24px."
@@ -1911,13 +1930,7 @@
     {
       "id": "list",
       "impact": null,
-      "tags": [
-        "cat.structure",
-        "wcag2a",
-        "wcag131",
-        "EN-301-549",
-        "EN-9.1.3.1"
-      ],
+      "tags": ["cat.structure", "wcag2a", "wcag131", "EN-301-549", "EN-9.1.3.1"],
       "description": "Ensure that lists are structured correctly",
       "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
       "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/list?application=webdriverjs",
@@ -2139,7 +2152,12 @@
             {
               "id": "landmark",
               "data": null,
-              "relatedNodes": [{ "html": "<main>", "target": ["main"] }],
+              "relatedNodes": [
+                {
+                  "html": "<main>",
+                  "target": ["main"]
+                }
+              ],
               "impact": "serious",
               "message": "Page has a landmark region"
             }

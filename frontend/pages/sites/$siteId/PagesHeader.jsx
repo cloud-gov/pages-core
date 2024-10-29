@@ -3,15 +3,11 @@ import PropTypes from 'prop-types';
 
 import GitHubLink from '@shared/GitHubLink';
 
-const PagesHeader = ({
-  owner, repository, title,
-}) => (
+const PagesHeader = ({ owner, repository, title }) => (
   <div className="page-header grid-row flex-align-center">
     <div className="desktop:grid-col-fill grid-col-12">
       <div className="header-title">
-        <h1 className="font-sans-lg margin-top-3">
-          {`${owner}/${repository}`}
-        </h1>
+        <h1 className="font-sans-lg margin-top-3">{`${owner}/${repository}`}</h1>
       </div>
     </div>
     <div className="desktop:grid-col-auto grid-col-12 header-actions margin-right-neg-1">

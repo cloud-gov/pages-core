@@ -19,32 +19,47 @@ module.exports = wrapHandlers({
         userId: toInt(userId),
       },
     });
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'OrganizationRole Removed', { organizationRole: { orgId, userId } });
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'OrganizationRole Removed', {
+      organizationRole: {
+        orgId,
+        userId,
+      },
+    });
 
     return res.json({});
   },
 
   async update(req, res) {
     const {
-      body: {
-        organizationId,
-        roleId,
-        userId,
-      },
+      body: { organizationId, roleId, userId },
     } = req;
 
     const org = await fetchModelById(organizationId, Organization);
     if (!org) return res.notFound();
 
-    await OrganizationRole.update({ roleId: toInt(roleId) }, {
+    await OrganizationRole.update(
+      {
+        roleId: toInt(roleId),
+      },
+      {
+        where: {
+          organizationId: toInt(organizationId),
+          userId: toInt(userId),
+        },
+      },
+    );
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'OrganizationRole Updated', {
+      organizationRole: {
+        organizationId,
+        userId,
+        roleId,
+      },
+    });
+    const member = await OrganizationRole.forOrganization(org).findOne({
       where: {
-        organizationId: toInt(organizationId),
         userId: toInt(userId),
       },
     });
-    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'OrganizationRole Updated', { organizationRole: { organizationId, userId, roleId } });
-    const member = await OrganizationRole.forOrganization(org)
-      .findOne({ where: { userId: toInt(userId) } });
 
     const json = organizationRoleSerializer.serialize(member);
     return res.json(json);

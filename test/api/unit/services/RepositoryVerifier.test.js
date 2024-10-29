@@ -104,8 +104,12 @@ describe('RepositoryVerifier', () => {
       let users;
       let site;
       Promise.all([
-        factory.user({ githubAccessToken: null }),
-        factory.user({ githubAccessToken: null }),
+        factory.user({
+          githubAccessToken: null,
+        }),
+        factory.user({
+          githubAccessToken: null,
+        }),
       ])
         .then((_users) => {
           users = _users;
@@ -138,17 +142,44 @@ describe('RepositoryVerifier', () => {
     it('verify sites only with users that have githubAccessToken', (done) => {
       let users;
       const repoLastVerified = moment().subtract(1, 'day').toDate();
-      Site.destroy({ where: {}, truncate: true })
-        .then(() => factory.site({ users: [], repoLastVerified }))
-        .then(() => factory.user({ githubAccessToken: null, repoLastVerified }))
-        .then(user => factory.site({ users: [user], repoLastVerified }))
+      Site.destroy({
+        where: {},
+        truncate: true,
+      })
+        .then(() =>
+          factory.site({
+            users: [],
+            repoLastVerified,
+          }),
+        )
+        .then(() =>
+          factory.user({
+            githubAccessToken: null,
+            repoLastVerified,
+          }),
+        )
+        .then((user) =>
+          factory.site({
+            users: [user],
+            repoLastVerified,
+          }),
+        )
         .then(() => Promise.all([factory.user(), factory.user()]))
         .then((_users) => {
           users = _users;
           return Promise.all([
-            factory.site({ users, repoLastVerified }),
-            factory.site({ users, repoLastVerified }),
-            factory.site({ users, repoLastVerified }),
+            factory.site({
+              users,
+              repoLastVerified,
+            }),
+            factory.site({
+              users,
+              repoLastVerified,
+            }),
+            factory.site({
+              users,
+              repoLastVerified,
+            }),
           ]);
         })
         .then((sites) => {
@@ -167,11 +198,17 @@ describe('RepositoryVerifier', () => {
           });
           return RepositoryVerifier.verifyRepos();
         })
-        .then(() => Site.findAll({ include: User }))
+        .then(() =>
+          Site.findAll({
+            include: User,
+          }),
+        )
         .then((sites) => {
           expect(sites.length).to.equal(5);
-          expect(sites.filter(site => site.Users.length > 0).length).to.equal(4);
-          expect(sites.filter(site => site.repoLastVerified > repoLastVerified).length).to.equal(3);
+          expect(sites.filter((site) => site.Users.length > 0).length).to.equal(4);
+          expect(
+            sites.filter((site) => site.repoLastVerified > repoLastVerified).length,
+          ).to.equal(3);
           done();
         })
         .catch(done);
@@ -180,30 +217,57 @@ describe('RepositoryVerifier', () => {
 
   context('verifyUserRepos', () => {
     it('verify sites only with users that have githubAccessToken', (done) => {
-      const MockRepositoryVerifier = proxyquire('../../../../api/services/RepositoryVerifier',
-        { './GitHub': MockGitHub });
+      const MockRepositoryVerifier = proxyquire(
+        '../../../../api/services/RepositoryVerifier',
+        {
+          './GitHub': MockGitHub,
+        },
+      );
       let user;
       let sites;
       const repoLastVerified = moment().subtract(1, 'day').toDate();
-      factory.user()
+      factory
+        .user()
         .then((model) => {
           user = model;
           const owner = 'owner';
           return Promise.all([
-            factory.site({ owner, repository: 'repo-0', users: [user], repoLastVerified }),
-            factory.site({ owner, repository: 'repo-1', users: [user], repoLastVerified }),
-            factory.site({ owner, repository: 'repo-2', repoLastVerified }),
+            factory.site({
+              owner,
+              repository: 'repo-0',
+              users: [user],
+              repoLastVerified,
+            }),
+            factory.site({
+              owner,
+              repository: 'repo-1',
+              users: [user],
+              repoLastVerified,
+            }),
+            factory.site({
+              owner,
+              repository: 'repo-2',
+              repoLastVerified,
+            }),
           ]);
         })
         .then((models) => {
           sites = models;
           return MockRepositoryVerifier.verifyUserRepos(user);
         })
-        .then(() => Site.findAll({ where: { id: sites.map(s => s.id) } }))
+        .then(() =>
+          Site.findAll({
+            where: {
+              id: sites.map((s) => s.id),
+            },
+          }),
+        )
         .then((models) => {
           sites = models;
           expect(sites.length).equal(3);
-          expect(sites.filter(s => s.repoLastVerified > repoLastVerified).length).to.equal(2);
+          expect(
+            sites.filter((s) => s.repoLastVerified > repoLastVerified).length,
+          ).to.equal(2);
           done();
         })
         .catch(done);

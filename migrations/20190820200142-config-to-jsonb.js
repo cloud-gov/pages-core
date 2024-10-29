@@ -1,22 +1,29 @@
 const yaml = require('js-yaml');
 
-const cmdGetSitesText = 'SELECT id, config, "demoConfig", "previewConfig" from site where '
-  + '(config is not null AND TRIM(config) <> \'\')'
-  + ' OR ("demoConfig" is not null AND TRIM("demoConfig") <> \'\')'
-  + ' OR ("previewConfig" is not null AND TRIM("previewConfig") <> \'\')';
+const cmdGetSitesText =
+  'SELECT id, config, "demoConfig", "previewConfig" from site where ' +
+  "(config is not null AND TRIM(config) <> '')" +
+  ' OR ("demoConfig" is not null AND TRIM("demoConfig") <> \'\')' +
+  ' OR ("previewConfig" is not null AND TRIM("previewConfig") <> \'\')';
 
 const convertSiteConfigsToJSON = (db, site) => {
   const atts = [];
   if (site.config && site.config.trim().length > 0) {
-    atts.push(`"defaultConfig" = '${JSON.stringify(yaml.load(site.config.trim()))}'::jsonb`);
+    atts.push(
+      `"defaultConfig" = '${JSON.stringify(yaml.load(site.config.trim()))}'::jsonb`,
+    );
   }
 
   if (site.demoConfig && site.demoConfig.trim().length > 0) {
-    atts.push(`"demoConfig" = '${JSON.stringify(yaml.load(site.demoConfig.trim()))}'::jsonb`);
+    atts.push(
+      `"demoConfig" = '${JSON.stringify(yaml.load(site.demoConfig.trim()))}'::jsonb`,
+    );
   }
 
   if (site.previewConfig && site.previewConfig.trim().length > 0) {
-    atts.push(`"previewConfig" = '${JSON.stringify(yaml.load(site.previewConfig.trim()))}'::jsonb`);
+    atts.push(
+      `"previewConfig" = '${JSON.stringify(yaml.load(site.previewConfig.trim()))}'::jsonb`,
+    );
   }
 
   const cmdUpdateSiteRecord = `
@@ -30,7 +37,8 @@ const convertSiteConfigsToJSON = (db, site) => {
   return db.runSql(cmdUpdateSiteRecord);
 };
 
-const convertAllSitesConfigsToJSON = (db, sites) => Promise.all(sites.rows.map(site => convertSiteConfigsToJSON(db, site)));
+const convertAllSitesConfigsToJSON = (db, sites) =>
+  Promise.all(sites.rows.map((site) => convertSiteConfigsToJSON(db, site)));
 
 exports.up = (db, callback) => {
   let sites;
@@ -76,12 +84,14 @@ const convertSiteConfigsToYAML = (db, site) => {
   return db.runSql(cmdUpdateSiteRecord);
 };
 
-const cmdGetSitesJSON = 'SELECT id, "defaultConfig", "demoConfig", "previewConfig" from site where '
-  + '("defaultConfig" is not null)'
-  + ' OR ("demoConfig" is not null)'
-  + ' OR ("previewConfig" is not null)';
+const cmdGetSitesJSON =
+  'SELECT id, "defaultConfig", "demoConfig", "previewConfig" from site where ' +
+  '("defaultConfig" is not null)' +
+  ' OR ("demoConfig" is not null)' +
+  ' OR ("previewConfig" is not null)';
 
-const convertAllSitesConfigsToYAML = (db, sites) => Promise.all(sites.rows.map(site => convertSiteConfigsToYAML(db, site)));
+const convertAllSitesConfigsToYAML = (db, sites) =>
+  Promise.all(sites.rows.map((site) => convertSiteConfigsToYAML(db, site)));
 
 exports.down = (db, callback) => {
   let sites;

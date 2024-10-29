@@ -8,17 +8,17 @@ const getRepoLastVerified = (site) => {
 };
 
 const RepoLastVerified = ({ site, maxDaysUnverified, userUpdated }) => {
-  const daysAgo = fromDate => (new Date() - new Date(fromDate)) / (24 * 60 * 60 * 1000);
-  const minutesAgo = fromDate => (new Date() - new Date(fromDate)) / (60 * 1000);
-  if ((daysAgo(site.repoLastVerified) > maxDaysUnverified)
-    && (userUpdated && (minutesAgo(userUpdated) > 4))) { // user logged in 4 mins
-    return (
-      <p className="repo-verification">
-        {getRepoLastVerified(site)}
-      </p>
-    );
+  const daysAgo = (fromDate) => (new Date() - new Date(fromDate)) / (24 * 60 * 60 * 1000);
+  const minutesAgo = (fromDate) => (new Date() - new Date(fromDate)) / (60 * 1000);
+  if (
+    daysAgo(site.repoLastVerified) > maxDaysUnverified &&
+    userUpdated &&
+    minutesAgo(userUpdated) > 4
+  ) {
+    // user logged in 4 mins
+    return <p className="repo-verification">{getRepoLastVerified(site)}</p>;
   }
-  return (null);
+  return null;
 };
 
 RepoLastVerified.propTypes = {

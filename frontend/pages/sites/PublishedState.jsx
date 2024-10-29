@@ -11,11 +11,7 @@ const getPublishedState = (site) => {
   return 'Please wait for build to complete or check logs for error message.';
 };
 
-const PublishedState = ({ site = {} }) => (
-  <p>
-    {getPublishedState(site)}
-  </p>
-);
+const PublishedState = ({ site = {} }) => <p>{getPublishedState(site)}</p>;
 
 PublishedState.propTypes = {
   site: PropTypes.shape({

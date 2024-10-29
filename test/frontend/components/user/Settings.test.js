@@ -5,16 +5,28 @@ import sinon from 'sinon';
 
 import LoadingIndicator from '../../../../frontend/components/LoadingIndicator';
 
-import { buildInitialValues, Settings } from '../../../../frontend/components/user/Settings';
+import {
+  buildInitialValues,
+  Settings,
+} from '../../../../frontend/components/user/Settings';
 
-function getProps({
-  organizations, sites, user, actions: {
-    error, success, updateUserSettings, userSettingsUpdated,
-  } = {},
-} = { actions: {} }) {
+function getProps(
+  {
+    organizations,
+    sites,
+    user,
+    actions: { error, success, updateUserSettings, userSettingsUpdated } = {},
+  } = { actions: {} },
+) {
   return {
-    organizations: organizations ?? { isLoading: false, data: [] },
-    sites: sites ?? { isLoading: false, data: [] },
+    organizations: organizations ?? {
+      isLoading: false,
+      data: [],
+    },
+    sites: sites ?? {
+      isLoading: false,
+      data: [],
+    },
     user: user ?? {},
     actions: {
       error: error ?? sinon.stub(),
@@ -53,7 +65,11 @@ describe('<Settings />', () => {
   afterEach(() => sinon.restore());
 
   it('shows the loading indicator when sites data is loading', () => {
-    const props = getProps({ sites: { isLoading: true } });
+    const props = getProps({
+      sites: {
+        isLoading: true,
+      },
+    });
 
     const wrapper = shallow(<Settings {...props} />);
 
@@ -61,7 +77,11 @@ describe('<Settings />', () => {
   });
 
   it('shows the loading indicator when organizations data is loading', () => {
-    const props = getProps({ organizations: { isLoading: true } });
+    const props = getProps({
+      organizations: {
+        isLoading: true,
+      },
+    });
 
     const wrapper = shallow(<Settings {...props} />);
 

@@ -15,7 +15,7 @@ const httpError = (message, payload = {}) => ({
   payload,
 });
 
-const httpSuccess = message => ({
+const httpSuccess = (message) => ({
   type: httpSuccessType,
   status: 'info',
   message,
@@ -30,9 +30,14 @@ const clear = () => ({
 });
 
 export {
-  authError, authErrorType,
-  httpError, httpErrorType,
-  httpSuccess, httpSuccessType,
-  setStale, setStaleType,
-  clear, clearType,
+  authError,
+  authErrorType,
+  httpError,
+  httpErrorType,
+  httpSuccess,
+  httpSuccessType,
+  setStale,
+  setStaleType,
+  clear,
+  clearType,
 };

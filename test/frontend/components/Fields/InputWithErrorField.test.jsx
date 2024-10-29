@@ -13,7 +13,10 @@ describe('<InputWithErrorField />', () => {
       label: 'the label',
       placeholder: 'placeholder',
       help: <span id="helpspan">help text</span>,
-      meta: { touched: false, error: null },
+      meta: {
+        touched: false,
+        error: null,
+      },
     };
 
     const wrapper = shallow(<InputWithErrorField {...props} />);
@@ -29,7 +32,10 @@ describe('<InputWithErrorField />', () => {
       name: 'aName',
       label: 'the label',
       placeholder: 'put text here',
-      meta: { touched: false, error: null },
+      meta: {
+        touched: false,
+        error: null,
+      },
     };
 
     let wrapper = shallow(<InputWithErrorField {...props} />);

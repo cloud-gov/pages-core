@@ -1,17 +1,9 @@
 const _ = require('underscore');
 const { wrapHandlers } = require('../utils');
-const {
-  serialize,
-  serializeMany,
-} = require('../serializers/site-branch-config');
+const { serialize, serializeMany } = require('../serializers/site-branch-config');
 const EventCreator = require('../services/EventCreator');
-const {
-  ValidationError,
-  parseSiteConfig,
-} = require('../utils/validators');
-const {
-  Build, Site, SiteBranchConfig, Event,
-} = require('../models');
+const { ValidationError, parseSiteConfig } = require('../utils/validators');
+const { Build, Site, SiteBranchConfig, Event } = require('../models');
 
 function generateS3Key(site, context, branch) {
   if (context === 'site' || context === 'demo') {
@@ -33,14 +25,18 @@ function validate({ branch, config = {}, context } = {}) {
   }
 
   if (
-    parsedConfig instanceof Error
-    || typeof parsedConfig === 'number'
-    || typeof parsedConfig === 'string'
+    parsedConfig instanceof Error ||
+    typeof parsedConfig === 'number' ||
+    typeof parsedConfig === 'string'
   ) {
     throw new ValidationError('Config must be valid JSON or YAML.');
   }
 
-  return { branch, config: parsedConfig, context };
+  return {
+    branch,
+    config: parsedConfig,
+    context,
+  };
 }
 
 module.exports = wrapHandlers({
@@ -55,7 +51,9 @@ module.exports = wrapHandlers({
     }
 
     const siteBranchConfigs = await SiteBranchConfig.findAll({
-      where: { siteId: site.id },
+      where: {
+        siteId: site.id,
+      },
     });
 
     const json = serializeMany(siteBranchConfigs);
@@ -85,14 +83,12 @@ module.exports = wrapHandlers({
         s3Key,
       });
 
-      EventCreator.audit(
-        Event.labels.USER_ACTION,
-        req.user,
-        'SiteBranchConfig Created',
-        {
-          siteBranchConfig: { id: sbc.id, siteId },
-        }
-      );
+      EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteBranchConfig Created', {
+        siteBranchConfig: {
+          id: sbc.id,
+          siteId,
+        },
+      });
 
       if (context && context !== 'preview' && branch) {
         const build = await Build.create({
@@ -114,7 +110,7 @@ module.exports = wrapHandlers({
               siteId,
               buildId: build.id,
             },
-          }
+          },
         );
       }
 
@@ -124,12 +120,13 @@ module.exports = wrapHandlers({
     } catch (error) {
       if (error.errors) {
         const duplicateBranchError = error.errors.find(
-          err => err.type === 'unique violation'
+          (err) => err.type === 'unique violation',
         );
 
         if (duplicateBranchError) {
           return res.badRequest({
             message:
+              // eslint-disable-next-line max-len
               'An error occurred creating the site branch config: Branch names must be unique per site.',
           });
         }
@@ -164,19 +161,14 @@ module.exports = wrapHandlers({
     }
 
     await siteBranchConfig.destroy();
-    EventCreator.audit(
-      Event.labels.USER_ACTION,
-      req.user,
-      'SiteBranchConfig Destroyed',
-      {
-        siteBranchConfig: {
-          id,
-          siteId,
-          branch: siteBranchConfig.branch,
-          context: siteBranchConfig.context,
-        },
-      }
-    );
+    EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteBranchConfig Destroyed', {
+      siteBranchConfig: {
+        id,
+        siteId,
+        branch: siteBranchConfig.branch,
+        context: siteBranchConfig.context,
+      },
+    });
 
     return res.ok({});
   },
@@ -205,7 +197,7 @@ module.exports = wrapHandlers({
           config,
           context,
         },
-        x => !x
+        (x) => !x,
       );
 
       const sbcUpdated = await sbc.update(payload, {
@@ -215,14 +207,12 @@ module.exports = wrapHandlers({
         },
       });
 
-      EventCreator.audit(
-        Event.labels.USER_ACTION,
-        req.user,
-        'SiteBranchConfig Updated',
-        {
-          siteBranchConfig: { id: sbcUpdated.id, siteId },
-        }
-      );
+      EventCreator.audit(Event.labels.USER_ACTION, req.user, 'SiteBranchConfig Updated', {
+        siteBranchConfig: {
+          id: sbcUpdated.id,
+          siteId,
+        },
+      });
 
       if (context && context !== 'preview' && branch) {
         const build = await Build.create({
@@ -244,7 +234,7 @@ module.exports = wrapHandlers({
               siteId,
               buildId: build.id,
             },
-          }
+          },
         );
       }
 

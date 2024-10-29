@@ -36,23 +36,32 @@ async function rotateBucketKey(site, cfApi, sleepNumber = 10000) {
   await cfApi.createServiceKey(serviceInstance.name, serviceInstance.guid);
 
   const now = new Date();
-  await site.update({ awsBucketKeyUpdatedAt: now });
+  await site.update({
+    awsBucketKeyUpdatedAt: now,
+  });
 
   return site;
 }
 
 async function rotateSitesBucketKeys({
-  limit = 20, username, password, sleepNumber = 10000,
+  limit = 20,
+  username,
+  password,
+  sleepNumber = 10000,
 }) {
   const authClient = new CloudFoundryAuthClient({ username, password });
-  const cfApi = new CFApiClient({ authClient });
+  const cfApi = new CFApiClient({
+    authClient,
+  });
 
   const sites = await Site.findAll({
     order: [['awsBucketKeyUpdatedAt', 'ASC']],
     limit,
   });
 
-  return Promise.allSettled(sites.map(site => rotateBucketKey(site, cfApi, sleepNumber)));
+  return Promise.allSettled(
+    sites.map((site) => rotateBucketKey(site, cfApi, sleepNumber)),
+  );
 }
 
 module.exports = {

@@ -372,6 +372,7 @@ const BUILD_SCAN_RULES = [
   },
   {
     id: '10036-1',
+    // eslint-disable-next-line max-len
     name: 'Server Leaks its Webserver Application via "Server" HTTP Response Header Field',
     type: 'owasp-zap',
     url: 'https://www.zaproxy.org/docs/alerts/10036-1/',
@@ -1794,6 +1795,7 @@ const BUILD_SCAN_RULES = [
   },
   {
     id: 'definition-list',
+    // eslint-disable-next-line max-len
     name: '<dl> elements must only directly contain properly-ordered <dt> and <dd> groups, <script>, <template> or <div> elements',
     type: 'a11y',
     url: 'https://dequeuniversity.com/rules/axe/4.9/definition-list',
@@ -2022,6 +2024,7 @@ const BUILD_SCAN_RULES = [
   },
   {
     id: 'list',
+    // eslint-disable-next-line max-len
     name: '<ul> and <ol> must only directly contain <li>, <script> or <template> elements',
     type: 'a11y',
     url: 'https://dequeuniversity.com/rules/axe/4.9/list',
@@ -2172,12 +2175,14 @@ const BUILD_SCAN_RULES = [
   },
   {
     id: 'td-has-header',
+    // eslint-disable-next-line max-len
     name: 'Non-empty <td> elements in larger <table> must have an associated table header',
     type: 'a11y',
     url: 'https://dequeuniversity.com/rules/axe/4.9/td-has-header',
   },
   {
     id: 'td-headers-attr',
+    // eslint-disable-next-line max-len
     name: 'Table cells that use the headers attribute must only refer to cells in the same table',
     type: 'a11y',
     url: 'https://dequeuniversity.com/rules/axe/4.9/td-headers-attr',

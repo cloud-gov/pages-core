@@ -1,5 +1,3 @@
-/* eslint-disable object-curly-newline */
-/* eslint-disable object-curly-newline */
 const fs = require('fs');
 const path = require('path');
 const inflection = require('inflection');
@@ -25,14 +23,14 @@ const { logger } = require('../../winston');
  * ```
  */
 function buildEnum(values) {
-  const lowerCaseValues = values.map(value => value.toLowerCase());
+  const lowerCaseValues = values.map((value) => value.toLowerCase());
 
   const constants = lowerCaseValues.reduce(
     (acc, value) => ({
       ...acc,
       [inflection.capitalize(value)]: value,
     }),
-    {}
+    {},
   );
 
   return {
@@ -44,7 +42,7 @@ function buildEnum(values) {
 function generateS3ServiceName(owner, repository) {
   if (!owner || !repository) return undefined;
 
-  const format = str => str.toString().toLowerCase().split(' ').join('-');
+  const format = (str) => str.toString().toLowerCase().split(' ').join('-');
 
   const serviceName = `o-${format(owner)}-r-${format(repository)}`;
 
@@ -81,8 +79,7 @@ function toSubdomainPart(str) {
   if (subdomain.length < 2) {
     // If we generate parts, make it longer
     while (subdomain.length < 5) {
-      subdomain
-        += characters[Math.floor(Math.random() * Math.floor(characters.length))];
+      subdomain += characters[Math.floor(Math.random() * Math.floor(characters.length))];
     }
   }
   return subdomain;
@@ -95,7 +92,7 @@ function generateSubdomain(owner, repository) {
 
 function isPastAuthThreshold(authDate) {
   return moment().isAfter(
-    moment(authDate).add(config.policies.authRevalidationMinutes, 'minutes')
+    moment(authDate).add(config.policies.authRevalidationMinutes, 'minutes'),
   );
 }
 
@@ -110,12 +107,11 @@ function getDirectoryFiles(dir, existingFileList) {
 }
 
 function loadDevelopmentManifest() {
-  const webpackConfig = require('../../webpack.config.js'); // eslint-disable-line global-require,import/extensions
+  const webpackConfig = require('../../webpack.config.js');
   const { publicPath } = webpackConfig.output;
   const cleanedPath = publicPath.slice(1);
   const jsFiles = {};
 
-  // eslint-disable-next-line array-callback-return
   Object.keys(webpackConfig.entry).map((key) => {
     const file = `${key}.js`;
     jsFiles[file] = `${cleanedPath}${file}`;
@@ -134,7 +130,8 @@ function loadDevelopmentManifest() {
 function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
-    const msg = 'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
+    const msg =
+      'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
     logger.error(msg);
     throw new Error(msg);
   }
@@ -178,14 +175,14 @@ function pick(keys, obj) {
   const objKeys = Object.keys(obj);
   return keys.reduce((picked, key) => {
     if (objKeys.includes(key)) {
-      picked[key] = obj[key]; // eslint-disable-line no-param-reassign
+      picked[key] = obj[key];
     }
     return picked;
   }, {});
 }
 
 function omit(keys, obj) {
-  const pickedKeys = Object.keys(obj).filter(key => !keys.includes(key));
+  const pickedKeys = Object.keys(obj).filter((key) => !keys.includes(key));
   return pick(pickedKeys, obj);
 }
 
@@ -195,11 +192,11 @@ function toInt(val) {
 }
 
 function wait(time = 500) {
-  return new Promise(r => setTimeout(r, time));
+  return new Promise((r) => setTimeout(r, time));
 }
 
 function omitBy(fn, obj) {
-  const pickedKeys = Object.keys(obj).filter(key => !fn(obj[key], key));
+  const pickedKeys = Object.keys(obj).filter((key) => !fn(obj[key], key));
 
   return pick(pickedKeys, obj);
 }
@@ -260,7 +257,9 @@ function truncateString(s, characters = 30) {
   return s;
 }
 
-const DEFAULT_BUILD_TASK_PARAMS = '-p \'{ "STATUS_CALLBACK": "{{job.data.STATUS_CALLBACK}}", "TASK_ID": {{job.data.TASK_ID}}, "AWS_DEFAULT_REGION": "{{job.data.AWS_DEFAULT_REGION}}", "AWS_ACCESS_KEY_ID": "{{job.data.AWS_ACCESS_KEY_ID}}", "AWS_SECRET_ACCESS_KEY": "{{job.data.AWS_SECRET_ACCESS_KEY}}", "BUCKET": "{{job.data.BUCKET}}" }\'';
+const DEFAULT_BUILD_TASK_PARAMS =
+  // eslint-disable-next-line max-len
+  '-p \'{ "STATUS_CALLBACK": "{{job.data.STATUS_CALLBACK}}", "TASK_ID": {{job.data.TASK_ID}}, "AWS_DEFAULT_REGION": "{{job.data.AWS_DEFAULT_REGION}}", "AWS_ACCESS_KEY_ID": "{{job.data.AWS_ACCESS_KEY_ID}}", "AWS_SECRET_ACCESS_KEY": "{{job.data.AWS_SECRET_ACCESS_KEY}}", "BUCKET": "{{job.data.BUCKET}}" }\'';
 
 const ZAP_SCAN_RULES = [
   { id: '10038' },
@@ -269,14 +268,29 @@ const ZAP_SCAN_RULES = [
   { id: '10098' },
   { id: '10099' },
   { id: '90004' },
-  { id: '10017', match: ['https://dap.digitalgov.gov/', 'https://search.usa.gov/'] },
-  { id: '10202', match: ['search'] },
-  { id: '10097', match: ['/assets/styles'] },
-  { id: '90003', match: ['https://dap.digitalgov.gov/', 'https://search.usa.gov/'] },
+  {
+    id: '10017',
+    match: ['https://dap.digitalgov.gov/', 'https://search.usa.gov/'],
+  },
+  {
+    id: '10202',
+    match: ['search'],
+  },
+  {
+    id: '10097',
+    match: ['/assets/styles'],
+  },
+  {
+    id: '90003',
+    match: ['https://dap.digitalgov.gov/', 'https://search.usa.gov/'],
+  },
 ];
 
 const DEFAULT_SCAN_RULES = {
-  'owasp-zap': ZAP_SCAN_RULES.map(rule => ({ ...rule, source: 'Pages' })),
+  'owasp-zap': ZAP_SCAN_RULES.map((rule) => ({
+    ...rule,
+    source: 'Pages',
+  })),
   a11y: [],
 };
 

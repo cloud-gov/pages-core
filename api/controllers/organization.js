@@ -1,8 +1,6 @@
 const organizationSerializer = require('../serializers/organization');
 const organizationRoleSerializer = require('../serializers/organization-role');
-const {
-  Event, Organization, OrganizationRole, User,
-} = require('../models');
+const { Event, Organization, OrganizationRole, User } = require('../models');
 const EventCreator = require('../services/EventCreator');
 const OrganizationService = require('../services/organization');
 const { toInt, wrapHandlers } = require('../utils');
@@ -52,14 +50,28 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const { email, inviteLink: link, origin } = isResend
+    const {
+      email,
+      inviteLink: link,
+      origin,
+    } = isResend
       ? await OrganizationService.resendInvite(user, uaaEmail)
-      : await OrganizationService.inviteUserToOrganization(user, org.id, toInt(roleId), uaaEmail);
+      : await OrganizationService.inviteUserToOrganization(
+          user,
+          org.id,
+          toInt(roleId),
+          uaaEmail,
+        );
 
     // TODO - refactor above method to return user so this extra query is not necessary
     const newUser = await User.byUAAEmail(email).findOne();
-    const member = await OrganizationRole.forOrganization({ id: toInt(id) })
-      .findOne({ where: { userId: newUser.id } });
+    const member = await OrganizationRole.forOrganization({
+      id: toInt(id),
+    }).findOne({
+      where: {
+        userId: newUser.id,
+      },
+    });
 
     if (link) {
       await queueJob.sendUAAInvite(email, link, origin, org.name);
@@ -67,10 +79,15 @@ module.exports = wrapHandlers({
 
     const json = {
       member: organizationRoleSerializer.serialize(member),
-      invite: { email, link },
+      invite: {
+        email,
+        link,
+      },
     };
 
-    const auditMessage = isResend ? 'User Invite Resent by Org Manager' : 'User Invited by Org Manager';
+    const auditMessage = isResend
+      ? 'User Invite Resent by Org Manager'
+      : 'User Invited by Org Manager';
     EventCreator.audit(Event.labels.ORG_MANAGER_ACTION, req.user, auditMessage, {
       organizationId: org.id,
       roleId,

@@ -1,8 +1,6 @@
 const IORedis = require('ioredis');
 
-const {
-  Domain, Build, Site, SiteBranchConfig,
-} = require('../models');
+const { Domain, Build, Site, SiteBranchConfig } = require('../models');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
 const config = require('../../config');
@@ -30,7 +28,7 @@ function queue() {
     new IORedis(redisConfig.url, {
       tls: redisConfig.tls,
       maxRetriesPerRequest: null,
-    })
+    }),
   );
 }
 
@@ -96,9 +94,7 @@ function buildDnsRecords(domain) {
  */
 async function checkDnsRecords(domain) {
   const dnsResults = await Promise.all(
-    domain.names
-      .split(',')
-      .map(domainName => DnsService.checkDnsRecords(domainName))
+    domain.names.split(',').map((domainName) => DnsService.checkDnsRecords(domainName)),
   );
 
   return dnsResults.flat();
@@ -112,7 +108,7 @@ function checkAcmeChallengeDnsRecord(domain) {
   return Promise.all(
     domain.names
       .split(',')
-      .map(domainName => DnsService.checkAcmeChallengeDnsRecord(domainName))
+      .map((domainName) => DnsService.checkAcmeChallengeDnsRecord(domainName)),
   );
 }
 
@@ -130,8 +126,10 @@ function isSiteUrlManagedByDomain(site, domains, context) {
     return false;
   }
   return domains
-    .filter(domain => domain.context === context)
-    .some(domain => domain.namesArray().some(name => `https://${name}` === site[siteDomain]));
+    .filter((domain) => domain.context === context)
+    .some((domain) =>
+      domain.namesArray().some((name) => `https://${name}` === site[siteDomain]),
+    );
 }
 
 /**
@@ -145,7 +143,7 @@ async function rebuildAssociatedSite(domain) {
       site: domain.siteId,
       branch,
       username: 'Automated Platfrom Operation',
-    }).then(b => b.enqueue());
+    }).then((b) => b.enqueue());
   }
 }
 
@@ -156,13 +154,16 @@ async function rebuildAssociatedSite(domain) {
 async function deprovision(domain) {
   if (!canDeprovision(domain)) {
     throw new Error(
-      `Only '${States.Provisioning}', '${States.Provisioned}', or '${States.Failed}' domains can be deprovisioned.`
+      // eslint-disable-next-line max-len
+      `Only '${States.Provisioning}', '${States.Provisioned}', or '${States.Failed}' domains can be deprovisioned.`,
     );
   }
 
   await cfApi().deleteServiceInstance(domain.serviceName);
 
-  await domain.update({ state: States.Deprovisioning });
+  await domain.update({
+    state: States.Deprovisioning,
+  });
 
   queueDeprovisionStatusCheck(domain.id);
 
@@ -180,16 +181,15 @@ async function provision(domain, dnsResults) {
   }
 
   if (
-    !dnsResults.some(dnsResult => DnsService.isAcmeChallengeDnsRecord(dnsResult.record))
+    !dnsResults.some((dnsResult) => DnsService.isAcmeChallengeDnsRecord(dnsResult.record))
   ) {
-    throw new Error(
-      'There must be at least one Acme Challenge DNS record provided'
-    );
+    throw new Error('There must be at least one Acme Challenge DNS record provided');
   }
 
   if (!DnsService.canProvision(dnsResults)) {
     throw new Error(
-      'The Acme Challenge DNS records must be set correctly before the domain can be provisioned.'
+      // eslint-disable-next-line max-len
+      'The Acme Challenge DNS records must be set correctly before the domain can be provisioned.',
     );
   }
 
@@ -221,9 +221,12 @@ async function provision(domain, dnsResults) {
  * @param {number} id The domain id
  */
 async function checkDeprovisionStatus(id) {
-  const domain = await Domain.findByPk(id, { include: [SiteBranchConfig] });
+  const domain = await Domain.findByPk(id, {
+    include: [SiteBranchConfig],
+  });
 
   if (domain.state !== Domain.States.Deprovisioning) {
+    // eslint-disable-next-line max-len
     return `Domain ${id}|${domain.names} must be ${Domain.States.Deprovisioning} to be deprovisioned, but is ${domain.state}.`;
   }
 
@@ -245,9 +248,12 @@ async function checkDeprovisionStatus(id) {
  * @param {number} id The domain id
  */
 async function checkProvisionStatus(id) {
-  const domain = await Domain.findByPk(id, { include: [SiteBranchConfig] });
+  const domain = await Domain.findByPk(id, {
+    include: [SiteBranchConfig],
+  });
 
   if (domain.state !== Domain.States.Provisioning) {
+    // eslint-disable-next-line max-len
     return `Domain ${id}|${domain.names} must be ${Domain.States.Provisioning} to be provisioned, but is ${domain.state}.`;
   }
 
@@ -258,11 +264,15 @@ async function checkProvisionStatus(id) {
 
   switch (lastOperation) {
     case 'succeeded':
-      await domain.update({ state: States.Provisioned });
+      await domain.update({
+        state: States.Provisioned,
+      });
       await module.exports.rebuildAssociatedSite(domain);
       return `Domain ${id}|${domain.names} successfully provisioned.`;
     case 'failed':
-      await domain.update({ state: States.Failed });
+      await domain.update({
+        state: States.Failed,
+      });
       throw new Error(`Domain ${id}|${domain.names} failed to provision.`);
     default:
       queueProvisionStatusCheck(id);

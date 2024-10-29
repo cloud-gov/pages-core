@@ -2,10 +2,7 @@
 // let's do this when running on CG
 const cfenv = require('cfenv');
 
-const {
-  APP_ENV,
-  PRODUCT,
-} = process.env;
+const { APP_ENV, PRODUCT } = process.env;
 
 const appEnv = cfenv.getAppEnv();
 
@@ -18,7 +15,9 @@ process.env.UAA_CLIENT_ID = uaaCredentials.clientID;
 process.env.UAA_CLIENT_SECRET = uaaCredentials.clientSecret;
 
 if (PRODUCT === 'federalist') {
-  const githubCredentials = appEnv.getServiceCreds(`${PRODUCT}-${APP_ENV}-github-queues-ui`);
+  const githubCredentials = appEnv.getServiceCreds(
+    `${PRODUCT}-${APP_ENV}-github-queues-ui`,
+  );
   process.env.GITHUB_CLIENT_ID = githubCredentials.GITHUB_CLIENT_ID;
   process.env.GITHUB_CLIENT_SECRET = githubCredentials.GITHUB_CLIENT_SECRET;
 }

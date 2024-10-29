@@ -9,14 +9,31 @@ import ResendInviteForm from './ResendInviteForm';
 import UpdateUserForm from './UpdateUserForm';
 
 function showRemoveConfirm(member, org) {
-  return window.confirm(`Are you sure you want to remove ${member.User.UAAIdentity.email} from ${org.name}?`);
+  return window.confirm(
+    `Are you sure you want to remove ${member.User.UAAIdentity.email} from ${org.name}?`,
+  );
 }
 
 function OrganizationTable({
-  currentMember, sortedMembers, roleOptions, org, dispatch, successNotification,
+  currentMember,
+  sortedMembers,
+  roleOptions,
+  org,
+  dispatch,
+  successNotification,
 }) {
   return (
-    <table className="usa-table usa-table--borderless usa-table--stacked log-table org-member-table width-full table-full-width">
+    <table
+      className={`
+        usa-table
+        usa-table--borderless
+        usa-table--stacked
+        log-table
+        org-member-table
+        width-full
+        table-full-width
+      `}
+    >
       <thead>
         <tr>
           <th scope="col">Email</th>
@@ -29,47 +46,46 @@ function OrganizationTable({
       <tbody>
         {currentMember?.User && (
           <tr key={currentMember.User?.id}>
-            <th scope="row" data-title="Email">{currentMember.User?.UAAIdentity?.email}</th>
-            <td data-title="Role">
-              manager
-            </td>
-            <td data-title="Added">
-              {timeFrom(currentMember?.createdAt)}
-            </td>
+            <th scope="row" data-title="Email">
+              {currentMember.User?.UAAIdentity?.email}
+            </th>
+            <td data-title="Role">manager</td>
+            <td data-title="Added">{timeFrom(currentMember?.createdAt)}</td>
             <td data-title="Last Signed In">
-              {currentMember?.User?.signedInAt ? timeFrom(currentMember.User.signedInAt) : 'Never'}
+              {currentMember?.User?.signedInAt
+                ? timeFrom(currentMember.User.signedInAt)
+                : 'Never'}
             </td>
             <td label="Actions" data-title="Actions" className="table-actions" />
           </tr>
         )}
 
-        {sortedMembers.map(member => (
+        {sortedMembers.map((member) => (
           <tr key={member.User.id}>
-            <th scope="row" data-title="Email">{member.User.UAAIdentity.email}</th>
+            <th scope="row" data-title="Email">
+              {member.User.UAAIdentity.email}
+            </th>
             <td data-title="Role">
               <span className="usa-sr-only">Role</span>
               <UpdateUserForm
                 form={`updateOrganizationUser-${member.User.id}`}
-                initialValues={{ roleId: member.Role.id }}
+                initialValues={{
+                  roleId: member.Role.id,
+                }}
                 roleOptions={roleOptions}
-                onSubmit={
-                  ({ roleId }) => federalistApi.updateOrganizationRole(
-                    org.id,
-                    roleId,
-                    member.User.id
-                  )
+                onSubmit={({ roleId }) =>
+                  federalistApi.updateOrganizationRole(org.id, roleId, member.User.id)
                 }
-                onSubmitSuccess={
-                  (updatedMember, reduxDispatch) => {
-                    dispatch({ type: 'updateMember', payload: updatedMember });
-                    reduxDispatch(successNotification('Successfully updated user.'));
-                  }
-                }
+                onSubmitSuccess={(updatedMember, reduxDispatch) => {
+                  dispatch({
+                    type: 'updateMember',
+                    payload: updatedMember,
+                  });
+                  reduxDispatch(successNotification('Successfully updated user.'));
+                }}
               />
             </td>
-            <td data-title="Added">
-              {timeFrom(member.createdAt)}
-            </td>
+            <td data-title="Added">{timeFrom(member.createdAt)}</td>
             <td data-title="Last Signed In">
               {member.User.signedInAt ? timeFrom(member.User.signedInAt) : 'Never'}
             </td>
@@ -78,39 +94,38 @@ function OrganizationTable({
               <RemoveUserForm
                 form={`removeOrganizationUser-${member.User.id}`}
                 onSubmit={() => true}
-                onSubmitSuccess={
-                  async (_, reduxDispatch) => {
-                    if (!showRemoveConfirm(member, org)) {
-                      return;
-                    }
+                onSubmitSuccess={async (_, reduxDispatch) => {
+                  if (!showRemoveConfirm(member, org)) {
+                    return;
+                  }
 
-                    await federalistApi.removeOrganizationRole(org.id, member.User.id);
-                    dispatch({ type: 'removeMember', payload: member.User.id });
-                    reduxDispatch(successNotification('Successfully removed user.'));
-                  }
-                }
+                  await federalistApi.removeOrganizationRole(org.id, member.User.id);
+                  dispatch({
+                    type: 'removeMember',
+                    payload: member.User.id,
+                  });
+                  reduxDispatch(successNotification('Successfully removed user.'));
+                }}
               />
-              { (member.User.UAAIdentity.origin === 'uaa' || member.User.UAAIdentity.origin === 'cloud.gov')
-                && !member.User.signedInAt && (
-                <ResendInviteForm
-                  form={`resendInvite-${member.User.id}`}
-                  onSubmit={() => true}
-                  onSubmitSuccess={
-                    async (_, reduxDispatch) => {
-                      await federalistApi.inviteToOrganization(
-                        org.id,
-                        {
-                          uaaEmail: member.User.UAAIdentity.email,
-                          user: member.User.id,
-                          roleID: member.Role.id,
-                          isResend: true,
-                        }
+              {(member.User.UAAIdentity.origin === 'uaa' ||
+                member.User.UAAIdentity.origin === 'cloud.gov') &&
+                !member.User.signedInAt && (
+                  <ResendInviteForm
+                    form={`resendInvite-${member.User.id}`}
+                    onSubmit={() => true}
+                    onSubmitSuccess={async (_, reduxDispatch) => {
+                      await federalistApi.inviteToOrganization(org.id, {
+                        uaaEmail: member.User.UAAIdentity.email,
+                        user: member.User.id,
+                        roleID: member.Role.id,
+                        isResend: true,
+                      });
+                      reduxDispatch(
+                        successNotification('Successfully resent invitation.'),
                       );
-                      reduxDispatch(successNotification('Successfully resent invitation.'));
-                    }
-                  }
-                />
-              )}
+                    }}
+                  />
+                )}
             </td>
           </tr>
         ))}

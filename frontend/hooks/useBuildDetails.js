@@ -11,10 +11,12 @@ export const useBuildDetails = (id) => {
 
   useEffect(() => {
     if (!results.buildDetails) {
-      api.fetchBuild(id).then(data => setResults({
-        isLoading: false,
-        buildDetails: data,
-      }));
+      api.fetchBuild(id).then((data) =>
+        setResults({
+          isLoading: false,
+          buildDetails: data,
+        }),
+      );
     }
   }, [results]);
 

@@ -13,6 +13,7 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const { sessionForCookie } = require('../support/cookieSession');
 
 const { uaa } = config.passport;
+// eslint-disable-next-line max-len
 const flashMessage = `Apologies; you are not authorized to access ${config.app.appName}! Please contact the ${config.app.appName} team if this is in error.`;
 
 describe('Authentication requests', () => {
@@ -28,15 +29,9 @@ describe('Authentication requests', () => {
 
   context('UAA', () => {
     context('Callbacks', () => {
-      beforeEach(() => Promise.all([
-        User.truncate(),
-        UAAIdentity.truncate(),
-      ]));
+      beforeEach(() => Promise.all([User.truncate(), UAAIdentity.truncate()]));
 
-      afterEach(() => Promise.all([
-        User.truncate(),
-        UAAIdentity.truncate(),
-      ]));
+      afterEach(() => Promise.all([User.truncate(), UAAIdentity.truncate()]));
 
       describe('GET /login', () => {
         it('should redirect to the configured IdP for authentication', (done) => {
@@ -102,9 +97,11 @@ describe('Authentication requests', () => {
             const uaaUserInfo = uaaUser({
               uaaId,
               email,
-              groups: [{
-                display: 'pages.admin',
-              }],
+              groups: [
+                {
+                  display: 'pages.admin',
+                },
+              ],
             });
             const user = await factory.user();
             await factory.uaaIdentity({
@@ -118,7 +115,9 @@ describe('Authentication requests', () => {
             cfUAANocks.mockUAAAuth(uaaUserProfile, code);
             cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
 
-            const cookie = await unauthenticatedSession({ oauthState });
+            const cookie = await unauthenticatedSession({
+              oauthState,
+            });
 
             const res = await request(app)
               .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
@@ -134,14 +133,20 @@ describe('Authentication requests', () => {
         });
 
         context('when the admin user does not exist in the database', () => {
-          it('should fail to authenticate, redirect the user and provide a flash message', async () => {
+          it(`should fail to authenticate,
+              redirect the user and provide a flash message`, async () => {
             const uaaId = 'uaa-admin-does-not-exist';
-            const profile = { email: 'hello@example.com', user_id: uaaId };
+            const profile = {
+              email: 'hello@example.com',
+              user_id: uaaId,
+            };
             const userProfile = uaaUser({
               id: uaaId,
-              groups: [{
-                display: 'pages.admin',
-              }],
+              groups: [
+                {
+                  display: 'pages.admin',
+                },
+              ],
               ...profile,
             });
             const oauthState = 'state-123abc';
@@ -150,7 +155,9 @@ describe('Authentication requests', () => {
             cfUAANocks.mockUAAAuth(profile, code);
             cfUAANocks.mockVerifyUserGroup(uaaId, userProfile);
 
-            const cookie = await unauthenticatedSession({ oauthState });
+            const cookie = await unauthenticatedSession({
+              oauthState,
+            });
 
             await request(app)
               .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
@@ -169,9 +176,11 @@ describe('Authentication requests', () => {
           it('should return 401', async () => {
             const oauthState = 'state-123abc';
             const code = 'code';
-            cfUAANocks.mockFailedExchange(code)
+            cfUAANocks.mockFailedExchange(code);
 
-            const cookie = await unauthenticatedSession({ oauthState });
+            const cookie = await unauthenticatedSession({
+              oauthState,
+            });
 
             await request(app)
               .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)
@@ -183,10 +192,8 @@ describe('Authentication requests', () => {
     });
 
     describe('GET /auth/uaa/logout', () => {
-      it('redirects to the root', () => request(app)
-        .get('/auth/uaa/logout')
-        .expect('Location', '/')
-        .expect(302));
+      it('redirects to the root', () =>
+        request(app).get('/auth/uaa/logout').expect('Location', '/').expect(302));
     });
   });
 });

@@ -56,23 +56,46 @@ describe('sitesReducer', () => {
       type: SITES_FETCH_STARTED,
     });
 
-    expect(actual).to.deep.equal({ ...initialState, isLoading: true });
+    expect(actual).to.deep.equal({
+      ...initialState,
+      isLoading: true,
+    });
   });
 
   it("replaces anything it has when it gets a 'sites received' action", () => {
     const sites = [{ hello: 'world' }, { how: 'are you?' }];
 
-    const actual = fixture({ ...initialState, data: [{ oldData: 'to be lost' }] }, {
-      type: SITES_RECEIVED,
-      sites,
-    });
+    const actual = fixture(
+      {
+        ...initialState,
+        data: [
+          {
+            oldData: 'to be lost',
+          },
+        ],
+      },
+      {
+        type: SITES_RECEIVED,
+        sites,
+      },
+    );
 
-    expect(actual).to.deep.equal({ ...initialState, isLoading: false, data: sites });
+    expect(actual).to.deep.equal({
+      ...initialState,
+      isLoading: false,
+      data: sites,
+    });
   });
 
-
   it("ignores a malformed 'sites received' action", () => {
-    const state = { ...initialState, data: [{ oldData: 'to be there' }] };
+    const state = {
+      ...initialState,
+      data: [
+        {
+          oldData: 'to be there',
+        },
+      ],
+    };
     const actual = fixture(state, {
       type: SITES_RECEIVED,
     });
@@ -81,43 +104,77 @@ describe('sitesReducer', () => {
   });
 
   it('adds a site if action has a site', () => {
-    const existingSites = [{ existing: 'siteToKeep' }];
-    const site = { hereIs: 'something' };
+    const existingSites = [
+      {
+        existing: 'siteToKeep',
+      },
+    ];
+    const site = {
+      hereIs: 'something',
+    };
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_ADDED,
-      site,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_ADDED,
+        site,
+      },
+    );
 
     expect(actual.data).to.deep.equal(existingSites.concat(site));
   });
 
   it('does not add a site if action has no site', () => {
-    const existingSites = [{ existing: 'siteToKeep' }];
+    const existingSites = [
+      {
+        existing: 'siteToKeep',
+      },
+    ];
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_ADDED,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_ADDED,
+      },
+    );
 
     expect(actual.data).to.deep.equal(existingSites);
   });
 
   it("ignores when given an update action and the new site's id is not found", () => {
-    const existingSites = [{
-      id: 'siteToKeep',
-      oldData: true,
-    }, {
-      id: 'anotherSiteToKeep',
-      oldData: true,
-    }];
+    const existingSites = [
+      {
+        id: 'siteToKeep',
+        oldData: true,
+      },
+      {
+        id: 'anotherSiteToKeep',
+        oldData: true,
+      },
+    ];
 
-    const site = { id: 'something', oldData: false };
+    const site = {
+      id: 'something',
+      oldData: false,
+    };
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_UPDATED,
-      siteId: 'something',
-      site,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_UPDATED,
+        siteId: 'something',
+        site,
+      },
+    );
 
     expect(actual.data).to.deep.equal(existingSites);
   });
@@ -135,13 +192,23 @@ describe('sitesReducer', () => {
 
     const existingSites = [siteOne, siteTwo];
 
-    const newSite = { id: 'siteToKeep', oldData: false, hi: 'there' };
+    const newSite = {
+      id: 'siteToKeep',
+      oldData: false,
+      hi: 'there',
+    };
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_UPDATED,
-      siteId: 'siteToKeep',
-      site: newSite,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_UPDATED,
+        siteId: 'siteToKeep',
+        site: newSite,
+      },
+    );
 
     expect(actual.data).to.deep.equal([newSite, siteTwo]);
   });
@@ -153,11 +220,17 @@ describe('sitesReducer', () => {
     };
 
     const newBranches = ['pencil', 'beer'];
-    const actual = fixture({ isLoading: false, data: [site] }, {
-      type: SITE_BRANCHES_RECEIVED,
-      siteId: site.id,
-      branches: newBranches,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: [site],
+      },
+      {
+        type: SITE_BRANCHES_RECEIVED,
+        siteId: site.id,
+        branches: newBranches,
+      },
+    );
 
     expect(actual.data).to.deep.equal([
       {
@@ -180,10 +253,16 @@ describe('sitesReducer', () => {
 
     const existingSites = [siteOne, siteTwo];
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_DELETED,
-      siteId: "i'm not here.",
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_DELETED,
+        siteId: "i'm not here.",
+      },
+    );
 
     expect(actual.data).to.deep.equal(existingSites);
   });
@@ -203,29 +282,49 @@ describe('sitesReducer', () => {
 
     const existingSites = [siteOne, siteTwo];
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_DELETED,
-      siteId: siteToLoseId,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_DELETED,
+        siteId: siteToLoseId,
+      },
+    );
 
     expect(actual.data).to.deep.equal([siteOne]);
   });
 
-  it('adds site to state\'s data when SITE_USER_ADDED', () => {
-    const siteAdded = { id: 55 };
-    const actual = fixture({ isLoading: false, data: [] }, {
-      type: SITE_USER_ADDED,
-      site: siteAdded,
-    });
+  it("adds site to state's data when SITE_USER_ADDED", () => {
+    const siteAdded = {
+      id: 55,
+    };
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: [],
+      },
+      {
+        type: SITE_USER_ADDED,
+        site: siteAdded,
+      },
+    );
 
     expect(actual.isLoading).to.be.false;
     expect(actual.data).to.deep.equal([siteAdded]);
   });
 
   it('returns existing state when SITE_USER_ADDED if action has no site', () => {
-    const actual = fixture({ isLoading: false, data: [] }, {
-      type: SITE_USER_ADDED,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: [],
+      },
+      {
+        type: SITE_USER_ADDED,
+      },
+    );
 
     expect(actual.isLoading).to.be.false;
     expect(actual.data).to.deep.equal([]);
@@ -242,13 +341,23 @@ describe('sitesReducer', () => {
     const state = {
       isLoading: false,
       data: [
-        oldSite, {
-          id: 2, owner: 'person2', repository: 'b', users: [],
+        oldSite,
+        {
+          id: 2,
+          owner: 'person2',
+          repository: 'b',
+          users: [],
         },
       ],
     };
-    const updatedSite = { ...oldSite, users: [{ username: 'jane' }] };
-    const actual = siteReducer(state, { type: SITE_USER_REMOVED, site: updatedSite });
+    const updatedSite = {
+      ...oldSite,
+      users: [{ username: 'jane' }],
+    };
+    const actual = siteReducer(state, {
+      type: SITE_USER_REMOVED,
+      site: updatedSite,
+    });
 
     expect(actual.data.length).to.equal(2);
     expect(actual.data[0].users[0].username).to.equal('jane');
@@ -268,13 +377,27 @@ describe('sitesReducer', () => {
 
     const existingSites = [siteOne, siteTwo];
 
-    const newSite = { id: 'siteToKeep', oldData: false, hi: 'there', basicAuth: { username: 'username', password: 'password' } };
+    const newSite = {
+      id: 'siteToKeep',
+      oldData: false,
+      hi: 'there',
+      basicAuth: {
+        username: 'username',
+        password: 'password',
+      },
+    };
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_BASIC_AUTH_SAVED,
-      siteId: 'siteToKeep',
-      site: newSite,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_BASIC_AUTH_SAVED,
+        siteId: 'siteToKeep',
+        site: newSite,
+      },
+    );
 
     expect(actual.data).to.deep.equal([newSite, siteTwo]);
   });
@@ -283,7 +406,10 @@ describe('sitesReducer', () => {
     const siteOne = {
       id: 'siteToKeep',
       oldData: true,
-      basicAuth: { username: 'username', password: 'password' },
+      basicAuth: {
+        username: 'username',
+        password: 'password',
+      },
     };
 
     const siteTwo = {
@@ -293,13 +419,24 @@ describe('sitesReducer', () => {
 
     const existingSites = [siteOne, siteTwo];
 
-    const newSite = { id: 'siteToKeep', oldData: false, hi: 'there', basicAuth: {} };
+    const newSite = {
+      id: 'siteToKeep',
+      oldData: false,
+      hi: 'there',
+      basicAuth: {},
+    };
 
-    const actual = fixture({ isLoading: false, data: existingSites }, {
-      type: SITE_BASIC_AUTH_REMOVED,
-      siteId: 'siteToKeep',
-      site: newSite,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: existingSites,
+      },
+      {
+        type: SITE_BASIC_AUTH_REMOVED,
+        siteId: 'siteToKeep',
+        site: newSite,
+      },
+    );
 
     expect(actual.data).to.deep.equal([newSite, siteTwo]);
   });

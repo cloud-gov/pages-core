@@ -4,11 +4,10 @@ const config = require('./config');
 
 const logger = winston.createLogger({
   level: config.log.level,
-  format: winston.format.combine(
-    winston.format.simple(),
-    winston.format.colorize()
-  ),
-  defaultMeta: { service: `bull-board-${config.appEnv}` },
+  format: winston.format.combine(winston.format.simple(), winston.format.colorize()),
+  defaultMeta: {
+    service: `bull-board-${config.appEnv}`,
+  },
   transports: [new winston.transports.Console()],
   silent: config.log.silent,
 });
@@ -17,23 +16,19 @@ expressWinston.requestWhitelist.push('body');
 expressWinston.bodyBlacklist.push('password', 'value');
 
 const expressErrorLogger = expressWinston.errorLogger({
-  format: winston.format.combine(
-    winston.format.json(),
-    winston.format.colorize()
-  ),
+  format: winston.format.combine(winston.format.json(), winston.format.colorize()),
   transports: [new winston.transports.Console()],
   skip: () => config.log.silent,
 });
 
 const expressLogger = expressWinston.logger({
-  format: winston.format.combine(
-    winston.format.simple(),
-    winston.format.colorize()
-  ),
+  format: winston.format.combine(winston.format.simple(), winston.format.colorize()),
   transports: [new winston.transports.Console()],
   skip: () => config.log.silent,
 });
 
 module.exports = {
-  logger, expressErrorLogger, expressLogger,
+  logger,
+  expressErrorLogger,
+  expressLogger,
 };

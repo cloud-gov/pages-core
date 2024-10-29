@@ -6,18 +6,21 @@ const buildsFetchStarted = () => ({
   type: buildsFetchStartedType,
 });
 
-const buildsReceived = builds => ({
+const buildsReceived = (builds) => ({
   type: buildsReceivedType,
   builds,
 });
 
-const buildRestarted = build => ({
+const buildRestarted = (build) => ({
   type: buildRestartedType,
   build,
 });
 
 export {
-  buildsFetchStarted, buildsFetchStartedType,
-  buildsReceived, buildsReceivedType,
-  buildRestarted, buildRestartedType,
+  buildsFetchStarted,
+  buildsFetchStartedType,
+  buildsReceived,
+  buildsReceivedType,
+  buildRestarted,
+  buildRestartedType,
 };

@@ -9,7 +9,7 @@ const { Event } = require('./models');
 const { CF_INSTANCE_INDEX } = process.env;
 
 function handleResults(results) {
-  const errors = results.filter(r => r.status === 'rejected').map(r => r.reason);
+  const errors = results.filter((r) => r.status === 'rejected').map((r) => r.reason);
   if (errors.length === 0) {
     return;
   }
@@ -25,8 +25,7 @@ function scheduleJobs() {
     // audit users and remove sites w/o repo push permissions
     schedule.scheduleJob('15 0 * * *', () => {
       logger.info('Auditing All Sites');
-      SiteUserAuditor.auditAllSites()
-        .then(handleResults);
+      SiteUserAuditor.auditAllSites().then(handleResults);
     });
   }
 }

@@ -5,7 +5,7 @@ function alert({ errors, reason }) {
     <p style="${css.p}"><strong>${reason}</strong></p>
     <p style="${css.p}">
       <ul>
-        ${errors.map(error => `<li style="${css.p}">${error}</li>`)}
+        ${errors.map((error) => `<li style="${css.p}">${error}</li>`)}
       </ul>
     </p>
   `);

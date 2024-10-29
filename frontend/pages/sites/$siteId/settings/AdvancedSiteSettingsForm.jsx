@@ -13,15 +13,14 @@ export const AdvancedSiteSettingsForm = ({
   pristine,
   handleSubmit,
 }) => (
-  <form
-    className="settings-form settings-form-advanced"
-    onSubmit={handleSubmit}
-  >
+  <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="well">
-      <label className="usa-sr-only" htmlFor="engine">Site engine</label>
+      <label className="usa-sr-only" htmlFor="engine">
+        Site engine
+      </label>
       <Field
         name="engine"
-        component={p => (
+        component={(p) => (
           <SelectSiteEngine
             name="engine"
             id="engine"
@@ -65,6 +64,6 @@ AdvancedSiteSettingsForm.propTypes = {
 };
 
 // create a higher-order component with reduxForm and export that
-export default reduxForm({ form: 'advancedSiteSettings' })(
-  AdvancedSiteSettingsForm
-);
+export default reduxForm({
+  form: 'advancedSiteSettings',
+})(AdvancedSiteSettingsForm);

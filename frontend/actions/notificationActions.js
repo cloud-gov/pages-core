@@ -11,9 +11,21 @@ const defaultNotification = {
 
 export default {
   success: (message) => {
-    dispatch(success({ ...defaultNotification, title: 'Success', message }));
+    dispatch(
+      success({
+        ...defaultNotification,
+        title: 'Success',
+        message,
+      }),
+    );
   },
   error: (message) => {
-    dispatch(error({ ...defaultNotification, title: 'Error', message }));
+    dispatch(
+      error({
+        ...defaultNotification,
+        title: 'Error',
+        message,
+      }),
+    );
   },
 };

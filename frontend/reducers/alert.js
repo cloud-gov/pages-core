@@ -21,7 +21,10 @@ export default function alert(state = initialState, action) {
         status: action.status,
       };
     case SET_STALE:
-      return { ...state, stale: true };
+      return {
+        ...state,
+        stale: true,
+      };
     case CLEAR:
       return initialState;
     default:

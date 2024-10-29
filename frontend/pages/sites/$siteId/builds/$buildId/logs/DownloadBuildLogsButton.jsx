@@ -1,12 +1,10 @@
-/* eslint-disable react/forbid-prop-types */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 
 function DownloadBuildLogsButton(props) {
   function downloadBuildLogs() {
     const { buildLogsData = [], buildId } = props;
-    const text = buildLogsData.map(source => `${source}\n`);
+    const text = buildLogsData.map((source) => `${source}\n`);
     const blob = new Blob([text], { type: 'text/plain' });
     const aElement = document.createElement('a');
     aElement.setAttribute('download', `build-log-${buildId}.txt`);
@@ -18,7 +16,9 @@ function DownloadBuildLogsButton(props) {
   }
 
   return (
-    <button type="button" className="usa-button" onClick={downloadBuildLogs}>Download logs</button>
+    <button type="button" className="usa-button" onClick={downloadBuildLogs}>
+      Download logs
+    </button>
   );
 }
 

@@ -1,6 +1,4 @@
-import {
-  dispatchHideAddNewSiteFieldsAction,
-} from './dispatchActions';
+import { dispatchHideAddNewSiteFieldsAction } from './dispatchActions';
 
 export default {
   hideAddNewSiteFields() {

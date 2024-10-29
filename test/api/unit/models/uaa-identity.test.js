@@ -6,8 +6,14 @@ const createUser = require('../../support/factory/user');
 
 function clean() {
   return Promise.all([
-    UAAIdentity.truncate({ force: true, cascade: true }),
-    User.truncate({ force: true, cascade: true }),
+    UAAIdentity.truncate({
+      force: true,
+      cascade: true,
+    }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -17,7 +23,7 @@ describe('UAAIdentity model', () => {
   after(clean);
 
   it('`uuaId` is required', async () => {
-    const error = await UAAIdentity.create({}).catch(e => e);
+    const error = await UAAIdentity.create({}).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeValidationError');
@@ -33,7 +39,7 @@ describe('UAAIdentity model', () => {
     const error = await createUAAIdentity({
       uaaId,
       userId: user2.id,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeUniqueConstraintError');
@@ -41,7 +47,7 @@ describe('UAAIdentity model', () => {
 
   it('`userName` is required', async () => {
     const uaaId = 'uaa-id';
-    const error = await UAAIdentity.create({ uaaId }).catch(e => e);
+    const error = await UAAIdentity.create({ uaaId }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeValidationError');
@@ -57,7 +63,7 @@ describe('UAAIdentity model', () => {
     const error = await createUAAIdentity({
       username,
       userId: user2.id,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeUniqueConstraintError');
@@ -66,7 +72,7 @@ describe('UAAIdentity model', () => {
   it('`email` is required', async () => {
     const uaaId = 'uaa-id';
     const userName = 'username';
-    const error = await UAAIdentity.create({ uaaId, userName }).catch(e => e);
+    const error = await UAAIdentity.create({ uaaId, userName }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeValidationError');
@@ -78,7 +84,7 @@ describe('UAAIdentity model', () => {
     const error = await createUAAIdentity({
       email,
       userId: user.id,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeValidationError');
@@ -95,7 +101,7 @@ describe('UAAIdentity model', () => {
     const error = await createUAAIdentity({
       email,
       userId: user2.id,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeUniqueConstraintError');
@@ -109,7 +115,7 @@ describe('UAAIdentity model', () => {
       uaaId,
       userName,
       email,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeValidationError');
@@ -142,7 +148,7 @@ describe('UAAIdentity model', () => {
       userName,
       email,
       origin,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeDatabaseError');
@@ -168,7 +174,7 @@ describe('UAAIdentity model', () => {
       email,
       origin,
       userId: user.id,
-    }).catch(e => e);
+    }).catch((e) => e);
 
     expect(error).to.be.an('error');
     expect(error.name).to.eq('SequelizeUniqueConstraintError');

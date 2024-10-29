@@ -5,12 +5,14 @@ const publishedFilesFetchStarted = () => ({
   type: publishedFilesFetchStartedType,
 });
 
-const publishedFilesReceived = files => ({
+const publishedFilesReceived = (files) => ({
   type: publishedFilesReceivedType,
   files,
 });
 
 export {
-  publishedFilesFetchStartedType, publishedFilesFetchStarted,
-  publishedFilesReceivedType, publishedFilesReceived,
+  publishedFilesFetchStartedType,
+  publishedFilesFetchStarted,
+  publishedFilesReceivedType,
+  publishedFilesReceived,
 };

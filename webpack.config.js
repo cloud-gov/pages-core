@@ -19,11 +19,11 @@ const devtool = isDev ? 'inline-source-map' : undefined;
 const stats = isDev ? 'minimal' : 'none';
 const devServer = isDev
   ? {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-      publicPath: '/',
-    },
-  }
+      static: {
+        directory: path.join(__dirname, 'dist'),
+        publicPath: '/',
+      },
+    }
   : {};
 
 // Decide on how to use this later.
@@ -65,11 +65,19 @@ const svgoConfig = {
 
 const plugins = [
   // Make sure this is the first plugin!!!
-  new MiniCssExtractPlugin({ filename: 'styles.css' }),
+  new MiniCssExtractPlugin({
+    filename: 'styles.css',
+  }),
   new CopyPlugin({
     patterns: [
-      { from: `${uswdsDist}/img`, to: 'img' },
-      { from: `${uswdsDist}/js`, to: 'js' },
+      {
+        from: `${uswdsDist}/img`,
+        to: 'img',
+      },
+      {
+        from: `${uswdsDist}/js`,
+        to: 'js',
+      },
     ],
   }),
   // When webpack bundles moment, it includes all of its locale files,
@@ -92,7 +100,7 @@ if (!isDev) {
     new WebpackManifestPlugin({
       fileName: '../webpack-manifest.json',
       publicPath: '',
-    })
+    }),
   );
 }
 
@@ -138,7 +146,7 @@ module.exports = {
             loader: 'css-loader',
             options: {
               url: {
-                filter: url => !(url.includes('img') || url.includes('images')),
+                filter: (url) => !(url.includes('img') || url.includes('images')),
               },
             },
           },
@@ -166,10 +174,18 @@ module.exports = {
         test: /\.svg$/i,
         oneOf: [
           {
-            // For .svg files in public/images/icons/, use the @svgr/webpack loader
+            // For .svg files in public/images/icons/,
+            // use the @svgr/webpack loader
             // so that they can be loaded as React components
             include: path.resolve(__dirname, 'public/images/icons'),
-            use: [{ loader: '@svgr/webpack', options: { svgoConfig } }],
+            use: [
+              {
+                loader: '@svgr/webpack',
+                options: {
+                  svgoConfig,
+                },
+              },
+            ],
           },
           {
             // For all other .svg files, fallback to asset/resource

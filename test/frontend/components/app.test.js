@@ -36,7 +36,9 @@ const props = {
 };
 
 const AppFixture = proxyquire('../../../frontend/components/app', {
-  '../actions/alertActions': { update: alertActionUpdate },
+  '../actions/alertActions': {
+    update: alertActionUpdate,
+  },
   '../util/buildStatusNotifier': class Test {},
 }).App;
 
@@ -61,7 +63,11 @@ describe('<App/>', () => {
   // });
 
   it('does not trigger an alert update if no alert message is present', () => {
-    wrapper.setProps({ location: { key: 'path' } });
+    wrapper.setProps({
+      location: {
+        key: 'path',
+      },
+    });
     expect(alertActionUpdate.called).to.be.false;
   });
 
@@ -91,7 +97,11 @@ describe('<App/>', () => {
 
     wrapper = mountRouter(<AppFixture {...newProps} />);
 
-    wrapper.setProps({ location: { key: 'next-route' } });
+    wrapper.setProps({
+      location: {
+        key: 'next-route',
+      },
+    });
     expect(alertActionUpdate.called).to.be.true;
     expect(alertActionUpdate.calledWith(newProps.alert.stale)).to.be.true;
   });

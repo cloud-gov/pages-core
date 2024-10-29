@@ -4,11 +4,11 @@ const { paginate, wrapHandlers } = require('../../utils');
 
 module.exports = wrapHandlers({
   async list(req, res) {
-    const {
-      limit, page, type, label, model, modelId,
-    } = req.query;
+    const { limit, page, type, label, model, modelId } = req.query;
 
-    const query = { where: {} };
+    const query = {
+      where: {},
+    };
 
     if (type) {
       query.where.type = type;
@@ -26,7 +26,12 @@ module.exports = wrapHandlers({
       query.where.modelId = modelId;
     }
 
-    const pagination = await paginate(Event, serializer.serializeMany, { limit, page }, query);
+    const pagination = await paginate(
+      Event,
+      serializer.serializeMany,
+      { limit, page },
+      query,
+    );
 
     const json = {
       meta: {

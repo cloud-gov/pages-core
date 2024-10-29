@@ -1,26 +1,28 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const factory = require('../../support/factory');
-const {
-  Build,
-  Site,
-  SiteBranchConfig,
-  User,
-} = require('../../../../api/models');
+const { Build, Site, SiteBranchConfig, User } = require('../../../../api/models');
 const NightlyBuildsHelper = require('../../../../api/services/NightlyBuildsHelper');
 const QueueJobs = require('../../../../api/queue-jobs');
 
 describe('NightlyBuildsHelper', () => {
-  const nightlyConfig = { schedule: 'nightly' };
+  const nightlyConfig = {
+    schedule: 'nightly',
+  };
 
   before(async () => {
     sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
-    await factory.user({ username: process.env.USER_AUDITOR });
+    await factory.user({
+      username: process.env.USER_AUDITOR,
+    });
   });
 
   beforeEach(async () => {
     await Promise.all([
-      Build.truncate({ force: true, cascade: true }),
+      Build.truncate({
+        force: true,
+        cascade: true,
+      }),
       Site.truncate(),
       SiteBranchConfig.truncate(),
     ]);
@@ -29,14 +31,20 @@ describe('NightlyBuildsHelper', () => {
   afterEach(async () => {
     sinon.restore();
     await Promise.all([
-      Build.truncate({ force: true, cascade: true }),
+      Build.truncate({
+        force: true,
+        cascade: true,
+      }),
       Site.truncate(),
       SiteBranchConfig.truncate(),
     ]);
   });
 
   after(async () => {
-    await User.truncate({ force: true, cascade: true });
+    await User.truncate({
+      force: true,
+      cascade: true,
+    });
   });
 
   describe('when there is an error', () => {
@@ -60,7 +68,8 @@ describe('NightlyBuildsHelper', () => {
     });
   });
 
-  it('it should remove sites without push from user and site w/o repo and report', async () => {
+  it(`it should remove sites without push
+      from user and site w/o repo and report`, async () => {
     const sites = await Promise.all([
       factory.site({
         owner: 'scheduled',
@@ -104,13 +113,13 @@ describe('NightlyBuildsHelper', () => {
     });
 
     const builds = await Build.findAll({
-      where: { site: sites.map((site) => site.id) },
+      where: {
+        site: sites.map((site) => site.id),
+      },
     });
 
     expect(builds.length).to.eql(3);
     expect(builds.filter((build) => build.branch === 'main').length).to.eql(1);
-    expect(builds.filter((build) => build.branch === 'staging').length).to.eql(
-      2
-    );
+    expect(builds.filter((build) => build.branch === 'staging').length).to.eql(2);
   });
 });

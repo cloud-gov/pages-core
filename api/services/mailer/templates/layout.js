@@ -1,8 +1,12 @@
-const { app: { hostname } } = require('../../../../config');
+/* eslint-disable max-len */
+const {
+  app: { hostname },
+} = require('../../../../config');
 
 const IMAGE_HOST_DOMAIN = `${hostname}/images/transactional-emails`;
 
-const FOOTER_TEXT = 'cloud.gov is a product of the General Services Administration, 1800 F Street NW, Washington, DC 20405';
+const FOOTER_TEXT =
+  'cloud.gov is a product of the General Services Administration, 1800 F Street NW, Washington, DC 20405';
 
 // common styles
 const css = {
@@ -11,14 +15,34 @@ const css = {
 };
 
 function centeredButton(link, text) {
+  const linkStyle = `
+    line-height:100%;
+    text-decoration:none;
+    display:inline-block;
+    max-width:100%;
+    background-color:#2672de;
+    border-radius:3px;
+    color:#fff;
+    font-size:16px;
+    text-align:center;
+    padding:12px 12px 12px 12px;
+    font-weight:500
+  `;
   return `
-    <table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation"
-      style="text-align:center;padding:12px">
+    <table
+      align="center"
+      width="100%"
+      border="0"
+      cellPadding="0"
+      cellSpacing="0"
+      role="presentation"
+      style="text-align:center;padding:12px"
+    >
       <tbody>
         <tr>
           <td>
             <a href="${link}"
-              style="line-height:100%;text-decoration:none;display:inline-block;max-width:100%;background-color:#2672de;border-radius:3px;color:#fff;font-size:16px;text-align:center;padding:12px 12px 12px 12px;font-weight:500"
+              style="${linkStyle}"
               target="_blank">
               ${text}
             </a>
@@ -105,5 +129,7 @@ function layout(content, preheader = '') {
 }
 
 module.exports = {
-  layout, css, centeredButton,
+  layout,
+  css,
+  centeredButton,
 };

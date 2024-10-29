@@ -9,10 +9,7 @@ function increment(key) {
 }
 
 function build(params = {}) {
-  const {
-    context = Domain.Contexts.Site,
-    names = increment('www.example.gov'),
-  } = params;
+  const { context = Domain.Contexts.Site, names = increment('www.example.gov') } = params;
 
   return Domain.build({
     ...params,
@@ -37,7 +34,9 @@ async function create(params = {}) {
   }
 
   if (!params.siteId) {
-    const site = await siteFactory({ include: SiteBranchConfig });
+    const site = await siteFactory({
+      include: SiteBranchConfig,
+    });
     siteId = site.id;
     siteBranchConfigId = site.SiteBranchConfigs[0].id;
   }
@@ -50,7 +49,10 @@ async function create(params = {}) {
 }
 
 function truncate() {
-  return Domain.truncate({ force: true, cascade: true });
+  return Domain.truncate({
+    force: true,
+    cascade: true,
+  });
 }
 
 module.exports = {

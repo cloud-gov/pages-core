@@ -6,9 +6,8 @@ export default function RouterError() {
       <div className="grid-row info-block usa-content">
         <h1 className="font-sans-2xl">Error</h1>
         <p>
-          Apologies! An error occurred in the application that we didn&apos;t
-          know to handle. Refreshing the page might fix the problem but you can
-          also notifiy us.
+          Apologies! An error occurred in the application that we didn&apos;t know to
+          handle. Refreshing the page might fix the problem but you can also notifiy us.
         </p>
       </div>
     </main>

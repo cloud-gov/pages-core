@@ -30,8 +30,7 @@ async function archiveBuildLogsDaily(job) {
 
   logger.log(`Found ${builds.length} builds.`);
 
-  const { errors } = await PromisePool
-    .withConcurrency(5)
+  const { errors } = await PromisePool.withConcurrency(5)
     .for(builds)
     .process(({ id }) => BuildLogs.archiveBuildLogsForBuildId(id));
 
@@ -41,7 +40,9 @@ async function archiveBuildLogsDaily(job) {
     return 'Ok';
   }
 
-  const errMsg = `Archive build logs for ${startDate.format('YYYY-MM-DD')} - ${endDate.format('YYYY-MM-DD')} completed with errors`;
+  const errMsg =
+    `Archive build logs for ${startDate.format('YYYY-MM-DD')}` +
+    ` - ${endDate.format('YYYY-MM-DD')} completed with errors`;
   logger.log(errMsg);
   await logger.flush();
 

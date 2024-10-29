@@ -95,10 +95,11 @@ const useSiteBuildTasks = sinon.stub().returns({
 const { SiteReports } = proxyquire('../../../../frontend/components/site/SiteReports', {
   '../ReportResultsSummary': () => <span />,
   '../../hooks/useSiteBuildTasks': { useSiteBuildTasks },
-  '../../hooks/useBuildTasksForSite': { useBuildTasksForSite },
+  '../../hooks/useBuildTasksForSite': {
+    useBuildTasksForSite,
+  },
   '../GithubBuildBranchLink': () => <span />,
   '../GithubBuildShaLink': () => <span />,
-
 });
 
 describe('<SiteReports/>', () => {
@@ -113,7 +114,12 @@ describe('<SiteReports/>', () => {
   it('should not error if status is unknown/unexpected', () => {
     useBuildTasksForSite.returns({
       isLoading: false,
-      buildTasks: [{ ...defaultScan, status: 'unexpected' }],
+      buildTasks: [
+        {
+          ...defaultScan,
+          status: 'unexpected',
+        },
+      ],
     });
     mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
   });
@@ -123,11 +129,16 @@ describe('<SiteReports/>', () => {
       isLoading: false,
       buildTasks: [],
     });
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
+    const wrapper = mountRouter(
+      <SiteReports />,
+      '/site/:id/reports',
+      '/site/5/reports',
+      state,
+    );
     expect(
-      wrapper.find('p',
-        { children: 'Looks like this site doesn’t have any reports yet.' }
-      )
+      wrapper.find('p', {
+        children: 'Looks like this site doesn’t have any reports yet.',
+      }),
     ).to.exist;
   });
 
@@ -137,13 +148,23 @@ describe('<SiteReports/>', () => {
       isLoading: false,
       buildTasks: Array(N)
         .fill(1)
-        .map((val, index) => ({ ...defaultScan, id: index })),
+        .map((val, index) => ({
+          ...defaultScan,
+          id: index,
+        })),
     });
 
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
+    const wrapper = mountRouter(
+      <SiteReports />,
+      '/site/:id/reports',
+      '/site/5/reports',
+      state,
+    );
     expect(wrapper.find('table#list tr')).to.have.length(N + 1);
     expect(wrapper.find('table#list + p')).to.have.length(1);
-    expect(wrapper.find('table#list + p').text()).to.contain(`Showing ${N} most recent report(s).`);
+    expect(wrapper.find('table#list + p').text()).to.contain(
+      `Showing ${N} most recent report(s).`,
+    );
   });
 
   it('should render a paragraph about truncation if 100 or more builds are present', () => {
@@ -151,13 +172,25 @@ describe('<SiteReports/>', () => {
       isLoading: false,
       buildTasks: Array(100)
         .fill(1)
-        .map((val, index) => ({ ...defaultScan, id: index })),
+        .map((val, index) => ({
+          ...defaultScan,
+          id: index,
+        })),
     });
 
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
+    const wrapper = mountRouter(
+      <SiteReports />,
+      '/site/:id/reports',
+      '/site/5/reports',
+      state,
+    );
     expect(wrapper.find('table#list tr')).to.have.length(101); // front end does not actually truncate the list
     expect(wrapper.find('table#list + p + p')).to.have.length(1);
-    expect(wrapper.find('table#list + p + p').contains('List only displays 100 most recent reports from the last 180 days.')).to.be.true;
+    expect(
+      wrapper
+        .find('table#list + p + p')
+        .contains('List only displays 100 most recent reports from the last 180 days.'),
+    ).to.be.true;
   });
 
   it('should render a loading state if the reports are loading', () => {
@@ -165,7 +198,12 @@ describe('<SiteReports/>', () => {
       isLoading: true,
       buildTasks: [],
     });
-    const wrapper = mountRouter(<SiteReports />, '/site/:id/reports', '/site/5/reports', state);
+    const wrapper = mountRouter(
+      <SiteReports />,
+      '/site/:id/reports',
+      '/site/5/reports',
+      state,
+    );
     expect(wrapper.find('table#list')).to.have.length(0);
     expect(wrapper.find(LoadingIndicator)).to.have.length(1);
   });

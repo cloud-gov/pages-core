@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 const { Build } = require('../api/models');
 const Mailer = require('../api/workers/Mailer');
 
-const [,, EMAIL_TO, MINUTES] = process.argv;
+const [, , EMAIL_TO, MINUTES] = process.argv;
 const BUILD_QUEUED_MINUTES = MINUTES || 3;
 const EMAIL_SUBJECT = `ALERT ${process.env.CF_SPACE}: Site Builds Still Queued`;
 
@@ -29,7 +29,7 @@ async function checkQueuedBuilds() {
   };
 
   const builds = await Build.findAll(options);
-  return builds.map(b => b.id);
+  return builds.map((b) => b.id);
 }
 
 function createBodyHTML(buildIds) {
@@ -53,7 +53,11 @@ function createBodyHTML(buildIds) {
 
 async function sendEmail(to, subject, html) {
   const mailer = new Mailer();
-  const info = await mailer.send({ to, subject, html });
+  const info = await mailer.send({
+    to,
+    subject,
+    html,
+  });
   console.log(info.message);
 }
 

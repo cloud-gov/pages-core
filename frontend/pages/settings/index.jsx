@@ -20,7 +20,7 @@ function buildInitialValues(sites, user) {
         ...acc,
         [`${site.id}`]: user.buildNotificationSettings?.[site.id] || 'site',
       }),
-      {}
+      {},
     ),
   };
 }
@@ -36,45 +36,57 @@ const onGithubAuthFailure = (_error) => {
 };
 
 function UserSettings() {
-  const organizations = useSelector(state => state.organizations);
-  const sites = useSelector(state => state.sites);
-  const user = useSelector(state => state.user.data);
+  const organizations = useSelector((state) => state.organizations);
+  const sites = useSelector((state) => state.sites);
+  const user = useSelector((state) => state.user.data);
 
-  if (sites?.isLoading || organizations?.isLoading || !sites || !sites.data || !organizations) {
+  if (
+    sites?.isLoading ||
+    organizations?.isLoading ||
+    !sites ||
+    !sites.data ||
+    !organizations
+  ) {
     return <LoadingIndicator />;
   }
 
   const initialValues = buildInitialValues(sites.data, user);
 
-  const onSubmit = userSettings => federalistApi.updateUserSettings(userSettings)
-    .catch((e) => { throw new SubmissionError({ _error: e.message }); });
+  const onSubmit = (userSettings) =>
+    federalistApi.updateUserSettings(userSettings).catch((e) => {
+      throw new SubmissionError({
+        _error: e.message,
+      });
+    });
 
   const onSubmitFail = (err, dispatch) => {
-    dispatch(error({
-      message: 'Failed to update settings.',
-      title: 'Error',
-      position: 'tr',
-      autoDismiss: 5,
-    }));
+    dispatch(
+      error({
+        message: 'Failed to update settings.',
+        title: 'Error',
+        position: 'tr',
+        autoDismiss: 5,
+      }),
+    );
   };
 
   const onSubmitSuccess = (updatedUser, dispatch) => {
     dispatch(userSettingsUpdated(updatedUser));
-    dispatch(success({
-      message: 'Successfully updated settings.',
-      title: 'Success',
-      position: 'tr',
-      autoDismiss: 3,
-    }));
+    dispatch(
+      success({
+        message: 'Successfully updated settings.',
+        title: 'Success',
+        position: 'tr',
+        autoDismiss: 3,
+      }),
+    );
   };
 
   return (
     <div className="user-settings">
       <div className="page-header grid-row">
         <div className="grid-col">
-          <h1 className="font-sans-2xl">
-            User Settings
-          </h1>
+          <h1 className="font-sans-2xl">User Settings</h1>
         </div>
       </div>
       <div className="well grid-row">

@@ -4,12 +4,12 @@ const passport = require('../services/passport');
 const EventCreator = require('../services/EventCreator');
 
 function redirectIfAuthenticated(req, res, next) {
-  // eslint-disable-next-line no-unused-expressions
   req.session.authenticated ? res.redirect('/') : next();
 }
 
 function uaaCallback(req, res, next) {
-  // provide this interior callback in place of the default passport.authenticate behavior:
+  // provide this interior callback in place of the default passport.
+  // authenticate behavior:
   // https://github.com/jaredhanson/passport/blob/master/lib/middleware/authenticate.js#L34
   passport.authenticate('uaa', (err, user, info) => {
     if (err) {
@@ -19,7 +19,9 @@ function uaaCallback(req, res, next) {
       return req.logIn(user, next);
     }
     // no user, no error
-    req.session.flash = { error: [info.message] };
+    req.session.flash = {
+      error: [info.message],
+    };
     return res.redirect('/');
   })(req, res, next);
 }
@@ -48,7 +50,11 @@ const onGithubSuccess = async (req, res) => {
     signedInAt: new Date(),
   });
 
-  EventCreator.audit(Event.labels.AUTHENTICATION_PAGES_GH_TOKEN, user, 'GitHub authentication for token');
+  EventCreator.audit(
+    Event.labels.AUTHENTICATION_PAGES_GH_TOKEN,
+    user,
+    'GitHub authentication for token',
+  );
 
   const script = `
     <script nonce="${res.locals.cspNonce}">
@@ -60,6 +66,10 @@ const onGithubSuccess = async (req, res) => {
 };
 
 router.get('/auth/github2', passport.authenticate('github2'));
-router.get('/auth/github2/callback', passport.authenticate('github2', { session: false }), onGithubSuccess);
+router.get(
+  '/auth/github2/callback',
+  passport.authenticate('github2', { session: false }),
+  onGithubSuccess,
+);
 
 module.exports = router;

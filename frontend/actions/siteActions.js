@@ -32,14 +32,13 @@ const resetFormOnError = (err) => {
 export default {
   fetchSites() {
     dispatchSitesFetchStartedAction();
-    return federalist.fetchSites()
-      .then(dispatchSitesReceivedAction)
-      .catch(alertError);
+    return federalist.fetchSites().then(dispatchSitesReceivedAction).catch(alertError);
   },
 
   addSite(siteToAdd, navigate) {
     dispatchSitesFetchStartedAction();
-    return federalist.addSite(siteToAdd)
+    return federalist
+      .addSite(siteToAdd)
       .then((site) => {
         // site is undefined here if addSite fails
         if (site) {
@@ -54,7 +53,11 @@ export default {
   },
 
   addUserToSite({ owner, repository }, navigate) {
-    return federalist.addUserToSite({ owner, repository })
+    return federalist
+      .addUserToSite({
+        owner,
+        repository,
+      })
       .then(dispatchUserAddedToSiteAction)
       .then(navigate)
       .catch((err) => {
@@ -70,7 +73,8 @@ export default {
   },
 
   removeUserFromSite(siteId, userId) {
-    return federalist.removeUserFromSite(siteId, userId)
+    return federalist
+      .removeUserFromSite(siteId, userId)
       .then(dispatchUserRemovedFromSiteAction)
       .then(this.fetchSites)
       .then(userActions.fetchUser)
@@ -79,7 +83,8 @@ export default {
   },
 
   updateSite(site, data) {
-    return federalist.updateSite(site, data)
+    return federalist
+      .updateSite(site, data)
       .then((updatedSite) => {
         if (updatedSite) {
           dispatchSiteUpdatedAction(updatedSite);
@@ -90,13 +95,15 @@ export default {
 
   deleteSite(siteId) {
     dispatchSitesFetchStartedAction();
-    return federalist.deleteSite(siteId)
+    return federalist
+      .deleteSite(siteId)
       .then(dispatchSiteDeletedAction.bind(null, siteId))
       .catch(alertError);
   },
 
   removeBasicAuthFromSite(siteId) {
-    return federalist.removeBasicAuthFromSite(siteId)
+    return federalist
+      .removeBasicAuthFromSite(siteId)
       .then((site) => {
         if (site) {
           dispatchSiteBasicAuthRemovedAction(site);
@@ -107,7 +114,8 @@ export default {
   },
 
   saveBasicAuthToSite(siteId, basicAuth) {
-    return federalist.saveBasicAuthToSite(siteId, basicAuth)
+    return federalist
+      .saveBasicAuthToSite(siteId, basicAuth)
       .then((site) => {
         if (site) {
           dispatchSiteBasicAuthSavedAction(site);

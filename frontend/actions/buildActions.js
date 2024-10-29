@@ -24,23 +24,20 @@ const dispatchBuildRestartedAction = (build) => {
 export default {
   fetchBuilds(site) {
     dispatchBuildsFetchStartedAction();
-    return api.fetchBuilds(site)
-      .then(dispatchBuildsReceivedAction);
+    return api.fetchBuilds(site).then(dispatchBuildsReceivedAction);
   },
 
   refetchBuilds(site) {
-    return api.fetchBuilds(site)
-      .then(dispatchBuildsReceivedAction);
+    return api.fetchBuilds(site).then(dispatchBuildsReceivedAction);
   },
 
   restartBuild(buildId, siteId) {
-    return api.restartBuild(buildId, siteId)
-      .then((build) => {
-        if (Object.keys(build).length > 0) {
-          dispatchBuildRestartedAction(build);
-        } else {
-          alertActions.alertSuccess('Build is already queued.');
-        }
-      });
+    return api.restartBuild(buildId, siteId).then((build) => {
+      if (Object.keys(build).length > 0) {
+        dispatchBuildRestartedAction(build);
+      } else {
+        alertActions.alertSuccess('Build is already queued.');
+      }
+    });
   },
 };

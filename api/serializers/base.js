@@ -2,9 +2,9 @@ const yaml = require('js-yaml');
 const _ = require('underscore');
 
 const transforms = {
-  '': value => value,
-  date: value => value?.toISOString(),
-  yaml: value => yaml.dump(value),
+  '': (value) => value,
+  date: (value) => value?.toISOString(),
+  yaml: (value) => yaml.dump(value),
 };
 
 class BaseSerializer {
@@ -21,13 +21,12 @@ class BaseSerializer {
     }
 
     const allAttributes = {
-      ...this.attributes, ...(isSystemAdmin ? this.adminAttributes : {}),
+      ...this.attributes,
+      ...(isSystemAdmin ? this.adminAttributes : {}),
     };
 
     function applyTransforms(spec, attribute) {
-      const transform = (typeof spec === 'function')
-        ? spec
-        : transforms[spec];
+      const transform = typeof spec === 'function' ? spec : transforms[spec];
 
       return transform(model.get(attribute), model, isSystemAdmin);
     }
@@ -36,7 +35,7 @@ class BaseSerializer {
   }
 
   serializeMany(models, isSystemAdmin = false) {
-    return models.map(model => this.serialize(model, isSystemAdmin));
+    return models.map((model) => this.serialize(model, isSystemAdmin));
   }
 }
 
