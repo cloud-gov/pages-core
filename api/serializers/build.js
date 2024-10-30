@@ -7,7 +7,6 @@ const {
   BuildTask,
   BuildTaskType,
 } = require('../models');
-const { buildViewLink } = require('../utils/build');
 const siteSerializer = require('./site');
 const userSerializer = require('./user');
 
@@ -25,17 +24,12 @@ const toJSON = (build) => {
     object.startedAt = object.startedAt.toISOString();
   }
 
-  if (build.Site) {
-    object.viewLink = buildViewLink(build, build.Site);
-  }
-
   Object.keys(object).forEach((key) => {
     if (object[key] === null) {
       delete object[key];
     }
   });
   delete object.token;
-  delete object.url;
   delete object.logsS3Key;
   // only return first 80 chars in case it's long
   if (object.error) {

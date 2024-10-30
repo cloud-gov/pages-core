@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import BranchViewLink from '@shared/BranchViewLink';
+import BranchViewLink from './BranchViewLink';
 
 import { SITE } from '@propTypes';
 

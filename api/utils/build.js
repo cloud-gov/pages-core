@@ -1,40 +1,29 @@
 const config = require('../../config');
 
-function buildPath(build, site) {
-  const sbc = site?.SiteBranchConfigs?.find((c) => c.branch === build.branch);
-
-  if (sbc) {
-    return sbc.s3Key;
-  }
-
+function previewPath(build, site) {
   return `/preview/${site.owner}/${site.repository}/${build.branch}`;
 }
 
-function buildUrl(build, site) {
+function proxyUrl(path, site) {
   const { proxyDomain } = config.app;
-  const path = buildPath(build, site);
   const url = new URL(path, `https://${site.awsBucketName}.${proxyDomain}`);
-
-  return url.href;
+  // use a trailing slash to prevent the browser from interpreting
+  // branch names with dots as file extensions
+  return url.href + '/';
 }
 
-function buildViewLink(build, site) {
+/* canonical url for a build:
+  - if we don't have a matching site branch config, use the preview url
+  - if we don't have a matching domain, use the site branch config s3key path
+  - use the custom domain
+*/
+function buildUrl(build, site) {
   const { SiteBranchConfigs, Domains } = site;
-
-  if (build.url) {
-    const regex = /(http|https):\/\/+/;
-
-    if (regex.test(build.url)) {
-      return `${build.url.replace(regex, 'https://')}/`;
-    }
-
-    return `https://${build.url}/`;
-  }
 
   const siteBranchConfig = SiteBranchConfigs.find((sbc) => sbc.branch === build.branch);
 
   if (!siteBranchConfig) {
-    return `${buildUrl(build, site)}/`;
+    return proxyUrl(previewPath(build, site), site);
   }
 
   const domain = Domains.find(
@@ -42,7 +31,7 @@ function buildViewLink(build, site) {
   );
 
   if (!domain) {
-    return `${buildUrl(build, site)}/`;
+    return proxyUrl(siteBranchConfig.s3Key, site);
   }
 
   const domainName = domain.names.split(',')[0];
@@ -50,7 +39,18 @@ function buildViewLink(build, site) {
   return `https://${domainName.replace(/\/+$/, '')}/`;
 }
 
-module.exports = {
-  buildViewLink,
-  buildUrl,
-};
+/* generate SITE_PREFIX for builds
+ uses similar but slightly different logic to buildUrl
+(ignores domains, no proxyUrl, no leading slashes)
+*/
+function sitePrefix(build, site) {
+  const { SiteBranchConfigs } = site;
+
+  const siteBranchConfig = SiteBranchConfigs.find((sbc) => sbc.branch === build.branch);
+
+  const path = siteBranchConfig ? siteBranchConfig.s3Key : previewPath(build, site);
+
+  return path.replace(/^(\/)+/, '');
+}
+
+module.exports = { buildUrl, sitePrefix };

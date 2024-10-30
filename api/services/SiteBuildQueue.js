@@ -9,7 +9,7 @@ const {
 } = require('../models');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const { buildViewLink, buildUrl } = require('../utils/build');
+const { sitePrefix, buildUrl } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
 
@@ -24,13 +24,8 @@ const siteConfig = (build, siteBranchConfigs = []) => {
   return configRecord?.config || {};
 };
 
-const baseURLForDomain = (rawDomain) => url.parse(rawDomain).path.replace(/(\/)+$/, '');
-
-const sitePrefixForBuild = (rawDomain) =>
-  baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
-
 const baseURLForBuild = (build) => {
-  const link = buildViewLink(build, build.Site);
+  const link = buildUrl(build, build.Site);
   const urlObject = new URL(link);
   return urlObject.pathname.replace(/(\/)+$/, '');
 };
@@ -61,7 +56,7 @@ const generateDefaultCredentials = async (build) => {
     CONFIG: JSON.stringify(siteConfig(build, SiteBranchConfigs)),
     REPOSITORY: repository,
     OWNER: owner,
-    SITE_PREFIX: sitePrefixForBuild(buildUrl(build, build.Site)),
+    SITE_PREFIX: sitePrefix(build, build.Site),
     GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
     GENERATOR: engine,
     BUILD_ID: build.id,
