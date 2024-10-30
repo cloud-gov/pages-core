@@ -21,10 +21,8 @@ const infoContent = (
   <>
     Certain environment variable names are reserved for
     {` ${globals.APP_NAME} `}
-    use and will
-    be ignored. Warnings for any ignored environment variables will be present
-    in the build logs. See the default variables in
-    {' '}
+    use and will be ignored. Warnings for any ignored environment variables will be
+    present in the build logs. See the default variables in{' '}
     <a
       href="https://cloud.gov/pages/documentation/env-vars-on-pages-builds"
       rel="noopener"
@@ -32,8 +30,7 @@ const infoContent = (
       Environment Variables On
       {` ${globals.APP_NAME} `}
       Builds
-    </a>
-    {' '}
+    </a>{' '}
     for an up-to-date list.
   </>
 );
@@ -41,24 +38,16 @@ const infoContent = (
 const warningContent = (
   <>
     {` ${globals.APP_NAME} `}
-    is a
-    {' '}
-    <b>
-      FISMA Moderate
-    </b>
-    {' '}
-    system, do NOT store variables for systems that are High, and
-    only expose variables if it is safe to do so. You assume the risk if the
-    values you add contain, or allow access to information that is not suitable
-    for this categorization. See
-    {' '}
+    is a <b>FISMA Moderate</b> system, do NOT store variables for systems that are High,
+    and only expose variables if it is safe to do so. You assume the risk if the values
+    you add contain, or allow access to information that is not suitable for this
+    categorization. See{' '}
     <a
       href="https://csrc.nist.gov/Projects/Risk-Management/Risk-Management-Framework-(RMF)-Overview/Security-Categorization"
       rel="noopener noreferrer"
     >
       FISMA Security Categorization
-    </a>
-    {' '}
+    </a>{' '}
     for more information on FISMA information categorization.
   </>
 );
@@ -76,43 +65,31 @@ class EnvironmentVariables extends Component {
       actions,
     } = this.props;
 
-    const addUEV = params => actions.addUserEnvironmentVariable(siteId, params);
-    const deleteUEV = uevId => actions.deleteUserEnvironmentVariable(siteId, uevId);
+    const addUEV = (params) => actions.addUserEnvironmentVariable(siteId, params);
+    const deleteUEV = (uevId) => actions.deleteUserEnvironmentVariable(siteId, uevId);
     const showTable = !isLoading && data.length > 0;
 
     return (
       <div className="grid-col-12">
-        <h3 className="font-heading-xl margin-top-4 margin-bottom-2">Environment Variables</h3>
+        <h3 className="font-heading-xl margin-top-4 margin-bottom-2">
+          Environment Variables
+        </h3>
         <div>
-          <AlertBanner
-            status="info"
-            message={infoContent}
-            alertRole={false}
-          />
-          <AlertBanner
-            status="warning"
-            message={warningContent}
-            alertRole={false}
-          />
+          <AlertBanner status="info" message={infoContent} alertRole={false} />
+          <AlertBanner status="warning" message={warningContent} alertRole={false} />
           <br />
-          { isLoading
-            ? <LoadingIndicator />
-            : (
-              <>
-                <ExpandableArea
-                  bordered
-                  title="Add a new environment variable"
-                >
-                  <div className="well">
-                    <EnvironmentVariableForm onSubmit={params => addUEV(params)} />
-                  </div>
-                </ExpandableArea>
-                { showTable
-                && (
-                <EnvironmentVariableTable uevs={data} onDelete={deleteUEV} />
-                )}
-              </>
-            )}
+          {isLoading ? (
+            <LoadingIndicator />
+          ) : (
+            <>
+              <ExpandableArea bordered title="Add a new environment variable">
+                <div className="well">
+                  <EnvironmentVariableForm onSubmit={(params) => addUEV(params)} />
+                </div>
+              </ExpandableArea>
+              {showTable && <EnvironmentVariableTable uevs={data} onDelete={deleteUEV} />}
+            </>
+          )}
         </div>
       </div>
     );
@@ -133,15 +110,21 @@ EnvironmentVariables.propTypes = {
 };
 
 const mapStateToProps = ({ userEnvironmentVariables }, { siteId }) => ({
-  userEnvironmentVariables: siteUserEnvironmentVariables(userEnvironmentVariables, siteId),
+  userEnvironmentVariables: siteUserEnvironmentVariables(
+    userEnvironmentVariables,
+    siteId,
+  ),
 });
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({
-    addUserEnvironmentVariable,
-    deleteUserEnvironmentVariable,
-    fetchUserEnvironmentVariables,
-  }, dispatch),
+const mapDispatchToProps = (dispatch) => ({
+  actions: bindActionCreators(
+    {
+      addUserEnvironmentVariable,
+      deleteUserEnvironmentVariable,
+      fetchUserEnvironmentVariables,
+    },
+    dispatch,
+  ),
 });
 
 export { EnvironmentVariables };

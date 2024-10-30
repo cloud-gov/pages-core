@@ -10,7 +10,9 @@ const updateSettingsBodySchema = {
     buildNotificationSettings: {
       type: 'object',
       patternProperties: {
-        '^\\d+$': { enum: ['none', 'builds', 'site'] },
+        '^\\d+$': {
+          enum: ['none', 'builds', 'site'],
+        },
       },
     },
   },
@@ -29,13 +31,17 @@ module.exports = {
     const { body, user } = req;
 
     if (!validateUpdateSettingsBody(body)) {
-      const message = validateUpdateSettingsBody.errors.map(e => e.message).join('\n');
-      return res.badRequest({ message });
+      const message = validateUpdateSettingsBody.errors.map((e) => e.message).join('\n');
+      return res.badRequest({
+        message,
+      });
     }
 
     const { buildNotificationSettings } = body;
 
-    await user.update({ buildNotificationSettings });
+    await user.update({
+      buildNotificationSettings,
+    });
 
     return res.json(userSerializer.serialize(user));
   },
@@ -43,7 +49,8 @@ module.exports = {
   async revokeApplicationGrant(req, res) {
     const { user } = req;
     await revokeApplicationGrant(user);
-    // even if the token revoke fails, we return a 200 because we still want to prompt a reauth flow
+    // even if the token revoke fails, we return a
+    // 200 because we still want to prompt a reauth flow
     return res.json({});
   },
 };

@@ -1,8 +1,10 @@
 const crypto = require('crypto');
 
 const relationshipBuilder = (guid) => {
-  const value = guid || crypto.randomUUID()
-  return { data: { guid: value  } };
+  const value = guid || crypto.randomUUID();
+  return {
+    data: { guid: value },
+  };
 };
 
 const createCFAPIResource = ({
@@ -13,7 +15,7 @@ const createCFAPIResource = ({
   spaceGuid,
   ...props
 } = {}) => {
-  const service_instance = relationshipBuilder(serviceInstanceGuid)
+  const service_instance = relationshipBuilder(serviceInstanceGuid);
   const service_plan = relationshipBuilder(servicePlanGuid);
   const space = relationshipBuilder(spaceGuid);
 
@@ -29,11 +31,7 @@ const createCFAPIResource = ({
   };
 };
 
-const createCFAPIResourceList = ({
-  totalPages = 1,
-  totalResults,
-  resources = [],
-}) => {
+const createCFAPIResourceList = ({ totalPages = 1, totalResults, resources = [] }) => {
   const createdResources = resources.map((r) => createCFAPIResource(r));
   const totalResultsCount = totalResults || createdResources.length;
 

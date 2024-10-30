@@ -11,11 +11,13 @@ export const useBuildTasks = (id) => {
 
   useEffect(() => {
     if (!results.buildTasks) {
-      api.fetchTasks(id).then(data => setResults({
-        isLoading: false,
-        buildTasks: data,
-        hasBuildTasks: process.env.FEATURE_BUILD_TASKS === 'active' && data.length > 0,
-      }));
+      api.fetchTasks(id).then((data) =>
+        setResults({
+          isLoading: false,
+          buildTasks: data,
+          hasBuildTasks: process.env.FEATURE_BUILD_TASKS === 'active' && data.length > 0,
+        }),
+      );
     }
   }, [results]);
 

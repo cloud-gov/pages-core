@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import { useScannableBuild } from '@hooks/useScannableBuild';
-import {
-  dateAndTimeSimple,
-  duration,
-  timeFrom,
-} from '@util/datetime';
+import { dateAndTimeSimple, duration, timeFrom } from '@util/datetime';
 import buildActions from '@actions/buildActions';
 
 import GithubBuildBranchLink from '@shared/GithubBuildBranchLink';
@@ -39,16 +35,12 @@ function checkBuildHasBuildTasks(build) {
 
 function checkAllBuildTasksFinished(build) {
   return build.BuildTasks?.every(
-    ({ status }) => status === 'success' || status === 'error' || status === 'cancelled'
+    ({ status }) => status === 'success' || status === 'error' || status === 'cancelled',
   );
 }
 
 function checkIsScannableBuild(build, showBuildTasks, latestForBranch) {
-  return (
-    showBuildTasks
-    && latestForBranch
-    && checkAllBuildTasksFinished(build)
-  );
+  return showBuildTasks && latestForBranch && checkAllBuildTasksFinished(build);
 }
 
 BuildLogsLink.propTypes = {
@@ -56,12 +48,7 @@ BuildLogsLink.propTypes = {
   siteId: PropTypes.number.isRequired,
 };
 
-const Build = ({
-  build,
-  latestForBranch,
-  showBuildTasks = false,
-  site,
-}) => {
+const Build = ({ build, latestForBranch, showBuildTasks = false, site }) => {
   const siteId = site.id;
   const buildHasBuildTasks = checkBuildHasBuildTasks(build);
   const isScannableBuild = checkIsScannableBuild(build, showBuildTasks, latestForBranch);
@@ -123,12 +110,7 @@ const Build = ({
     return messageStatusDoneIcon;
   };
 
-  const {
-    messagePrefix,
-    status: buildStatus,
-    done,
-    icon,
-  } = buildStateData(build);
+  const { messagePrefix, status: buildStatus, done, icon } = buildStateData(build);
 
   return (
     <tr
@@ -137,10 +119,7 @@ const Build = ({
     >
       <th scope="row" data-title="Build">
         <div className="build-info">
-          <div className="build-info-prefix">
-            #
-            {build.id}
-          </div>
+          <div className="build-info-prefix">#{build.id}</div>
           <div className="build-info-details">
             <div className="status-info">
               <h3 className="status-info-title">
@@ -153,13 +132,11 @@ const Build = ({
               </h3>
             </div>
             <span id={`build-${build.id}`} className="usa-sr-only">
-              Build #
-              {build.id}
+              Build #{build.id}
             </span>
             {build.startedAt && !!done && (
               <p>
-                Finished
-                {' '}
+                Finished{' '}
                 <span title={dateAndTimeSimple(build.startedAt)}>
                   {timeFrom(build.startedAt)}
                 </span>
@@ -183,9 +160,7 @@ const Build = ({
             </p>
 
             <p className="logs-link">
-              {build.startedAt && (
-                <BuildLogsLink buildId={build.id} siteId={siteId} />
-              )}
+              {build.startedAt && <BuildLogsLink buildId={build.id} siteId={siteId} />}
             </p>
           </div>
         </div>
@@ -200,15 +175,12 @@ const Build = ({
             </span>
           </div>
         </div>
-
       </td>
-      { showBuildTasks && (
+      {showBuildTasks && (
         <td data-title="Reports">
           {build.BuildTasks?.length > 0 && (
             <p className="scan-link">
-              <Link to={`/sites/${siteId}/reports?build=${build.id}`}>
-                View reports
-              </Link>
+              <Link to={`/sites/${siteId}/reports?build=${build.id}`}>View reports</Link>
             </p>
           )}
           {isScannableBuild && (
@@ -245,14 +217,16 @@ const Build = ({
         )}
         {latestForBranch && ['error', 'success'].includes(build.state) && (
           <CreateBuildLink
-            handlerParams={{ buildId: build.id, siteId }}
+            handlerParams={{
+              buildId: build.id,
+              siteId,
+            }}
             handleClick={buildActions.restartBuild}
             className="usa-button small-button margin-top-1 rebuild-button"
           >
             Rebuild
           </CreateBuildLink>
         )}
-
       </td>
     </tr>
   );
@@ -261,7 +235,6 @@ const Build = ({
 Build.propTypes = {
   build: BUILD.isRequired,
   // we're getting previewBuilds from the parent
-  // eslint-disable-next-line react/forbid-prop-types
   latestForBranch: PropTypes.object.isRequired,
   showBuildTasks: PropTypes.bool,
   site: SITE.isRequired,

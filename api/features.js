@@ -17,7 +17,10 @@ function readEnv(envVar) {
 
 class UnknownFeatureFlagError extends Error {
   constructor(flag, ...args) {
-    const flagsStr = Object.keys(Flags).map(f => `\n- ${f}`).join('');
+    const flagsStr = Object.keys(Flags)
+      .map((f) => `\n- ${f}`)
+      .join('');
+    // eslint-disable-next-line max-len
     const msg = `Requested feature status for unknown feature flag '${flag}'. Available flags are:${flagsStr}`;
     super(msg, ...args);
   }
@@ -32,5 +35,7 @@ function enabled(flag) {
 }
 
 module.exports = {
-  enabled, Flags, UnknownFeatureFlagError,
+  enabled,
+  Flags,
+  UnknownFeatureFlagError,
 };

@@ -7,19 +7,20 @@ const { UserAction } = require('../../../../api/models');
 
 describe('user action serializer', () => {
   it('should serialize correctly', (done) => {
-    userActionFactory.buildMany(3)
-    .then(actions => userActionSerializer.serialize(actions))
-    .then((object) => {
-      const arraySchema = {
-        type: 'array',
-        items: userActionSchema,
-      };
-      const result = validateJSONSchema(object, arraySchema);
+    userActionFactory
+      .buildMany(3)
+      .then((actions) => userActionSerializer.serialize(actions))
+      .then((object) => {
+        const arraySchema = {
+          type: 'array',
+          items: userActionSchema,
+        };
+        const result = validateJSONSchema(object, arraySchema);
 
-      expect(result.errors).to.be.empty;
-      done();
-    })
-    .catch(done);
+        expect(result.errors).to.be.empty;
+        done();
+      })
+      .catch(done);
   });
 });
 
@@ -35,6 +36,8 @@ describe('.toJSON', () => {
       updatedAt: new Date(),
     };
     const model = UserAction.build(props);
-    expect(userActionSerializer.toJSON(model).createdAt).to.equal(props.createdAt.toISOString());
+    expect(userActionSerializer.toJSON(model).createdAt).to.equal(
+      props.createdAt.toISOString(),
+    );
   });
 });

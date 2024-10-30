@@ -3,11 +3,14 @@ const Mailer = require('../api/workers/Mailer');
 
 async function sendEmail(to, subject, html) {
   const mailer = new Mailer();
-  const info = await mailer.send({ to, subject, html });
+  const info = await mailer.send({
+    to,
+    subject,
+    html,
+  });
   console.log(info.message);
 }
 
-const [,, to, subject, html] = process.argv;
+const [, , to, subject, html] = process.argv;
 
-sendEmail(to, subject, html)
-  .catch(console.error);
+sendEmail(to, subject, html).catch(console.error);

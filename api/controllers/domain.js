@@ -3,9 +3,7 @@ const EventCreator = require('../services/EventCreator');
 const domainSerializer = require('../serializers/domain');
 const { wrapHandlers } = require('../utils');
 const { siteViewOrigin } = require('../utils/site');
-const {
-  Domain, Event, Site, SiteBranchConfig,
-} = require('../models');
+const { Domain, Event, Site, SiteBranchConfig } = require('../models');
 
 module.exports = wrapHandlers({
   async create(req, res) {
@@ -26,7 +24,7 @@ module.exports = wrapHandlers({
     }
 
     const existingDomain = site.Domains.find(
-      d => d.names === names || d.siteBranchConfigId === sbcId
+      (d) => d.names === names || d.siteBranchConfigId === sbcId,
     );
 
     if (existingDomain?.names === names) {
@@ -37,26 +35,21 @@ module.exports = wrapHandlers({
 
     if (existingDomain?.siteBranchConfigId === sbcId) {
       return res.badRequest({
-        message:
-          'A domain with the same branch config already exists for the site.',
+        message: 'A domain with the same branch config already exists for the site.',
       });
     }
 
-    const siteBranchConfig = site.SiteBranchConfigs.find(
-      sbc => sbc.id === sbcId
-    );
+    const siteBranchConfig = site.SiteBranchConfigs.find((sbc) => sbc.id === sbcId);
 
     if (!siteBranchConfig) {
       return res.badRequest({
-        message:
-          'The site branch config specified for the domain does not exist.',
+        message: 'The site branch config specified for the domain does not exist.',
       });
     }
 
     if (siteBranchConfig?.context === 'preview') {
       return res.badRequest({
-        message:
-          'The domain site branch config cannot have the context of "preview".',
+        message: 'The domain site branch config cannot have the context of "preview".',
       });
     }
 
@@ -85,7 +78,7 @@ module.exports = wrapHandlers({
           ...obj,
           [error.path]: error.message,
         }),
-        {}
+        {},
       );
 
       return res.unprocessableEntity({
@@ -107,7 +100,7 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const domain = site.Domains.find(d => d.id === domainId);
+    const domain = site.Domains.find((d) => d.id === domainId);
 
     if (!domain) {
       return res.notFound();
@@ -127,7 +120,9 @@ module.exports = wrapHandlers({
       EventCreator.audit(Event.labels.SITE_USER, user, 'Domain Created', {
         domain,
       });
-      return res.json({ message: 'Success' });
+      return res.json({
+        message: 'Success',
+      });
     } catch (error) {
       if (!error.errors) {
         throw error;
@@ -137,7 +132,7 @@ module.exports = wrapHandlers({
           ...obj,
           [err.path]: err.message,
         }),
-        {}
+        {},
       );
 
       return res.unprocessableEntity({
@@ -162,7 +157,7 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    const domain = site.Domains.find(d => d.id === domainId);
+    const domain = site.Domains.find((d) => d.id === domainId);
 
     if (!domain) {
       return res.notFound();
@@ -182,44 +177,40 @@ module.exports = wrapHandlers({
         siteBranchConfigId,
         names,
       },
-      x => !x
+      (x) => !x,
     );
 
     if (payload.siteBranchConfigId) {
       const siteBranchConfig = site.SiteBranchConfigs.find(
-        sbc => sbc.id === payload.siteBranchConfigId
+        (sbc) => sbc.id === payload.siteBranchConfigId,
       );
 
       if (!siteBranchConfig) {
         return res.badRequest({
-          message:
-            'The site branch config specified for the domain does not exist.',
+          message: 'The site branch config specified for the domain does not exist.',
         });
       }
 
       if (siteBranchConfig?.context === 'preview') {
         return res.badRequest({
-          message:
-            'The domain site branch config cannot have the context of "preview".',
+          message: 'The domain site branch config cannot have the context of "preview".',
         });
       }
 
       const existingDomain = site.Domains.find(
-        d => d.siteBranchConfigId === payload.siteBranchConfigId
-          && d.id !== domainId
+        (d) => d.siteBranchConfigId === payload.siteBranchConfigId && d.id !== domainId,
       );
 
       if (existingDomain) {
         return res.badRequest({
-          message:
-            'A domain with the same branch config already exists for the site.',
+          message: 'A domain with the same branch config already exists for the site.',
         });
       }
     }
 
     if (payload.names) {
       const existingDomain = site.Domains.find(
-        d => d.names === payload.names && d.id !== domainId
+        (d) => d.names === payload.names && d.id !== domainId,
       );
 
       if (existingDomain) {
@@ -245,7 +236,7 @@ module.exports = wrapHandlers({
           ...obj,
           [err.path]: err.message,
         }),
-        {}
+        {},
       );
 
       return res.unprocessableEntity({

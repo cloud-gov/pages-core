@@ -1,11 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "id",
-    "name",
-    "createdAt",
-    "updatedAt"
-  ],
+  "required": ["id", "name", "createdAt", "updatedAt"],
   "properties": {
     "id": {
       "type": "integer"

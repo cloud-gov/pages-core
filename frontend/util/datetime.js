@@ -1,6 +1,4 @@
-import {
-  format, formatDistanceStrict, parseISO,
-} from 'date-fns';
+import { format, formatDistanceStrict, parseISO } from 'date-fns';
 
 const NO_TIME = '-';
 
@@ -12,7 +10,10 @@ const NO_TIME = '-';
   see https://github.com/date-fns/date-fns/blob/master/CHANGELOG.md#changed-3
   for more details.
  */
-const compat = fn => (...args) => fn(...args.map(arg => (typeof arg === 'string' ? parseISO(arg) : arg)));
+const compat =
+  (fn) =>
+  (...args) =>
+    fn(...args.map((arg) => (typeof arg === 'string' ? parseISO(arg) : arg)));
 
 /**
  * Helper to get the given date or `now` in UTC.
@@ -28,7 +29,7 @@ function getUTCDate(dateString = Date.now()) {
     date.getUTCDate(),
     date.getUTCHours(),
     date.getUTCMinutes(),
-    date.getUTCSeconds()
+    date.getUTCSeconds(),
   );
 }
 
@@ -44,7 +45,9 @@ export const duration = compat((startTime, endTime) => {
   }
 
   const baseTime = endTime || new Date();
-  return formatDistanceStrict(startTime, baseTime, { roundingMethod: 'floor' });
+  return formatDistanceStrict(startTime, baseTime, {
+    roundingMethod: 'floor',
+  });
 });
 
 /**
@@ -57,7 +60,10 @@ export const timeFrom = compat((date) => {
     return NO_TIME;
   }
 
-  return formatDistanceStrict(date, new Date(), { addSuffix: true, roundingMethod: 'floor' });
+  return formatDistanceStrict(date, new Date(), {
+    addSuffix: true,
+    roundingMethod: 'floor',
+  });
 });
 
 /**
@@ -74,7 +80,8 @@ export const dateAndTime = compat((date) => {
 });
 
 /**
- * Return a shorter human-readable day, months, year, and hours (Dec 25, 2020 at 5:22 PM (GMT-5))
+ * Return a shorter human-readable day, months,
+ * year, and hours (Dec 25, 2020 at 5:22 PM (GMT-5))
  * @param  {String | Date} date format "YYYY-DD-DDT00:00:00.000Z"
  * @return {String}
  */

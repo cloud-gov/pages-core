@@ -22,30 +22,41 @@ describe('S3PublishedFileLister', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      factory.site().then((model) => {
-        site = model;
+      factory
+        .site()
+        .then((model) => {
+          site = model;
 
-        s3Mock.on(ListObjectsV2Command).resolvesOnce({
-          IsTruncated: true,
-          KeyCount: 3,
-          CommonPrefixes: [
-            { Prefix: `preview/${site.owner}/${site.repository}/abc/` },
-            { Prefix: `preview/${site.owner}/${site.repository}/def/` },
-            { Prefix: `preview/${site.owner}/${site.repository}/ghi/` },
-          ],
-          ContinuationToken: 'A',
-          NextContinuationToken: null,
-        });
+          s3Mock.on(ListObjectsV2Command).resolvesOnce({
+            IsTruncated: true,
+            KeyCount: 3,
+            CommonPrefixes: [
+              {
+                Prefix: `preview/${site.owner}/${site.repository}/abc/`,
+              },
+              {
+                Prefix: `preview/${site.owner}/${site.repository}/def/`,
+              },
+              {
+                Prefix: `preview/${site.owner}/${site.repository}/ghi/`,
+              },
+            ],
+            ContinuationToken: 'A',
+            NextContinuationToken: null,
+          });
 
-        return S3PublishedFileLister.listPublishedPreviews(site);
-      }).then((publishedPreviews) => {
-        expect(publishedPreviews).to.deep.equal(['abc', 'def', 'ghi']);
-        done();
-      }).catch(done);
+          return S3PublishedFileLister.listPublishedPreviews(site);
+        })
+        .then((publishedPreviews) => {
+          expect(publishedPreviews).to.deep.equal(['abc', 'def', 'ghi']);
+          done();
+        })
+        .catch(done);
     });
 
     it('responds with the appropriate error when s3 keys are invalid', (done) => {
-      const expected = 'S3 keys out of date. Update them with `npm run update-local-config`';
+      const expected =
+        'S3 keys out of date. Update them with `npm run update-local-config`';
       let site;
 
       mockTokenRequest();
@@ -55,7 +66,8 @@ describe('S3PublishedFileLister', () => {
         code: 'InvalidAccessKeyId',
       });
 
-      factory.site()
+      factory
+        .site()
         .then((model) => {
           site = model;
           return S3PublishedFileLister.listPublishedPreviews(site);
@@ -75,41 +87,69 @@ describe('S3PublishedFileLister', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      factory.site({ defaultBranch: 'main' }).then((model) => {
-        site = model;
-        prefix = `site/${site.owner}/${site.repository}/`;
+      factory
+        .site({
+          defaultBranch: 'main',
+        })
+        .then((model) => {
+          site = model;
+          prefix = `site/${site.owner}/${site.repository}/`;
 
-        s3Mock.on(ListObjectsV2Command).resolvesOnce({
-          IsTruncated: true,
-          KeyCount: 3,
-          Contents: [
-            { Key: `${prefix}abc`, Size: 123 },
-            { Key: `${prefix}abc/def`, Size: 456 },
-            { Key: `${prefix}ghi`, Size: 789 },
-          ],
-          ContinuationToken: 'A',
-          NextContinuationToken: 'B',
-        }).resolvesOnce({
-          IsTruncated: false,
-          Contents: [
+          s3Mock
+            .on(ListObjectsV2Command)
+            .resolvesOnce({
+              IsTruncated: true,
+              KeyCount: 3,
+              Contents: [
+                {
+                  Key: `${prefix}abc`,
+                  Size: 123,
+                },
+                {
+                  Key: `${prefix}abc/def`,
+                  Size: 456,
+                },
+                {
+                  Key: `${prefix}ghi`,
+                  Size: 789,
+                },
+              ],
+              ContinuationToken: 'A',
+              NextContinuationToken: 'B',
+            })
+            .resolvesOnce({
+              IsTruncated: false,
+              Contents: [],
+              ContinuationToken: 'B',
+              NextContinuationToken: null,
+            });
 
-          ],
-          ContinuationToken: 'B',
-          NextContinuationToken: null,
-        });
-
-        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'main');
-      }).then((publishedFiles) => {
-        expect(publishedFiles).to.deep.equal({
-          isTruncated: false,
-          files: [
-            { name: 'abc', size: 123, key: `${prefix}abc` },
-            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
-            { name: 'ghi', size: 789, key: `${prefix}ghi` },
-          ],
-        });
-        done();
-      }).catch(done);
+          return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'main');
+        })
+        .then((publishedFiles) => {
+          expect(publishedFiles).to.deep.equal({
+            isTruncated: false,
+            files: [
+              {
+                name: 'abc',
+                size: 123,
+                key: `${prefix}abc`,
+              },
+              {
+                name: 'abc/def',
+                size: 456,
+                key: `${prefix}abc/def`,
+              },
+              {
+                name: 'ghi',
+                size: 789,
+                key: `${prefix}ghi`,
+              },
+            ],
+          });
+          done();
+        })
+        .catch(done);
     });
 
     it("should resolve with a list of files for the site's demo branch", (done) => {
@@ -119,41 +159,72 @@ describe('S3PublishedFileLister', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      factory.site({ demoBranch: 'demo-branch-name' }).then((model) => {
-        site = model;
-        prefix = `demo/${site.owner}/${site.repository}/`;
+      factory
+        .site({
+          demoBranch: 'demo-branch-name',
+        })
+        .then((model) => {
+          site = model;
+          prefix = `demo/${site.owner}/${site.repository}/`;
 
-        s3Mock.on(ListObjectsV2Command).resolvesOnce({
-          IsTruncated: true,
-          KeyCount: 3,
-          Contents: [
-            { Key: `${prefix}abc`, Size: 123 },
-            { Key: `${prefix}abc/def`, Size: 456 },
-            { Key: `${prefix}ghi`, Size: 789 },
-          ],
-          ContinuationToken: 'A',
-          NextContinuationToken: 'B',
-        }).resolvesOnce({
-          IsTruncated: false,
-          Contents: [
+          s3Mock
+            .on(ListObjectsV2Command)
+            .resolvesOnce({
+              IsTruncated: true,
+              KeyCount: 3,
+              Contents: [
+                {
+                  Key: `${prefix}abc`,
+                  Size: 123,
+                },
+                {
+                  Key: `${prefix}abc/def`,
+                  Size: 456,
+                },
+                {
+                  Key: `${prefix}ghi`,
+                  Size: 789,
+                },
+              ],
+              ContinuationToken: 'A',
+              NextContinuationToken: 'B',
+            })
+            .resolvesOnce({
+              IsTruncated: false,
+              Contents: [],
+              ContinuationToken: 'B',
+              NextContinuationToken: null,
+            });
 
-          ],
-          ContinuationToken: 'B',
-          NextContinuationToken: null,
-        });
-
-        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'demo-branch-name');
-      }).then((publishedFiles) => {
-        expect(publishedFiles).to.deep.equal({
-          isTruncated: false,
-          files: [
-            { name: 'abc', size: 123, key: `${prefix}abc` },
-            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
-            { name: 'ghi', size: 789, key: `${prefix}ghi` },
-          ],
-        });
-        done();
-      }).catch(done);
+          return S3PublishedFileLister.listPagedPublishedFilesForBranch(
+            site,
+            'demo-branch-name',
+          );
+        })
+        .then((publishedFiles) => {
+          expect(publishedFiles).to.deep.equal({
+            isTruncated: false,
+            files: [
+              {
+                name: 'abc',
+                size: 123,
+                key: `${prefix}abc`,
+              },
+              {
+                name: 'abc/def',
+                size: 456,
+                key: `${prefix}abc/def`,
+              },
+              {
+                name: 'ghi',
+                size: 789,
+                key: `${prefix}ghi`,
+              },
+            ],
+          });
+          done();
+        })
+        .catch(done);
     });
 
     it('should resolve with a list of files for a preview branch', (done) => {
@@ -163,41 +234,69 @@ describe('S3PublishedFileLister', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      factory.site({ defaultBranch: 'main' }).then((model) => {
-        site = model;
-        prefix = `preview/${site.owner}/${site.repository}/preview/`;
+      factory
+        .site({
+          defaultBranch: 'main',
+        })
+        .then((model) => {
+          site = model;
+          prefix = `preview/${site.owner}/${site.repository}/preview/`;
 
-        s3Mock.on(ListObjectsV2Command).resolvesOnce({
-          IsTruncated: true,
-          KeyCount: 3,
-          Contents: [
-            { Key: `${prefix}abc`, Size: 123 },
-            { Key: `${prefix}abc/def`, Size: 456 },
-            { Key: `${prefix}ghi`, Size: 789 },
-          ],
-          ContinuationToken: 'A',
-          NextContinuationToken: 'B',
-        }).resolvesOnce({
-          IsTruncated: false,
-          Contents: [
+          s3Mock
+            .on(ListObjectsV2Command)
+            .resolvesOnce({
+              IsTruncated: true,
+              KeyCount: 3,
+              Contents: [
+                {
+                  Key: `${prefix}abc`,
+                  Size: 123,
+                },
+                {
+                  Key: `${prefix}abc/def`,
+                  Size: 456,
+                },
+                {
+                  Key: `${prefix}ghi`,
+                  Size: 789,
+                },
+              ],
+              ContinuationToken: 'A',
+              NextContinuationToken: 'B',
+            })
+            .resolvesOnce({
+              IsTruncated: false,
+              Contents: [],
+              ContinuationToken: 'B',
+              NextContinuationToken: null,
+            });
 
-          ],
-          ContinuationToken: 'B',
-          NextContinuationToken: null,
-        });
-
-        return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview');
-      }).then((publishedFiles) => {
-        expect(publishedFiles).to.deep.equal({
-          isTruncated: false,
-          files: [
-            { name: 'abc', size: 123, key: `${prefix}abc` },
-            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
-            { name: 'ghi', size: 789, key: `${prefix}ghi` },
-          ],
-        });
-        done();
-      }).catch(done);
+          return S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview');
+        })
+        .then((publishedFiles) => {
+          expect(publishedFiles).to.deep.equal({
+            isTruncated: false,
+            files: [
+              {
+                name: 'abc',
+                size: 123,
+                key: `${prefix}abc`,
+              },
+              {
+                name: 'abc/def',
+                size: 456,
+                key: `${prefix}abc/def`,
+              },
+              {
+                name: 'ghi',
+                size: 789,
+                key: `${prefix}ghi`,
+              },
+            ],
+          });
+          done();
+        })
+        .catch(done);
     });
 
     it('should reject with an error if S3.listObjectsV2 is unsuccessful', (done) => {
@@ -206,8 +305,11 @@ describe('S3PublishedFileLister', () => {
 
       s3Mock.on(ListObjectsV2Command).rejects('Test error');
 
-      factory.site()
-        .then(site => S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview'))
+      factory
+        .site()
+        .then((site) =>
+          S3PublishedFileLister.listPagedPublishedFilesForBranch(site, 'preview'),
+        )
         .catch((err) => {
           expect(err.message).to.equal('Test error');
           done();

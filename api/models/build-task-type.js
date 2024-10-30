@@ -1,10 +1,6 @@
 const { buildEnum } = require('../utils');
 
-const associate = ({
-  BuildTaskType,
-  BuildTask,
-  SiteBuildTask,
-}) => {
+const associate = ({ BuildTaskType, BuildTask, SiteBuildTask }) => {
   // Associations
   BuildTaskType.hasMany(BuildTask, {
     foreignKey: 'buildTaskTypeId',
@@ -14,15 +10,9 @@ const associate = ({
   });
 };
 
-const Runners = buildEnum([
-  'cf_task',
-  'worker',
-]);
+const Runners = buildEnum(['cf_task', 'worker']);
 
-const StartsWhens = buildEnum([
-  'build',
-  'complete',
-]);
+const StartsWhens = buildEnum(['build', 'complete']);
 
 module.exports = (sequelize, DataTypes) => {
   const BuildTaskType = sequelize.define(
@@ -58,9 +48,10 @@ module.exports = (sequelize, DataTypes) => {
       url: {
         type: DataTypes.STRING,
       },
-    }, {
+    },
+    {
       tableName: 'build_task_type',
-    }
+    },
   );
 
   BuildTaskType.associate = associate;

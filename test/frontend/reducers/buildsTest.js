@@ -43,28 +43,46 @@ describe('buildsReducer', () => {
       type: BUILDS_FETCH_STARTED,
     });
 
-    expect(actual).to.deep.equal({ isLoading: true, data: [] });
+    expect(actual).to.deep.equal({
+      isLoading: true,
+      data: [],
+    });
   });
 
   it('sets the builds to the ones in the action when the fetch completes', () => {
     const BUILDS = ['🛠', '⚒'];
 
-    const actual = fixture({ isLoading: true, data: [] }, {
-      type: BUILDS_RECEIVED,
-      builds: BUILDS,
-    });
+    const actual = fixture(
+      {
+        isLoading: true,
+        data: [],
+      },
+      {
+        type: BUILDS_RECEIVED,
+        builds: BUILDS,
+      },
+    );
 
-    expect(actual).to.deep.equal({ isLoading: false, data: BUILDS });
+    expect(actual).to.deep.equal({
+      isLoading: false,
+      data: BUILDS,
+    });
   });
 
   it('records builds that are restarted', () => {
     const BUILDS = ['🔧', '🔨'];
     const RESTARTED_BUILD = '⛏';
 
-    const actual = fixture({ isLoading: false, data: BUILDS }, {
-      type: BUILD_RESTARTED,
-      build: RESTARTED_BUILD,
-    });
+    const actual = fixture(
+      {
+        isLoading: false,
+        data: BUILDS,
+      },
+      {
+        type: BUILD_RESTARTED,
+        build: RESTARTED_BUILD,
+      },
+    );
 
     expect(actual).to.deep.equal({
       isLoading: false,

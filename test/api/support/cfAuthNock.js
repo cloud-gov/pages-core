@@ -2,7 +2,14 @@ const jwt = require('jsonwebtoken');
 const nock = require('nock');
 
 const mockTokenRequest = (token) => {
-  const accessToken = token || jwt.sign({ exp: (Date.now() / 1000) + 600 }, '123abc');
+  const accessToken =
+    token ||
+    jwt.sign(
+      {
+        exp: Date.now() / 1000 + 600,
+      },
+      '123abc',
+    );
 
   const n = nock('https://login.example.com', {
     reqheaders: {
@@ -22,7 +29,7 @@ const mockTokenRequest = (token) => {
   }
 
   if (token === 'emptytoken') {
-    return n.reply(200, { });
+    return n.reply(200, {});
   }
 
   return n.reply(200, {

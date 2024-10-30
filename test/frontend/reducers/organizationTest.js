@@ -35,22 +35,46 @@ describe('organizationsReducer', () => {
       type: ORGANIZATIONS_FETCH_STARTED,
     });
 
-    expect(actual).to.deep.equal({ ...initialState, isLoading: true });
+    expect(actual).to.deep.equal({
+      ...initialState,
+      isLoading: true,
+    });
   });
 
   it("replaces anything it has when it gets a 'organizations received' action", () => {
     const organizations = [{ hello: 'world' }, { how: 'are you?' }];
 
-    const actual = fixture({ ...initialState, data: [{ oldData: 'to be lost' }] }, {
-      type: ORGANIZATIONS_RECEIVED,
-      organizations,
-    });
+    const actual = fixture(
+      {
+        ...initialState,
+        data: [
+          {
+            oldData: 'to be lost',
+          },
+        ],
+      },
+      {
+        type: ORGANIZATIONS_RECEIVED,
+        organizations,
+      },
+    );
 
-    expect(actual).to.deep.equal({ ...initialState, isLoading: false, data: organizations });
+    expect(actual).to.deep.equal({
+      ...initialState,
+      isLoading: false,
+      data: organizations,
+    });
   });
 
   it("ignores a malformed 'organizations received' action", () => {
-    const state = { ...initialState, data: [{ oldData: 'to be there' }] };
+    const state = {
+      ...initialState,
+      data: [
+        {
+          oldData: 'to be there',
+        },
+      ],
+    };
     const actual = fixture(state, {
       type: ORGANIZATIONS_RECEIVED,
     });

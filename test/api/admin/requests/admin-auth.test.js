@@ -3,7 +3,11 @@ const request = require('supertest');
 const { UAAIdentity, User } = require('../../../../api/models');
 const cfUAANock = require('../../support/cfUAANock');
 const userFactory = require('../../support/factory/user');
-const { uaaUser, uaaProfile, createUAAIdentity } = require('../../support/factory/uaa-identity');
+const {
+  uaaUser,
+  uaaProfile,
+  createUAAIdentity,
+} = require('../../support/factory/uaa-identity');
 const { sessionForCookie } = require('../../support/cookieSession');
 const { unauthenticatedSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
@@ -13,21 +17,16 @@ const { options: uaaConfig } = require('../../../../config').passport.uaa;
 const app = require('../../../../app');
 
 describe('Admin authentication request', () => {
-  after(() => Promise.all([
-    User.truncate(),
-    UAAIdentity.truncate(),
-  ]));
+  after(() => Promise.all([User.truncate(), UAAIdentity.truncate()]));
 
   describe('GET /admin/login', () => {
     it('should redirect to the configured authorization endpoint', (done) => {
-      const locationRE = process.env.PRODUCT === 'pages'
-        ? new RegExp(`^${uaaConfig.authorizationURL}`)
-        : new RegExp('^https://github.com/login/oauth/authorize');
+      const locationRE =
+        process.env.PRODUCT === 'pages'
+          ? new RegExp(`^${uaaConfig.authorizationURL}`)
+          : new RegExp('^https://github.com/login/oauth/authorize');
 
-      request(app)
-        .get('/admin/login')
-        .expect('Location', locationRE)
-        .expect(302, done);
+      request(app).get('/admin/login').expect('Location', locationRE).expect(302, done);
     });
   });
 
@@ -35,7 +34,10 @@ describe('Admin authentication request', () => {
     it('returns unauthorized if the user is not an admin', async () => {
       const uaaId = 'user_id_1';
       const code = 'code';
-      const profile = { email: 'hello@example.com', user_id: uaaId };
+      const profile = {
+        email: 'hello@example.com',
+        user_id: uaaId,
+      };
       const user = await userFactory();
       await createUAAIdentity({
         uaaId,
@@ -43,15 +45,18 @@ describe('Admin authentication request', () => {
       });
       const userProfile = uaaUser({
         id: uaaId,
-        groups: [{
-          display: 'not.admin',
-        }],
+        groups: [
+          {
+            display: 'not.admin',
+          },
+        ],
         ...profile,
       });
 
       cfUAANock.mockUAAAuth(profile, code);
       cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
-      cfUAANock.mockVerifyUserGroup(uaaId, userProfile); // mocked twice for subsequent calls
+      // mocked twice for subsequent calls
+      cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
 
       return request(app)
         .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
@@ -69,9 +74,11 @@ describe('Admin authentication request', () => {
       const uaaUserInfo = uaaUser({
         uaaId,
         email,
-        groups: [{
-          display: 'pages.admin',
-        }],
+        groups: [
+          {
+            display: 'pages.admin',
+          },
+        ],
       });
 
       before(async () => {
@@ -86,16 +93,15 @@ describe('Admin authentication request', () => {
       beforeEach(() => {
         cfUAANock.mockUAAAuth(uaaUserProfile, code);
         cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
-        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo); // mocked twice for subsequent calls
+        // mocked twice for subsequent calls
+        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
       });
 
       it('returns a script tag', (done) => {
         request(app)
           .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
           .expect((res) => {
-            expect(res.text.trim()).to.match(
-              /^<script nonce=".*">(.|\n)*<\/script>$/g
-            );
+            expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
           })
           .expect(200, done);
       });
@@ -112,13 +118,8 @@ describe('Admin authentication request', () => {
           .expect(200);
 
         const updatedCookie = res.header['set-cookie'][0];
-        const session = await sessionForCookie(
-          updatedCookie,
-          'pages-admin.sid'
-        );
-        expect(res.text.trim()).to.match(
-          /^<script nonce=".*">(.|\n)*<\/script>$/g
-        );
+        const session = await sessionForCookie(updatedCookie, 'pages-admin.sid');
+        expect(res.text.trim()).to.match(/^<script nonce=".*">(.|\n)*<\/script>$/g);
         expect(session.passport.user).to.exist;
         expect(session.passport.user.role).to.exist;
       });

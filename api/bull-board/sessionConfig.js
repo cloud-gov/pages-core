@@ -11,7 +11,9 @@ function configureSession() {
     maxRetriesPerRequest: null,
   });
 
-  const store = new RedisStore({ client });
+  const store = new RedisStore({
+    client,
+  });
 
   return session({
     cookie: {

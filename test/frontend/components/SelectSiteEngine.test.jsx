@@ -30,14 +30,22 @@ describe('<SelectSiteEngine />', () => {
       expect(wrapper.find(`option[value="${engine}"]`)).to.have.length(1);
     });
 
-    const selectSiteEngines = wrapper.getElements()[0].props.children.map(engine => engine.key);
-    selectSiteEngines.forEach(engine => expect(expectedEngineValues).to.include(engine));
+    const selectSiteEngines = wrapper
+      .getElements()[0]
+      .props.children.map((engine) => engine.key);
+    selectSiteEngines.forEach((engine) =>
+      expect(expectedEngineValues).to.include(engine),
+    );
   });
 
   it('calls props.onChange when a new option is selected', () => {
     const select = wrapper.find('select');
     expect(props.onChange.notCalled).to.be.true;
-    select.simulate('change', { target: { value: expectedEngineValues[2] } });
+    select.simulate('change', {
+      target: {
+        value: expectedEngineValues[2],
+      },
+    });
     expect(props.onChange.calledOnce).to.be.true;
   });
 });

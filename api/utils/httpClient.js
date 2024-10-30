@@ -17,7 +17,7 @@ class HttpClient {
     });
 
     this.client.interceptors.response.use(
-      response => response,
+      (response) => response,
       async (error) => {
         const { response } = error;
 
@@ -31,7 +31,7 @@ class HttpClient {
 
           // For CF Api - really need to look at refactoring this class
           if (response.data?.errors) {
-            const err = new Error(response.data.errors.map(e => e.detail).join(', '));
+            const err = new Error(response.data.errors.map((e) => e.detail).join(', '));
             err.errors = response.data.errors;
             throw err;
           }
@@ -43,7 +43,7 @@ class HttpClient {
         }
 
         throw error;
-      }
+      },
     );
   }
 

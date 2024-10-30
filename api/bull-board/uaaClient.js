@@ -66,7 +66,7 @@ class UAAClient {
    * @param {[string]} groupNames - allowed UAA group names, ex: ['pages.user']
    */
   userInGroup(userGroups, groupNames) {
-    return userGroups.filter(group => groupNames.includes(group.display)).length > 0;
+    return userGroups.filter((group) => groupNames.includes(group.display)).length > 0;
   }
 
   /**
@@ -106,29 +106,26 @@ class UAAClient {
    */
   async fetchUser(userId, clientToken) {
     const path = `/Users/${userId}`;
-    const options = { token: clientToken };
+    const options = {
+      token: clientToken,
+    };
 
     return this.request(path, options);
   }
 
   request(path, opts = {}) {
-    const {
-      body,
-      form,
-      method = 'get',
-      params,
-      token,
-    } = opts;
+    const { body, form, method = 'get', params, token } = opts;
 
-    return this.httpClient.request({
-      data: body || (form && new URLSearchParams(form).toString()),
-      headers: token && {
-        Authorization: `Bearer ${token}`,
-      },
-      method,
-      params,
-      url: path,
-    })
+    return this.httpClient
+      .request({
+        data: body || (form && new URLSearchParams(form).toString()),
+        headers: token && {
+          Authorization: `Bearer ${token}`,
+        },
+        method,
+        params,
+        url: path,
+      })
       .then((response) => {
         if (response.data.error) {
           const msg = `${response.data.error}
@@ -138,7 +135,9 @@ class UAAClient {
         }
         return response.data;
       })
-      .catch((e) => { throw new Error(e); });
+      .catch((e) => {
+        throw new Error(e);
+      });
   }
 }
 

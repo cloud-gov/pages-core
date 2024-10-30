@@ -48,7 +48,7 @@ export const AddRepoSiteForm = ({
       <Field
         name="repoOrganizationId"
         type="select"
-        component={p => (
+        component={(p) => (
           <UserOrgSelect
             id="repoOrganizationId"
             name="repoOrganizationId"
@@ -61,15 +61,16 @@ export const AddRepoSiteForm = ({
         )}
       />
     </div>
-    {
-      showAddNewSiteFields && (
+    {showAddNewSiteFields && (
       <div className="add-repo-site-additional-fields">
         {showNewSiteAlert()}
         <div className="form-group margin-y-2">
-          <label className="usa-label text-bold" htmlFor="engine">Site engine</label>
+          <label className="usa-label text-bold" htmlFor="engine">
+            Site engine
+          </label>
           <Field
             name="engine"
-            component={p => (
+            component={(p) => (
               <SelectSiteEngine
                 name="engine"
                 id="engine"
@@ -80,8 +81,7 @@ export const AddRepoSiteForm = ({
           />
         </div>
       </div>
-      )
-}
+    )}
     <button
       type="submit"
       className="usa-button usa-button--primary inline-block"

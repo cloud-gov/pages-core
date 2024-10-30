@@ -1,19 +1,18 @@
 const path = require('path');
-const {
-  BuildTask,
-} = require('../models');
+const { BuildTask } = require('../models');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const S3Helper = require('./S3Helper');
 
 const apiClient = new CloudFoundryAPIClient();
 
-const statusCallbackURL = buildTask => new URL(
-  path.join('/v0/tasks', String(buildTask.id), buildTask.token),
-  config.app.hostname
-).href;
+const statusCallbackURL = (buildTask) =>
+  new URL(
+    path.join('/v0/tasks', String(buildTask.id), buildTask.token),
+    config.app.hostname,
+  ).href;
 
-const generateDefaultCredentials = async buildTask => ({
+const generateDefaultCredentials = async (buildTask) => ({
   STATUS_CALLBACK: statusCallbackURL(buildTask),
   TASK_ID: buildTask.id,
 });
@@ -23,7 +22,7 @@ const buildContainerEnvironment = async (buildTask) => {
 
   return apiClient
     .fetchServiceInstanceCredentials(buildTask.Build.Site.s3ServiceName)
-    .then(credentials => ({
+    .then((credentials) => ({
       ...defaultCredentials,
       AWS_DEFAULT_REGION: credentials.region,
       AWS_ACCESS_KEY_ID: credentials.access_key_id,
@@ -34,18 +33,13 @@ const buildContainerEnvironment = async (buildTask) => {
 
 const setupBucket = async (build) => {
   const credentials = await apiClient.fetchServiceInstanceCredentials(
-    build.Site.s3ServiceName
+    build.Site.s3ServiceName,
   );
-  const {
-    access_key_id, // eslint-disable-line
-    bucket,
-    region,
-    secret_access_key, // eslint-disable-line
-  } = credentials;
+  const { access_key_id, bucket, region, secret_access_key } = credentials;
 
   const s3Client = new S3Helper.S3Client({
-    accessKeyId: access_key_id, // eslint-disable-line
-    secretAccessKey: secret_access_key, // eslint-disable-line
+    accessKeyId: access_key_id,
+    secretAccessKey: secret_access_key,
     bucket,
     region,
   });
@@ -58,7 +52,7 @@ const setupBucket = async (build) => {
 };
 
 const BuildTaskQueue = {
-  messageBodyForBuild: async buildTask => buildContainerEnvironment(buildTask),
+  messageBodyForBuild: async (buildTask) => buildContainerEnvironment(buildTask),
 
   setupTaskEnv: async (buildTaskId) => {
     const buildTask = await BuildTask.forRunner().findByPk(buildTaskId);

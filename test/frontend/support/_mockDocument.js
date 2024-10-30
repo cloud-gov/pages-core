@@ -1,8 +1,11 @@
 class Document {
-
   static querySelectorAll(queryStr) {
     if (queryStr === 'meta[name="accessToken"]') {
-      return [{ content: 'accessToken' }];
+      return [
+        {
+          content: 'accessToken',
+        },
+      ];
     }
     return [];
   }

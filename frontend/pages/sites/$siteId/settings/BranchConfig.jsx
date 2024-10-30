@@ -12,14 +12,7 @@ function formatConfig(config) {
   return yaml.dump(config);
 }
 
-function BranchConfig({
-  id,
-  branch,
-  config,
-  context,
-  handleUpdate,
-  isExpanded,
-}) {
+function BranchConfig({ id, branch, config, context, handleUpdate, isExpanded }) {
   const formattedConfig = formatConfig(config);
   const [isLoading, setIsLoading] = useState(false);
   const [branchConfig, setBranchConfig] = useState({
@@ -30,7 +23,11 @@ function BranchConfig({
   });
 
   const resetValues = () => {
-    setBranchConfig({ ...branchConfig, branch, config: formattedConfig });
+    setBranchConfig({
+      ...branchConfig,
+      branch,
+      config: formattedConfig,
+    });
   };
 
   return (
@@ -49,7 +46,7 @@ function BranchConfig({
             .then(() => {
               setIsLoading(false);
               return notificationActions.success(
-                `Updated branch config for ${branchConfig.context}`
+                `Updated branch config for ${branchConfig.context}`,
               );
             })
             .finally(() => setIsLoading(false));
@@ -62,7 +59,12 @@ function BranchConfig({
             <>
               {context !== 'preview' && (
                 <div className="margin-bottom-3">
-                  <label className="usa-label text-bold margin-top-0" htmlFor={`${branch}-input`}>Branch name:</label>
+                  <label
+                    className="usa-label text-bold margin-top-0"
+                    htmlFor={`${branch}-input`}
+                  >
+                    Branch name:
+                  </label>
                   <input
                     className="usa-input"
                     id={`${branch}-input`}
@@ -77,14 +79,15 @@ function BranchConfig({
                 </div>
               )}
               <div>
-                <label className="usa-label text-bold margin-top-0" htmlFor={`${branch}-config-input`}>Configuration:</label>
+                <label
+                  className="usa-label text-bold margin-top-0"
+                  htmlFor={`${branch}-config-input`}
+                >
+                  Configuration:
+                </label>
                 <p className="margin-top-0">
-                  Add additional configuration in YAML to be added to your
-                  _config.yml file when we build your
-                  {' '}
-                  {context}
-                  {' '}
-                  branch.
+                  Add additional configuration in YAML to be added to your _config.yml
+                  file when we build your {context} branch.
                 </p>
                 <textarea
                   className="usa-input height-15"

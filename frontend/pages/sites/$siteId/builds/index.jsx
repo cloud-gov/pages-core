@@ -21,10 +21,10 @@ function scansDocsLink(url, cta = 'What’s this?') {
 }
 function latestBuildByBranch(builds) {
   const maxBuilds = {};
-  const branchNames = [...new Set(builds.map(item => item.branch))];
+  const branchNames = [...new Set(builds.map((item) => item.branch))];
   branchNames.forEach((branchName) => {
     const maxBuild = builds
-      .filter(b => b.branch === branchName)
+      .filter((b) => b.branch === branchName)
       .reduce((a, b) => (new Date(b.completedAt) > new Date(a.completedAt) ? b : a));
     maxBuilds[branchName] = maxBuild.id;
   });
@@ -41,13 +41,16 @@ function siteHasBuildTasks(SiteBuildTasks = []) {
 
 function SiteBuildList() {
   const { id } = useParams();
-  const site = useSelector(state => currentSite(state.sites, id));
-  const organization = useSelector(state => getOrgById(state.organizations, site.organizationId)
+  const site = useSelector((state) => currentSite(state.sites, id));
+  const organization = useSelector((state) =>
+    getOrgById(state.organizations, site.organizationId),
   );
-  const builds = useSelector(state => state.builds);
+  const builds = useSelector((state) => state.builds);
 
   useEffect(() => {
-    buildActions.fetchBuilds({ id });
+    buildActions.fetchBuilds({
+      id,
+    });
 
     const intervalHandle = setInterval(() => {
       if (document.visibilityState === 'visible') {
@@ -61,10 +64,11 @@ function SiteBuildList() {
 
   if (!builds?.isLoading && builds?.data?.length === 0) {
     const header = 'This site does not yet have any builds.';
-    const message = 'If this site was just added, the first build should be available within a few minutes.';
-    return (
-      <AlertBanner status="info" header={header} message={message} />
-    );
+    const message = `
+      If this site was just added,
+      the first build should be available within a few minutes.
+    `;
+    return <AlertBanner status="info" header={header} message={message} />;
   }
   const latestBuilds = builds.data && latestBuildByBranch(builds.data);
 
@@ -74,17 +78,24 @@ function SiteBuildList() {
         <div className="well">
           <AlertBanner
             status="warning"
-            message={sandboxMsg(
-              organization.daysUntilSandboxCleaning,
-              'site builds'
-            )}
+            message={sandboxMsg(organization.daysUntilSandboxCleaning, 'site builds')}
             alertRole={false}
           />
         </div>
       )}
       {builds?.data?.length > 0 && (
         <div className="grid-col-12 table-container">
-          <table className="usa-table usa-table--borderless usa-table--stacked log-table log-table__site-builds width-full table-full-width">
+          <table
+            className={`
+              usa-table
+              usa-table--borderless
+              usa-table--stacked
+              log-table
+              log-table__site-builds
+              width-full
+              table-full-width
+          `}
+          >
             <thead>
               <tr>
                 <th scope="col">Build</th>
@@ -92,10 +103,7 @@ function SiteBuildList() {
                 {siteHasBuildTasks(site.SiteBuildTasks) && (
                   <th scope="col">
                     Reports (
-                    {scansDocsLink(
-                      'https://cloud.gov/pages/documentation/build-scans/'
-                    )}
-                    )
+                    {scansDocsLink('https://cloud.gov/pages/documentation/build-scans/')})
                   </th>
                 )}
                 <th scope="col">Results</th>
@@ -117,17 +125,9 @@ function SiteBuildList() {
               })}
             </tbody>
           </table>
-          <p>
-            Showing
-            {' '}
-            {builds.data.length}
-            {' '}
-            most recent build(s).
-          </p>
+          <p>Showing {builds.data.length} most recent build(s).</p>
           {builds.data.length >= 100 && (
-            <p>
-              List only displays 100 most recent builds from the last 180 days.
-            </p>
+            <p>List only displays 100 most recent builds from the last 180 days.</p>
           )}
         </div>
       )}

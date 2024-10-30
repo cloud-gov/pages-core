@@ -23,37 +23,62 @@ describe('Admin - Domains API', () => {
       Site.truncate(),
       Organization.truncate(),
       SiteBranchConfig.truncate(),
-    ])
+    ]),
   );
 
   describe('Unauthorized domain route requests', async () => {
     const routes = [
-      { method: 'get', path: '/domains' },
-      { method: 'get', path: '/domains/:id' },
-      { method: 'delete', path: '/domains/:id' },
-      { method: 'get', path: '/domains/:id/dns' },
-      { method: 'get', path: '/domains/:id/dns-result' },
-      { method: 'post', path: '/domains/:id/destroy' },
-      { method: 'post', path: '/domains/:id/deprovision' },
-      { method: 'post', path: '/domains/:id/provision' },
-      { method: 'post', path: '/domains' },
+      {
+        method: 'get',
+        path: '/domains',
+      },
+      {
+        method: 'get',
+        path: '/domains/:id',
+      },
+      {
+        method: 'delete',
+        path: '/domains/:id',
+      },
+      {
+        method: 'get',
+        path: '/domains/:id/dns',
+      },
+      {
+        method: 'get',
+        path: '/domains/:id/dns-result',
+      },
+      {
+        method: 'post',
+        path: '/domains/:id/destroy',
+      },
+      {
+        method: 'post',
+        path: '/domains/:id/deprovision',
+      },
+      {
+        method: 'post',
+        path: '/domains/:id/provision',
+      },
+      {
+        method: 'post',
+        path: '/domains',
+      },
     ];
 
     it('should block all unauthenticated actions', async () => {
       await Promise.all(
         routes.map(async (route) => {
-          const response = await request(app)[route.method](route.path)
-            .expect(401);
+          const response = await request(app)[route.method](route.path).expect(401);
           expect(response.body.message).to.equal('Unauthorized');
-        })
+        }),
       );
     });
   });
 
   describe('GET /admin/reports/published-sites', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)['get']('/reports/published-sites')
-        .expect(401);
+      const response = await request(app)['get']('/reports/published-sites').expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
 
@@ -61,7 +86,9 @@ describe('Admin - Domains API', () => {
       const user = await factory.user();
 
       const org = await factory.organization.create();
-      const site = await factory.site({ organizationId: org.id });
+      const site = await factory.site({
+        organizationId: org.id,
+      });
       const siteBranchConfigId = site.SiteBranchConfigs[0].id;
       const domain = await factory.domain.create({
         siteId: site.id,
@@ -97,7 +124,8 @@ describe('Admin - Domains API', () => {
 
   describe('GET /admin/reports/published-sites.csv', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)['get']('/reports/published-sites.csv')
+      const response = await request(app)
+        ['get']('/reports/published-sites.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -110,7 +138,9 @@ describe('Admin - Domains API', () => {
         agency: 'Test Agency',
         isSelfAuthorized: true,
       });
-      const site = await factory.site({ organizationId: org.id });
+      const site = await factory.site({
+        organizationId: org.id,
+      });
       const domain = await factory.domain.create({
         siteId: site.id,
         siteBranchConfigId: site.SiteBranchConfigs[0].id,
@@ -130,22 +160,21 @@ describe('Admin - Domains API', () => {
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
         .expect(200);
-      expect(response.headers['content-type']).to.equal(
-        'text/csv; charset=utf-8'
-      );
+      expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
       expect(response.headers['content-disposition']).to.equal(
-        'attachment; filename="published-sites.csv"'
+        'attachment; filename="published-sites.csv"',
       );
       const [header, ...data] = response.text.split(/\n/);
       expect(header).to.equal(
-        '"Organization","Agency","Self Authorized","Site","Domain","Engine"'
+        '"Organization","Agency","Self Authorized","Site","Domain","Engine"',
       );
       expect(data.length).to.equal(2);
       expect(data[0]).to.equal(
-        `"${org.name}","${org.agency}",true,"${site.repository}","${domain.names}","${site.engine}"`
+        // eslint-disable-next-line max-len
+        `"${org.name}","${org.agency}",true,"${site.repository}","${domain.names}","${site.engine}"`,
       );
       expect(data[1]).to.equal(
-        `,,,"${orglessSite.repository}","${orglessDomain.names}","${orglessSite.engine}"`
+        `,,,"${orglessSite.repository}","${orglessDomain.names}","${orglessSite.engine}"`,
       );
     });
   });
@@ -172,7 +201,12 @@ describe('Admin - Domains API', () => {
 
     it('should return 404 if the site branch config does not exist', async () => {
       const user = await factory.user();
-      const site = await factory.site({}, { noSiteBranchConfig: true });
+      const site = await factory.site(
+        {},
+        {
+          noSiteBranchConfig: true,
+        },
+      );
       const siteBranchConfigId = 8772274669;
 
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
@@ -189,9 +223,15 @@ describe('Admin - Domains API', () => {
         .expect(404);
     });
 
-    it('should return 400 if the site branch config does not match the site', async () => {
+    it(`should return 400
+        if the site branch config does not match the site`, async () => {
       const user = await factory.user();
-      const site = await factory.site({}, { noSiteBranchConfig: true });
+      const site = await factory.site(
+        {},
+        {
+          noSiteBranchConfig: true,
+        },
+      );
       const otherSite = await factory.site();
       const otherSBC = otherSite.SiteBranchConfigs[0];
 
@@ -209,13 +249,18 @@ describe('Admin - Domains API', () => {
         .expect(400);
 
       expect(response.body.message).to.equal(
-        'The site and site branch config are not related.'
+        'The site and site branch config are not related.',
       );
     });
 
     it('should return 400 if the site branch config is a "preview" context', async () => {
       const user = await factory.user();
-      const site = await factory.site({}, { noSiteBranchConfig: true });
+      const site = await factory.site(
+        {},
+        {
+          noSiteBranchConfig: true,
+        },
+      );
       const sbc = await factory.siteBranchConfig.create({
         site,
         context: 'preview',
@@ -235,11 +280,12 @@ describe('Admin - Domains API', () => {
         .expect(400);
 
       expect(response.body.message).to.equal(
-        'The site branch config cannot have the context of "preview".'
+        'The site branch config cannot have the context of "preview".',
       );
     });
 
-    it('should create a new domain for a site based on the site branch config', async () => {
+    it(`should create a new domain
+        for a site based on the site branch config`, async () => {
       const names = 'www.example.gov';
       const user = await factory.user();
       const site = await factory.site();

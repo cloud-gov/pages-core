@@ -9,12 +9,13 @@ const attributes = {
   username: '',
   buildNotificationSettings: '',
   hasGithubAuth: (_, user) => !!user.githubAccessToken,
-  UAAIdentity: (uaaIdentity, _, isSystemAdmin) => uaaIdentitySerializer
-    .serialize(uaaIdentity, isSystemAdmin),
-  OrganizationRoles: (orgRoles, _, isSystemAdmin) => orgRoles?.map(orgRole => ({
-    Organization: organizationSerializer.serialize(orgRole.Organization, isSystemAdmin),
-    Role: roleSerializer.serialize(orgRole.Role, isSystemAdmin),
-  })),
+  UAAIdentity: (uaaIdentity, _, isSystemAdmin) =>
+    uaaIdentitySerializer.serialize(uaaIdentity, isSystemAdmin),
+  OrganizationRoles: (orgRoles, _, isSystemAdmin) =>
+    orgRoles?.map((orgRole) => ({
+      Organization: organizationSerializer.serialize(orgRole.Organization, isSystemAdmin),
+      Role: roleSerializer.serialize(orgRole.Role, isSystemAdmin),
+    })),
   signedInAt: '',
 };
 
@@ -29,4 +30,8 @@ const adminAttributes = {
 
 const { serialize, serializeMany } = new BaseSerializer(attributes, adminAttributes);
 
-module.exports = { toJSON: serialize, serialize, serializeMany };
+module.exports = {
+  toJSON: serialize,
+  serialize,
+  serializeMany,
+};

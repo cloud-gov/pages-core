@@ -14,10 +14,13 @@ const buildActions = {
   fetchBuilds: fetchBuildMock,
 };
 
-const { SiteBuilds, REFRESH_INTERVAL } = proxyquire('../../../../frontend/components/site/siteBuilds', {
-  './siteBuildsBuild': () => <tr />,
-  '../../actions/buildActions': buildActions,
-});
+const { SiteBuilds, REFRESH_INTERVAL } = proxyquire(
+  '../../../../frontend/components/site/siteBuilds',
+  {
+    './siteBuildsBuild': () => <tr />,
+    '../../actions/buildActions': buildActions,
+  },
+);
 
 let state;
 const defaultUser = {
@@ -73,41 +76,82 @@ describe('<SiteBuilds/>', () => {
 
   it('should not error if state is unkown/unexpected', () => {
     state.builds.data[0].state = 'unexpected';
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
-    expect(wrapper.find({ className: 'view-site-link' })).to.have.length(0);
+    const wrapper = mountRouter(
+      <SiteBuilds />,
+      '/site/:id/builds',
+      '/site/5/builds',
+      state,
+    );
+    expect(
+      wrapper.find({
+        className: 'view-site-link',
+      }),
+    ).to.have.length(0);
   });
 
   it('should render an empty state if no builds are present', () => {
-    state.builds = { isLoading: false, data: [] };
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+    state.builds = {
+      isLoading: false,
+      data: [],
+    };
+    const wrapper = mountRouter(
+      <SiteBuilds />,
+      '/site/:id/builds',
+      '/site/5/builds',
+      state,
+    );
 
     expect(wrapper.find('table')).to.have.length(0);
-    expect(wrapper.find('AlertBanner').prop('header')).to.equal('This site does not yet have any builds.');
+    expect(wrapper.find('AlertBanner').prop('header')).to.equal(
+      'This site does not yet have any builds.',
+    );
     expect(wrapper.find('AlertBanner').prop('message')).to.equal(
-      'If this site was just added, the first build should be available within a few minutes.'
+      'If this site was just added, the first build should be available within a few minutes.',
     );
   });
 
   it('should render as many rows as there are builds, plus one for the table header', () => {
     state.builds.data = Array(4)
       .fill(1)
-      .map((val, index) => ({ ...defaultBuild, id: index }));
+      .map((val, index) => ({
+        ...defaultBuild,
+        id: index,
+      }));
 
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+    const wrapper = mountRouter(
+      <SiteBuilds />,
+      '/site/:id/builds',
+      '/site/5/builds',
+      state,
+    );
     expect(wrapper.find('table tr')).to.have.length(5);
     expect(wrapper.find('table + p')).to.have.length(1);
-    expect(wrapper.find('table + p').text()).to.contain('Showing 4 most recent build(s).');
+    expect(wrapper.find('table + p').text()).to.contain(
+      'Showing 4 most recent build(s).',
+    );
   });
 
   it('should render a paragraph about truncation if 100 or more builds are present', () => {
     state.builds.data = Array(100)
       .fill(1)
-      .map((val, index) => ({ ...defaultBuild, id: index }));
+      .map((val, index) => ({
+        ...defaultBuild,
+        id: index,
+      }));
 
-    const wrapper = mountRouter(<SiteBuilds />, '/site/:id/builds', '/site/5/builds', state);
+    const wrapper = mountRouter(
+      <SiteBuilds />,
+      '/site/:id/builds',
+      '/site/5/builds',
+      state,
+    );
     expect(wrapper.find('table tr')).to.have.length(101); // front end does not actually truncate the list
     expect(wrapper.find('table + p + p')).to.have.length(1);
-    expect(wrapper.find('table + p + p').contains('List only displays 100 most recent builds from the last 180 days.')).to.be.true;
+    expect(
+      wrapper
+        .find('table + p + p')
+        .contains('List only displays 100 most recent builds from the last 180 days.'),
+    ).to.be.true;
   });
 
   it('should fetch the builds on mount', () => {

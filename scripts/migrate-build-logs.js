@@ -19,8 +19,7 @@ async function runArchiveBuildLogsDaily(date) {
     },
   });
 
-  const { errors } = await PromisePool
-    .withConcurrency(5)
+  const { errors } = await PromisePool.withConcurrency(5)
     .for(builds)
     .process(({ id }) => BuildLogs.archiveBuildLogsForBuildId(id));
 
@@ -46,15 +45,22 @@ async function runMigrateBuildLogs(startDateStr) {
 
       // eslint-disable-next-line no-await-in-loop
       const { builds, errors } = await runArchiveBuildLogsDaily(date);
-      console.log(`  Success: ${builds.length - errors.length} Failure: ${errors.length}`);
+      console.log(
+        `  Success: ${builds.length - errors.length} Failure: ${errors.length}`,
+      );
       totalResults += builds.length;
       totalErrors += errors.length;
     }
 
-    console.log(`Build log migration complete with ${totalResults - totalErrors} successes and ${totalErrors} errors.`);
+    console.log(`
+      Build log migration complete with
+      ${totalResults - totalErrors} successes and ${totalErrors} errors.
+    `);
 
     if (totalErrors > 0) {
-      console.error('Not all build logs were archived successfully, see above for details.');
+      console.error(
+        'Not all build logs were archived successfully, see above for details.',
+      );
       process.exit(1);
     }
 

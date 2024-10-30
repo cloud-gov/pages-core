@@ -14,8 +14,8 @@ const templateGrid = (
   handleChooseActive,
   handleSubmit,
   organizations,
-  templates
-) => (
+  templates,
+) =>
   Object.keys(templates).map((templateKey, index) => {
     const template = templates[templateKey];
 
@@ -34,14 +34,13 @@ const templateGrid = (
         />
       </ul>
     );
-  })
-);
+  });
 
 function TemplateList(props) {
   const { defaultOwner, organizations } = props;
   const [activeChildId, setActiveChildId] = useState(-1);
   const navigate = useNavigate();
-  const templates = useSelector(state => state.FRONTEND_CONFIG.TEMPLATES);
+  const templates = useSelector((state) => state.FRONTEND_CONFIG.TEMPLATES);
 
   function onSubmitTemplate(site) {
     siteActions.addSite(site, navigate);
@@ -56,7 +55,7 @@ function TemplateList(props) {
         setActiveChildId,
         onSubmitTemplate,
         organizations,
-        templates
+        templates,
       )}
     </div>
   );

@@ -44,7 +44,7 @@ function promisedQueueAllEvents(queueEvents) {
     events.forEach((event) =>
       queueEvents.on(event, (x) => {
         return resolve(x);
-      })
+      }),
     );
   });
 }

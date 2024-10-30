@@ -5,12 +5,14 @@ const publishedBranchesFetchStarted = () => ({
   type: publishedBranchesFetchStartedType,
 });
 
-const publishedBranchesReceived = branches => ({
+const publishedBranchesReceived = (branches) => ({
   type: publishedBranchesReceivedType,
   branches,
 });
 
 export {
-  publishedBranchesFetchStartedType, publishedBranchesFetchStarted,
-  publishedBranchesReceivedType, publishedBranchesReceived,
+  publishedBranchesFetchStartedType,
+  publishedBranchesFetchStarted,
+  publishedBranchesReceivedType,
+  publishedBranchesReceived,
 };

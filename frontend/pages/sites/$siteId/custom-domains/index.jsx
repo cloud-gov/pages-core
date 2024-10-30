@@ -10,7 +10,7 @@ import Domains from './Domains';
 function DomainList() {
   const { id } = useParams();
   const { domains, deleteSiteDomain } = useSiteDomains(id);
-  const site = useSelector(state => currentSite(state.sites, id));
+  const site = useSelector((state) => currentSite(state.sites, id));
 
   if (!site || domains.isLoading) {
     return null;
@@ -18,11 +18,7 @@ function DomainList() {
 
   return (
     <div>
-      <Domains
-        siteId={site.id}
-        domains={domains}
-        handleDelete={deleteSiteDomain}
-      />
+      <Domains siteId={site.id} domains={domains} handleDelete={deleteSiteDomain} />
       <div
         style={{
           position: 'relative',
@@ -35,9 +31,7 @@ function DomainList() {
           className="usa-button button-add-website margin-right-0"
           alt="Add a new site domain"
         >
-          <UsaIcon name="add" />
-          {' '}
-          Add new domain
+          <UsaIcon name="add" /> Add new domain
         </Link>
       </div>
     </div>

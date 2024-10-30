@@ -20,7 +20,7 @@ const { SiteSettings } = proxyquire(
     './BranchConfigs': () => <div />,
     './ReportConfigs': () => <div />,
     './Domains': () => <div />,
-  }
+  },
 );
 
 describe('<SiteSettings/>', () => {
@@ -60,7 +60,12 @@ describe('<SiteSettings/>', () => {
   });
 
   beforeEach(() => {
-    wrapper = mountRouter(<SiteSettings />, '/sites/:id/settings', '/sites/1/settings', state);
+    wrapper = mountRouter(
+      <SiteSettings />,
+      '/sites/:id/settings',
+      '/sites/1/settings',
+      state,
+    );
   });
 
   after(() => {

@@ -12,11 +12,7 @@ export const githubRepoUrl = (value) => {
 };
 
 const GitHubRepoUrlField = ({ ...props }) => (
-  <Field
-    component={InputWithErrorField}
-    validate={[githubRepoUrl]}
-    {...props}
-  />
+  <Field component={InputWithErrorField} validate={[githubRepoUrl]} {...props} />
 );
 
 export default GitHubRepoUrlField;

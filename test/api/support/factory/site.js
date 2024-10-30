@@ -44,7 +44,7 @@ async function addSiteBranchConfigs(site) {
     defaultConfig,
     demoConfig,
     previewConfig,
-    demoDomain
+    demoDomain,
   } = site;
 
   if (defaultBranch) {
@@ -95,7 +95,11 @@ function site(overrides, options = {}) {
       }
       return Promise.all(userPromises);
     })
-    .then(() => Site.findByPk(site.id, { include: SiteBranchConfig }));
+    .then(() =>
+      Site.findByPk(site.id, {
+        include: SiteBranchConfig,
+      }),
+    );
 }
 
 module.exports = site;

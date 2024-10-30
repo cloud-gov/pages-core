@@ -37,18 +37,23 @@ function paramsForNewBuild({ user, site }) {
 
 function ownerIsFederalistUser(owner) {
   return User.findOne({
-    where: { username: owner },
+    where: {
+      username: owner,
+    },
     attributes: ['username'],
   });
 }
 
 function checkSiteExists({ owner, repository }) {
   return Site.findOne({
-    where: { owner, repository },
+    where: {
+      owner,
+      repository,
+    },
   }).then((existingSite) => {
     if (existingSite) {
       const error = new Error(
-        `This site has already been added to ${config.app.appName}.`
+        `This site has already been added to ${config.app.appName}.`,
       );
       error.status = 400;
       throw error;
@@ -72,9 +77,11 @@ function checkGithubOrg({ user, owner }) {
       if (!federalistAuthorizedOrg) {
         throw {
           message:
-            `${config.app.appName} can't confirm org permissions for '${owner}'.`
-            + `Either '${owner}' hasn't approved access for ${config.app.appName} or you aren't an org member.`
-            + `Ensure you are an org member and ask an org owner to authorize ${config.app.appName} for the organization.`,
+            `${config.app.appName} can't confirm org permissions for '${owner}'.` +
+            // eslint-disable-next-line max-len
+            `Either '${owner}' hasn't approved access for ${config.app.appName} or you aren't an org member.` +
+            // eslint-disable-next-line max-len
+            `Ensure you are an org member and ask an org owner to authorize ${config.app.appName} for the organization.`,
           status: 403,
         };
       }
@@ -114,10 +121,7 @@ function buildSite(params, s3) {
 
 function buildInfrastructure(params, s3ServiceName) {
   return apiClient
-    .createSiteBucket(
-      s3ServiceName,
-      config.env.cfSpaceGuid
-    )
+    .createSiteBucket(s3ServiceName, config.env.cfSpaceGuid)
     .then(() => apiClient.fetchServiceInstanceCredentials(s3ServiceName))
     .then((credentials) => {
       const s3 = {
@@ -160,7 +164,8 @@ async function saveAndBuildSite({ site, user }) {
 
   await site.save();
 
-  // Currently uses site.defaultBranch to create site branch config via validateSite function
+  // Currently uses site.defaultBranch to
+  // create site branch config via validateSite function
   // will need to change in the future once the defaultBranch column is dropped from site
   await site.createSiteBranchConfig({
     branch: site.defaultBranch,
@@ -168,11 +173,14 @@ async function saveAndBuildSite({ site, user }) {
     s3Key: `/site/${site.owner}/${site.repository}`,
   });
 
-  const buildParams = paramsForNewBuild({ site, user });
+  const buildParams = paramsForNewBuild({
+    site,
+    user,
+  });
 
   await Promise.all([
     site.addUser(user.id),
-    Build.create(buildParams).then(build => build.enqueue()),
+    Build.create(buildParams).then((build) => build.enqueue()),
   ]);
 
   return site;
@@ -181,14 +189,27 @@ async function saveAndBuildSite({ site, user }) {
 async function createSiteFromExistingRepo({ siteParams, user }) {
   const { owner, repository } = siteParams;
 
-  await checkSiteExists({ owner, repository });
-  const repo = await checkGithubRepository({ user, owner, repository });
-  await checkGithubOrg({ user, owner });
+  await checkSiteExists({
+    owner,
+    repository,
+  });
+  const repo = await checkGithubRepository({
+    user,
+    owner,
+    repository,
+  });
+  await checkGithubOrg({
+    user,
+    owner,
+  });
   const site = await validateSite({
     ...siteParams,
     defaultBranch: repo.default_branch,
   });
-  return saveAndBuildSite({ site, user });
+  return saveAndBuildSite({
+    site,
+    user,
+  });
 }
 
 async function createSiteFromTemplate({ siteParams, user, template }) {
@@ -201,7 +222,10 @@ async function createSiteFromTemplate({ siteParams, user, template }) {
 
   const site = await validateSite(params);
   await GitHub.createRepoFromTemplate(user, owner, repository, template);
-  return saveAndBuildSite({ site, user });
+  return saveAndBuildSite({
+    site,
+    user,
+  });
 }
 
 function createSite({ user, siteParams }) {
@@ -218,7 +242,10 @@ function createSite({ user, siteParams }) {
     });
   }
 
-  return createSiteFromExistingRepo({ siteParams: newSiteParams, user });
+  return createSiteFromExistingRepo({
+    siteParams: newSiteParams,
+    user,
+  });
 }
 
 module.exports = {

@@ -1,6 +1,4 @@
-const associate = ({
-  BuildTask, BuildTaskType, Site, SiteBuildTask,
-}) => {
+const associate = ({ BuildTask, BuildTaskType, Site, SiteBuildTask }) => {
   SiteBuildTask.belongsTo(BuildTaskType, {
     foreignKey: 'buildTaskTypeId',
     allowNull: false,
@@ -14,9 +12,7 @@ const associate = ({
 };
 
 async function createBuildTask(build) {
-  const {
-    BuildTask,
-  } = this.sequelize.models;
+  const { BuildTask } = this.sequelize.models;
 
   return BuildTask.create({
     buildTaskTypeId: this.buildTaskTypeId,
@@ -30,7 +26,6 @@ module.exports = (sequelize, DataTypes) => {
   const SiteBuildTask = sequelize.define(
     'SiteBuildTask',
     {
-
       branch: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -39,10 +34,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         allowNull: true,
       },
-    }, {
+    },
+    {
       tableName: 'site_build_task',
       paranoid: true,
-    }
+    },
   );
 
   SiteBuildTask.associate = associate;

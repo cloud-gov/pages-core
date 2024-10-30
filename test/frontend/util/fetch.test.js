@@ -12,10 +12,29 @@ describe('fetchWrapper', () => {
   before(() => {
     fetchMock.put('/horses', {}, { name: 'putHorses' });
     fetchMock.post('/cats', {}, { name: 'postCats' });
-    fetchMock.get('/cats', JSON.stringify({ cats: 5 }), { name: 'cats' });
+    fetchMock.get(
+      '/cats',
+      JSON.stringify({
+        cats: 5,
+      }),
+      { name: 'cats' },
+    );
     fetchMock.get('/dogs', { say: 'woof' }, { name: 'dogs' });
-    fetchMock.get('/dogs/bad', { status: 400, body: 'they\'re all good dogs, brent' }, { name: 'badDogs' });
-    fetchMock.get('/cats/affection', { status: 204 }, { name: 'affectionCats' });
+    fetchMock.get(
+      '/dogs/bad',
+      {
+        status: 400,
+        body: "they're all good dogs, brent",
+      },
+      { name: 'badDogs' },
+    );
+    fetchMock.get(
+      '/cats/affection',
+      { status: 204 },
+      {
+        name: 'affectionCats',
+      },
+    );
     fetchMock.get('*', {}, { name: 'default' });
   });
 
@@ -24,9 +43,13 @@ describe('fetchWrapper', () => {
   });
 
   it('returns response as json', (done) => {
-    fetchWrapper('/cats', { method: 'GET' })
+    fetchWrapper('/cats', {
+      method: 'GET',
+    })
       .then((result) => {
-        expect(result).to.deep.equal({ cats: 5 });
+        expect(result).to.deep.equal({
+          cats: 5,
+        });
         expect(fetchMock).route('cats').to.have.been.called;
         done();
       })
@@ -40,16 +63,20 @@ describe('fetchWrapper', () => {
       c: 'boops',
       d: 'beeps',
     };
-    fetchWrapper('/foo', { params });
-    expect(fetchMock).route('default').to.have.been.called
-      .with.url('/foo?a=1&b=2&c=boops&d=beeps');
+    fetchWrapper('/foo', {
+      params,
+    });
+    expect(fetchMock)
+      .route('default')
+      .to.have.been.called.with.url('/foo?a=1&b=2&c=boops&d=beeps');
   });
 
   it('fetches with default options', (done) => {
     fetchWrapper('/dogs')
       .then((result) => {
-        expect(fetchMock).route('dogs').to.have.been.called
-          .with.options({
+        expect(fetchMock)
+          .route('dogs')
+          .to.have.been.called.with.options({
             headers: {
               accept: 'application/json',
               'content-type': 'application/json',
@@ -57,38 +84,49 @@ describe('fetchWrapper', () => {
             method: 'GET',
             credentials: 'same-origin',
           });
-        expect(result).to.deep.equal({ say: 'woof' });
+        expect(result).to.deep.equal({
+          say: 'woof',
+        });
         done();
       })
       .catch(done);
   });
 
   it('adds other specified headers', (done) => {
-    fetchWrapper('/dogs', { headers:
-      { 'x-government-innovation': 'disrupted' },
+    fetchWrapper('/dogs', {
+      headers: {
+        'x-government-innovation': 'disrupted',
+      },
     })
-    .then((result) => {
-      expect(fetchMock).route('dogs').to.have.been.called
-        .with.options({
-          headers: {
-            accept: 'application/json',
-            'content-type': 'application/json',
-            'x-government-innovation': 'disrupted',
-          },
-          method: 'GET',
-          credentials: 'same-origin',
+      .then((result) => {
+        expect(fetchMock)
+          .route('dogs')
+          .to.have.been.called.with.options({
+            headers: {
+              accept: 'application/json',
+              'content-type': 'application/json',
+              'x-government-innovation': 'disrupted',
+            },
+            method: 'GET',
+            credentials: 'same-origin',
+          });
+        expect(result).to.deep.equal({
+          say: 'woof',
         });
-      expect(result).to.deep.equal({ say: 'woof' });
-      done();
-    })
-    .catch(done);
+        done();
+      })
+      .catch(done);
   });
 
   it('allows other methods', () => {
-    fetchWrapper('/horses', { method: 'PUT' });
+    fetchWrapper('/horses', {
+      method: 'PUT',
+    });
     expect(fetchMock).route('putHorses').to.have.been.called;
 
-    fetchWrapper('/cats', { method: 'POST' });
+    fetchWrapper('/cats', {
+      method: 'POST',
+    });
     expect(fetchMock).route('postCats').to.have.been.called;
   });
 
@@ -104,7 +142,7 @@ describe('fetchWrapper', () => {
         expect(err).to.have.property('response');
         expect(err.response.ok).to.equal(false);
         expect(err.response.status).to.equal(400);
-        expect(err.message).to.equal('they\'re all good dogs, brent');
+        expect(err.message).to.equal("they're all good dogs, brent");
         done();
       });
   });

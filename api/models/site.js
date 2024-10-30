@@ -1,7 +1,9 @@
 const { Op } = require('sequelize');
 const { toInt } = require('../utils');
 const {
-  isEmptyOrBranch, isEmptyOrUrl, isValidSubdomain,
+  isEmptyOrBranch,
+  isEmptyOrUrl,
+  isValidSubdomain,
 } = require('../utils/validators');
 
 const afterValidate = (site) => {
@@ -18,7 +20,7 @@ const afterValidate = (site) => {
 };
 
 const validationFailed = (site, options, validationError) => {
-  const messages = validationError.errors.map(err => `${err.path}: ${err.message}`);
+  const messages = validationError.errors.map((err) => `${err.path}: ${err.message}`);
 
   const error = new Error(messages.join('\n'));
   error.status = 403;
@@ -77,32 +79,54 @@ const associate = ({
     } else {
       query.where = {
         [Op.or]: [
-          { owner: { [Op.substring]: search } },
-          { repository: { [Op.substring]: search } },
+          {
+            owner: {
+              [Op.substring]: search,
+            },
+          },
+          {
+            repository: {
+              [Op.substring]: search,
+            },
+          },
         ],
       };
     }
     return query;
   });
-  Site.addScope('byOrg', id => ({
-    include: [{
-      model: Organization,
-      where: { id },
-    }],
+  Site.addScope('byOrg', (id) => ({
+    include: [
+      {
+        model: Organization,
+        where: { id },
+      },
+    ],
   }));
-  Site.addScope('forUser', user => ({
+  Site.addScope('forUser', (user) => ({
     where: {
       [Op.and]: [
         {
           [Op.or]: [
-            { '$Users.id$': { [Op.not]: null } },
-            { organizationId: { [Op.not]: null } },
+            {
+              '$Users.id$': {
+                [Op.not]: null,
+              },
+            },
+            {
+              organizationId: {
+                [Op.not]: null,
+              },
+            },
           ],
         },
         {
           [Op.or]: [
-            { '$Users.id$': user.id },
-            { '$Organization.OrganizationRoles.userId$': user.id },
+            {
+              '$Users.id$': user.id,
+            },
+            {
+              '$Organization.OrganizationRoles.userId$': user.id,
+            },
           ],
         },
       ],
@@ -115,9 +139,11 @@ const associate = ({
       {
         model: Organization,
         required: false,
-        include: [{
-          model: OrganizationRole,
-        }],
+        include: [
+          {
+            model: OrganizationRole,
+          },
+        ],
       },
     ],
   }));
@@ -125,143 +151,164 @@ const associate = ({
 
 const beforeValidate = (site) => {
   if (site.repository) {
-    site.repository = site.repository.toLowerCase(); // eslint-disable-line no-param-reassign
+    site.repository = site.repository.toLowerCase();
   }
   if (site.owner) {
-    site.owner = site.owner.toLowerCase(); // eslint-disable-line no-param-reassign
+    site.owner = site.owner.toLowerCase();
   }
 };
 
 module.exports = (sequelize, DataTypes) => {
-  const Site = sequelize.define('Site', {
-    demoBranch: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmptyOrBranch,
+  const Site = sequelize.define(
+    'Site',
+    {
+      demoBranch: {
+        type: DataTypes.STRING,
+        validate: {
+          isEmptyOrBranch,
+        },
+      },
+      demoDomain: {
+        type: DataTypes.STRING,
+        validate: {
+          isEmptyOrUrl,
+        },
+      },
+      defaultConfig: {
+        type: DataTypes.JSONB,
+      },
+      defaultBranch: {
+        type: DataTypes.STRING,
+        defaultValue: 'master',
+        validate: {
+          isEmptyOrBranch,
+        },
+      },
+      domain: {
+        type: DataTypes.STRING,
+        validate: {
+          isEmptyOrUrl,
+        },
+      },
+      engine: {
+        type: DataTypes.ENUM,
+        values: ['hugo', 'jekyll', 'node.js', 'static'],
+        defaultValue: 'static',
+      },
+      owner: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      previewConfig: {
+        type: DataTypes.JSONB,
+      },
+      demoConfig: {
+        type: DataTypes.JSONB,
+      },
+      publishedAt: {
+        type: DataTypes.DATE,
+      },
+      repository: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      repoLastVerified: {
+        type: DataTypes.DATE,
+        defaultValue: new Date(),
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      s3ServiceName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      awsBucketName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      awsBucketRegion: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      awsBucketKeyUpdatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      config: {
+        type: DataTypes.JSONB,
+        defaultValue: {},
+      },
+      subdomain: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isValidSubdomain,
+        },
+      },
+      basicAuth: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.config.basicAuth || {};
+        },
+        set(basicAuth) {
+          this.setDataValue('config', {
+            ...this.config,
+            basicAuth,
+          });
+        },
+      },
+      containerConfig: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.config.containerConfig || {};
+        },
+        set(containerConfig) {
+          this.setDataValue('config', {
+            ...this.config,
+            containerConfig,
+          });
+        },
+      },
+      organizationId: {
+        type: DataTypes.INTEGER,
+        references: 'Organization',
+      },
+      webhookId: {
+        type: DataTypes.INTEGER,
       },
     },
-    demoDomain: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmptyOrUrl,
+    {
+      tableName: 'site',
+      hooks: {
+        beforeValidate,
+        afterValidate,
+        validationFailed,
       },
+      paranoid: true,
     },
-    defaultConfig: {
-      type: DataTypes.JSONB,
-    },
-    defaultBranch: {
-      type: DataTypes.STRING,
-      defaultValue: 'master',
-      validate: {
-        isEmptyOrBranch,
-      },
-    },
-    domain: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmptyOrUrl,
-      },
-    },
-    engine: {
-      type: DataTypes.ENUM,
-      values: ['hugo', 'jekyll', 'node.js', 'static'],
-      defaultValue: 'static',
-    },
-    owner: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    previewConfig: {
-      type: DataTypes.JSONB,
-    },
-    demoConfig: {
-      type: DataTypes.JSONB,
-    },
-    publishedAt: {
-      type: DataTypes.DATE,
-    },
-    repository: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    repoLastVerified: {
-      type: DataTypes.DATE,
-      defaultValue: new Date(),
-    },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-    s3ServiceName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    awsBucketName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    awsBucketRegion: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    awsBucketKeyUpdatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    config: {
-      type: DataTypes.JSONB,
-      defaultValue: {},
-    },
-    subdomain: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isValidSubdomain,
-      },
-    },
-    basicAuth: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        return this.config.basicAuth || {};
-      },
-      set(basicAuth) {
-        this.setDataValue('config', { ...this.config, basicAuth });
-      },
-    },
-    containerConfig: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        return this.config.containerConfig || {};
-      },
-      set(containerConfig) {
-        this.setDataValue('config', { ...this.config, containerConfig });
-      },
-    },
-    organizationId: {
-      type: DataTypes.INTEGER,
-      references: 'Organization',
-    },
-    webhookId: {
-      type: DataTypes.INTEGER,
-    },
-  }, {
-    tableName: 'site',
-    hooks: {
-      beforeValidate,
-      afterValidate,
-      validationFailed,
-    },
-    paranoid: true,
-  });
+  );
 
   Site.associate = associate;
-  Site.withUsers = id => Site.findByPk(id, { include: [sequelize.models.User] });
-  Site.orgScope = id => ({ method: ['byOrg', id] });
-  Site.searchScope = search => ({ method: ['byIdOrText', search] });
-  Site.forUser = user => Site.scope({ method: ['forUser', user] });
-  Site.domainFromContext = context => (context === 'site' ? 'domain' : 'demoDomain');
-  Site.branchFromContext = context => (context === 'site' ? 'defaultBranch' : 'demoBranch');
+  Site.withUsers = (id) =>
+    Site.findByPk(id, {
+      include: [sequelize.models.User],
+    });
+  Site.orgScope = (id) => ({
+    method: ['byOrg', id],
+  });
+  Site.searchScope = (search) => ({
+    method: ['byIdOrText', search],
+  });
+  Site.forUser = (user) =>
+    Site.scope({
+      method: ['forUser', user],
+    });
+  Site.domainFromContext = (context) => (context === 'site' ? 'domain' : 'demoDomain');
+  Site.branchFromContext = (context) =>
+    context === 'site' ? 'defaultBranch' : 'demoBranch';
   return Site;
 };

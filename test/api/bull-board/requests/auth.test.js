@@ -5,14 +5,22 @@ const csrfToken = require('../../support/csrfToken');
 const { UAAIdentity, User } = require('../../../../api/models');
 const cfUAANock = require('../../support/cfUAANock');
 const userFactory = require('../../support/factory/user');
-const { uaaUser, uaaProfile, createUAAIdentity } = require('../../support/factory/uaa-identity');
+const {
+  uaaUser,
+  uaaProfile,
+  createUAAIdentity,
+} = require('../../support/factory/uaa-identity');
 const sessionConfig = require('../../../../api/bull-board/sessionConfig');
 const config = require('../../../../config');
 const app = require('../../../../api/bull-board/app');
 
 const { options: uaaConfig } = config.passport.uaa;
 
-function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionConfig } = {}) {
+function unauthenticatedSession({
+  oauthState,
+  authRedirectPath,
+  cfg = sessionConfig,
+} = {}) {
   return new Promise((resolve, reject) => {
     const sessionKey = crypto.randomBytes(8).toString('hex');
 
@@ -26,7 +34,9 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
       flash: {},
       authenticated: false,
       csrfSecret: csrfToken.TEST_CSRF_SECRET,
-      'oauth2:github.com': { state: oauthState },
+      'oauth2:github.com': {
+        state: oauthState,
+      },
       authRedirectPath,
     };
 
@@ -66,40 +76,33 @@ const sessionForCookie = (cookie, sid = 'pages-bull-board.sid') => {
 
 if (config.product === 'pages') {
   describe('bull board authentication request', () => {
-    after(() => Promise.all([
-      User.truncate(),
-      UAAIdentity.truncate(),
-    ]));
+    after(() => Promise.all([User.truncate(), UAAIdentity.truncate()]));
 
     describe('GET /login', () => {
       it('should redirect to the configured cloud.gov authorization endpoint', () => {
         const locationRE = new RegExp(`^${uaaConfig.authorizationURL}`);
-        request(app)
-          .get('/login')
-          .expect('Location', locationRE)
-          .expect(302);
+        request(app).get('/login').expect('Location', locationRE).expect(302);
       });
     });
 
     describe('GET /auth/uaa/logout', () => {
-      it('redirects to the root', () => request(app)
-        .get('/auth/uaa/logout')
-        .expect('Location', '/')
-        .expect(302));
+      it('redirects to the root', () =>
+        request(app).get('/auth/uaa/logout').expect('Location', '/').expect(302));
     });
 
     describe('GET / while unauthenticated', () => {
-      it('redirects to the root', () => request(app)
-        .get('/')
-        .expect('Location', '/login')
-        .expect(302));
+      it('redirects to the root', () =>
+        request(app).get('/').expect('Location', '/login').expect(302));
     });
 
     describe('GET /auth/uaa/callback', () => {
       it('returns unauthorized if the user is not an admin', async () => {
         const uaaId = 'bull_non_admin_id_1';
         const code = 'code';
-        const profile = { email: 'hello@bull-example.com', user_id: uaaId };
+        const profile = {
+          email: 'hello@bull-example.com',
+          user_id: uaaId,
+        };
         const user = await userFactory();
         await createUAAIdentity({
           uaaId,
@@ -107,9 +110,11 @@ if (config.product === 'pages') {
         });
         const userProfile = uaaUser({
           id: uaaId,
-          groups: [{
-            display: 'pages.user',
-          }],
+          groups: [
+            {
+              display: 'pages.user',
+            },
+          ],
           ...profile,
         });
 
@@ -132,9 +137,11 @@ if (config.product === 'pages') {
         const uaaUserInfo = uaaUser({
           uaaId,
           email,
-          groups: [{
-            display: 'pages.admin',
-          }],
+          groups: [
+            {
+              display: 'pages.admin',
+            },
+          ],
         });
         let user;
         before(async () => {
@@ -154,7 +161,10 @@ if (config.product === 'pages') {
         it('authenticates the session', async () => {
           const oauthState = 'state-123abc';
           const uaaIdentity = await user.getUAAIdentity();
-          const cookie = await unauthenticatedSession({ oauthState, cfg: sessionConfig });
+          const cookie = await unauthenticatedSession({
+            oauthState,
+            cfg: sessionConfig,
+          });
 
           await request(app)
             .get(`/auth/uaa/callback?code=${code}&state=${oauthState}`)

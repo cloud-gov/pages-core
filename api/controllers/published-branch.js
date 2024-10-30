@@ -22,7 +22,9 @@ module.exports = {
         let combinedBranchNames = branchNames.slice(0);
 
         if (site.demoBranch) {
-          combinedBranchNames = branchNames.filter(branchName => branchName !== site.demoBranch);
+          combinedBranchNames = branchNames.filter(
+            (branchName) => branchName !== site.demoBranch,
+          );
           combinedBranchNames = [site.demoBranch].concat(combinedBranchNames);
         }
 

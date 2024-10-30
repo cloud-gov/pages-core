@@ -95,12 +95,15 @@ describe('<BranchViewLink/>', () => {
 
   it('renders a preview link to the other branches', () => {
     const branchName = 'some-other-branch';
-    const updatedProps = { ...props, branchName };
+    const updatedProps = {
+      ...props,
+      branchName,
+    };
     const wrapper = shallow(<BranchViewLink {...updatedProps} />);
     const anchor = wrapper.find('a');
     expect(anchor.length).to.equal(1);
     expect(anchor.prop('href')).to.equal(
-      `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchName}`
+      `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchName}`,
     );
     expect(anchor.text()).equal(viewSiteBuildCTA);
   });

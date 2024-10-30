@@ -38,7 +38,11 @@ const fetchInitialData = () => {
 };
 
 export default (
-  <Route path="/" element={<App onEnter={fetchInitialData} />} errorElement={ErrorElement}>
+  <Route
+    path="/"
+    element={<App onEnter={fetchInitialData} />}
+    errorElement={ErrorElement}
+  >
     <Route path="organizations" element={<OrganizationList />} />
     <Route path="organizations/:id" element={<OrganizationEdit />} />
     <Route path="sites" element={<Sites />} />
@@ -54,7 +58,7 @@ export default (
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
       <Route path="builds/:buildId/logs" element={<BuildLogs />} />
       <Route path="scans" loader={() => redirect('../reports')} />
-      {(process.env.FEATURE_BUILD_TASKS === 'active') && (
+      {process.env.FEATURE_BUILD_TASKS === 'active' && (
         <Route path="reports" element={<Reports />} />
       )}
     </Route>

@@ -1,13 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "id",
-    "siteId",
-    "userId",
-    "targetId",
-    "targetType",
-    "actionId"
-  ],
+  "required": ["id", "siteId", "userId", "targetId", "targetType", "actionId"],
   "properties": {
     "id": {
       "type": "integer"

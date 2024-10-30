@@ -12,8 +12,14 @@ function request(endpoint, params = {}, { handleHttpError = true } = {}) {
 
   const url = `${API}/${endpoint}`;
 
-  const headers = { ...defaultHeaders, ...(params.headers || {}) };
-  const finalParams = { ...params, headers };
+  const headers = {
+    ...defaultHeaders,
+    ...(params.headers || {}),
+  };
+  const finalParams = {
+    ...params,
+    headers,
+  };
 
   return fetch(url, finalParams).catch((error) => {
     if (handleHttpError) {
@@ -155,7 +161,7 @@ export default {
         // we want to handle the error elsewhere in order
         // to show the additional AddSite fields
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -163,7 +169,9 @@ export default {
     return request(
       `site/${siteId}/user/${userId}`,
       { method: 'DELETE' },
-      { handleHttpError: false }
+      {
+        handleHttpError: false,
+      },
     );
   },
 
@@ -176,7 +184,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -189,7 +197,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -197,7 +205,9 @@ export default {
     return request(
       `site/${siteId}`,
       { method: 'DELETE' },
-      { handleHttpError: false }
+      {
+        handleHttpError: false,
+      },
     );
   },
 
@@ -231,7 +241,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -256,13 +266,7 @@ export default {
     return request(`site/${siteId}/branch-config`);
   },
 
-  updateSiteBranchConfig(
-    siteId,
-    siteBranchConfigId,
-    branch,
-    config = {},
-    context
-  ) {
+  updateSiteBranchConfig(siteId, siteBranchConfigId, branch, config = {}, context) {
     return request(`site/${siteId}/branch-config/${siteBranchConfigId}`, {
       method: 'PUT',
       data: {
@@ -285,7 +289,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -301,7 +305,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -313,7 +317,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -329,7 +333,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -341,7 +345,7 @@ export default {
       },
       {
         handleHttpError: false,
-      }
+      },
     );
   },
 
@@ -374,7 +378,9 @@ export default {
     return request(
       `/build/${buildId}/task`,
       { method: 'POST' },
-      { handleHttpError: false }
+      {
+        handleHttpError: false,
+      },
     );
   },
 

@@ -2,9 +2,7 @@ const { expect } = require('chai');
 const request = require('supertest');
 
 const app = require('../../../app');
-const {
-  Organization, OrganizationRole, Role, User,
-} = require('../../../api/models');
+const { Organization, OrganizationRole, Role, User } = require('../../../api/models');
 
 const csrfToken = require('../support/csrfToken');
 const factory = require('../support/factory');
@@ -14,9 +12,18 @@ const { requiresAuthentication } = require('./shared');
 
 function clean() {
   return Promise.all([
-    Organization.truncate({ force: true, cascade: true }),
-    OrganizationRole.truncate({ force: true, cascade: true }),
-    User.truncate({ force: true, cascade: true }),
+    Organization.truncate({
+      force: true,
+      cascade: true,
+    }),
+    OrganizationRole.truncate({
+      force: true,
+      cascade: true,
+    }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -29,8 +36,16 @@ describe('Organization Role API', () => {
   before(async () => {
     await clean();
     [userRole, managerRole] = await Promise.all([
-      Role.findOne({ where: { name: 'user' } }),
-      Role.findOne({ where: { name: 'manager' } }),
+      Role.findOne({
+        where: {
+          name: 'user',
+        },
+      }),
+      Role.findOne({
+        where: {
+          name: 'manager',
+        },
+      }),
     ]);
   });
 
@@ -53,22 +68,36 @@ describe('Organization Role API', () => {
       ]);
 
       await Promise.all(
-        orgs.flatMap(org => [
-          org.addUser(currentUser, { through: { roleId: userRole.id } }),
-          org.addUser(user, { through: { roleId: managerRole.id } }),
-        ])
+        orgs.flatMap((org) => [
+          org.addUser(currentUser, {
+            through: {
+              roleId: userRole.id,
+            },
+          }),
+          org.addUser(user, {
+            through: {
+              roleId: managerRole.id,
+            },
+          }),
+        ]),
       );
 
       const response = await authenticatedRequest.get('/v0/organization-role');
 
       validateAgainstJSONSchema('GET', '/organization-role', 200, response.body);
-      expect(response.body.map(or => or.Organization.id)).to.have.members(orgs.map(o => o.id));
-      expect(response.body.map(or => or.Role.name)).to.have.members(['user', 'user']);
+      expect(response.body.map((or) => or.Organization.id)).to.have.members(
+        orgs.map((o) => o.id),
+      );
+      expect(response.body.map((or) => or.Role.name)).to.have.members(['user', 'user']);
     });
   });
 
   describe('DELETE /v0/organization/:org_id/user/:user_id', () => {
-    requiresAuthentication('DELETE', '/organization/1/user/1', '/organization/{org_id}/user/{user_id}');
+    requiresAuthentication(
+      'DELETE',
+      '/organization/1/user/1',
+      '/organization/{org_id}/user/{user_id}',
+    );
 
     it('returns a 404 if the user is not a manager of the organization', async () => {
       const [user, org] = await Promise.all([
@@ -77,14 +106,28 @@ describe('Organization Role API', () => {
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: userRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const response = await authenticatedRequest.delete(`/v0/organization/${org.id}/user/${user.id}`)
+      const response = await authenticatedRequest
+        .delete(`/v0/organization/${org.id}/user/${user.id}`)
         .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 404, response.body);
+      validateAgainstJSONSchema(
+        'DELETE',
+        '/organization/{org_id}/user/{user_id}',
+        404,
+        response.body,
+      );
     });
 
     it('deletes the organization role and returns an empty object', async () => {
@@ -94,52 +137,88 @@ describe('Organization Role API', () => {
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      expect(await OrganizationRole.count({
-        where: {
-          organizationId: org.id,
-          userId: user.id,
-        },
-      })).to.eq(1);
+      expect(
+        await OrganizationRole.count({
+          where: {
+            organizationId: org.id,
+            userId: user.id,
+          },
+        }),
+      ).to.eq(1);
 
-      const response = await authenticatedRequest.delete(`/v0/organization/${org.id}/user/${user.id}`)
+      const response = await authenticatedRequest
+        .delete(`/v0/organization/${org.id}/user/${user.id}`)
         .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 200, response.body);
+      validateAgainstJSONSchema(
+        'DELETE',
+        '/organization/{org_id}/user/{user_id}',
+        200,
+        response.body,
+      );
 
-      expect(await OrganizationRole.count({
-        where: {
-          organizationId: org.id,
-          userId: user.id,
-        },
-      })).to.eq(0);
+      expect(
+        await OrganizationRole.count({
+          where: {
+            organizationId: org.id,
+            userId: user.id,
+          },
+        }),
+      ).to.eq(0);
     });
 
     it('returns a 404 if the organization is not active', async () => {
       const [user, org] = await Promise.all([
         factory.user(),
-        factory.organization.create({ isActive: false }),
+        factory.organization.create({
+          isActive: false,
+        }),
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const response = await authenticatedRequest.delete(`/v0/organization/${org.id}/user/${user.id}`)
+      const response = await authenticatedRequest
+        .delete(`/v0/organization/${org.id}/user/${user.id}`)
         .set('x-csrf-token', csrfToken.getToken());
 
-      validateAgainstJSONSchema('DELETE', '/organization/{org_id}/user/{user_id}', 404, response.body);
+      validateAgainstJSONSchema(
+        'DELETE',
+        '/organization/{org_id}/user/{user_id}',
+        404,
+        response.body,
+      );
 
-      expect(await OrganizationRole.count({
-        where: {
-          organizationId: org.id,
-          userId: user.id,
-        },
-      })).to.eq(1);
+      expect(
+        await OrganizationRole.count({
+          where: {
+            organizationId: org.id,
+            userId: user.id,
+          },
+        }),
+      ).to.eq(1);
     });
   });
 
@@ -153,11 +232,20 @@ describe('Organization Role API', () => {
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: userRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const response = await authenticatedRequest.put('/v0/organization-role')
+      const response = await authenticatedRequest
+        .put('/v0/organization-role')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,
@@ -175,11 +263,20 @@ describe('Organization Role API', () => {
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const response = await authenticatedRequest.put('/v0/organization-role')
+      const response = await authenticatedRequest
+        .put('/v0/organization-role')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,
@@ -196,16 +293,29 @@ describe('Organization Role API', () => {
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const orgRole = await OrganizationRole
-        .findOne({ where: { userId: user.id, organizationId: org.id } });
+      const orgRole = await OrganizationRole.findOne({
+        where: {
+          userId: user.id,
+          organizationId: org.id,
+        },
+      });
 
       expect(orgRole.roleId).to.eq(userRole.id);
 
-      const response = await authenticatedRequest.put('/v0/organization-role')
+      const response = await authenticatedRequest
+        .put('/v0/organization-role')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,
@@ -220,23 +330,39 @@ describe('Organization Role API', () => {
       expect(orgRole.roleId).to.eq(managerRole.id);
     });
 
-    it('returns an error if the organization role cannot be updated b/c organization is inactive', async () => {
+    it(`returns an error if the organization role cannot
+        be updated b/c organization is inactive`, async () => {
       const [user, org] = await Promise.all([
         factory.user(),
-        factory.organization.create({ isActive: false }),
+        factory.organization.create({
+          isActive: false,
+        }),
       ]);
 
       await Promise.all([
-        org.addUser(currentUser, { through: { roleId: managerRole.id } }),
-        org.addUser(user, { through: { roleId: userRole.id } }),
+        org.addUser(currentUser, {
+          through: {
+            roleId: managerRole.id,
+          },
+        }),
+        org.addUser(user, {
+          through: {
+            roleId: userRole.id,
+          },
+        }),
       ]);
 
-      const orgRole = await OrganizationRole
-        .findOne({ where: { userId: user.id, organizationId: org.id } });
+      const orgRole = await OrganizationRole.findOne({
+        where: {
+          userId: user.id,
+          organizationId: org.id,
+        },
+      });
 
       expect(orgRole.roleId).to.eq(userRole.id);
 
-      const response = await authenticatedRequest.put('/v0/organization-role')
+      const response = await authenticatedRequest
+        .put('/v0/organization-role')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
           organizationId: org.id,

@@ -17,7 +17,9 @@ const SiteListItem = proxyquire('../../../../frontend/components/siteList/siteLi
   './publishedState': PublishedState,
   './repoLastVerified': RepoLastVerified,
   '../GitHubLink': GitHubLink,
-  '../icons': { IconView: 'div' },
+  '../icons': {
+    IconView: 'div',
+  },
 }).default;
 
 const testSite = {
@@ -32,7 +34,7 @@ const testUser = {
   username: 'not-owner',
   id: 4,
   email: 'not-owner@beep.gov',
-  updatedAt: new Date(new Date() - (10 * 24 * 60 * 60 * 1000)).toString(),
+  updatedAt: new Date(new Date() - 10 * 24 * 60 * 60 * 1000).toString(),
 };
 
 const testOrganization = {
@@ -45,15 +47,15 @@ const testOrganization = {
 describe('<SiteListItem />', () => {
   let wrapper;
 
-  beforeEach(() => {
-
-  });
+  beforeEach(() => {});
 
   afterEach(sinon.restore);
 
   it('outputs a published state component', () => {
     wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} />);
-    expect(wrapper.find(PublishedState).props()).to.deep.equals({ site: testSite });
+    expect(wrapper.find(PublishedState).props()).to.deep.equals({
+      site: testSite,
+    });
     expect(wrapper.find(PublishedState)).to.have.length(1);
   });
 
@@ -78,11 +80,7 @@ describe('<SiteListItem />', () => {
 
   it('outputs a link component to direct user to the site page w/ org prop', () => {
     wrapper = mountRouter(
-      <SiteListItem
-        site={testSite}
-        user={testUser}
-        organization={testOrganization}
-      />
+      <SiteListItem site={testSite} user={testUser} organization={testOrganization} />,
     );
     expect(wrapper.find(Link).props()).to.deep.equals({
       to: `/sites/${testSite.id}`,
@@ -93,66 +91,74 @@ describe('<SiteListItem />', () => {
   });
 
   it('no Link if org is inactive', () => {
-    const org = { ...testOrganization, isActive: false };
-    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} organization={org} />);
+    const org = {
+      ...testOrganization,
+      isActive: false,
+    };
+    wrapper = mountRouter(
+      <SiteListItem site={testSite} user={testUser} organization={org} />,
+    );
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h2')).to.have.length(1);
   });
 
   it('no Link if org site is inactive', () => {
-    const site = { ...testSite, isActive: false };
+    const site = {
+      ...testSite,
+      isActive: false,
+    };
     wrapper = mountRouter(
-      <SiteListItem
-        site={site}
-        user={testUser}
-        organization={testOrganization}
-      />
+      <SiteListItem site={site} user={testUser} organization={testOrganization} />,
     );
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h2')).to.have.length(1);
   });
 
   it('no Link if non-org site is inactive', () => {
-    const site = { ...testSite, isActive: false };
+    const site = {
+      ...testSite,
+      isActive: false,
+    };
     wrapper = mountRouter(<SiteListItem site={site} user={testUser} />);
     expect(wrapper.find(Link)).to.have.length(0);
     expect(wrapper.find('h2')).to.have.length(1);
   });
 
-  it('outputs an h3 with the site\'s organization', () => {
+  it("outputs an h3 with the site's organization", () => {
     const organizationId = testOrganization.id;
-    const updatedSite = { ...testSite, organizationId };
+    const updatedSite = {
+      ...testSite,
+      organizationId,
+    };
     wrapper = mountRouter(
-      <SiteListItem
-        site={updatedSite}
-        user={testUser}
-        organization={testOrganization}
-      />
+      <SiteListItem site={updatedSite} user={testUser} organization={testOrganization} />,
     );
     expect(wrapper.find('h3')).to.have.length(1);
     expect(wrapper.find('p')).to.have.length(0); // is not sandbox
   });
-  it('outputs an h3 with the site\'s sandbox organization', () => {
+  it("outputs an h3 with the site's sandbox organization", () => {
     const organizationId = testOrganization.id;
-    const updatedSite = { ...testSite, organizationId };
+    const updatedSite = {
+      ...testSite,
+      organizationId,
+    };
     wrapper = mountRouter(
       <SiteListItem
         site={updatedSite}
         user={testUser}
-        organization={{ ...testOrganization, isSandbox: true, daysUntilSandboxCleaning: 5 }}
-      />
+        organization={{
+          ...testOrganization,
+          isSandbox: true,
+          daysUntilSandboxCleaning: 5,
+        }}
+      />,
     );
     expect(wrapper.find('p')).to.have.length(1); // is sandbox
     expect(wrapper.find('h3')).to.have.length(1);
   });
 
-  it('outputs without an h3 with the site\'s organization', () => {
-    wrapper = mountRouter(
-      <SiteListItem
-        site={testSite}
-        user={testUser}
-      />
-    );
+  it("outputs without an h3 with the site's organization", () => {
+    wrapper = mountRouter(<SiteListItem site={testSite} user={testUser} />);
     expect(wrapper.find('h3')).to.have.length(0);
   });
 
@@ -172,17 +178,15 @@ describe('<SiteListItem />', () => {
 
     expect(removeSiteLink.exists()).to.be.true;
     expect(removeSiteLink.contains('Remove')).to.be.true;
-    removeSiteLink.simulate('click', { preventDefault: () => ({}) });
+    removeSiteLink.simulate('click', {
+      preventDefault: () => ({}),
+    });
     expect(clickSpy.called).to.be.true;
   });
 
   it('should not have a `Remove` button when it has an organization', () => {
     wrapper = mountRouter(
-      <SiteListItem
-        site={testSite}
-        user={testUser}
-        organization={testOrganization}
-      />
+      <SiteListItem site={testSite} user={testUser} organization={testOrganization} />,
     );
     const removeSiteLink = wrapper.find('ButtonLink');
     expect(removeSiteLink.exists()).to.be.false;

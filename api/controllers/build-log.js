@@ -6,7 +6,11 @@ const BuildLogs = require('../services/build-logs');
 async function getBuildLogsFromS3(build, state, offset, limit) {
   const origin = 's3';
 
-  const { output, byteLength } = await BuildLogs.getBuildLogs(build, offset, offset + limit - 1);
+  const { output, byteLength } = await BuildLogs.getBuildLogs(
+    build,
+    offset,
+    offset + limit - 1,
+  );
 
   if (!output) {
     return {
@@ -105,9 +109,14 @@ module.exports = wrapHandlers({
       : await getBuildLogsFromDatabase(build, build.state, offset, lineLimit);
 
     if (buildLogs.length === 0 && offset === 0) {
-      const isExpired = moment(build.completedAt).isBefore(moment().subtract(179, 'days'));
+      const isExpired = moment(build.completedAt).isBefore(
+        moment().subtract(179, 'days'),
+      );
       if (isExpired) {
-        buildLogs.push({ source: 'ALL', output: 'Build logs are only retained for 180 days.' });
+        buildLogs.push({
+          source: 'ALL',
+          output: 'Build logs are only retained for 180 days.',
+        });
       }
     }
 

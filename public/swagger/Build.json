@@ -1,13 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "id",
-    "createdAt",
-    "site",
-    "state",
-    "updatedAt",
-    "username"
-  ],
+  "required": ["id", "createdAt", "site", "state", "updatedAt", "username"],
   "not": {
     "required": ["token"]
   },
@@ -35,10 +28,7 @@
     },
     "source": {
       "type": "object",
-      "required": [
-        "owner",
-        "repository"
-      ],
+      "required": ["owner", "repository"],
       "properties": {
         "owner": {
           "type": "string"
@@ -56,14 +46,7 @@
     },
     "state": {
       "type": "string",
-      "enum": [
-        "error",
-        "processing",
-        "skipped",
-        "success",
-        "queued",
-        "created"
-      ]
+      "enum": ["error", "processing", "skipped", "success", "queued", "created"]
     },
     "updatedAt": {
       "type": "string"

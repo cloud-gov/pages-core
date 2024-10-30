@@ -10,5 +10,8 @@ const federalistCreds = appEnv.getServiceCreds(serviceCredsKey) || {};
 
 module.exports = (key) => {
   const creds = key ? appEnv.getServiceCreds(key) : federalistCreds;
-  return { ...process.env, ...creds };
+  return {
+    ...process.env,
+    ...creds,
+  };
 };

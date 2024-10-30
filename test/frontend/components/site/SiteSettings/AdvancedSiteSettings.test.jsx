@@ -6,17 +6,15 @@ import { spy } from 'sinon';
 import { AdvancedSiteSettings } from '../../../../../frontend/components/site/SiteSettings/AdvancedSiteSettings';
 
 describe('<AdvancedSiteSettings/>', () => {
-  const makeProps = () => (
-    {
-      siteId: 9999,
-      initialValues: {
-        engine: 'jekyll',
-        defaultConfig: 'boop: beep',
-      },
-      onDelete: spy(),
-      onSubmit: spy(),
-    }
-  );
+  const makeProps = () => ({
+    siteId: 9999,
+    initialValues: {
+      engine: 'jekyll',
+      defaultConfig: 'boop: beep',
+    },
+    onDelete: spy(),
+    onSubmit: spy(),
+  });
 
   it('should render', () => {
     const props = makeProps();

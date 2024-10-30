@@ -47,13 +47,17 @@ describe('sessionAuth', () => {
   it('logs out the user if authenticatedAt is missing', () => {
     delete mockReq.session.authenticatedAt;
     sessionAuth(mockReq, mockRes, mockNext);
-    expect(moment(mockReq.session.authenticatedAt).isSame(moment(), 'second')).to.equal(true);
+    expect(moment(mockReq.session.authenticatedAt).isSame(moment(), 'second')).to.equal(
+      true,
+    );
     expect(mockReq.logout.calledOnce).to.equal(true);
     expect(mockReq.session.authRedirectPath).to.equal(undefined);
   });
 
   it('logs out the user if authenticatedAt is too old', () => {
-    mockReq.session.authenticatedAt = moment().subtract(config.policies.authRevalidationMinutes + 5, 'minutes').toDate();
+    mockReq.session.authenticatedAt = moment()
+      .subtract(config.policies.authRevalidationMinutes + 5, 'minutes')
+      .toDate();
     sessionAuth(mockReq, mockRes, mockNext);
     expect(mockReq.logout.calledOnce).to.equal(true);
     expect(mockReq.session.authRedirectPath).to.equal(undefined);

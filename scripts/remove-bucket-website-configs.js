@@ -17,7 +17,10 @@ async function removeBucketWebsiteConfig(site) {
   } = creds;
 
   if (site.awsBucketName && site.awsBucketName !== bucket) {
-    throw new Error(`S3 service bucket name ${bucket} does not match site bucket name ${site.awsBucketName}.`);
+    throw new Error(
+      // eslint-disable-next-line max-len
+      `S3 service bucket name ${bucket} does not match site bucket name ${site.awsBucketName}.`,
+    );
   }
 
   const s3 = new S3({
@@ -52,8 +55,7 @@ async function removeBucketWebsiteConfigs() {
     paranoid: false, // include "deleted" sites
   });
 
-  const { errors } = await PromisePool
-    .withConcurrency(5)
+  const { errors } = await PromisePool.withConcurrency(5)
     .for(sites)
     .process(runRemoveBucketWebsiteConfig);
 
@@ -64,7 +66,9 @@ async function removeBucketWebsiteConfigs() {
 
   errors.forEach(({ item, message }) => console.error(`${item.id}: ${message}`));
 
-  throw new Error('Remove bucket website configs completed with errors, see above for details.');
+  throw new Error(
+    'Remove bucket website configs completed with errors, see above for details.',
+  );
 }
 
 removeBucketWebsiteConfigs()

@@ -9,11 +9,15 @@ const _attributes = (overrides = {}) => {
     user = userFactory();
   }
   if (!site) {
-    site = Promise.resolve(user).then(u => siteFactory({ users: [u] }));
+    site = Promise.resolve(user).then((u) =>
+      siteFactory({
+        users: [u],
+      }),
+    );
   }
 
   if (!username) {
-    username = Promise.resolve(user).then(u => u.username);
+    username = Promise.resolve(user).then((u) => u.username);
   }
 
   if (!branch) {
@@ -31,16 +35,15 @@ const _attributes = (overrides = {}) => {
 };
 
 function build(overrides) {
-  return Promise.props(_attributes(overrides))
-    .then((attributes) => {
-      Object.keys(attributes).forEach((key) => {
-        if (attributes[key].sequelize) {
-          attributes[key] = attributes[key].id;
-        }
-      });
-
-      return Build.create(attributes);
+  return Promise.props(_attributes(overrides)).then((attributes) => {
+    Object.keys(attributes).forEach((key) => {
+      if (attributes[key].sequelize) {
+        attributes[key] = attributes[key].id;
+      }
     });
+
+    return Build.create(attributes);
+  });
 }
 
 module.exports = build;

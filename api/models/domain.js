@@ -11,9 +11,7 @@ const States = buildEnum([
 ]);
 const Contexts = buildEnum(['site', 'demo']);
 
-function associate({
-  Domain, Site, SiteBranchConfig, Organization,
-}) {
+function associate({ Domain, Site, SiteBranchConfig, Organization }) {
   // Associations
   Domain.belongsTo(Site, {
     foreignKey: 'siteId',
@@ -34,15 +32,23 @@ function associate({
     } else {
       query.where = {
         [Op.or]: [
-          { names: { [Op.substring]: search } },
-          { serviceName: { [Op.substring]: search } },
+          {
+            names: {
+              [Op.substring]: search,
+            },
+          },
+          {
+            serviceName: {
+              [Op.substring]: search,
+            },
+          },
         ],
       };
     }
     return query;
   });
 
-  Domain.addScope('bySite', id => ({
+  Domain.addScope('bySite', (id) => ({
     include: [
       {
         model: Site,
@@ -64,13 +70,13 @@ function associate({
     ],
   });
 
-  Domain.addScope('byState', state => ({
+  Domain.addScope('byState', (state) => ({
     where: {
       state,
     },
   }));
 
-  Domain.addScope('byOrg', id => ({
+  Domain.addScope('byOrg', (id) => ({
     include: [
       {
         model: Site,
@@ -87,11 +93,17 @@ function associate({
   }));
 
   Domain.addScope('provisionedWithSiteAndOrganization', {
-    where: { state: 'provisioned' },
+    where: {
+      state: 'provisioned',
+    },
     include: [
       {
         model: Site,
-        include: [{ model: Organization }],
+        include: [
+          {
+            model: Organization,
+          },
+        ],
       },
     ],
     order: [
@@ -146,14 +158,22 @@ function define(sequelize, DataTypes) {
     {
       tableName: 'domain',
       paranoid: true,
-    }
+    },
   );
 
   Domain.associate = associate;
-  Domain.searchScope = search => ({ method: ['byIdOrText', search] });
-  Domain.siteScope = siteId => ({ method: ['bySite', siteId] });
-  Domain.orgScope = orgId => ({ method: ['byOrg', orgId] });
-  Domain.stateScope = state => ({ method: ['byState', state] });
+  Domain.searchScope = (search) => ({
+    method: ['byIdOrText', search],
+  });
+  Domain.siteScope = (siteId) => ({
+    method: ['bySite', siteId],
+  });
+  Domain.orgScope = (orgId) => ({
+    method: ['byOrg', orgId],
+  });
+  Domain.stateScope = (state) => ({
+    method: ['byState', state],
+  });
   Domain.States = States;
   Domain.Contexts = Contexts;
   Domain.prototype.isPending = function isPending() {

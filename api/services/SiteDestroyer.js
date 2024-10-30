@@ -11,14 +11,13 @@ function queue() {
     new IORedis(redisConfig.url, {
       tls: redisConfig.tls,
       maxRetriesPerRequest: null,
-    })
+    }),
   );
 }
 // this function should only be called within the queue/worker
 module.exports.destroySiteInfra = async function destroySiteInfra(site, user) {
   const todos = [
-    S3SiteRemover.removeSite(site)
-      .then(() => S3SiteRemover.removeInfrastructure(site)),
+    S3SiteRemover.removeSite(site).then(() => S3SiteRemover.removeInfrastructure(site)),
   ];
 
   if (user) {
@@ -31,11 +30,13 @@ module.exports.destroySiteInfra = async function destroySiteInfra(site, user) {
 module.exports.destroySite = async function destroySite(site, user) {
   const domains = await site.getDomains();
   if (domains.length > 0) {
-    // To simplify, not making a distinction on the state of the domain (provisioned or not),
+    // To simplify, not making a distinction on
+    // the state of the domain (provisioned or not),
     // the domain must be deprovisioned and deleted to delete the site.
     const message = `
-      This site is associated with the following custom domains and cannot be deleted until they have been deleted:
-      ${domains.map(domain => domain.names).join(', ')}
+      This site is associated with the following custom domains
+      and cannot be deleted until they have been deleted:
+      ${domains.map((domain) => domain.names).join(', ')}
     `;
     return ['error', message];
   }

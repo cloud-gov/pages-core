@@ -5,12 +5,22 @@ const { UAAIdentity, User } = require('../../../../api/models');
 const EventCreator = require('../../../../api/services/EventCreator');
 const cfUAANock = require('../../support/cfUAANock');
 const createUser = require('../../support/factory/user');
-const { createUAAIdentity, uaaUser, uaaProfile } = require('../../support/factory/uaa-identity');
+const {
+  createUAAIdentity,
+  uaaUser,
+  uaaProfile,
+} = require('../../support/factory/uaa-identity');
 
 function clean() {
   return Promise.all([
-    UAAIdentity.truncate({ force: true, cascade: true }),
-    User.truncate({ force: true, cascade: true }),
+    UAAIdentity.truncate({
+      force: true,
+      cascade: true,
+    }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
@@ -19,7 +29,7 @@ describe('verifyUAAUser', () => {
 
   beforeEach(async () => {
     eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
-    await clean()
+    await clean();
   });
 
   afterEach(() => sinon.restore());
@@ -33,11 +43,14 @@ describe('verifyUAAUser', () => {
     const { uaaId } = identity;
     const uaaUserResponse = uaaUser({
       uaaId,
-      groups: [{
-        display: 'group.one',
-      }, {
-        display: 'group.two',
-      }],
+      groups: [
+        {
+          display: 'group.one',
+        },
+        {
+          display: 'group.two',
+        },
+      ],
     });
 
     const uaaUserProfile = uaaProfile({
@@ -50,9 +63,9 @@ describe('verifyUAAUser', () => {
     expect(identity.accessToken).to.be.null;
     expect(identity.refreshToken).to.be.null;
 
-    const verifiedUser = await verifyUAAUser(
-      accessToken, refreshToken, uaaUserProfile, ['group.one']
-    );
+    const verifiedUser = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
+      'group.one',
+    ]);
 
     await identity.reload();
 
@@ -69,11 +82,14 @@ describe('verifyUAAUser', () => {
     const { uaaId } = identity;
     const uaaUserResponse = uaaUser({
       uaaId,
-      groups: [{
-        display: 'group.one',
-      }, {
-        display: 'group.two',
-      }],
+      groups: [
+        {
+          display: 'group.one',
+        },
+        {
+          display: 'group.two',
+        },
+      ],
     });
 
     const uaaUserProfile = uaaProfile({
@@ -83,7 +99,9 @@ describe('verifyUAAUser', () => {
 
     cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
+    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
+      'group.three',
+    ]);
 
     expect(eventAuditStub.called).to.equal(true);
     return expect(result).to.be.null;
@@ -96,11 +114,14 @@ describe('verifyUAAUser', () => {
     const email = 'not-a-saved-identity@example.com';
     const uaaUserResponse = uaaUser({
       uaaId,
-      groups: [{
-        display: 'group.one',
-      }, {
-        display: 'group.two',
-      }],
+      groups: [
+        {
+          display: 'group.one',
+        },
+        {
+          display: 'group.two',
+        },
+      ],
     });
 
     const uaaUserProfile = uaaProfile({
@@ -110,7 +131,9 @@ describe('verifyUAAUser', () => {
 
     cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.three']);
+    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
+      'group.three',
+    ]);
 
     expect(eventAuditStub.called).to.equal(true);
     return expect(result).to.be.null;
@@ -124,11 +147,14 @@ describe('verifyUAAUser', () => {
     const { uaaId } = identity;
     const uaaUserResponse = uaaUser({
       uaaId,
-      groups: [{
-        display: 'group.one',
-      }, {
-        display: 'group.two',
-      }],
+      groups: [
+        {
+          display: 'group.one',
+        },
+        {
+          display: 'group.two',
+        },
+      ],
     });
 
     const uaaUserProfile = uaaProfile({
@@ -140,7 +166,9 @@ describe('verifyUAAUser', () => {
 
     await user.destroy();
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, ['group.one']);
+    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
+      'group.one',
+    ]);
 
     expect(eventAuditStub.called).to.equal(true);
     return expect(result).to.be.null;

@@ -11,7 +11,10 @@ const toJSON = (userAction) => {
 const serialize = (data) => {
   const models = Array.isArray(data) ? data : [data];
 
-  return models.map(model => toJSON(model));
+  return models.map((model) => toJSON(model));
 };
 
-module.exports = { serialize, toJSON };
+module.exports = {
+  serialize,
+  toJSON,
+};

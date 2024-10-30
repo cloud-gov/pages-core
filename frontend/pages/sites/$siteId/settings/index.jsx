@@ -1,8 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  useParams, useNavigate, useLocation,
-} from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import siteActions from '@actions/siteActions';
 import { currentSite } from '@selectors/site';
@@ -17,7 +15,7 @@ import globals from '../../../../globals';
 function SiteSettings() {
   const { id } = useParams();
   const { hash } = useLocation();
-  const site = useSelector(state => currentSite(state.sites, id));
+  const site = useSelector((state) => currentSite(state.sites, id));
   const navigate = useNavigate();
 
   if (!site) {
@@ -26,9 +24,12 @@ function SiteSettings() {
 
   function handleDelete() {
     if (
-      window.confirm(
-        `${site.owner}/${site.repository}\nAre you sure you want to delete this site for all users? This action will also delete all site builds and take down the live site, if published.`
-      )
+      window.confirm(`
+        ${site.owner}/${site.repository}
+        Are you sure you want to delete this site for all users?
+        This action will also delete all site builds
+        and take down the live site, if published.
+      `)
     ) {
       return siteActions
         .deleteSite(site.id)
@@ -50,8 +51,7 @@ function SiteSettings() {
     <div className="grid-row">
       <div className="grid-col-12">
         <p className="font-body-sm line-height-sans-4 measure-6 margin-bottom-4">
-          See our documentation site for more about
-          {' '}
+          See our documentation site for more about{' '}
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -59,10 +59,8 @@ function SiteSettings() {
             href="https://cloud.gov/pages/documentation/#managing-site-settings"
           >
             these settings
-          </a>
-          {' '}
-          or
-          {' '}
+          </a>{' '}
+          or{' '}
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -82,9 +80,7 @@ function SiteSettings() {
       />
 
       <EnvironmentVariables siteId={site.id} />
-      {site.SiteBuildTasks.length > 0 && (
-        <ReportConfigs siteId={site.id} />
-      )}
+      {site.SiteBuildTasks.length > 0 && <ReportConfigs siteId={site.id} />}
     </div>
   );
 }

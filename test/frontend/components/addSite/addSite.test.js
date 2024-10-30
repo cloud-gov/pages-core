@@ -28,10 +28,12 @@ const user = {
 };
 
 const organizations = {
-  data: [{
-    id: 1,
-    name: 'org-1',
-  }],
+  data: [
+    {
+      id: 1,
+      name: 'org-1',
+    },
+  ],
   isLoading: false,
 };
 
@@ -50,8 +52,13 @@ const defaultState = {
 const { AddSite } = proxyquire('../../../../frontend/components/AddSite', {
   './TemplateSiteList': TemplateSiteList,
   '../alertBanner': AlertBanner,
-  '../../actions/siteActions': { addSite, addUserToSite },
-  '../../actions/addNewSiteFieldsActions': { hideAddNewSiteFields },
+  '../../actions/siteActions': {
+    addSite,
+    addUserToSite,
+  },
+  '../../actions/addNewSiteFieldsActions': {
+    hideAddNewSiteFields,
+  },
 });
 
 describe('<AddSite/>', () => {
@@ -103,7 +110,12 @@ describe('<AddSite/>', () => {
   it('calls addUserToSite action when add site form is submitted', () => {
     const repoUrl = 'https://github.com/owner/repo';
     wrapper.find('ReduxForm').at(0).props().onSubmit({ repoUrl });
-    expect(addUserToSite.calledWith({ owner: 'owner', repository: 'repo' })).to.be.true;
+    expect(
+      addUserToSite.calledWith({
+        owner: 'owner',
+        repository: 'repo',
+      }),
+    ).to.be.true;
   });
 
   it('calls addSite action when add site form is submitted and showAddNewSiteFields is true', () => {
@@ -114,14 +126,20 @@ describe('<AddSite/>', () => {
     state.showAddNewSiteFields = true;
     wrapper = mountRouter(<AddSite />, '/sites/new', '/sites/new', state);
 
-    wrapper.find('ReduxForm').at(0).props().onSubmit({ repoUrl, engine, repoOrganizationId });
-
-    expect(addSite.calledWith({
-      owner: 'boop',
-      repository: 'beeper-v2',
+    wrapper.find('ReduxForm').at(0).props().onSubmit({
+      repoUrl,
       engine,
-      organizationId: repoOrganizationId,
-    })).to.be.true;
+      repoOrganizationId,
+    });
+
+    expect(
+      addSite.calledWith({
+        owner: 'boop',
+        repository: 'beeper-v2',
+        engine,
+        organizationId: repoOrganizationId,
+      }),
+    ).to.be.true;
   });
 
   it('user with no orgs cannot use this page', () => {

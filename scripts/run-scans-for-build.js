@@ -25,11 +25,15 @@ async function main() {
       console.log(`${logHelper} Created ${tasks.length} new scan(s)`);
     } catch {
       // if there are existing build tasks, find these
-      tasks = await BuildTask.findAll({ where: { buildId: build.id } });
+      tasks = await BuildTask.findAll({
+        where: {
+          buildId: build.id,
+        },
+      });
       console.log(`${logHelper} Found ${tasks.length} existing scan(s)`);
     }
 
-    await Promise.all(tasks.map(async task => task.enqueue()));
+    await Promise.all(tasks.map(async (task) => task.enqueue()));
 
     console.log(`${logHelper} Successfully queued ${tasks.length} scan(s)`);
 

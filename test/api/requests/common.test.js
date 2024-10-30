@@ -39,7 +39,9 @@ commonPaths.forEach((path) => {
           .get(path)
           .then((response) => {
             prodTrackingScripts.forEach((script) => {
-              expect(response.text.indexOf(script), `${script} not found`).to.be.above(-1);
+              expect(response.text.indexOf(script), `${script} not found`).to.be.above(
+                -1,
+              );
             });
             done();
           })
@@ -80,7 +82,10 @@ commonPaths.forEach((path) => {
         request(app)
           .get(path)
           .then((response) => {
-            const titleRegex = new RegExp(`<title>\\s*${config.app.appName}\\s*<\\/title>`, 'g');
+            const titleRegex = new RegExp(
+              `<title>\\s*${config.app.appName}\\s*<\\/title>`,
+              'g',
+            );
             expect(response.text.search(titleRegex)).to.be.above(-1);
             done();
           })

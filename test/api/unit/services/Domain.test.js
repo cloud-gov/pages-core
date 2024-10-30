@@ -1,16 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const {
-  Domain,
-  Build,
-  Site,
-  SiteBranchConfig,
-} = require('../../../../api/models');
-const {
-  domain: DomainFactory,
-  site: SiteFactory,
-} = require('../../support/factory');
+const { Domain, Build, Site, SiteBranchConfig } = require('../../../../api/models');
+const { domain: DomainFactory, site: SiteFactory } = require('../../support/factory');
 const DnsService = require('../../../../api/services/Dns');
 const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
@@ -28,7 +20,9 @@ describe('Domain Service', () => {
     it('returns an array of dns records from domain.names', () => {
       const domainNames = ['agency.gov', 'www.agency.gov'];
 
-      const domain = DomainFactory.build({ names: domainNames.join(',') });
+      const domain = DomainFactory.build({
+        names: domainNames.join(','),
+      });
 
       const result = DomainService.buildDnsRecords(domain);
 
@@ -51,7 +45,9 @@ describe('Domain Service', () => {
     });
 
     it('returns false if the domain is not pending', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioned,
+      });
       const dnsResults = [];
       sinon.stub(DnsService, 'canProvision').returns(true);
 
@@ -73,7 +69,9 @@ describe('Domain Service', () => {
 
   describe('.canDeprovision()', () => {
     it('returns true if domain is provisioned', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioned,
+      });
 
       const result = DomainService.canDeprovision(domain);
 
@@ -81,7 +79,9 @@ describe('Domain Service', () => {
     });
 
     it('returns true if domain is provisioning', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Provisioning });
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioning,
+      });
 
       const result = DomainService.canDeprovision(domain);
 
@@ -89,7 +89,9 @@ describe('Domain Service', () => {
     });
 
     it('returns true if domain is failed', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Failed });
+      const domain = DomainFactory.build({
+        state: Domain.States.Failed,
+      });
 
       const result = DomainService.canDeprovision(domain);
 
@@ -107,7 +109,9 @@ describe('Domain Service', () => {
 
   describe('.canDestroy()', () => {
     it('returns false if domain is provisioned', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioned,
+      });
 
       const result = DomainService.canDestroy(domain);
 
@@ -115,7 +119,9 @@ describe('Domain Service', () => {
     });
 
     it('returns false if domain is provisioning', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Provisioning });
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioning,
+      });
 
       const result = DomainService.canDestroy(domain);
 
@@ -123,7 +129,9 @@ describe('Domain Service', () => {
     });
 
     it('returns false if domain is failed', () => {
-      const domain = DomainFactory.build({ state: Domain.States.Failed });
+      const domain = DomainFactory.build({
+        state: Domain.States.Failed,
+      });
 
       const result = DomainService.canDestroy(domain);
 
@@ -158,16 +166,15 @@ describe('Domain Service', () => {
 
       await DomainService.checkDeprovisionStatus(domain.id);
 
-      sinon.assert.notCalled(
-        CloudFoundryAPIClient.prototype.fetchServiceInstances
-      );
+      sinon.assert.notCalled(CloudFoundryAPIClient.prototype.fetchServiceInstances);
       sinon.assert.notCalled(DomainQueue.prototype.add);
     });
 
-    it('updates the state to pending and keeps origin values of domain if the service no longer exists', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances')
-        .resolves({ resources: [] });
+    it(`updates the state to pending and
+        keeps origin values of domain if the service no longer exists`, async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances').resolves({
+        resources: [],
+      });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const origin = 'foo.sites.pages.cloud.gov';
@@ -193,14 +200,11 @@ describe('Domain Service', () => {
     });
 
     it('updates the associated site if the service no longer exists', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances')
-        .resolves({ resources: [] });
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances').resolves({
+        resources: [],
+      });
       sinon.spy(DomainQueue.prototype, 'add');
-      const siteUpdateSpy = sinon.spy(
-        DomainService,
-        'rebuildAssociatedSite'
-      );
+      const siteUpdateSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       const domain = await DomainFactory.create({
         origin: 'foo.sites.pages.cloud.gov',
@@ -211,16 +215,18 @@ describe('Domain Service', () => {
 
       await DomainService.checkDeprovisionStatus(domain.id);
 
-      await domain.reload({ include: [SiteBranchConfig]});
+      await domain.reload({
+        include: [SiteBranchConfig],
+      });
 
       sinon.assert.notCalled(DomainQueue.prototype.add);
       sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
     });
 
     it('requeues the job if the service still exists', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances')
-        .resolves({ resources: [{}] });
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstances').resolves({
+        resources: [{}],
+      });
       sinon.stub(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({
@@ -235,7 +241,9 @@ describe('Domain Service', () => {
       sinon.assert.calledOnceWithExactly(
         DomainQueue.prototype.add,
         'checkDeprovisionStatus',
-        { id: domain.id }
+        {
+          id: domain.id,
+        },
       );
     });
   });
@@ -255,7 +263,7 @@ describe('Domain Service', () => {
       domainNames.forEach((domainName) => {
         sinon.assert.calledWithExactly(
           DnsService.checkAcmeChallengeDnsRecord,
-          domainName
+          domainName,
         );
       });
     });
@@ -292,17 +300,17 @@ describe('Domain Service', () => {
 
       await domain.reload();
 
-      sinon.assert.notCalled(
-        CloudFoundryAPIClient.prototype.fetchServiceInstance
-      );
+      sinon.assert.notCalled(CloudFoundryAPIClient.prototype.fetchServiceInstance);
       sinon.assert.notCalled(DomainQueue.prototype.add);
       expect(domain.state).to.eq(Domain.States.Failed);
     });
 
     it('sets the domain state to `provisioned` if successful', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ last_operation: { state: 'succeeded' } });
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance').resolves({
+        last_operation: {
+          state: 'succeeded',
+        },
+      });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({
@@ -315,21 +323,20 @@ describe('Domain Service', () => {
 
       sinon.assert.calledOnceWithExactly(
         CloudFoundryAPIClient.prototype.fetchServiceInstance,
-        domain.serviceName
+        domain.serviceName,
       );
       sinon.assert.notCalled(DomainQueue.prototype.add);
       expect(domain.state).to.eq(Domain.States.Provisioned);
     });
 
     it('updates the associated site if successful', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ last_operation: { state: 'succeeded' } });
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance').resolves({
+        last_operation: {
+          state: 'succeeded',
+        },
+      });
       sinon.spy(DomainQueue.prototype, 'add');
-      const siteUpdateSpy = sinon.spy(
-        DomainService,
-        'rebuildAssociatedSite'
-      );
+      const siteUpdateSpy = sinon.spy(DomainService, 'rebuildAssociatedSite');
 
       const domain = await DomainFactory.create({
         state: Domain.States.Provisioning,
@@ -337,35 +344,37 @@ describe('Domain Service', () => {
 
       await DomainService.checkProvisionStatus(domain.id);
 
-      await domain.reload({ include: [SiteBranchConfig]});
+      await domain.reload({
+        include: [SiteBranchConfig],
+      });
 
       sinon.assert.calledOnceWithExactly(
         CloudFoundryAPIClient.prototype.fetchServiceInstance,
-        domain.serviceName
+        domain.serviceName,
       );
       sinon.assert.notCalled(DomainQueue.prototype.add);
       sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
     });
 
     it('sets the domain state to `failed` if failed', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ last_operation: { state: 'failed' } });
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance').resolves({
+        last_operation: {
+          state: 'failed',
+        },
+      });
       sinon.spy(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({
         state: Domain.States.Provisioning,
       });
 
-      const error = await DomainService.checkProvisionStatus(domain.id).catch(
-        (e) => e
-      );
+      const error = await DomainService.checkProvisionStatus(domain.id).catch((e) => e);
 
       await domain.reload();
 
       sinon.assert.calledOnceWithExactly(
         CloudFoundryAPIClient.prototype.fetchServiceInstance,
-        domain.serviceName
+        domain.serviceName,
       );
       sinon.assert.notCalled(DomainQueue.prototype.add);
       expect(domain.state).to.eq(Domain.States.Failed);
@@ -373,9 +382,11 @@ describe('Domain Service', () => {
     });
 
     it('requeues the status check otherwise', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance')
-        .resolves({ last_operation: { state: 'something else' } });
+      sinon.stub(CloudFoundryAPIClient.prototype, 'fetchServiceInstance').resolves({
+        last_operation: {
+          state: 'something else',
+        },
+      });
       sinon.stub(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({
@@ -388,38 +399,50 @@ describe('Domain Service', () => {
 
       sinon.assert.calledOnceWithExactly(
         CloudFoundryAPIClient.prototype.fetchServiceInstance,
-        domain.serviceName
+        domain.serviceName,
       );
       sinon.assert.calledOnceWithExactly(
         DomainQueue.prototype.add,
         'checkProvisionStatus',
-        { id: domain.id }
+        {
+          id: domain.id,
+        },
       );
       expect(domain.state).to.eq(Domain.States.Provisioning);
     });
   });
 
   describe('.rebuildAssociatedSite()', () => {
-    it('triggers a rebuild on its associated site with matching domain name', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+    it(`triggers a rebuild on its associated site
+        with matching domain name`, async () => {
+      const site = await SiteFactory({
+        domain: 'https://www.agency.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov',
         state: Domain.States.Provisioning,
       });
 
-      await site.reload({ include: [Build] });
+      await site.reload({
+        include: [Build],
+      });
       expect(site.Builds).to.have.length(0);
 
-      await domain.reload({ include: [SiteBranchConfig]})
+      await domain.reload({
+        include: [SiteBranchConfig],
+      });
       await DomainService.rebuildAssociatedSite(domain);
 
-      await site.reload({ include: [Build] });
+      await site.reload({
+        include: [Build],
+      });
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].branch).to.equal(site.defaultBranch);
     });
 
-    it('triggers a rebuild on its associated site with matching demo domain name', async () => {
+    it(`triggers a rebuild on its associated
+        site with matching demo domain name`, async () => {
       const site = await SiteFactory({
         demoDomain: 'https://www.agency.gov',
         demoBranch: 'demo',
@@ -431,220 +454,235 @@ describe('Domain Service', () => {
         state: Domain.States.Provisioning,
       });
 
-      await site.reload({ include: [Build] });
+      await site.reload({
+        include: [Build],
+      });
       expect(site.Builds).to.have.length(0);
 
-      await domain.reload({ include: [SiteBranchConfig]})
+      await domain.reload({
+        include: [SiteBranchConfig],
+      });
       await DomainService.rebuildAssociatedSite(domain, site);
 
-      await site.reload({ include: [Build] });
+      await site.reload({
+        include: [Build],
+      });
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].branch).to.equal(site.demoBranch);
     });
   });
 
   describe('.isSiteUrlManagedByDomain()', () => {
-    it('reports a domain-managed site live URL when the URL matches a site-context domain', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+    it(`reports a domain-managed site live URL
+        when the URL matches a site-context domain`, async () => {
+      const site = await SiteFactory({
+        domain: 'https://www.agency.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov',
       });
-      await domain.reload({ include: [Site] });
-
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Site
-        )
-      ).to.be.true;
-    });
-
-    it('reports a domain-managed site demo URL when the URL matches a demo-context domain', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
-      const domain = await DomainFactory.create({
-        siteId: site.id,
-        names: 'www.agency.gov',
-        context: Domain.Contexts.Demo,
+      await domain.reload({
+        include: [Site],
       });
-      await domain.reload({ include: [Site] });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Demo
-        )
-      ).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site))
+        .to.be.true;
     });
 
-    it('reports a domain-managed site live URL when the site live URL is null', async () => {
-      const site = await SiteFactory({ domain: null });
-      const domain = await DomainFactory.create({
-        siteId: site.id,
-        names: 'www.agency.gov',
+    it(`reports a domain-managed site demo URL
+        when the URL matches a demo-context domain`, async () => {
+      const site = await SiteFactory({
+        demoDomain: 'https://www.agency.gov',
       });
-      await domain.reload({ include: [Site] });
-
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Site
-        )
-      ).to.be.true;
-    });
-
-    it('reports a domain-managed site demo URL when the site demo URL is null', async () => {
-      const site = await SiteFactory({ demoDomain: null, demoBranch: 'demo' });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov',
         context: Domain.Contexts.Demo,
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Demo
-        )
-      ).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo))
+        .to.be.true;
     });
 
-    it('reports a domain-managed site live URL when the URL matches a first site-context domain name', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+    it(`reports a domain-managed site live URL
+        when the site live URL is null`, async () => {
+      const site = await SiteFactory({
+        domain: null,
+      });
+      const domain = await DomainFactory.create({
+        siteId: site.id,
+        names: 'www.agency.gov',
+      });
+      await domain.reload({
+        include: [Site],
+      });
+
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site))
+        .to.be.true;
+    });
+
+    it(`reports a domain-managed site demo URL
+        when the site demo URL is null`, async () => {
+      const site = await SiteFactory({
+        demoDomain: null,
+        demoBranch: 'demo',
+      });
+      const domain = await DomainFactory.create({
+        siteId: site.id,
+        names: 'www.agency.gov',
+        context: Domain.Contexts.Demo,
+      });
+      await domain.reload({
+        include: [Site],
+      });
+
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo))
+        .to.be.true;
+    });
+
+    it(`reports a domain-managed site live URL
+        when the URL matches a first site-context domain name`, async () => {
+      const site = await SiteFactory({
+        domain: 'https://www.agency.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov,www.foo.gov,www.bar.gov',
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Site
-        )
-      ).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site))
+        .to.be.true;
     });
 
-    it('reports a domain-managed site live URL when the URL matches a first demo-context domain name', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
+    it(`reports a domain-managed site live URL
+        when the URL matches a first demo-context domain name`, async () => {
+      const site = await SiteFactory({
+        demoDomain: 'https://www.agency.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov,www.foo.gov,www.bar.gov',
         context: Domain.Contexts.Demo,
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Demo
-        )
-      ).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo))
+        .to.be.true;
     });
 
-    it('reports a domain-managed site live URL when the URL matches a non-first site-context domain name', async () => {
-      const site = await SiteFactory({ domain: 'https://www.agency.gov' });
+    it(`reports a domain-managed site live URL
+        when the URL matches a non-first site-context domain name`, async () => {
+      const site = await SiteFactory({
+        domain: 'https://www.agency.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.foo.gov,www.agency.gov,www.bar.gov',
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Site
-        )
-      ).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site))
+        .to.be.true;
     });
 
-    it('reports a domain-managed site live URL when the URL matches a non-first demo-context domain name', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.agency.gov' });
+    it(`reports a domain-managed site live URL
+        when the URL matches a non-first demo-context domain name`, async () => {
+      const site = await SiteFactory({
+        demoDomain: 'https://www.agency.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.foo.gov,www.agency.gov,www.bar.gov',
         context: Domain.Contexts.Demo,
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Demo
-        )
-      ).to.be.true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo))
+        .to.be.true;
     });
 
-    it('reports a non domain-managed site live URL when the URL does not match a site-context domain name', async () => {
-      const site = await SiteFactory({ domain: 'https://www.example.gov' });
+    it(`reports a non domain-managed site live URL
+        when the URL does not match a site-context domain name`, async () => {
+      const site = await SiteFactory({
+        domain: 'https://www.example.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov',
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Site
-        )
-      ).to.be.false;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Site))
+        .to.be.false;
     });
 
-    it('reports a non domain-managed site demo URL when the URL does not match a demo-context domain name', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.example.gov' });
+    it(`reports a non domain-managed site demo URL
+        when the URL does not match a demo-context domain name`, async () => {
+      const site = await SiteFactory({
+        demoDomain: 'https://www.example.gov',
+      });
       const domain = await DomainFactory.create({
         siteId: site.id,
         names: 'www.agency.gov',
         context: Domain.Contexts.Demo,
       });
-      await domain.reload({ include: [Site] });
+      await domain.reload({
+        include: [Site],
+      });
 
-      expect(
-        DomainService.isSiteUrlManagedByDomain(
-          site,
-          [domain],
-          Domain.Contexts.Demo
-        )
-      ).to.be.false;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [domain], Domain.Contexts.Demo))
+        .to.be.false;
     });
 
-    it('reports a non domain-managed site URL when an empty domain array is offered for evaluation', async () => {
-      const site = await SiteFactory({ domain: 'https://www.example.gov' });
+    it(`reports a non domain-managed site URL
+        when an empty domain array is offered for evaluation`, async () => {
+      const site = await SiteFactory({
+        domain: 'https://www.example.gov',
+      });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'site')).to.be
-        .false;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'site')).to.be.false;
     });
 
-    it('reports a non domain-managed demo URL when an empty domain array is offered for evaluation', async () => {
-      const site = await SiteFactory({ demoDomain: 'https://www.example.gov' });
+    it(`reports a non domain-managed demo URL
+        when an empty domain array is offered for evaluation`, async () => {
+      const site = await SiteFactory({
+        demoDomain: 'https://www.example.gov',
+      });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'demo')).to.be
-        .false;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'demo')).to.be.false;
     });
 
-    it('reports a domain-managed site URL when URL is null even if an empty domain array is offered for evaluation', async () => {
-      const site = await SiteFactory({ domain: null });
+    it(`reports a domain-managed site URL when URL is null even
+        if an empty domain array is offered for evaluation`, async () => {
+      const site = await SiteFactory({
+        domain: null,
+      });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'site')).to.be
-        .true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'site')).to.be.true;
     });
 
-    it('reports a domain-managed demo URL when URL is null even if an empty domain array is offered for evaluation', async () => {
-      const site = await SiteFactory({ demoDomain: null });
+    it(`reports a domain-managed demo URL when URL is null even
+        if an empty domain array is offered for evaluation`, async () => {
+      const site = await SiteFactory({
+        demoDomain: null,
+      });
 
-      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'demo')).to.be
-        .true;
+      expect(DomainService.isSiteUrlManagedByDomain(site, [], 'demo')).to.be.true;
     });
   });
 
@@ -656,14 +694,13 @@ describe('Domain Service', () => {
 
       expect(error).to.be.an('Error');
       expect(error.message).to.eq(
-        "Only 'provisioning', 'provisioned', or 'failed' domains can be deprovisioned."
+        "Only 'provisioning', 'provisioned', or 'failed' domains can be deprovisioned.",
       );
     });
 
-    it('deletes the service instance, sets the domain to `deprovisioning` and queues the status check', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance')
-        .resolves();
+    it(`deletes the service instance, sets the domain to \`deprovisioning\`
+        and queues the status check`, async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'deleteServiceInstance').resolves();
       sinon.stub(DomainQueue.prototype, 'add');
 
       const domain = await DomainFactory.create({
@@ -676,19 +713,22 @@ describe('Domain Service', () => {
 
       sinon.assert.calledOnceWithExactly(
         CloudFoundryAPIClient.prototype.deleteServiceInstance,
-        domain.serviceName
+        domain.serviceName,
       );
       sinon.assert.calledOnceWithExactly(
         DomainQueue.prototype.add,
         'checkDeprovisionStatus',
-        { id: domain.id }
+        {
+          id: domain.id,
+        },
       );
       expect(domain.state).to.eq(Domain.States.Deprovisioning);
     });
   });
 
   describe('.destroy()', () => {
-    it('throws an error and does not destroy the domain if the domain is not `pending`', async () => {
+    it(`throws an error and does not destroy the domain
+        if the domain is not \`pending\``, async () => {
       const domain = await DomainFactory.create({
         state: Domain.States.Provisioning,
       });
@@ -711,12 +751,12 @@ describe('Domain Service', () => {
 
   describe('.provision()', () => {
     it('throws if the domain cannot be provisioned', async () => {
-      const domain = DomainFactory.build({ state: Domain.States.Provisioned });
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioned,
+      });
       const dnsResults = [];
 
-      const error = await DomainService.provision(domain, dnsResults).catch(
-        (e) => e
-      );
+      const error = await DomainService.provision(domain, dnsResults).catch((e) => e);
 
       expect(error).to.be.an('Error');
       expect(error.message).to.eq("Only 'pending' domains can be provisioned.");
@@ -726,18 +766,18 @@ describe('Domain Service', () => {
       const domain = DomainFactory.build();
       const dnsResults = [];
 
-      const error = await DomainService.provision(domain, dnsResults).catch(
-        (e) => e
-      );
+      const error = await DomainService.provision(domain, dnsResults).catch((e) => e);
 
       expect(error).to.be.an('Error');
       expect(error.message).to.eq(
-        'There must be at least one Acme Challenge DNS record provided'
+        'There must be at least one Acme Challenge DNS record provided',
       );
     });
 
     it('throws if the dns records are not set', async () => {
-      const domain = DomainFactory.build({ names: 'www.agency.gov' });
+      const domain = DomainFactory.build({
+        names: 'www.agency.gov',
+      });
       const dnsResults = [
         {
           record: DnsService.buildAcmeChallengeDnsRecord(domain.names),
@@ -745,23 +785,23 @@ describe('Domain Service', () => {
         },
       ];
 
-      const error = await DomainService.provision(domain, dnsResults).catch(
-        (e) => e
-      );
+      const error = await DomainService.provision(domain, dnsResults).catch((e) => e);
 
       expect(error).to.be.an('Error');
       expect(error.message).to.eq(
-        'The Acme Challenge DNS records must be set correctly before the domain can be provisioned.'
+        // eslint-disable-next-line max-len
+        'The Acme Challenge DNS records must be set correctly before the domain can be provisioned.',
       );
     });
 
-    it('creates the service, sets the domain to `provisioning` and queues the status check', async () => {
-      sinon
-        .stub(CloudFoundryAPIClient.prototype, 'createExternalDomain')
-        .resolves();
+    it(`creates the service, sets the domain to \`provisioning\`
+        and queues the status check`, async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'createExternalDomain').resolves();
       sinon.stub(DomainQueue.prototype, 'add');
 
-      const domain = await DomainFactory.create({ names: 'www.agency.gov' });
+      const domain = await DomainFactory.create({
+        names: 'www.agency.gov',
+      });
       const dnsResults = [
         {
           record: DnsService.buildAcmeChallengeDnsRecord(domain.names),
@@ -782,12 +822,14 @@ describe('Domain Service', () => {
           path: domain.path,
           cfCdnSpaceName: config.env.cfCdnSpaceName,
           cfDomainWithCdnPlanGuid: config.env.cfDomainWithCdnPlanGuid,
-        })
+        }),
       );
       sinon.assert.calledOnceWithExactly(
         DomainQueue.prototype.add,
         'checkProvisionStatus',
-        { id: domain.id }
+        {
+          id: domain.id,
+        },
       );
       expect(domain.state).to.eq(Domain.States.Provisioning);
     });

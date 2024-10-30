@@ -3,7 +3,7 @@ const env = require('../services/environment')();
 const clientID = env.GITHUB_CLIENT_ID || 'not_set';
 const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
 
-const url = path => `${env.APP_HOSTNAME}${path}`;
+const url = (path) => `${env.APP_HOSTNAME}${path}`;
 
 module.exports = {
   github: {

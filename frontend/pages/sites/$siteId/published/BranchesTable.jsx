@@ -16,7 +16,15 @@ export default function BranchesTable({ branches, site }) {
         {` ${globals.APP_NAME} `}
         has published.
       </p>
-      <table className="usa-table usa-table--borderless usa-table--stacked published-branch-table log-table width-full table-full-width">
+      <table
+        className={`
+          usa-table
+          usa-table--borderless
+          usa-table--stacked published-branch-table
+          log-table width-full
+          table-full-width"
+        `}
+      >
         <thead>
           <tr>
             <th>Branch</th>
@@ -24,7 +32,9 @@ export default function BranchesTable({ branches, site }) {
           </tr>
         </thead>
         <tbody>
-          { branches.map((branch, index) => <BranchRow key={`branch-${index}`} branch={branch} site={site} />) }
+          {branches.map((branch, index) => (
+            <BranchRow key={`branch-${index}`} branch={branch} site={site} />
+          ))}
         </tbody>
       </table>
     </div>
@@ -32,7 +42,6 @@ export default function BranchesTable({ branches, site }) {
 }
 
 BranchesTable.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   branches: PropTypes.array,
   site: SITE,
 };

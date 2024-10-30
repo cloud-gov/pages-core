@@ -12,14 +12,19 @@ module.exports = function sessionAuth(req, res, next) {
     }
     return req.logout((logoutError) => {
       if (logoutError) {
-        EventCreator.error(Event.labels.AUTHENTICATION, logoutError, { user: req.user });
+        EventCreator.error(Event.labels.AUTHENTICATION, logoutError, {
+          user: req.user,
+        });
       }
-      EventCreator.error(Event.labels.AUTHENTICATION, 'session timed logout', { user: req.user });
+      EventCreator.error(Event.labels.AUTHENTICATION, 'session timed logout', {
+        user: req.user,
+      });
       return res.redirect(config.app.hostname);
     });
   }
   // else
   return res.forbidden({
-    message: 'You are not permitted to perform this action. Are you sure you are logged in?',
+    message:
+      'You are not permitted to perform this action. Are you sure you are logged in?',
   });
 };

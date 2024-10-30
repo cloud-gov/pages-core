@@ -67,15 +67,26 @@ describe('Published Files API', () => {
             .resolvesOnce({
               IsTruncated: true,
               Contents: [
-                { Key: `${prefix}abc`, Size: 123 },
-                { Key: `${prefix}abc/def`, Size: 456 },
+                {
+                  Key: `${prefix}abc`,
+                  Size: 123,
+                },
+                {
+                  Key: `${prefix}abc/def`,
+                  Size: 456,
+                },
               ],
               ContinuationToken: 'A',
               NextContinuationToken: 'B',
             })
             .resolvesOnce({
               IsTruncated: false,
-              Contents: [{ Key: `${prefix}ghi`, Size: 789 }],
+              Contents: [
+                {
+                  Key: `${prefix}ghi`,
+                  Size: 789,
+                },
+              ],
               ContinuationToken: 'B',
               NextContinuationToken: null,
             });
@@ -98,9 +109,21 @@ describe('Published Files API', () => {
             delete file.publishedBranch;
           });
           expect(files).to.deep.equal([
-            { name: 'abc', size: 123, key: `${prefix}abc` },
-            { name: 'abc/def', size: 456, key: `${prefix}abc/def` },
-            { name: 'ghi', size: 789, key: `${prefix}ghi` },
+            {
+              name: 'abc',
+              size: 123,
+              key: `${prefix}abc`,
+            },
+            {
+              name: 'abc/def',
+              size: 456,
+              key: `${prefix}abc/def`,
+            },
+            {
+              name: 'ghi',
+              size: 789,
+              key: `${prefix}ghi`,
+            },
           ]);
           done();
         })
@@ -171,10 +194,16 @@ describe('Published Files API', () => {
 
     it('should 403 if the user is not associated with the site', (done) => {
       const user = factory.user();
-      const site = factory.site({ defaultBranch: 'main' });
+      const site = factory.site({
+        defaultBranch: 'main',
+      });
       const cookie = authenticatedSession(user);
 
-      Promise.props({ user, site, cookie })
+      Promise.props({
+        user,
+        site,
+        cookie,
+      })
         .then((promisedValues) =>
           request(app)
             .get(

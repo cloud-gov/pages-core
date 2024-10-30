@@ -33,10 +33,17 @@ describe('publishedFileActions', () => {
   });
 
   it('fetchPublishedFiles', (done) => {
-    const response = { isTruncated: false, files: ['File 1', 'File 2'] };
+    const response = {
+      isTruncated: false,
+      files: ['File 1', 'File 2'],
+    };
     const publishedFilesPromise = Promise.resolve(response);
-    const startedAction = { action: 'started' };
-    const receivedAction = { action: 'received' };
+    const startedAction = {
+      action: 'started',
+    };
+    const receivedAction = {
+      action: 'received',
+    };
     fetchPublishedFiles.withArgs().returns(publishedFilesPromise);
     publishedFilesFetchStartedActionCreator.withArgs().returns(startedAction);
     publishedFilesReceivedActionCreator.withArgs(response).returns(receivedAction);

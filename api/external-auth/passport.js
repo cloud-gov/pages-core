@@ -11,7 +11,7 @@ const options = config.passport.github.externalOptions;
 const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
   const username = _profile.username.toLowerCase();
   const { maxAge } = config.session.cookie;
-  const isExpired = (date, timeLimit) => (new Date() - date) > timeLimit;
+  const isExpired = (date, timeLimit) => new Date() - date > timeLimit;
 
   User.findOne({
     attributes: ['signedInAt'],
@@ -23,15 +23,22 @@ const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
       const productTitle = inflection.titleize(config.app.product);
 
       if (!user) {
-        throw new Error(`You must be a ${productTitle} user with a connected GitHub account.`);
+        throw new Error(
+          `You must be a ${productTitle} user with a connected GitHub account.`,
+        );
       }
 
       if (!user.signedInAt || isExpired(user.signedInAt, maxAge)) {
         const maxAgeHours = Math.ceil(maxAge / (1000 * 60 * 60));
-        throw new Error(`You have not logged-in to ${productTitle} within the past ${maxAgeHours} hours. Please log in to ${productTitle} and try again.`);
+        throw new Error(
+          // eslint-disable-next-line max-len
+          `You have not logged-in to ${productTitle} within the past ${maxAgeHours} hours. Please log in to ${productTitle} and try again.`,
+        );
       }
 
-      callback(null, { accessToken });
+      callback(null, {
+        accessToken,
+      });
     })
     .catch(callback);
 };

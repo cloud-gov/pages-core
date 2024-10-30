@@ -16,9 +16,7 @@ that allows require-ing non-js files. This file overrides require for
 those types with a noop function.
 */
 
-const ignoredExtensions = [
-  '.css', '.scss', '.jpg', '.jpeg', '.png', '.gif', '.svg',
-];
+const ignoredExtensions = ['.css', '.scss', '.jpg', '.jpeg', '.png', '.gif', '.svg'];
 
 ignoredExtensions.forEach((ext) => {
   require.extensions[ext] = () => null;
@@ -49,7 +47,9 @@ global.cancelAnimationFrame = function (id) {
 };
 copyProps(window, global);
 
-configure({ adapter: new Adapter() });
+configure({
+  adapter: new Adapter(),
+});
 
 // additional setup for testing
 process.env.APP_HOSTNAME = '/';

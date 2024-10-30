@@ -2,10 +2,20 @@ const BaseSerializer = require('./base');
 const bttSerializer = require('./build-task-type');
 
 function miniBuildSerializer({
-  branch, clonedCommitSha, requestedCommitSha, username, user, createdAt,
+  branch,
+  clonedCommitSha,
+  requestedCommitSha,
+  username,
+  user,
+  createdAt,
 }) {
   return {
-    branch, clonedCommitSha, requestedCommitSha, username, user, createdAt,
+    branch,
+    clonedCommitSha,
+    requestedCommitSha,
+    username,
+    user,
+    createdAt,
   };
 }
 const attributes = {
@@ -17,8 +27,8 @@ const attributes = {
   createdAt: 'date',
   updatedAt: 'date',
   siteBuildTaskId: '',
-  BuildTaskType: btt => btt && bttSerializer.serialize(btt),
-  Build: build => build && miniBuildSerializer(build.toJSON()),
+  BuildTaskType: (btt) => btt && bttSerializer.serialize(btt),
+  Build: (build) => build && miniBuildSerializer(build.toJSON()),
   buildId: '',
 };
 

@@ -69,7 +69,8 @@ describe('Dns Service', () => {
   });
 
   describe('.checkAcmeChallengeDnsRecord()', () => {
-    it('calls `checkDnsRecord` with an "Acme Challenge" dns record and returns the result', async () => {
+    it(`calls \`checkDnsRecord\` with an "Acme Challenge"
+        dns record and returns the result`, async () => {
       const domainName = 'www.agency.gov';
       const resolveResult = ['error', 'message'];
 
@@ -87,12 +88,14 @@ describe('Dns Service', () => {
   });
 
   describe('.checkDnsRecords()', () => {
-    it('calls and returns result from calling `checkDnsRecord` for each result from `buildDnsRecords`', async () => {
+    it(`calls and returns result from calling
+        \`checkDnsRecord\` for each result from \`buildDnsRecords\``, async () => {
       const domainName = 'www.agency.gov';
       const resolveResult1 = ['error', 'message'];
       const resolveResult2 = ['error', 'message'];
 
-      sinon.stub(DnsService, 'resolveDnsRecord')
+      sinon
+        .stub(DnsService, 'resolveDnsRecord')
         .onFirstCall()
         .resolves(resolveResult1)
         .onSecondCall()
@@ -140,7 +143,8 @@ describe('Dns Service', () => {
       expect(result).to.be.true;
     });
 
-    it('returns false if NOT all provided AcmeChallenge DnsResults are successful', () => {
+    it(`returns false if NOT all provided
+        AcmeChallenge DnsResults are successful`, () => {
       const domainName = 'www.agency.gov';
 
       const dnsResults = [
@@ -167,13 +171,17 @@ describe('Dns Service', () => {
   describe('.isAcmeChallengeRecord()', () => {
     it('is true if the record is an acme challenge record', () => {
       expect(
-        DnsService.isAcmeChallengeDnsRecord(DnsService.buildAcmeChallengeDnsRecord('www.agency.gov'))
+        DnsService.isAcmeChallengeDnsRecord(
+          DnsService.buildAcmeChallengeDnsRecord('www.agency.gov'),
+        ),
       ).to.be.true;
     });
 
     it('is false if the record is not an acme challenge record', () => {
       expect(
-        DnsService.isAcmeChallengeDnsRecord(DnsService.buildSiteDnsRecord('www.agency.gov'))
+        DnsService.isAcmeChallengeDnsRecord(
+          DnsService.buildSiteDnsRecord('www.agency.gov'),
+        ),
       ).to.be.false;
     });
   });

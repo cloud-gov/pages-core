@@ -1,10 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "id",
-    "name",
-    "hint"
-  ],
+  "required": ["id", "name", "hint"],
   "properties": {
     "id": {
       "type": "integer"

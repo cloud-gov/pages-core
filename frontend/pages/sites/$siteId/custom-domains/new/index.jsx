@@ -5,28 +5,19 @@ import AlertBanner from '@shared/alertBanner';
 
 const infoContent = (
   <>
-    Creating a new custom domain will
-    {' '}
-    <strong>NOT</strong>
-    {' '}
-    launch the live
-    domain URL you enter, but it will prepare this site to launch the domain you
-    entered. When you are ready to go live, email
-    {' '}
+    Creating a new custom domain will <strong>NOT</strong> launch the live domain URL you
+    enter, but it will prepare this site to launch the domain you entered. When you are
+    ready to go live, email{' '}
     <a
       title="Email support to launch a custom domain."
       href="mailto:pages-support@cloud.gov"
     >
       pages-support@cloud.gov
-    </a>
-    {' '}
+    </a>{' '}
     so we can start the domain launch process.
     <br />
     <br />
-    <strong>NOTE: </strong>
-    {' '}
-    Use
-    {' '}
+    <strong>NOTE: </strong> Use{' '}
     <a
       target="_blank"
       rel="noopener noreferrer"
@@ -34,17 +25,15 @@ const infoContent = (
       href="https://cloud.gov/pages/documentation/custom-domains/"
     >
       our documentation
-    </a>
-    {' '}
+    </a>{' '}
     to prepare your DNS settings so the domain can be launched.
   </>
 );
 
 function NewCustomDomain() {
   const { id } = useParams();
-  const {
-    availableConfigs, domain, setDomainValues, createSiteDomain,
-  } = useSiteDomain(id);
+  const { availableConfigs, domain, setDomainValues, createSiteDomain } =
+    useSiteDomain(id);
   const { names, siteBranchConfigId } = domain.data;
 
   return (
@@ -57,38 +46,69 @@ function NewCustomDomain() {
         onSubmit={(event) => {
           event.preventDefault();
 
-          return createSiteDomain({ names, siteBranchConfigId });
+          return createSiteDomain({
+            names,
+            siteBranchConfigId,
+          });
         }}
       >
         <div className="well">
           <div>
-            <label className="usa-label font-sans-lg text-bold" htmlFor="domain-name">Domain Name</label>
+            <label className="usa-label font-sans-lg text-bold" htmlFor="domain-name">
+              Domain Name
+            </label>
             <p>
-              Enter the custom domain name you will be launching.
-              {' '}
-              <span style={{ fontWeight: 'bold' }}>DO NOT</span>
-              {' '}
-              prepend
-              {' '}
-              <span style={{ fontWeight: 'bold' }}>https://</span>
-              {' '}
-              or
-              {' '}
-              <span style={{ fontWeight: 'bold' }}>http://</span>
-              {' '}
-              to the domain
-              name.
+              Enter the custom domain name you will be launching.{' '}
+              <span
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                DO NOT
+              </span>{' '}
+              prepend{' '}
+              <span
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                https://
+              </span>{' '}
+              or{' '}
+              <span
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                http://
+              </span>{' '}
+              to the domain name.
             </p>
             <p>
-              Enter only the domain name like:
-              {' '}
-              <span style={{ fontWeight: 'bold' }}>www.agency.gov</span>
-              ,
-              {' '}
-              <span style={{ fontWeight: 'bold' }}>site.agency.gov</span>
-              , or
-              {' '}
-              <span style={{ fontWeight: 'bold' }}>demo.site.agency.gov</span>
+              Enter only the domain name like:{' '}
+              <span
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                www.agency.gov
+              </span>
+              ,{' '}
+              <span
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                site.agency.gov
+              </span>
+              , or{' '}
+              <span
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                demo.site.agency.gov
+              </span>
               .
             </p>
             <input
@@ -107,24 +127,23 @@ function NewCustomDomain() {
             />
           </div>
           <div>
-            <label className="usa-label font-sans-lg text-bold" htmlFor="branch-context">Branch Context</label>
+            <label className="usa-label font-sans-lg text-bold" htmlFor="branch-context">
+              Branch Context
+            </label>
             <p>
               Select the site&apos;s branch context you will associate to the custom
               domain.
             </p>
             <p>
               If you do not see the branch, please set the branch in the site
-              settings&apos; branch configurations for
-              {' '}
+              settings&apos; branch configurations for{' '}
               <Link
                 to={`/sites/${id}/settings/#site-branch-config`}
                 alt="Go to site settings' live site context branch configuration"
               >
                 Live
-              </Link>
-              {' '}
-              or
-              {' '}
+              </Link>{' '}
+              or{' '}
               <Link
                 to={`/sites/${id}/settings/#demo-branch-config`}
                 alt="Go to site settings' demo context branch configuration"
@@ -147,15 +166,9 @@ function NewCustomDomain() {
               required
             >
               <option value=""> -- select an option -- </option>
-              {availableConfigs.map(sbc => (
+              {availableConfigs.map((sbc) => (
                 <option key={sbc.id} value={sbc.id}>
-                  Branch
-                  {' '}
-                  {sbc.branch}
-                  {' '}
-                  | Context
-                  {' '}
-                  {sbc.context}
+                  Branch {sbc.branch} | Context {sbc.context}
                 </option>
               ))}
             </select>

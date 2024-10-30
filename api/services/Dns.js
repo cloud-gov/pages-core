@@ -72,10 +72,7 @@ function buildSiteDnsRecord(domainName) {
  * @param {string} domainName
  */
 function buildDnsRecords(domainName) {
-  return [
-    buildAcmeChallengeDnsRecord(domainName),
-    buildSiteDnsRecord(domainName),
-  ];
+  return [buildAcmeChallengeDnsRecord(domainName), buildSiteDnsRecord(domainName)];
 }
 
 /**
@@ -85,16 +82,17 @@ function buildDnsRecords(domainName) {
 async function resolveDnsRecord(dnsRecord) {
   try {
     // Trying to reduce how long this takes, not sure this actually helps
-    const resolver = new dns.Resolver({ timeout: 2000, tries: 2 });
+    const resolver = new dns.Resolver({
+      timeout: 2000,
+      tries: 2,
+    });
     const values = await resolver.resolve(dnsRecord.name, dnsRecord.type);
 
     if (values.includes(dnsRecord.target)) {
       return [DnsResultState.Success];
     }
 
-    const message = values.length > 0
-      ? `Found [${values.join(', ')}]`
-      : 'Record not set';
+    const message = values.length > 0 ? `Found [${values.join(', ')}]` : 'Record not set';
 
     return [DnsResultState.Pending, message];
   } catch (error) {
@@ -126,10 +124,7 @@ async function checkDnsRecord(dnsRecord) {
  * @param {string} domainName
  */
 function checkDnsRecords(domainName) {
-  return Promise.all(
-    buildDnsRecords(domainName)
-      .map(checkDnsRecord)
-  );
+  return Promise.all(buildDnsRecords(domainName).map(checkDnsRecord));
 }
 
 /**
@@ -144,8 +139,8 @@ function checkAcmeChallengeDnsRecord(domainName) {
  */
 function canProvision(dnsResults) {
   return dnsResults
-    .filter(dnsResult => dnsResult.record.purpose === DnsRecordPurpose.AcmeChallenge)
-    .every(dnsResult => dnsResult.state === DnsResultState.Success);
+    .filter((dnsResult) => dnsResult.record.purpose === DnsRecordPurpose.AcmeChallenge)
+    .every((dnsResult) => dnsResult.state === DnsResultState.Success);
 }
 
 /**

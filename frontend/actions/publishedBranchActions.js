@@ -17,7 +17,6 @@ const dispatchPublishedBranchesReceivedAction = (branches) => {
 export default {
   fetchPublishedBranches(site) {
     dispatchPublishedBranchesFetchStartedAction();
-    return api.fetchPublishedBranches(site)
-      .then(dispatchPublishedBranchesReceivedAction);
+    return api.fetchPublishedBranches(site).then(dispatchPublishedBranchesReceivedAction);
   },
 };

@@ -22,7 +22,8 @@ const dispatchGithubBranchesFetchError = (error) => {
 export default {
   fetchBranches(site) {
     dispatchGithubBranchesFetchStartedAction();
-    return github.fetchBranches(site)
+    return github
+      .fetchBranches(site)
       .then(dispatchGithubBranchesReceivedAction)
       .catch(dispatchGithubBranchesFetchError);
   },

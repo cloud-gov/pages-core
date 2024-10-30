@@ -10,7 +10,7 @@ const initialDomainsState = {
   data: [],
 };
 
-const initialDomainState = siteId => ({
+const initialDomainState = (siteId) => ({
   error: null,
   data: {
     siteId,
@@ -26,18 +26,24 @@ export const useSiteDomains = (siteId, domainId) => {
     api
       .fetchSiteDomains(siteId)
       .then((results) => {
-        setDomains({ ...domains, isLoading: false, data: results });
+        setDomains({
+          ...domains,
+          isLoading: false,
+          data: results,
+        });
       })
-      .catch(error => setDomains({
-        ...domains,
-        isLoading: false,
-        state: 'error',
-        error: error.message,
-      }));
+      .catch((error) =>
+        setDomains({
+          ...domains,
+          isLoading: false,
+          state: 'error',
+          error: error.message,
+        }),
+      );
   }, [siteId, domainId]);
 
   function removeDomain(id) {
-    const filtered = domains.data.filter(d => d.id !== id);
+    const filtered = domains.data.filter((d) => d.id !== id);
     return setDomains({
       ...domains,
       data: filtered,
@@ -45,7 +51,7 @@ export const useSiteDomains = (siteId, domainId) => {
   }
 
   function deleteSiteDomain(id) {
-    const selected = domains.data.find(d => d.id === id);
+    const selected = domains.data.find((d) => d.id === id);
 
     if (!selected) {
       return window.alert('This custom domain was not found.');
@@ -54,25 +60,28 @@ export const useSiteDomains = (siteId, domainId) => {
     if (selected.state !== 'pending') {
       window.alert(
         `You cannot delete this custom domain since it is ${selected.state}.
-        Please email pages-support@cloud.gov to take down ${selected.names}`
+        Please email pages-support@cloud.gov to take down ${selected.names}`,
       );
     }
 
     if (
-      selected.state === 'pending'
-      && window.confirm(
-        `Are you sure you want to delete the custom domain ${selected.names}?`
+      selected.state === 'pending' &&
+      window.confirm(
+        `Are you sure you want to delete the custom domain ${selected.names}?`,
       )
     ) {
       return api
         .deleteSiteDomain(siteId, id)
         .then(() => removeDomain(id))
-        .catch(error => setDomains({ ...domains, error }));
+        .catch((error) =>
+          setDomains({
+            ...domains,
+            error,
+          }),
+        );
     }
 
-    return window.confirm(
-      `Unable to delete the custom domain ${selected.names}?`
-    );
+    return window.confirm(`Unable to delete the custom domain ${selected.names}?`);
   }
 
   return {
@@ -90,9 +99,7 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
     noPreviews: true,
   });
   const { domains } = useSiteDomains(siteId);
-  const [availableConfigs, setAvailableConfigs] = useState(
-    siteBranchConfigs.data
-  );
+  const [availableConfigs, setAvailableConfigs] = useState(siteBranchConfigs.data);
   const [domain, setDomain] = useState(initialDomainState);
 
   useEffect(() => {
@@ -100,33 +107,40 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
       api
         .fetchSiteDomains(siteId)
         .then((results) => {
-          const currentDomain = results.find(r => r.id === domainId);
+          const currentDomain = results.find((r) => r.id === domainId);
 
           if (!currentDomain) {
             setDomain({
               ...domain,
-              error: { message: 'No domain found with this ID.' },
+              error: {
+                message: 'No domain found with this ID.',
+              },
             });
           } else {
-            setDomain({ ...domain, data: currentDomain });
+            setDomain({
+              ...domain,
+              data: currentDomain,
+            });
           }
         })
-        .catch(error => setDomain({
-          ...domain,
-          isLoading: false,
-          error: error.message,
-        }));
+        .catch((error) =>
+          setDomain({
+            ...domain,
+            isLoading: false,
+            error: error.message,
+          }),
+        );
     }
   }, [siteId, domainId]);
 
   useEffect(() => {
     if (domains.data && siteBranchConfigs.data) {
       const otherDomains = domains.data
-        .filter(d => d.id !== domainId)
-        .map(d => d.siteBranchConfigId);
+        .filter((d) => d.id !== domainId)
+        .map((d) => d.siteBranchConfigId);
 
       const updatedAvailable = siteBranchConfigs.data.filter(
-        sbc => !otherDomains.includes(sbc.id)
+        (sbc) => !otherDomains.includes(sbc.id),
       );
 
       setAvailableConfigs(updatedAvailable);
@@ -135,26 +149,40 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
 
   function setDomainValues({ names, siteBranchConfigId }) {
     const updated = _.omit(
-      { names, siteBranchConfigId },
-      x => x === undefined || x === null
+      {
+        names,
+        siteBranchConfigId,
+      },
+      (x) => x === undefined || x === null,
     );
 
     return setDomain({
       ...domain,
-      data: { ...domain.data, ...updated },
+      data: {
+        ...domain.data,
+        ...updated,
+      },
     });
   }
 
   function createSiteDomain({ names, siteBranchConfigId }) {
     return api
       .createSiteDomain(siteId, names, siteBranchConfigId)
-      .then(results => setDomain({ ...domain, isLoading: false, data: results }))
+      .then((results) =>
+        setDomain({
+          ...domain,
+          isLoading: false,
+          data: results,
+        }),
+      )
       .then(() => navigate(`/sites/${siteId}/custom-domains`))
-      .catch(error => setDomain({
-        ...domain,
-        isLoading: false,
-        error: error.message,
-      }));
+      .catch((error) =>
+        setDomain({
+          ...domain,
+          isLoading: false,
+          error: error.message,
+        }),
+      );
   }
 
   function updateSiteDomain() {
@@ -171,12 +199,17 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
           }
         })
         .then(() => navigate(`/sites/${siteId}/custom-domains`))
-        .catch(error => setDomain({ ...domain, error }));
+        .catch((error) =>
+          setDomain({
+            ...domain,
+            error,
+          }),
+        );
     }
 
     return window.alert(
       `You cannot edit this custom domain since it is ${domain.state}.
-        Please email pages-support@cloud.gov to edit ${domain.names}`
+        Please email pages-support@cloud.gov to edit ${domain.names}`,
     );
   }
 

@@ -27,8 +27,14 @@ const SiteDestroyer = proxyquire('../../../../api/services/SiteDestroyer', stubs
 describe('SiteDestroyer', () => {
   afterEach(async () => {
     await Promise.all([
-      Site.truncate({ force: true, cascade: true }),
-      User.truncate({ force: true, cascade: true }),
+      Site.truncate({
+        force: true,
+        cascade: true,
+      }),
+      User.truncate({
+        force: true,
+        cascade: true,
+      }),
     ]);
   });
 
@@ -47,7 +53,9 @@ describe('SiteDestroyer', () => {
 
       const result = await SiteDestroyer.destroySite(site, user);
 
-      await site.reload({ paranoid: false });
+      await site.reload({
+        paranoid: false,
+      });
 
       expect(result).to.deep.eq(['ok']);
       expect(site.isSoftDeleted()).to.be.true;
@@ -55,7 +63,7 @@ describe('SiteDestroyer', () => {
     });
 
     it('throws an error when the site cannot be destroyed', async () => {
-      const error = await SiteDestroyer.destroySite(null, null).catch(e => e);
+      const error = await SiteDestroyer.destroySite(null, null).catch((e) => e);
 
       expect(error).to.be.an('error');
       sinon.assert.notCalled(SiteDestroyer.queueDestroySiteInfra);
@@ -68,7 +76,9 @@ describe('SiteDestroyer', () => {
 
       const result = await SiteDestroyer.destroySite(site, user);
 
-      await site.reload({ paranoid: false });
+      await site.reload({
+        paranoid: false,
+      });
 
       expect(result[0]).to.eq('error');
       expect(result[1]).to.have.string(domain.names);
@@ -77,27 +87,34 @@ describe('SiteDestroyer', () => {
     });
   });
 
-  // TODO: move this to worker tests? the worker code is responsible for calling mailer/slacker now
+  // TODO: move this to worker tests?
+  // the worker code is responsible for calling mailer/slacker now
   describe('.destroySiteInfra(site, user)', () => {
     afterEach(() => {
-      // sinon.resetHistory() doesn't work here, maybe bc the stubs are created outside of the
+      // sinon.resetHistory() doesn't work here
+      // maybe bc the stubs are created outside of the
       // test case?
       stubs['./GitHub'].deleteWebhook.resetHistory();
       stubs['./S3SiteRemover'].removeSite.resetHistory();
       stubs['./S3SiteRemover'].removeInfrastructure.resetHistory();
     });
 
-    it('removes the infra AND deletes the webhook when the user is provided', async () => {
-      const [site, user] = await Promise.all([
-        factory.site(),
-        factory.user(),
-      ]);
+    it(`removes the infra AND deletes
+        the webhook when the user is provided`, async () => {
+      const [site, user] = await Promise.all([factory.site(), factory.user()]);
 
       await SiteDestroyer.destroySiteInfra(site, user);
 
-      sinon.assert.calledOnceWithExactly(stubs['./GitHub'].deleteWebhook, site, user.githubAccessToken);
+      sinon.assert.calledOnceWithExactly(
+        stubs['./GitHub'].deleteWebhook,
+        site,
+        user.githubAccessToken,
+      );
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
-      sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeInfrastructure, site);
+      sinon.assert.calledOnceWithExactly(
+        stubs['./S3SiteRemover'].removeInfrastructure,
+        site,
+      );
     });
 
     it('removes the infra when the user is not provided', async () => {
@@ -106,7 +123,10 @@ describe('SiteDestroyer', () => {
       await SiteDestroyer.destroySiteInfra(site, null);
 
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
-      sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeInfrastructure, site);
+      sinon.assert.calledOnceWithExactly(
+        stubs['./S3SiteRemover'].removeInfrastructure,
+        site,
+      );
     });
   });
 });

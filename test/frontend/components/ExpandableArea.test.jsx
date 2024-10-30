@@ -9,7 +9,7 @@ describe('<ExpandableArea/>', () => {
     const wrapper = shallow(
       <ExpandableArea title="Test Title">
         <p>hello</p>
-      </ExpandableArea>
+      </ExpandableArea>,
     );
 
     expect(wrapper.exists()).to.be.true;

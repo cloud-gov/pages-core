@@ -6,7 +6,7 @@ const QueueWorker = require('../../../api/workers/QueueWorker');
 describe('QueueWorker', () => {
   describe('new QueueWorker()', () => {
     const queueName = 'queue';
-    const processor = () => { };
+    const processor = () => {};
 
     let queueWorker;
 
@@ -14,7 +14,8 @@ describe('QueueWorker', () => {
       queueWorker = new QueueWorker(queueName, connection, processor);
     });
 
-    it('creates a Bull MQ Worker QueueWorker with the provided arguments and defaults', () => {
+    it(`creates a Bull MQ Worker QueueWorker
+        with the provided arguments and defaults`, () => {
       expect(queueWorker.name).to.eq(queueName);
       expect(queueWorker.processFn).to.eq(processor);
       expect(queueWorker.opts.concurrency).to.eq(5);

@@ -3,8 +3,16 @@ const { BuildTaskType } = require('../models');
 const buildTaskTypeSerializer = require('../serializers/build-task-type');
 
 function configToRuleArray(config) {
-  // in our internal config, the rules are stored as arrays on an object with their TaskType
-  return Object.keys(config).map(type => config[type].map(rule => ({ ...rule, type }))).flat();
+  // in our internal config, the rules are stored
+  // as arrays on an object with their TaskType
+  return Object.keys(config)
+    .map((type) =>
+      config[type].map((rule) => ({
+        ...rule,
+        type,
+      })),
+    )
+    .flat();
 }
 
 module.exports = wrapHandlers({

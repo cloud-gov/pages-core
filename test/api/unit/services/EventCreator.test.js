@@ -15,7 +15,9 @@ describe('EventCreator', () => {
   describe('.audit', () => {
     it('.audit event created', async () => {
       const user = await factory.user();
-      const event = await  audit('authentication', user, 'audit message', { hi: 'bye' });
+      const event = await audit('authentication', user, 'audit message', {
+        hi: 'bye',
+      });
       expect(event.type).to.equal('audit');
       expect(event.label).to.equal('authentication');
       expect(event.model).to.equal('User');
@@ -34,7 +36,7 @@ describe('EventCreator', () => {
   describe('.error', () => {
     const err = new Error('not working');
     it('.error event created', async () => {
-      const event = await error('request-handler', err, { bye: 'hi' })
+      const event = await error('request-handler', err, { bye: 'hi' });
       expect(event.type).to.equal('error');
       expect(event.label).to.equal('request-handler');
       expect(event.model).to.be.null;
@@ -46,7 +48,10 @@ describe('EventCreator', () => {
 
     it('.error event created - w/ message', async () => {
       const message = 'override error message';
-      const event = await error('request-handler', err, { bye: 'hi', message });
+      const event = await error('request-handler', err, {
+        bye: 'hi',
+        message,
+      });
       expect(event.type).to.equal('error');
       expect(event.label).to.equal('request-handler');
       expect(event.model).to.be.null;

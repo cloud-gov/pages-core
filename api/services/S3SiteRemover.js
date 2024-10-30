@@ -15,10 +15,12 @@ const handleError = (err) => {
 
 const apiClient = new CloudFoundryAPIClient();
 
-const removeInfrastructure = site => apiClient.deleteRoute(site.awsBucketName)
-  .catch(handleError) // if route does not exist continue to delete service instance
-  .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
-  .catch(handleError); // if service instance does not exist handle error & delete site
+const removeInfrastructure = (site) =>
+  apiClient
+    .deleteRoute(site.awsBucketName)
+    .catch(handleError) // if route does not exist continue to delete service instance
+    .then(() => apiClient.deleteServiceInstance(site.s3ServiceName))
+    .catch(handleError); // if service instance does not exist handle error & delete site
 
 /**
   Deletes all of the objects in the S3 bucket belonging to the specified site.

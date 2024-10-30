@@ -1,4 +1,4 @@
-const ensureOrigin = expectedOrigin => (req, res, next) => {
+const ensureOrigin = (expectedOrigin) => (req, res, next) => {
   if (req.headers.origin !== expectedOrigin) {
     return res.unauthorized();
   }

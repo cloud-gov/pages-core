@@ -15,9 +15,14 @@ describe('Build Task model', () => {
       startBuildTaskStub.resolves();
 
       const site = await factory.site();
-      const build = await factory.build({ site });
+      const build = await factory.build({
+        site,
+      });
       const buildTaskType = await factory.buildTaskType();
-      const buildTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
+      const buildTask = await factory.buildTask({
+        build,
+        buildTaskTypeId: buildTaskType.id,
+      });
       await buildTask.enqueue();
       await buildTask.reload();
 
@@ -41,26 +46,52 @@ describe('Build Task model', () => {
       startBuildTaskStub.resolves();
 
       const site = await factory.site();
-      let build = await factory.build({ site });
+      let build = await factory.build({
+        site,
+      });
       const buildTaskType = await factory.buildTaskType();
-      const buildTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
+      const buildTask = await factory.buildTask({
+        build,
+        buildTaskTypeId: buildTaskType.id,
+      });
 
       // add N extra for the same site
       const N = 5;
 
-      await Promise.all(Array(N).fill(0).map(async (_) => {
-        build = await factory.build({ site });
-        return factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
-      }));
+      await Promise.all(
+        Array(N)
+          .fill(0)
+          .map(async (_) => {
+            build = await factory.build({ site });
+            return factory.buildTask({
+              build,
+              buildTaskTypeId: buildTaskType.id,
+            });
+          }),
+      );
 
       // add two complete task to check our math (they shouldn't count in priority)
-      build = await factory.build({ site });
-      const successfulTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
-      successfulTask.update({ status: BuildTask.Statuses.Success });
+      build = await factory.build({
+        site,
+      });
+      const successfulTask = await factory.buildTask({
+        build,
+        buildTaskTypeId: buildTaskType.id,
+      });
+      successfulTask.update({
+        status: BuildTask.Statuses.Success,
+      });
 
-      build = await factory.build({ site });
-      const errorTask = await factory.buildTask({ build, buildTaskTypeId: buildTaskType.id });
-      errorTask.update({ status: BuildTask.Statuses.Error });
+      build = await factory.build({
+        site,
+      });
+      const errorTask = await factory.buildTask({
+        build,
+        buildTaskTypeId: buildTaskType.id,
+      });
+      errorTask.update({
+        status: BuildTask.Statuses.Error,
+      });
 
       await buildTask.enqueue();
       await buildTask.reload();

@@ -13,19 +13,35 @@ describe('Mailer', () => {
       const subject = 'This is only a test';
       const html = '<p>For real, only a test<p>';
 
-      const mailer = new Mailer({ host, password, username });
+      const mailer = new Mailer({
+        host,
+        password,
+        username,
+      });
 
+      const base64 = Buffer.from(`${username}:${password}`).toString('Base64');
       const scope = nock(host, {
         reqheaders: {
-          authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('Base64')}`,
+          authorization: `Basic ${base64}`,
         },
       })
-        .post('/send', { html, subject, to })
+        .post('/send', {
+          html,
+          subject,
+          to,
+        })
         .reply(200);
 
-      const response = await mailer.send({ html, subject, to });
+      const response = await mailer.send({
+        html,
+        subject,
+        to,
+      });
 
-      expect(response).to.deep.eq({ data: '', status: 200 });
+      expect(response).to.deep.eq({
+        data: '',
+        status: 200,
+      });
       scope.done();
     });
   });

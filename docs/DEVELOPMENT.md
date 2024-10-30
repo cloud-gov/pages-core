@@ -87,6 +87,7 @@ For example:
 
 - Use `docker compose run --rm app yarn test` to run local testing on the app.
 - Use `docker compose run --rm app yarn lint` to check that your local changes meet our linting standards.
+- Use `docker compose run --rm app yarn format` to format your local changes based on our standards.
 
 Similarly you can run any command in the context of the database container `db` by running `docker compose run --rm db <THE COMMAND>`.
 
@@ -321,7 +322,7 @@ Note that the create/remove test user scripts only need to be run once per day t
 
 ### Linting
 
-We use [`eslint`](https://eslint.org/) and adhere to [Airbnb's eslint config](https://www.npmjs.com/package/eslint-config-airbnb) (with some [minor exceptions](https://github.com/cloud-gov/pages-core/blob/staging/.eslintrc.js#L2)) as recommended by the [18F Front End Guild](https://frontend.18f.gov/javascript/style/).
+We use [`eslint`](https://eslint.org/).
 
 Because this project was not initially written in a way that complies with our current linting standard, we are taking the strategy of bringing existing files into compliance as they are touched during normal feature development or bug fixing.
 
@@ -329,12 +330,6 @@ To lint the files in a branch, run:
 
 ```sh
 docker compose run --rm app yarn lint
-```
-
-`eslint` also has a helpful auto-fix command that can be run by:
-
-```sh
-docker compose run --rm app node_modules/.bin/eslint --fix path/to/file.js
 ```
 
 ## Feature Flags

@@ -4,10 +4,7 @@ import { currentSite, groupSitesByOrg } from '../../../frontend/selectors/site';
 describe('siteSelectors', () => {
   describe('.currentSite', () => {
     const state = {
-      data: [
-        { id: 2 },
-        { id: 3 },
-      ],
+      data: [{ id: 2 }, { id: 3 }],
     };
 
     it('returns the site for the given id', () => {
@@ -25,9 +22,18 @@ describe('siteSelectors', () => {
     const sites = {
       isLoading: true,
       data: [
-        { id: 1, organizationId: 1 },
-        { id: 2, organizationId: 1 },
-        { id: 3, organizationId: 2 },
+        {
+          id: 1,
+          organizationId: 1,
+        },
+        {
+          id: 2,
+          organizationId: 1,
+        },
+        {
+          id: 3,
+          organizationId: 2,
+        },
         { id: 4 },
       ],
     };
@@ -36,7 +42,7 @@ describe('siteSelectors', () => {
       const orgId = 1;
       const grouped = groupSitesByOrg(sites, orgId);
       expect(grouped.data).to.have.length(2);
-      grouped.data.map(group => expect(group.organizationId).to.equal(orgId));
+      grouped.data.map((group) => expect(group.organizationId).to.equal(orgId));
     });
 
     it('returns all sites with organization Id equals "all-options"', () => {

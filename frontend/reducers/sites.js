@@ -11,27 +11,35 @@ import {
   siteBasicAuthRemovedType as SITE_BASIC_AUTH_REMOVED,
 } from '../actions/actionCreators/siteActions';
 
-import {
-  httpErrorType as HTTP_ERROR,
-} from '../actions/actionCreators/alertActions';
+import { httpErrorType as HTTP_ERROR } from '../actions/actionCreators/alertActions';
 
 const initialState = {
   isLoading: false,
   data: undefined,
 };
 
-const mapPropertyToMatchingSite = (data, siteId, properties) => data.map((site) => {
-  if (site.id !== siteId) return site;
-  return { ...site, ...properties };
-});
+const mapPropertyToMatchingSite = (data, siteId, properties) =>
+  data.map((site) => {
+    if (site.id !== siteId) return site;
+    return {
+      ...site,
+      ...properties,
+    };
+  });
 
 export default function sites(state = initialState, action) {
   switch (action.type) {
     case HTTP_ERROR:
-      return { ...state, isLoading: false };
+      return {
+        ...state,
+        isLoading: false,
+      };
 
     case SITES_FETCH_STARTED:
-      return { ...state, isLoading: true };
+      return {
+        ...state,
+        isLoading: true,
+      };
 
     case SITES_RECEIVED: {
       const nextSites = action.sites || state.data;
@@ -43,7 +51,11 @@ export default function sites(state = initialState, action) {
     }
 
     case SITE_ADDED:
-      return { ...state, isLoading: false, data: state.data.concat(action.site || []) };
+      return {
+        ...state,
+        isLoading: false,
+        data: state.data.concat(action.site || []),
+      };
 
     case SITE_UPDATED:
     case SITE_BASIC_AUTH_REMOVED:
@@ -56,28 +68,29 @@ export default function sites(state = initialState, action) {
     case SITE_BRANCHES_RECEIVED:
       return {
         isLoading: false,
-        data: mapPropertyToMatchingSite(state.data, action.siteId, { branches: action.branches }),
+        data: mapPropertyToMatchingSite(state.data, action.siteId, {
+          branches: action.branches,
+        }),
       };
 
     case SITE_DELETED:
       return {
         isLoading: false,
-        data: state.data.filter(site => site.id !== action.siteId),
+        data: state.data.filter((site) => site.id !== action.siteId),
       };
 
     case SITE_USER_ADDED:
-      return action.site ? {
-        isLoading: false,
-        data: state.data.concat(action.site),
-      } : state;
+      return action.site
+        ? {
+            isLoading: false,
+            data: state.data.concat(action.site),
+          }
+        : state;
 
     case SITE_USER_REMOVED: {
       return {
         isLoading: false,
-        data: [
-          action.site,
-          ...state.data.filter(site => site.id !== action.site.id),
-        ],
+        data: [action.site, ...state.data.filter((site) => site.id !== action.site.id)],
       };
     }
 

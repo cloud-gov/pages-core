@@ -13,7 +13,12 @@ const config = require('../../config');
 const adminApi = require('../admin');
 const externalAuth = require('../external-auth');
 const {
-  cacheControl, devMiddleware, errorHandler, parseJson, xssProtection, fourOhFourHandler,
+  cacheControl,
+  devMiddleware,
+  errorHandler,
+  parseJson,
+  xssProtection,
+  fourOhFourHandler,
 } = require('../middlewares');
 const responses = require('../responses');
 const passport = require('../services/passport');

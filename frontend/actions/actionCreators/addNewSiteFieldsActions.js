@@ -10,6 +10,8 @@ const hideAddNewSiteFields = () => ({
 });
 
 export {
-  showAddNewSiteFields, showAddNewSiteFieldsType,
-  hideAddNewSiteFields, hideAddNewSiteFieldsType,
+  showAddNewSiteFields,
+  showAddNewSiteFieldsType,
+  hideAddNewSiteFields,
+  hideAddNewSiteFieldsType,
 };

@@ -15,14 +15,30 @@ export const useSiteBranchConfigs = (siteId, { noPreviews = false } = {}) => {
       .fetchSiteBranchConfigs(siteId)
       .then((results) => {
         if (noPreviews) {
-          const filtered = results.filter(r => r.context !== 'preview');
-          setConfigs({ ...siteBranchConfigs, isLoading: false, data: filtered });
+          const filtered = results.filter((r) => r.context !== 'preview');
+          setConfigs({
+            ...siteBranchConfigs,
+            isLoading: false,
+            data: filtered,
+          });
         } else {
-          setConfigs({ ...siteBranchConfigs, isLoading: false, data: results });
+          setConfigs({
+            ...siteBranchConfigs,
+            isLoading: false,
+            data: results,
+          });
         }
       })
-      .catch(error => setConfigs({ ...siteBranchConfigs, state: 'error', error: error.message }));
+      .catch((error) =>
+        setConfigs({
+          ...siteBranchConfigs,
+          state: 'error',
+          error: error.message,
+        }),
+      );
   }, [siteId]);
 
-  return { siteBranchConfigs };
+  return {
+    siteBranchConfigs,
+  };
 };

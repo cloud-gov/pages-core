@@ -23,7 +23,7 @@ export default {
         message,
         position: 'tr',
         autoDismiss: 0,
-      })
+      }),
     );
   },
 

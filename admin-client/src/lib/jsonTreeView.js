@@ -63,16 +63,24 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     name_ = undefined;
   }
 
-  let name; let value; let type; let oldType = null; let filterText = ''; let hidden = false;
+  let name;
+  let value;
+  let type;
+  let oldType = null;
+  let filterText = '';
+  let hidden = false;
   let readonly = parent_ ? parent_.readonly : true;
   let readonlyWhenFiltering = parent_ ? parent_.readonlyWhenFiltering : true;
   let alwaysShowRoot = false;
   let showCount = parent_ ? parent_.showCountOfObjectOrArray : true;
   let includingRootName = true;
-  const domEventListeners = []; const children = []; let expanded = false;
-  let edittingName = false; let edittingValue = false;
-  let nameEditable = true; let
-    valueEditable = true;
+  const domEventListeners = [];
+  const children = [];
+  let expanded = false;
+  let edittingName = false;
+  let edittingValue = false;
+  let nameEditable = true;
+  let valueEditable = true;
 
   const dom = {
     container: document.createElement('div'),
@@ -125,7 +133,8 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
       },
       set(ro) {
         readonly = setBit(readonly, 0, +ro);
-        readonly & 1 ? dom.container.classList.add('readonly')
+        readonly & 1
+          ? dom.container.classList.add('readonly')
           : dom.container.classList.remove('readonly');
         for (const i in children) {
           if (typeof children[i] === 'object') {
@@ -160,7 +169,8 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
       },
       set(h) {
         hidden = h;
-        h ? dom.container.classList.add('hidden')
+        h
+          ? dom.container.classList.add('hidden')
           : dom.container.classList.remove('hidden');
         if (!h) {
           parent_ && (parent_.hidden = h);
@@ -333,7 +343,6 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
       value: editField.bind(null, 'value'),
       enumerable: true,
     },
-
   });
 
   Object.keys(dom).forEach((k) => {
@@ -363,18 +372,14 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
   addDomEventListener(dom.name, 'dblclick', editField.bind(null, 'name'));
   addDomEventListener(dom.name, 'click', itemClicked.bind(null, 'name'));
   addDomEventListener(dom.name, 'blur', editFieldStop.bind(null, 'name'));
-  addDomEventListener(dom.name, 'keypress',
-    editFieldKeyPressed.bind(null, 'name'));
-  addDomEventListener(dom.name, 'keydown',
-    editFieldTabPressed.bind(null, 'name'));
+  addDomEventListener(dom.name, 'keypress', editFieldKeyPressed.bind(null, 'name'));
+  addDomEventListener(dom.name, 'keydown', editFieldTabPressed.bind(null, 'name'));
 
   addDomEventListener(dom.value, 'dblclick', editField.bind(null, 'value'));
   addDomEventListener(dom.value, 'click', itemClicked.bind(null, 'value'));
   addDomEventListener(dom.value, 'blur', editFieldStop.bind(null, 'value'));
-  addDomEventListener(dom.value, 'keypress',
-    editFieldKeyPressed.bind(null, 'value'));
-  addDomEventListener(dom.value, 'keydown',
-    editFieldTabPressed.bind(null, 'value'));
+  addDomEventListener(dom.value, 'keypress', editFieldKeyPressed.bind(null, 'value'));
+  addDomEventListener(dom.value, 'keydown', editFieldTabPressed.bind(null, 'value'));
   addDomEventListener(dom.value, 'keydown', numericValueKeyDown);
 
   // addDomEventListener(dom.insert, 'click', onInsertClick);
@@ -385,12 +390,12 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
 
   function setBit(n, i, b) {
     let j = 0;
-    while ((n >> j << j)) {
+    while ((n >> j) << j) {
       j++;
     }
     return i >= j
-      ? (n | +b << i)
-      : (n >> (i + 1) << (i + 1)) | (n % (n >> i << i)) | (+b << i);
+      ? n | (+b << i)
+      : ((n >> (i + 1)) << (i + 1)) | n % ((n >> i) << i) | (+b << i);
   }
 
   function refresh(silent) {
@@ -479,8 +484,8 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
   }
 
   function destroy() {
-    let child; let
-      event;
+    let child;
+    let event;
 
     while (event === domEventListeners.pop()) {
       event.element.removeEventListener(event.name, event.fn);
@@ -510,8 +515,8 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
 
   function setValue(newValue) {
     let oldValue = value;
-    let str; let
-      len;
+    let str;
+    let len;
 
     if (isRoot_ && !oldValue) {
       oldValue = newValue;
@@ -528,12 +533,12 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
         break;
       case 'object':
         len = Object.keys(newValue).length;
-        str = showCount ? `Object[${len}]` : (len < 1 ? '{}' : '');
+        str = showCount ? `Object[${len}]` : len < 1 ? '{}' : '';
         break;
 
       case 'array':
         len = newValue.length;
-        str = showCount ? `Array[${len}]` : (len < 1 ? '[]' : '');
+        str = showCount ? `Array[${len}]` : len < 1 ? '[]' : '';
         break;
 
       default:
@@ -569,15 +574,15 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
   }
 
   function updateObjectChildCount() {
-    let str = ''; let
-      len;
+    let str = '';
+    let len;
     if (type === 'object') {
       len = Object.keys(value).length;
-      str = showCount ? `Object[${len}]` : (len < 1 ? '{}' : '');
+      str = showCount ? `Object[${len}]` : len < 1 ? '{}' : '';
     }
     if (type === 'array') {
       len = value.length;
-      str = showCount ? `Array[${len}]` : (len < 1 ? '[]' : '');
+      str = showCount ? `Array[${len}]` : len < 1 ? '[]' : '';
     }
     dom.value.innerText = str;
   }
@@ -619,8 +624,14 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     }
 
     child.destroy();
-    child.emit('delete', child, [child.name], child.value,
-      child.parent.isRoot ? child.parent.oldType : child.parent.type, true);
+    child.emit(
+      'delete',
+      child,
+      [child.name],
+      child.value,
+      child.parent.isRoot ? child.parent.oldType : child.parent.type,
+      true,
+    );
     child.removeAllListeners();
   }
 
@@ -638,7 +649,7 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     const editable = field == 'name' ? nameEditable : valueEditable;
     const element = dom[field];
 
-    if (!editable && (parent_ && parent_.type === 'array')) {
+    if (!editable && parent_ && parent_.type === 'array') {
       if (!parent_.inserting) {
         // throw new Error('Cannot edit an array index.');
         return;
@@ -664,8 +675,12 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
   }
 
   function itemClicked() {
-    self.emit('click', self,
-      !self.withRootName && self.isRoot ? [''] : [self.name], self.value);
+    self.emit(
+      'click',
+      self,
+      !self.withRootName && self.isRoot ? [''] : [self.name],
+      self.value,
+    );
   }
 
   function editFieldStop(field) {
@@ -732,8 +747,8 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
   }
 
   function numericValueKeyDown(e) {
-    let increment = 0; let
-      currentValue;
+    let increment = 0;
+    let currentValue;
 
     if (type != 'number') {
       return;
@@ -872,7 +887,7 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     const key = child.name;
 
     if (passive) {
-      if (self.withRootName/* || !self.isRoot */) {
+      if (self.withRootName /* || !self.isRoot */) {
         keyPath.unshift(name);
       }
       self.emit('delete', child, keyPath, deletedValue, parentType, passive);
@@ -917,7 +932,11 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
 
   function addDomEventListener(element, name, fn) {
     element.addEventListener(name, fn);
-    domEventListeners.push({ element, name, fn });
+    domEventListeners.push({
+      element,
+      name,
+      fn,
+    });
   }
 }
 

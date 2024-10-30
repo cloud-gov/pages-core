@@ -3,7 +3,9 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 
-import ReduxFormBasicAuthSettingsForm, { BasicAuthSettingsForm } from '../../../../../frontend/components/site/SiteSettings/BasicAuthSettingsForm';
+import ReduxFormBasicAuthSettingsForm, {
+  BasicAuthSettingsForm,
+} from '../../../../../frontend/components/site/SiteSettings/BasicAuthSettingsForm';
 
 const stubs = {};
 
@@ -37,12 +39,20 @@ describe('<BasicAuthSettingsForm/>', () => {
 
     it('a `username` Field', () => {
       const wrapper = shallow(<BasicAuthSettingsForm {...defaultProps} />);
-      expect(wrapper.find({ name: 'username' })).to.have.lengthOf(1);
+      expect(
+        wrapper.find({
+          name: 'username',
+        }),
+      ).to.have.lengthOf(1);
     });
 
     it('a `password` Field', () => {
       const wrapper = shallow(<BasicAuthSettingsForm {...defaultProps} />);
-      expect(wrapper.find({ name: 'password' })).to.have.lengthOf(1);
+      expect(
+        wrapper.find({
+          name: 'password',
+        }),
+      ).to.have.lengthOf(1);
     });
 
     it('a disabled submit button', () => {
@@ -53,8 +63,13 @@ describe('<BasicAuthSettingsForm/>', () => {
     });
 
     it('an enabled submit button', () => {
-      const props = {...defaultProps};
-      props.initialValues = { username: 'username', password: 'password' };
+      const props = {
+        ...defaultProps,
+      };
+      props.initialValues = {
+        username: 'username',
+        password: 'password',
+      };
       props.pristine = false;
       const wrapper = shallow(<BasicAuthSettingsForm {...props} />);
       const submitButton = wrapper.find('button[type="submit"]');
@@ -63,8 +78,13 @@ describe('<BasicAuthSettingsForm/>', () => {
     });
 
     it('an disabled submit button due to invalid username', () => {
-      const props = {...defaultProps};
-      props.initialValues = { username: 'use', password: 'password' };
+      const props = {
+        ...defaultProps,
+      };
+      props.initialValues = {
+        username: 'use',
+        password: 'password',
+      };
       props.pristine = false;
       const wrapper = shallow(<BasicAuthSettingsForm {...props} />);
       const submitButton = wrapper.find('button[type="submit"]');
@@ -73,8 +93,13 @@ describe('<BasicAuthSettingsForm/>', () => {
     });
 
     it('an disabled submit button due to invalid password', () => {
-      const props = {...defaultProps};
-      props.initialValues = { username: 'username', password: 'passw' };
+      const props = {
+        ...defaultProps,
+      };
+      props.initialValues = {
+        username: 'username',
+        password: 'passw',
+      };
       props.pristine = false;
       const wrapper = shallow(<BasicAuthSettingsForm {...props} />);
       const submitButton = wrapper.find('button[type="submit"]');
@@ -84,7 +109,10 @@ describe('<BasicAuthSettingsForm/>', () => {
 
     describe('when `submitting` is true', () => {
       it('a disabled submit button', () => {
-        const props = { ...defaultProps, submitting: true };
+        const props = {
+          ...defaultProps,
+          submitting: true,
+        };
         const wrapper = shallow(<BasicAuthSettingsForm {...props} />);
         const submitButton = wrapper.find('button[type="submit"]');
         expect(submitButton).to.have.lengthOf(1);

@@ -21,27 +21,35 @@ function _setSearchString(query = {}) {
   return search.toString();
 }
 
-async function _fetch(path, fetchOpts = {}, apiOpts = { handleError: true }) {
-  const fetchOptions = { ...defaultOptions, ...fetchOpts };
+async function _fetch(
+  path,
+  fetchOpts = {},
+  apiOpts = {
+    handleError: true,
+  },
+) {
+  const fetchOptions = {
+    ...defaultOptions,
+    ...fetchOpts,
+  };
   if (!['GET', 'HEAD', 'OPTIONS'].includes(fetchOptions.method)) {
     fetchOptions.headers['x-csrf-token'] = session.csrfToken();
   }
 
-  let request = fetch(`${apiUrl}/admin${path}`, fetchOptions)
-    .then(async (r) => {
-      if (r.ok) return r.json();
-      if (r.status === 401) {
-        authLogout();
-        return null;
-      }
-      if (r.status === 422) {
-        const json = await r.json();
-        const error = new Error(json.message || r.statusText);
-        error.errors = json.errors;
-        throw error;
-      }
-      throw new Error(r.statusText);
-    });
+  let request = fetch(`${apiUrl}/admin${path}`, fetchOptions).then(async (r) => {
+    if (r.ok) return r.json();
+    if (r.status === 401) {
+      authLogout();
+      return null;
+    }
+    if (r.status === 422) {
+      const json = await r.json();
+      const error = new Error(json.message || r.statusText);
+      error.errors = json.errors;
+      throw error;
+    }
+    throw new Error(r.statusText);
+  });
 
   if (apiOpts.handleError) {
     request = request.catch((e) => {
@@ -55,24 +63,25 @@ async function _fetch(path, fetchOpts = {}, apiOpts = { handleError: true }) {
 }
 
 async function _fetchAttachedFile(path) {
-  const fetchOptions = { ...defaultOptions };
+  const fetchOptions = {
+    ...defaultOptions,
+  };
   fetchOptions.headers['x-csrf-token'] = session.csrfToken();
 
-  let request = fetch(`${apiUrl}/admin${path}`, fetchOptions)
-    .then(async (r) => {
-      if (r.ok) return r.text();
-      if (r.status === 401) {
-        authLogout();
-        return null;
-      }
-      if (r.status === 422) {
-        const json = await r.json();
-        const error = new Error(json.message || r.statusText);
-        error.errors = json.errors;
-        throw error;
-      }
-      throw new Error(r.statusText);
-    });
+  let request = fetch(`${apiUrl}/admin${path}`, fetchOptions).then(async (r) => {
+    if (r.ok) return r.text();
+    if (r.status === 401) {
+      authLogout();
+      return null;
+    }
+    if (r.status === 422) {
+      const json = await r.json();
+      const error = new Error(json.message || r.statusText);
+      error.errors = json.errors;
+      throw error;
+    }
+    throw new Error(r.statusText);
+  });
 
   request = request.catch((e) => {
     notification.setError(`API request failed: ${e.message}`);
@@ -84,7 +93,10 @@ async function _fetchAttachedFile(path) {
 }
 
 function destroy(path, body) {
-  return _fetch(path, { method: 'DELETE', body: JSON.stringify(body) });
+  return _fetch(path, {
+    method: 'DELETE',
+    body: JSON.stringify(body),
+  });
 }
 
 function get(path, query) {
@@ -101,11 +113,21 @@ function getAttachedFile(path) {
 }
 
 function post(path, body = {}, opts = {}) {
-  return _fetch(path, { method: 'POST', body: JSON.stringify(body) }, opts);
+  return _fetch(
+    path,
+    {
+      method: 'POST',
+      body: JSON.stringify(body),
+    },
+    opts,
+  );
 }
 
 function put(path, body) {
-  return _fetch(path, { method: 'PUT', body: JSON.stringify(body) });
+  return _fetch(path, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
 }
 
 async function destroySite(id) {
@@ -117,7 +139,9 @@ async function fetchMe() {
 }
 
 function fetchBuildLogEventSource(id, onMessage) {
-  const es = new EventSource(`${apiUrl}/admin/builds/${id}/log`, { withCredentials: true });
+  const es = new EventSource(`${apiUrl}/admin/builds/${id}/log`, {
+    withCredentials: true,
+  });
   es.addEventListener('message', onMessage);
   es.addEventListener('error', (error) => {
     console.error('EventSource failed:', error);

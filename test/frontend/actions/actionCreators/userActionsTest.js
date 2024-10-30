@@ -1,10 +1,15 @@
 import { expect } from 'chai';
 import {
-  userReceived, userReceivedType,
-  userFetchStarted, userFetchStartedType,
-  userActionFetchStarted, userActionFetchStartedType,
-  userActionReceived, userActionReceivedType,
-  userSettingsUpdated, userSettingsUpdatedType,
+  userReceived,
+  userReceivedType,
+  userFetchStarted,
+  userFetchStartedType,
+  userActionFetchStarted,
+  userActionFetchStartedType,
+  userActionReceived,
+  userActionReceivedType,
+  userSettingsUpdated,
+  userSettingsUpdatedType,
 } from '../../../../frontend/actions/actionCreators/userActions';
 
 describe('userActions actionCreators', () => {

@@ -4,14 +4,15 @@ const request = require('supertest');
 const app = require('../../../app');
 const config = require('../../../config');
 const { authenticatedSession } = require('../support/session');
-const { sessionForCookie, sessionCookieFromResponse } = require('../support/cookieSession');
+const {
+  sessionForCookie,
+  sessionCookieFromResponse,
+} = require('../support/cookieSession');
 
 describe('Main Site', () => {
   describe('Home /', () => {
     it('should work', () => {
-      request(app)
-        .get('/')
-        .expect(200);
+      request(app).get('/').expect(200);
     });
 
     it('should redirect to /sites when authenticated', async () => {
@@ -27,9 +28,7 @@ describe('Main Site', () => {
 
   describe('App /404', () => {
     it('should redirect to / with a flash error when not authenticated', async () => {
-      const response = await request(app)
-        .get('/blahblahpage')
-        .expect(404);
+      const response = await request(app).get('/blahblahpage').expect(404);
 
       expect(/Log in with (Github|cloud\.gov)/.test(response.text)).to.be.true;
     });
@@ -40,21 +39,19 @@ describe('Main Site', () => {
         .get('/blahblahpage')
         .set('Cookie', cookie)
         .expect(404);
-      expect(response.text.indexOf('Can\'t find the page you\'re looking for?')).to.be.above(-1);
+      expect(
+        response.text.indexOf("Can't find the page you're looking for?"),
+      ).to.be.above(-1);
     });
   });
 
   describe('options method', () => {
     it('should respond with a 404 for an options request without path', async () => {
-      await request(app)
-        .options('/')
-        .expect(404);
+      await request(app).options('/').expect(404);
     });
 
     it('should respond with a 404 for an options request with a path', async () => {
-      await request(app)
-        .options('/boo/hoo')
-        .expect(404);
+      await request(app).options('/boo/hoo').expect(404);
     });
   });
   describe('App /sites', () => {
@@ -70,7 +67,8 @@ describe('Main Site', () => {
         .then((sess) => {
           expect(sess.flash.error.length).to.equal(1);
           expect(sess.flash.error[0]).to.equal(
-            'You are not permitted to perform this action. Are you sure you are logged in?'
+            // eslint-disable-next-line max-len
+            'You are not permitted to perform this action. Are you sure you are logged in?',
           );
           done();
         })
@@ -79,21 +77,17 @@ describe('Main Site', () => {
 
     it('should work when authenticated', (done) => {
       authenticatedSession()
-        .then(cookie => request(app)
-          .get('/sites')
-          .set('Cookie', cookie)
-          .expect(200))
+        .then((cookie) => request(app).get('/sites').set('Cookie', cookie).expect(200))
         .then(() => done());
     });
 
     it('should have app content', (done) => {
       authenticatedSession()
-        .then(cookie => request(app)
-          .get('/sites')
-          .set('Cookie', cookie)
-          .expect(200))
+        .then((cookie) => request(app).get('/sites').set('Cookie', cookie).expect(200))
         .then((response) => {
-          expect(response.text.indexOf('<div id="js-app" class="padding-top-2"></div>')).to.be.above(-1);
+          expect(
+            response.text.indexOf('<div id="js-app" class="padding-top-2"></div>'),
+          ).to.be.above(-1);
           done();
         })
         .catch(done);
@@ -101,10 +95,7 @@ describe('Main Site', () => {
 
     it('should contain references to built assets', (done) => {
       authenticatedSession()
-        .then(cookie => request(app)
-          .get('/sites')
-          .set('Cookie', cookie)
-          .expect(200))
+        .then((cookie) => request(app).get('/sites').set('Cookie', cookie).expect(200))
         .then((response) => {
           const stylesBundleRe = /<link rel="stylesheet" href="\/styles\.css">/;
           expect(response.text.search(stylesBundleRe)).to.be.above(-1);
@@ -119,10 +110,7 @@ describe('Main Site', () => {
 
     it('should contain a csrfToken', (done) => {
       authenticatedSession()
-        .then(cookie => request(app)
-          .get('/sites')
-          .set('Cookie', cookie)
-          .expect(200))
+        .then((cookie) => request(app).get('/sites').set('Cookie', cookie).expect(200))
         .then((response) => {
           const csrfTokenRe = /window.CSRF_TOKEN = "[a-z0-9_-]+";/i;
           expect(response.text.search(csrfTokenRe)).to.be.above(-1);
@@ -133,10 +121,7 @@ describe('Main Site', () => {
 
     it('should contain front end config values', (done) => {
       authenticatedSession()
-        .then(cookie => request(app)
-          .get('/sites')
-          .set('Cookie', cookie)
-          .expect(200))
+        .then((cookie) => request(app).get('/sites').set('Cookie', cookie).expect(200))
         .then((response) => {
           expect(response.text.search('FRONTEND_CONFIG')).to.be.above(-1);
           expect(response.text.search('TEMPLATES')).to.be.above(-1);
@@ -150,10 +135,15 @@ describe('Main Site', () => {
     context('when an error is present', () => {
       beforeEach(() => {
         process.env.VCAP_SERVICES = JSON.stringify({
-          'user-provided': [{
-            credentials: { HEADING: 'Error message heading', BODY: 'Error message body' },
-            name: 'federalist-site-wide-error',
-          }],
+          'user-provided': [
+            {
+              credentials: {
+                HEADING: 'Error message heading',
+                BODY: 'Error message body',
+              },
+              name: 'federalist-site-wide-error',
+            },
+          ],
         });
       });
 
@@ -162,9 +152,8 @@ describe('Main Site', () => {
       });
 
       it('should display a banner for authenticated users', (done) => {
-        authenticatedSession().then(cookie => request(app)
-          .get('/sites')
-          .set('Cookie', cookie))
+        authenticatedSession()
+          .then((cookie) => request(app).get('/sites').set('Cookie', cookie))
           .then((response) => {
             expect(response.text).to.match(/usa-alert usa-alert--error/);
             expect(response.text).to.match(/Error message heading/);

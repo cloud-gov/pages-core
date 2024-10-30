@@ -33,9 +33,7 @@ function profileAttributes({ userId, username, ...rest } = {}) {
   };
 }
 
-function userAttributes({
-  uaaId, userId, username, groups, ...rest
-} = {}) {
+function userAttributes({ uaaId, userId, username, groups, ...rest } = {}) {
   const uname = username || generateUniqueUserNameEmail();
   const email = generateUniqueUserNameEmail();
   const usersGroups = groups || [];

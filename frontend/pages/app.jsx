@@ -20,8 +20,8 @@ function shouldClearAlert(alert) {
 export function App({ onEnter }) {
   const notifier = new BuildStatusNotifier();
   const location = useLocation();
-  const alert = useSelector(state => state.alert);
-  const notifications = useSelector(state => state.notifications);
+  const alert = useSelector((state) => state.alert);
+  const notifications = useSelector((state) => state.notifications);
 
   useEffect(() => {
     notifier.listen();

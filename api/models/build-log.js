@@ -10,7 +10,9 @@ const associate = ({ BuildLog, Build }) => {
 const sanitizeBuildSecrets = (buildLog) => {
   const { models } = buildLog.sequelize;
   return models.Build.findOne({
-    where: { id: buildLog.build },
+    where: {
+      id: buildLog.build,
+    },
     include: [models.User],
   }).then((build) => {
     const secrets = [
@@ -18,33 +20,37 @@ const sanitizeBuildSecrets = (buildLog) => {
       build ? build.User.githubAccessToken : undefined,
     ];
     secrets.forEach((secret) => {
-      buildLog.output = buildLog.output.replace(secret, '[FILTERED]'); // eslint-disable-line no-param-reassign
+      buildLog.output = buildLog.output.replace(secret, '[FILTERED]');
     });
   });
 };
 
-const afterValidate = buildLog => sanitizeBuildSecrets(buildLog);
+const afterValidate = (buildLog) => sanitizeBuildSecrets(buildLog);
 
 module.exports = (sequelize, DataTypes) => {
-  const BuildLog = sequelize.define('BuildLog', {
-    output: {
-      type: DataTypes.STRING,
-      allowNull: false,
+  const BuildLog = sequelize.define(
+    'BuildLog',
+    {
+      output: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      source: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      build: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
-    source: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    {
+      tableName: 'buildlog',
+      hooks: {
+        afterValidate,
+      },
     },
-    build: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  }, {
-    tableName: 'buildlog',
-    hooks: {
-      afterValidate,
-    },
-  });
+  );
 
   BuildLog.associate = associate;
 

@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import { reduxForm } from 'redux-form';
 import { IconEnvelope } from '@shared/icons';
 
-const ResendInviteForm = ({
-  handleSubmit,
-  submitting,
-}) => (
+const ResendInviteForm = ({ handleSubmit, submitting }) => (
   <form onSubmit={handleSubmit}>
     <button
       type="submit"

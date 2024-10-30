@@ -5,23 +5,14 @@ const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
-const {
-  Organization,
-  User,
-} = require('../../../../api/models');
+const { Organization, User } = require('../../../../api/models');
 
 describe('Admin - Organizations API', () => {
-  afterEach(() =>
-    Promise.all([
-      User.truncate(),
-      Organization.truncate(),
-    ])
-  );
+  afterEach(() => Promise.all([User.truncate(), Organization.truncate()]));
 
   describe('GET /admin/reports/organizations', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)['get']('/reports/organizations')
-        .expect(401);
+      const response = await request(app)['get']('/reports/organizations').expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
 
@@ -46,7 +37,8 @@ describe('Admin - Organizations API', () => {
 
   describe('GET /admin/reports/organizations.csv', () => {
     it('should require admin authentication', async () => {
-      const response = await request(app)['get']('/reports/organizations.csv')
+      const response = await request(app)
+        ['get']('/reports/organizations.csv')
         .expect(401);
       expect(response.body.message).to.equal('Unauthorized');
     });
@@ -54,8 +46,14 @@ describe('Admin - Organizations API', () => {
     it('returns all organizations', async () => {
       const user = await factory.user();
 
-      const org1 = await factory.organization.create({agency: 'Agency 1', isSelfAuthorized: false});
-      const org2 = await factory.organization.create({agency: 'Agency 2', isSelfAuthorized: true});
+      const org1 = await factory.organization.create({
+        agency: 'Agency 1',
+        isSelfAuthorized: false,
+      });
+      const org2 = await factory.organization.create({
+        agency: 'Agency 2',
+        isSelfAuthorized: true,
+      });
 
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const response = await request(app)
@@ -63,23 +61,15 @@ describe('Admin - Organizations API', () => {
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
         .expect(200);
-      expect(response.headers['content-type']).to.equal(
-        'text/csv; charset=utf-8'
-      );
+      expect(response.headers['content-type']).to.equal('text/csv; charset=utf-8');
       expect(response.headers['content-disposition']).to.equal(
-        'attachment; filename="organizations.csv"'
+        'attachment; filename="organizations.csv"',
       );
       const [header, ...data] = response.text.split(/\n/);
-      expect(header).to.equal(
-        '"Organization","Agency","Self Authorized"'
-      );
+      expect(header).to.equal('"Organization","Agency","Self Authorized"');
       expect(data.length).to.equal(2);
-      expect(data[0]).to.equal(
-        `"${org1.name}","${org1.agency}",false`
-      );
-      expect(data[1]).to.equal(
-        `"${org2.name}","${org2.agency}",true`
-      );
+      expect(data[0]).to.equal(`"${org1.name}","${org1.agency}",false`);
+      expect(data[1]).to.equal(`"${org2.name}","${org2.agency}",true`);
     });
   });
 });

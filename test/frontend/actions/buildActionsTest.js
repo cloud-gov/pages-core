@@ -1,10 +1,10 @@
-import { expect } from "chai";
-import { spy, stub } from "sinon";
-import proxyquire from "proxyquire";
+import { expect } from 'chai';
+import { spy, stub } from 'sinon';
+import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
 
-describe("buildActions", () => {
+describe('buildActions', () => {
   let fixture;
   let dispatch;
   let buildsFetchStartedActionCreator;
@@ -18,30 +18,30 @@ describe("buildActions", () => {
 
   beforeEach(() => {
     dispatch = spy();
-    buildsFetchStartedActionCreator = stub()
-    buildsReceivedActionCreator = stub()
-    buildFetchStartedActionCreator = stub()
-    buildReceivedActionCreator = stub()
+    buildsFetchStartedActionCreator = stub();
+    buildsReceivedActionCreator = stub();
+    buildFetchStartedActionCreator = stub();
+    buildReceivedActionCreator = stub();
     buildRestartedActionCreator = stub();
 
-    fetchBuilds = stub()
+    fetchBuilds = stub();
     restartBuild = stub();
 
     alertSuccess = stub();
 
-    fixture = proxyquire("../../../frontend/actions/buildActions", {
-      "./actionCreators/buildActions": {
+    fixture = proxyquire('../../../frontend/actions/buildActions', {
+      './actionCreators/buildActions': {
         buildsFetchStarted: buildsFetchStartedActionCreator,
         buildsReceived: buildsReceivedActionCreator,
         buildFetchStarted: buildFetchStartedActionCreator,
         buildReceived: buildReceivedActionCreator,
         buildRestarted: buildRestartedActionCreator,
       },
-      "../util/federalistApi": {
+      '../util/federalistApi': {
         fetchBuilds: fetchBuilds,
         restartBuild: restartBuild,
       },
-      "../store": {
+      '../store': {
         dispatch: dispatch,
       },
       './alertActions': {
@@ -50,36 +50,40 @@ describe("buildActions", () => {
     }).default;
   });
 
-  it("fetchBuilds", done => {
-    const site = { id: "🎫" }
-    const builds = ["🔧", "🔨", "⛏"]
-    const buildsPromise = Promise.resolve(builds)
-    const startedAction = { action: "🚦" }
-    const receivedAction = { action: "🏁" }
+  it('fetchBuilds', (done) => {
+    const site = { id: '🎫' };
+    const builds = ['🔧', '🔨', '⛏'];
+    const buildsPromise = Promise.resolve(builds);
+    const startedAction = {
+      action: '🚦',
+    };
+    const receivedAction = {
+      action: '🏁',
+    };
 
-    fetchBuilds.withArgs(site).returns(buildsPromise)
-    buildsFetchStartedActionCreator.withArgs().returns(startedAction)
-    buildsReceivedActionCreator.withArgs(builds).returns(receivedAction)
+    fetchBuilds.withArgs(site).returns(buildsPromise);
+    buildsFetchStartedActionCreator.withArgs().returns(startedAction);
+    buildsReceivedActionCreator.withArgs(builds).returns(receivedAction);
 
-    const actual = fixture.fetchBuilds(site)
+    const actual = fixture.fetchBuilds(site);
 
     actual.then(() => {
-      expect(dispatch.calledTwice).to.be.true
-      expect(dispatch.calledWith(startedAction)).to.be.true
-      expect(dispatch.calledWith(receivedAction)).to.be.true
-      done()
-    })
-  })
+      expect(dispatch.calledTwice).to.be.true;
+      expect(dispatch.calledWith(startedAction)).to.be.true;
+      expect(dispatch.calledWith(receivedAction)).to.be.true;
+      done();
+    });
+  });
 
-  describe("restartBuild", () => {
-    it("build is restarted", done => {
+  describe('restartBuild', () => {
+    it('build is restarted', (done) => {
       const build = {
-        "we": "like to build it's true",
-        "how": "about you?"
+        we: "like to build it's true",
+        how: 'about you?',
       };
       const buildPromise = Promise.resolve(build);
       const action = {
-        action: "action"
+        action: 'action',
       };
       restartBuild.withArgs().returns(buildPromise);
       buildRestartedActionCreator.withArgs(build).returns(action);
@@ -89,11 +93,11 @@ describe("buildActions", () => {
       actual.then(() => {
         expect(dispatch.calledOnce).to.be.true;
         expect(dispatch.calledWith(action)).to.be.true;
-        done()
+        done();
       });
     });
 
-    it("build is NOT restarted", done => {
+    it('build is NOT restarted', (done) => {
       const build = {};
       const buildPromise = Promise.resolve(build);
       restartBuild.withArgs().returns(buildPromise);
@@ -102,7 +106,7 @@ describe("buildActions", () => {
       actual.then(() => {
         expect(dispatch.notCalled).to.be.true;
         expect(alertSuccess.calledWith('Build is already queued.')).to.be.true;
-        done()
+        done();
       });
     });
   });

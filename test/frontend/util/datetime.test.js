@@ -1,6 +1,9 @@
 import { expect } from 'chai';
 import {
-  duration, timeFrom, dateAndTime, timestampUTC,
+  duration,
+  timeFrom,
+  dateAndTime,
+  timestampUTC,
 } from '../../../frontend/util/datetime';
 
 const NO_DATE = '-';
@@ -14,11 +17,11 @@ describe('datetime', () => {
       expect(duration(startTime, endTime)).to.equal('3 minutes');
     });
 
-    it('works if endTime isn\'t defined', () => {
+    it("works if endTime isn't defined", () => {
       expect(duration(+new Date())).to.equal('0 seconds');
     });
 
-    it('provides a fallback if startTime isn\'t defined', () => {
+    it("provides a fallback if startTime isn't defined", () => {
       expect(duration()).to.equal(NO_DATE);
     });
   });

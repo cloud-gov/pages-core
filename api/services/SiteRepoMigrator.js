@@ -17,7 +17,10 @@ async function getUserGHCredentials(email) {
 
   const { githubAccessToken, githubUserId } = uaaUser.User;
 
-  return { githubAccessToken, githubUserId };
+  return {
+    githubAccessToken,
+    githubUserId,
+  };
 }
 
 async function setRepoWebhook(site, uaaEmail) {
@@ -34,14 +37,16 @@ async function setRepoWebhook(site, uaaEmail) {
 async function updateSiteServices(oldServceName, newServiceName) {
   const s3ServiceInstance = await apiClient.fetchServiceInstance(oldServceName);
   const s3KeyInstance = await apiClient.fetchCredentialBindingsInstance(
-    `${oldServceName}-key`
+    `${oldServceName}-key`,
   );
 
   // Rename s3 service instance
   await apiClient.authRequest(
     'PATCH',
     `/v3/service_instances/${s3ServiceInstance.guid}/`,
-    { name: newServiceName }
+    {
+      name: newServiceName,
+    },
   );
 
   // Create new service key based on new service name
@@ -50,7 +55,7 @@ async function updateSiteServices(oldServceName, newServiceName) {
   // Delete old service key
   await apiClient.authRequest(
     'DELETE',
-    `/v3/service_credential_bindings/${s3KeyInstance.guid}`
+    `/v3/service_credential_bindings/${s3KeyInstance.guid}`,
   );
 }
 

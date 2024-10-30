@@ -9,10 +9,15 @@ describe('SiteWideErrorLoader', () => {
 
     it('should load the site wide error', () => {
       process.env.VCAP_SERVICES = JSON.stringify({
-        'user-provided': [{
-          credentials: { HEADING: 'Error message heading', BODY: 'Error message body' },
-          name: 'federalist-site-wide-error',
-        }],
+        'user-provided': [
+          {
+            credentials: {
+              HEADING: 'Error message heading',
+              BODY: 'Error message body',
+            },
+            name: 'federalist-site-wide-error',
+          },
+        ],
       });
 
       const siteWideError = SiteWideErrorLoader.loadSiteWideError();
@@ -27,10 +32,15 @@ describe('SiteWideErrorLoader', () => {
 
     it('should return null if the site wide error user provided service is empty', () => {
       process.env.VCAP_SERVICES = JSON.stringify({
-        'user-provided': [{
-          credentials: { HEADING: '', BODY: '' },
-          name: 'federalist-site-wide-error',
-        }],
+        'user-provided': [
+          {
+            credentials: {
+              HEADING: '',
+              BODY: '',
+            },
+            name: 'federalist-site-wide-error',
+          },
+        ],
       });
 
       const siteWideError = SiteWideErrorLoader.loadSiteWideError();

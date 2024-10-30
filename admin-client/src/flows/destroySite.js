@@ -7,7 +7,9 @@ function destroy(site) {
     try {
       await destroySite(site.id);
       page('/sites');
-      return notification.setSuccess(`Site ${site.id}: ${site.repository} deleted successfully!`);
+      return notification.setSuccess(
+        `Site ${site.id}: ${site.repository} deleted successfully!`,
+      );
     } catch (error) {
       return notification.setError(`Unable to delete site ${site.id}: ${error.message}`);
     }

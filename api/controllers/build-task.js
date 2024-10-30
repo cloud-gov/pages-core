@@ -2,9 +2,7 @@ const { readFile } = require('node:fs/promises');
 const { join } = require('node:path');
 const { localSiteBuildTasks } = require('../../config');
 const { wrapHandlers, appMatch } = require('../utils');
-const {
-  Build, BuildTask, BuildTaskType, SiteBuildTask, Site,
-} = require('../models');
+const { Build, BuildTask, BuildTaskType, SiteBuildTask, Site } = require('../models');
 const buildTaskSerializer = require('../serializers/build-task');
 const { getObject } = require('../services/S3BuildTask');
 
@@ -21,7 +19,10 @@ module.exports = wrapHandlers({
     }
 
     const task = await BuildTask.findOne({
-      where: { buildId, id: buildTaskId },
+      where: {
+        buildId,
+        id: buildTaskId,
+      },
       include: BuildTaskType,
     });
 
@@ -45,7 +46,9 @@ module.exports = wrapHandlers({
     }
 
     const tasks = await BuildTask.findAll({
-      where: { buildId },
+      where: {
+        buildId,
+      },
       include: BuildTaskType,
     });
 
@@ -89,10 +92,11 @@ module.exports = wrapHandlers({
       },
     });
 
-    await Promise.all(siteBuildTasks.map(siteBuildTask => (siteBuildTask
-      .createBuildTask(build)
-      .then(async task => task.enqueue())
-    )));
+    await Promise.all(
+      siteBuildTasks.map((siteBuildTask) =>
+        siteBuildTask.createBuildTask(build).then(async (task) => task.enqueue()),
+      ),
+    );
 
     return res.ok({});
   },
@@ -102,11 +106,11 @@ module.exports = wrapHandlers({
     const { task_id: taskId, sub_page: subPage } = params;
 
     if (process.env.FEATURE_LOCAL_BUILD_REPORTS === 'active') {
-      const task = localSiteBuildTasks.find(t => t.id.toString() === taskId);
+      const task = localSiteBuildTasks.find((t) => t.id.toString() === taskId);
       const file = subPage || 'index';
       const reportPath = join(
         __dirname,
-        `../../services/local/tasks/${task.type}/${file}.json`
+        `../../services/local/tasks/${task.type}/${file}.json`,
       );
 
       const raw = await readFile(reportPath, 'utf-8');
@@ -121,13 +125,16 @@ module.exports = wrapHandlers({
     }
 
     const task = await BuildTask.findOne({
-      where: { id: taskId },
+      where: {
+        id: taskId,
+      },
       include: [
         BuildTaskType,
         {
           model: Build,
           include: Site,
-        }],
+        },
+      ],
     });
 
     // the build check again serves as an authorizer
@@ -150,7 +157,10 @@ module.exports = wrapHandlers({
     const type = appMatch(task.BuildTaskType);
 
     const fullJSON = {
-      ...taskJSON, report, type, siteId: task.Build.Site.id,
+      ...taskJSON,
+      report,
+      type,
+      siteId: task.Build.Site.id,
     };
 
     return res.json(fullJSON);

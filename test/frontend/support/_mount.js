@@ -2,9 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { mount } from 'enzyme';
 import configureStore from 'redux-mock-store';
-import {
-  MemoryRouter, Routes, Route,
-} from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
 const mountRouter = (elem, path = '/', url = '/', state = {}) => {
   const mockStore = configureStore([]);
@@ -15,17 +13,13 @@ const mountRouter = (elem, path = '/', url = '/', state = {}) => {
           <Route path={path} element={elem} />
         </Routes>
       </MemoryRouter>
-    </Provider>
+    </Provider>,
   );
 };
 
 const mountStore = (elem, state = {}) => {
   const mockStore = configureStore([]);
-  return mount(
-    <Provider store={mockStore(state)}>
-      {elem}
-    </Provider>
-  );
+  return mount(<Provider store={mockStore(state)}>{elem}</Provider>);
 };
 
 export { mountRouter, mountStore };

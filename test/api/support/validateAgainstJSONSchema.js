@@ -12,15 +12,15 @@ const validateAgainstJSONSchema = (action, path, statusCode, response) => {
   const actionLower = action.toLowerCase();
   const pathLower = path.toLowerCase();
   const statusCodeInt = parseInt(statusCode, 10);
-  const responseSchema = schema.paths[pathLower][actionLower].responses[statusCodeInt].schema;
+  const responseSchema =
+    schema.paths[pathLower][actionLower].responses[statusCodeInt].schema;
 
   const result = validate(response, responseSchema);
 
   if (result.errors.length) {
     console.error(result.errors); // eslint-disable-line no-console
-    throw new Error(
-      `Failed to validate against definition: ${actionLower} ${pathLower} ${statusCodeInt}`
-    );
+    const definition = `${actionLower} ${pathLower} ${statusCodeInt}`;
+    throw new Error(`Failed to validate against definition: ${definition}`);
   }
 };
 

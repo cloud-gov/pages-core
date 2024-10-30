@@ -10,8 +10,9 @@ import {
 export function fetchUserEnvironmentVariables(siteId) {
   return (dispatch) => {
     dispatch(userEnvironmentVariablesFetchStarted(siteId));
-    return federalist.fetchUserEnvironmentVariables(siteId)
-      .then(uevs => dispatch(userEnvironmentVariablesReceived(siteId, uevs)))
+    return federalist
+      .fetchUserEnvironmentVariables(siteId)
+      .then((uevs) => dispatch(userEnvironmentVariablesReceived(siteId, uevs)))
       .catch((error) => {
         window.scrollTo(0, 0);
         dispatch(httpError(error.message, { siteId }));
@@ -20,21 +21,27 @@ export function fetchUserEnvironmentVariables(siteId) {
 }
 
 export function deleteUserEnvironmentVariable(siteId, userEnvironmentVariableId) {
-  return dispatch => federalist.deleteUserEnvironmentVariable(siteId, userEnvironmentVariableId)
-    .then(() => dispatch(userEnvironmentVariableDeleted(siteId, userEnvironmentVariableId)))
-    .catch((error) => {
-      window.scrollTo(0, 0);
-      dispatch(httpError(error.message, { siteId }));
-    });
+  return (dispatch) =>
+    federalist
+      .deleteUserEnvironmentVariable(siteId, userEnvironmentVariableId)
+      .then(() =>
+        dispatch(userEnvironmentVariableDeleted(siteId, userEnvironmentVariableId)),
+      )
+      .catch((error) => {
+        window.scrollTo(0, 0);
+        dispatch(httpError(error.message, { siteId }));
+      });
 }
 
 export function addUserEnvironmentVariable(siteId, userEnvironmentVariable) {
-  return dispatch => federalist.createUserEnvironmentVariable(siteId, userEnvironmentVariable)
-    .then(uev => dispatch(userEnvironmentVariableAdded(siteId, uev)))
-    .catch((error) => {
-      window.scrollTo(0, 0);
-      dispatch(httpError(error.message, { siteId }));
-    });
+  return (dispatch) =>
+    federalist
+      .createUserEnvironmentVariable(siteId, userEnvironmentVariable)
+      .then((uev) => dispatch(userEnvironmentVariableAdded(siteId, uev)))
+      .catch((error) => {
+        window.scrollTo(0, 0);
+        dispatch(httpError(error.message, { siteId }));
+      });
 }
 
 export default {

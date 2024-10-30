@@ -4,8 +4,8 @@ const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const apiClient = new CloudFoundryAPIClient();
 
 const handleInvalidAccessKeyError = (error) => {
-  const validS3KeyUpdateEnv = process.env.NODE_ENV === 'development'
-    || process.env.NODE_ENV === 'test';
+  const validS3KeyUpdateEnv =
+    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
   if (error.code === 'InvalidAccessKeyId' && validS3KeyUpdateEnv) {
     const message = 'S3 keys out of date. Update them with `npm run update-local-config`';
@@ -24,10 +24,11 @@ function listTopLevelFolders(s3Client, path) {
 
   // Pass the Delimiter option so that results are grouped
   // according to their "folder" paths
-  return s3Client.listCommonPrefixes(path)
-    .then(commonPrefixes => commonPrefixes.map(
-      prefix => prefix.Prefix.split('/').slice(-2)[0]
-    ))
+  return s3Client
+    .listCommonPrefixes(path)
+    .then((commonPrefixes) =>
+      commonPrefixes.map((prefix) => prefix.Prefix.split('/').slice(-2)[0]),
+    )
     .catch(handleInvalidAccessKeyError);
 }
 
@@ -43,7 +44,8 @@ function listFilesPaged(s3Client, path, startAtKey = null) {
     prefixPath = `${prefixPath}/`;
   }
 
-  return s3Client.listObjectsPaged(prefixPath, startAtKey)
+  return s3Client
+    .listObjectsPaged(prefixPath, startAtKey)
     .then((pagedResults) => {
       const prefixComponents = path.split('/').length;
       const files = pagedResults.objects.map((file) => {
@@ -67,7 +69,8 @@ function listFilesPaged(s3Client, path, startAtKey = null) {
 function listPublishedPreviews(site) {
   const previewPath = `preview/${site.owner}/${site.repository}/`;
 
-  return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
+  return apiClient
+    .fetchServiceInstanceCredentials(site.s3ServiceName)
     .then((credentials) => {
       const s3Client = new S3Helper.S3Client({
         accessKeyId: credentials.access_key_id,
@@ -90,7 +93,8 @@ function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
     filepath = `preview/${site.owner}/${site.repository}/${branch}`;
   }
 
-  return apiClient.fetchServiceInstanceCredentials(site.s3ServiceName)
+  return apiClient
+    .fetchServiceInstanceCredentials(site.s3ServiceName)
     .then((credentials) => {
       const s3Client = new S3Helper.S3Client({
         accessKeyId: credentials.access_key_id,
@@ -103,4 +107,7 @@ function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
     });
 }
 
-module.exports = { listPublishedPreviews, listPagedPublishedFilesForBranch };
+module.exports = {
+  listPublishedPreviews,
+  listPagedPublishedFilesForBranch,
+};

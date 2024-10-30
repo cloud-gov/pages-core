@@ -10,50 +10,64 @@ describe('GitHub', () => {
 
   describe('.getRepository(user, owner, repository)', () => {
     it('should resolve with the repository data if the repo exists', (done) => {
-      factory.user().then((user) => {
-        githubAPINocks.repo({
-          accessToken: user.githubAccessToken,
-          owner: 'repo-owner',
-          repo: 'repo-name',
-          response: [200, {
+      factory
+        .user()
+        .then((user) => {
+          githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: 'repo-owner',
+            repo: 'repo-name',
+            response: [
+              200,
+              {
+                name: 'repo-name',
+                owner: {
+                  login: 'repo-owner',
+                },
+                meta: {},
+              },
+            ],
+          });
+
+          return GitHub.getRepository(user, 'repo-owner', 'repo-name');
+        })
+        .then((data) => {
+          expect(data).to.deep.equal({
             name: 'repo-name',
             owner: {
               login: 'repo-owner',
             },
             meta: {},
-          }],
-        });
-
-        return GitHub.getRepository(user, 'repo-owner', 'repo-name');
-      }).then((data) => {
-        expect(data).to.deep.equal({
-          name: 'repo-name',
-          owner: {
-            login: 'repo-owner',
-          },
-          meta: {},
-        });
-        done();
-      }).catch(done);
+          });
+          done();
+        })
+        .catch(done);
     });
 
     it('should resolve with null if the repo does not exist', (done) => {
-      factory.user().then((user) => {
-        githubAPINocks.repo({
-          accessToken: user.githubAccessToken,
-          owner: 'repo-owner',
-          repo: 'repo-name',
-          response: [200, {
-            message: 'Not Found',
-            documentation_url: 'https://developer.github.com/v3',
-          }],
-        });
+      factory
+        .user()
+        .then((user) => {
+          githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: 'repo-owner',
+            repo: 'repo-name',
+            response: [
+              200,
+              {
+                message: 'Not Found',
+                documentation_url: 'https://developer.github.com/v3',
+              },
+            ],
+          });
 
-        return GitHub.getRepository(user, 'repo-owner', 'repo-name');
-      }).then((result) => {
-        expect(result.message).to.equal('Not Found');
-        done();
-      }).catch(done);
+          return GitHub.getRepository(user, 'repo-owner', 'repo-name');
+        })
+        .then((result) => {
+          expect(result.message).to.equal('Not Found');
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -61,88 +75,123 @@ describe('GitHub', () => {
     it('should create a repository for the user if the user is the owner', (done) => {
       let createRepoNock;
 
-      factory.user().then((user) => {
-        createRepoNock = githubAPINocks.createRepoForUser({
-          accessToken: user.githubAccessToken,
-          repo: 'repo-name',
-        });
+      factory
+        .user()
+        .then((user) => {
+          createRepoNock = githubAPINocks.createRepoForUser({
+            accessToken: user.githubAccessToken,
+            repo: 'repo-name',
+          });
 
-        return GitHub.createRepo(user, user.username, 'repo-name');
-      }).then(() => {
-        expect(createRepoNock.isDone()).to.equal(true);
-        done();
-      }).catch(done);
+          return GitHub.createRepo(user, user.username, 'repo-name');
+        })
+        .then(() => {
+          expect(createRepoNock.isDone()).to.equal(true);
+          done();
+        })
+        .catch(done);
     });
 
     it('should create a repository for an org if the user is not the owner', (done) => {
       let createRepoNock;
 
-      factory.user().then((user) => {
-        createRepoNock = githubAPINocks.createRepoForOrg({
-          accessToken: user.githubAccessToken,
-          org: 'org-name',
-          repo: 'repo-name',
-        });
+      factory
+        .user()
+        .then((user) => {
+          createRepoNock = githubAPINocks.createRepoForOrg({
+            accessToken: user.githubAccessToken,
+            org: 'org-name',
+            repo: 'repo-name',
+          });
 
-        return GitHub.createRepo(user, 'org-name', 'repo-name');
-      }).then(() => {
-        expect(createRepoNock.isDone()).to.equal(true);
-        done();
-      }).catch(done);
+          return GitHub.createRepo(user, 'org-name', 'repo-name');
+        })
+        .then(() => {
+          expect(createRepoNock.isDone()).to.equal(true);
+          done();
+        })
+        .catch(done);
     });
 
-    it('should create a user repository even if the case for the owner and username don\'t match', (done) => {
+    it(`should create a user repository even
+        if the case for the owner and username don't match`, (done) => {
       let createRepoNock;
 
-      factory.user().then((user) => {
-        createRepoNock = githubAPINocks.createRepoForUser({
-          accessToken: user.githubAccessToken,
-          repo: 'repo-name',
-        });
+      factory
+        .user()
+        .then((user) => {
+          createRepoNock = githubAPINocks.createRepoForUser({
+            accessToken: user.githubAccessToken,
+            repo: 'repo-name',
+          });
 
-        return GitHub.createRepo(user, user.username.toUpperCase(), 'repo-name');
-      }).then(() => {
-        expect(createRepoNock.isDone()).to.equal(true);
-        done();
-      }).catch(done);
+          return GitHub.createRepo(user, user.username.toUpperCase(), 'repo-name');
+        })
+        .then(() => {
+          expect(createRepoNock.isDone()).to.equal(true);
+          done();
+        })
+        .catch(done);
     });
 
     it('should reject if the user is not authorized to create a repository', (done) => {
-      factory.user().then((user) => {
-        githubAPINocks.createRepoForOrg({
-          accessToken: user.githubAccessToken,
-          org: 'org-name',
-          repo: 'repo-name',
-          response: [403, {
-            message: 'You need admin access to the organization before adding a repository to it.',
-          }],
-        });
+      factory
+        .user()
+        .then((user) => {
+          githubAPINocks.createRepoForOrg({
+            accessToken: user.githubAccessToken,
+            org: 'org-name',
+            repo: 'repo-name',
+            response: [
+              403,
+              {
+                message:
+                  // eslint-disable-next-line max-len
+                  'You need admin access to the organization before adding a repository to it.',
+              },
+            ],
+          });
 
-        return GitHub.createRepo(user, 'org-name', 'repo-name');
-      }).catch((err) => {
-        expect(err.status).to.equal(400);
-        expect(err.message).to.equal('You need admin access to the organization before adding a repository to it.');
-        done();
-      }).catch(done);
+          return GitHub.createRepo(user, 'org-name', 'repo-name');
+        })
+        .catch((err) => {
+          expect(err.status).to.equal(400);
+          expect(err.message).to.equal(
+            'You need admin access to the organization before adding a repository to it.',
+          );
+          done();
+        })
+        .catch(done);
     });
 
     it('should reject if the repo already exists', (done) => {
-      factory.user().then((user) => {
-        githubAPINocks.createRepoForOrg({
-          accessToken: user.githubAccessToken,
-          org: 'org-name',
-          repo: 'repo-name',
-          response: [422, {
-            errors: [{ message: 'name already exists on this account' }],
-          }],
-        });
+      factory
+        .user()
+        .then((user) => {
+          githubAPINocks.createRepoForOrg({
+            accessToken: user.githubAccessToken,
+            org: 'org-name',
+            repo: 'repo-name',
+            response: [
+              422,
+              {
+                errors: [
+                  {
+                    message: 'name already exists on this account',
+                  },
+                ],
+              },
+            ],
+          });
 
-        return GitHub.createRepo(user, 'org-name', 'repo-name');
-      }).catch((err) => {
-        expect(err.status).to.equal(400);
-        expect(err.message).to.equal('A repo with that name already exists.');
-        done();
-      }).catch(done);
+          return GitHub.createRepo(user, 'org-name', 'repo-name');
+        })
+        .catch((err) => {
+          expect(err.status).to.equal(400);
+          expect(err.message).to.equal('A repo with that name already exists.');
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -181,7 +230,8 @@ describe('GitHub', () => {
       expect(createRepoNock.isDone()).to.equal(true);
     });
 
-    it('should create a user repository even if the case for the owner and username don\'t match', async () => {
+    it(`should create a user repository even
+        if the case for the owner and username don't match`, async () => {
       const user = await factory.user();
       const createRepoNock = githubAPINocks.createRepoUsingTemplate({
         accessToken: user.githubAccessToken,
@@ -189,7 +239,12 @@ describe('GitHub', () => {
         template,
       });
 
-      await GitHub.createRepoFromTemplate(user, user.username.toUpperCase(), repo, template);
+      await GitHub.createRepoFromTemplate(
+        user,
+        user.username.toUpperCase(),
+        repo,
+        template,
+      );
 
       expect(createRepoNock.isDone()).to.equal(true);
     });
@@ -201,15 +256,24 @@ describe('GitHub', () => {
         owner: org,
         repo,
         template,
-        response: [403, {
-          message: 'You need admin access to the organization before adding a repository to it.',
-        }],
+        response: [
+          403,
+          {
+            message:
+              // eslint-disable-next-line max-len
+              'You need admin access to the organization before adding a repository to it.',
+          },
+        ],
       });
 
-      const err = await GitHub.createRepoFromTemplate(user, org, repo, template).catch(e => e);
+      const err = await GitHub.createRepoFromTemplate(user, org, repo, template).catch(
+        (e) => e,
+      );
 
       expect(err.status).to.equal(400);
-      expect(err.message).to.equal('You need admin access to the organization before adding a repository to it.');
+      expect(err.message).to.equal(
+        'You need admin access to the organization before adding a repository to it.',
+      );
     });
 
     it('should reject if the repo already exists', async () => {
@@ -219,12 +283,21 @@ describe('GitHub', () => {
         owner: org,
         repo,
         template,
-        response: [422, {
-          errors: [{ message: 'name already exists on this account' }],
-        }],
+        response: [
+          422,
+          {
+            errors: [
+              {
+                message: 'name already exists on this account',
+              },
+            ],
+          },
+        ],
       });
 
-      const err = await GitHub.createRepoFromTemplate(user, org, repo, template).catch(e => e);
+      const err = await GitHub.createRepoFromTemplate(user, org, repo, template).catch(
+        (e) => e,
+      );
 
       expect(err.status).to.equal(400);
       expect(err.message).to.equal('A repo with that name already exists.');
@@ -236,7 +309,8 @@ describe('GitHub', () => {
       let site;
       let user;
 
-      factory.user()
+      factory
+        .user()
         .then((model) => {
           user = model;
           return factory.site();
@@ -261,7 +335,8 @@ describe('GitHub', () => {
       let site;
       let user;
 
-      factory.user()
+      factory
+        .user()
         .then((model) => {
           user = model;
           return factory.site();
@@ -272,9 +347,16 @@ describe('GitHub', () => {
             accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
-            response: [400, {
-              errors: [{ message: 'Hook already exists on this repository' }],
-            }],
+            response: [
+              400,
+              {
+                errors: [
+                  {
+                    message: 'Hook already exists on this repository',
+                  },
+                ],
+              },
+            ],
           });
           return GitHub.setWebhook(site, user.githubAccessToken);
         })
@@ -284,11 +366,13 @@ describe('GitHub', () => {
         .catch(done);
     });
 
-    it('should reject if the user does not have admin access to the repository', (done) => {
+    it(`should reject if the user does not
+        have admin access to the repository`, (done) => {
       let site;
       let user;
 
-      factory.user()
+      factory
+        .user()
         .then((model) => {
           user = model;
           return factory.site();
@@ -299,9 +383,12 @@ describe('GitHub', () => {
             accessToken: user.githubAccessToken,
             owner: site.owner,
             repo: site.repository,
-            response: [404, {
-              message: 'Not Found',
-            }],
+            response: [
+              404,
+              {
+                message: 'Not Found',
+              },
+            ],
           });
           return GitHub.setWebhook(site, user.githubAccessToken);
         })
@@ -321,7 +408,9 @@ describe('GitHub', () => {
     it('throws when there is an unexpected error', async () => {
       const webhookId = 1;
       const [site, user] = await Promise.all([
-        factory.site({ webhookId }),
+        factory.site({
+          webhookId,
+        }),
         factory.user(),
       ]);
 
@@ -330,21 +419,29 @@ describe('GitHub', () => {
         owner: site.owner,
         repo: site.repository,
         webhookId,
-        response: [500, {
-          message: 'Uh oh',
-        }],
+        response: [
+          500,
+          {
+            message: 'Uh oh',
+          },
+        ],
       });
 
-      const error = await GitHub.deleteWebhook(site, user.githubAccessToken).catch(e => e);
+      const error = await GitHub.deleteWebhook(site, user.githubAccessToken).catch(
+        (e) => e,
+      );
 
       expect(error.status).to.equal(500);
       expect(error.message).to.equal('Uh oh');
     });
 
-    it('returns null if the user does not have access to the repository or hooks', async () => {
+    it(`returns null if the user does not
+        have access to the repository or hooks`, async () => {
       const webhookId = 1;
       const [site, user] = await Promise.all([
-        factory.site({ webhookId }),
+        factory.site({
+          webhookId,
+        }),
         factory.user(),
       ]);
 
@@ -353,9 +450,12 @@ describe('GitHub', () => {
         owner: site.owner,
         repo: site.repository,
         webhookId,
-        response: [404, {
-          message: 'Not Found',
-        }],
+        response: [
+          404,
+          {
+            message: 'Not Found',
+          },
+        ],
       });
 
       const response = await GitHub.deleteWebhook(site, user.githubAccessToken);
@@ -366,7 +466,9 @@ describe('GitHub', () => {
     it('returns success if the webhook was deleted', async () => {
       const webhookId = 1;
       const [site, user] = await Promise.all([
-        factory.site({ webhookId }),
+        factory.site({
+          webhookId,
+        }),
         factory.user(),
       ]);
 
@@ -375,9 +477,12 @@ describe('GitHub', () => {
         owner: site.owner,
         repo: site.repository,
         webhookId,
-        response: [200, {
-          message: 'No content',
-        }],
+        response: [
+          200,
+          {
+            message: 'No content',
+          },
+        ],
       });
 
       const response = await GitHub.deleteWebhook(site, user.githubAccessToken);
@@ -389,23 +494,23 @@ describe('GitHub', () => {
       it('finds the webhook id then deletes it', async () => {
         const webhookId = 1;
 
-        const [site, user] = await Promise.all([
-          factory.site(),
-          factory.user(),
-        ]);
+        const [site, user] = await Promise.all([factory.site(), factory.user()]);
 
         githubAPINocks.listWebhooks({
           accessToken: user.githubAccessToken,
           owner: site.owner,
           repo: site.repository,
-          response: [200, [
-            {
-              config: {
-                id: webhookId,
-                url: config.webhook.endpoint,
+          response: [
+            200,
+            [
+              {
+                config: {
+                  id: webhookId,
+                  url: config.webhook.endpoint,
+                },
               },
-            },
-          ]],
+            ],
+          ],
         });
 
         githubAPINocks.deleteWebhook({
@@ -413,9 +518,12 @@ describe('GitHub', () => {
           owner: site.owner,
           repo: site.repository,
           webhookId,
-          response: [200, {
-            message: 'No content',
-          }],
+          response: [
+            200,
+            {
+              message: 'No content',
+            },
+          ],
         });
 
         const response = await GitHub.deleteWebhook(site, user.githubAccessToken);
@@ -429,12 +537,18 @@ describe('GitHub', () => {
     it('should resolve if the user is on an allowed team', (done) => {
       githubAPINocks.userOrganizations({
         accessToken: '123abc',
-        organizations: [{ id: config.passport.github.organizations[0] }],
+        organizations: [
+          {
+            id: config.passport.github.organizations[0],
+          },
+        ],
       });
 
-      GitHub.validateUser('123abc').then(() => {
-        done();
-      }).catch(done);
+      GitHub.validateUser('123abc')
+        .then(() => {
+          done();
+        })
+        .catch(done);
     });
 
     it('should reject if the user is not on an allowed team', (done) => {
@@ -442,7 +556,11 @@ describe('GitHub', () => {
 
       githubAPINocks.userOrganizations({
         accessToken: '123abc',
-        organizations: [{ id: FAKE_INVALID_ORG_ID }],
+        organizations: [
+          {
+            id: FAKE_INVALID_ORG_ID,
+          },
+        ],
       });
 
       GitHub.validateUser('123abc').catch((err) => {
@@ -468,7 +586,9 @@ describe('GitHub', () => {
     beforeEach(() => {
       mockGHRequest = null;
       const userPromise = factory.user();
-      const sitePromise = factory.site({ users: Promise.all([userPromise]) });
+      const sitePromise = factory.site({
+        users: Promise.all([userPromise]),
+      });
 
       promised = Promise.props({
         user: userPromise,
@@ -477,18 +597,19 @@ describe('GitHub', () => {
     });
 
     it('returns a branch based on the supplied parameters', (done) => {
-      promised.then((values) => {
-        const { owner, repository } = values.site;
-        const branch = 'main';
+      promised
+        .then((values) => {
+          const { owner, repository } = values.site;
+          const branch = 'main';
 
-        mockGHRequest = githubAPINocks.getBranch({
-          owner,
-          repo: repository,
-          branch,
-        });
+          mockGHRequest = githubAPINocks.getBranch({
+            owner,
+            repo: repository,
+            branch,
+          });
 
-        return GitHub.getBranch(values.user, owner, repository, branch);
-      })
+          return GitHub.getBranch(values.user, owner, repository, branch);
+        })
         .then((branchInfo) => {
           expect(branchInfo).to.exist;
           expect(branchInfo.name).to.exist;
@@ -500,17 +621,17 @@ describe('GitHub', () => {
     });
 
     it('returns an error if branch is not defined', (done) => {
-      promised.then((values) => {
-        const { owner, repository } = values.site;
+      promised
+        .then((values) => {
+          const { owner, repository } = values.site;
 
-        return GitHub.getBranch(values.user, owner, repository)
-          .catch((err) => {
+          return GitHub.getBranch(values.user, owner, repository).catch((err) => {
             // octokit no longer validates the arguments client side so the error
             // we are receiving here is actually the missing nock...
             expect(err.status).to.equal(500);
             done();
           });
-      })
+        })
         .catch(done);
     });
   });
@@ -520,8 +641,14 @@ describe('GitHub', () => {
       const accessToken = 'token';
 
       githubAPINocks.getRepositories({ accessToken });
-      githubAPINocks.getRepositories({ accessToken, page: 2 });
-      githubAPINocks.getRepositories({ accessToken, page: 3 });
+      githubAPINocks.getRepositories({
+        accessToken,
+        page: 2,
+      });
+      githubAPINocks.getRepositories({
+        accessToken,
+        page: 3,
+      });
       GitHub.getRepositories(accessToken)
         .then((repos) => {
           expect(repos.length).to.equal(101);
@@ -533,11 +660,10 @@ describe('GitHub', () => {
     it('returns an exception', (done) => {
       const accessToken = 'invalid';
 
-      GitHub.getRepositories(accessToken)
-        .catch((err) => {
-          expect(err.status).to.exist;
-          done();
-        });
+      GitHub.getRepositories(accessToken).catch((err) => {
+        expect(err.status).to.exist;
+        done();
+      });
     });
   });
 
@@ -547,12 +673,22 @@ describe('GitHub', () => {
       const owner = 'owner';
       const repository = 'repo';
 
-      githubAPINocks.getCollaborators({ accessToken, owner, repository });
       githubAPINocks.getCollaborators({
-        accessToken, owner, repository, page: 2,
+        accessToken,
+        owner,
+        repository,
       });
       githubAPINocks.getCollaborators({
-        accessToken, owner, repository, page: 3,
+        accessToken,
+        owner,
+        repository,
+        page: 2,
+      });
+      githubAPINocks.getCollaborators({
+        accessToken,
+        owner,
+        repository,
+        page: 3,
       });
 
       GitHub.getCollaborators(accessToken, owner, repository)
@@ -566,11 +702,10 @@ describe('GitHub', () => {
     it('returns an exception', (done) => {
       const accessToken = 'invalid';
 
-      GitHub.getRepositories(accessToken)
-        .catch((err) => {
-          expect(err.status).to.exist;
-          done();
-        });
+      GitHub.getRepositories(accessToken).catch((err) => {
+        expect(err.status).to.exist;
+        done();
+      });
     });
   });
 
@@ -579,9 +714,20 @@ describe('GitHub', () => {
       const accessToken = 'token';
       const organization = 'testOrg';
 
-      githubAPINocks.getOrganizationMembers({ accessToken, organization });
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 2 });
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, page: 3 });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        page: 2,
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        page: 3,
+      });
       GitHub.getOrganizationMembers(accessToken, organization)
         .then((members) => {
           expect(members.length).to.equal(101);
@@ -594,21 +740,30 @@ describe('GitHub', () => {
       const accessToken = 'token';
       const organization = 'failOrg';
 
-      githubAPINocks.getOrganizationMembers({ accessToken, organization });
-      GitHub.getOrganizationMembers(accessToken, organization)
-        .catch((err) => {
-          expect(err.status).to.exist;
-          done();
-        });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+      });
+      GitHub.getOrganizationMembers(accessToken, organization).catch((err) => {
+        expect(err.status).to.exist;
+        done();
+      });
     });
 
     it('returns a list of organization admin members', (done) => {
       const accessToken = 'token';
       const organization = 'testOrg';
 
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'admin' });
       githubAPINocks.getOrganizationMembers({
-        accessToken, organization, role: 'admin', page: 2,
+        accessToken,
+        organization,
+        role: 'admin',
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        role: 'admin',
+        page: 2,
       });
       GitHub.getOrganizationMembers(accessToken, organization, 'admin')
         .then((members) => {
@@ -622,9 +777,16 @@ describe('GitHub', () => {
       const accessToken = 'token';
       const organization = 'testOrg';
 
-      githubAPINocks.getOrganizationMembers({ accessToken, organization, role: 'member' });
       githubAPINocks.getOrganizationMembers({
-        accessToken, organization, role: 'member', page: 2,
+        accessToken,
+        organization,
+        role: 'member',
+      });
+      githubAPINocks.getOrganizationMembers({
+        accessToken,
+        organization,
+        role: 'member',
+        page: 2,
       });
       GitHub.getOrganizationMembers(accessToken, organization, 'member')
         .then((members) => {
@@ -641,12 +803,22 @@ describe('GitHub', () => {
       const org = 'federalist-users';
       const team_slug = '12345';
 
-      githubAPINocks.getTeamMembers({ accessToken, org, team_slug });
       githubAPINocks.getTeamMembers({
-        accessToken, org, team_slug, page: 2,
+        accessToken,
+        org,
+        team_slug,
       });
       githubAPINocks.getTeamMembers({
-        accessToken, org, team_slug, page: 3,
+        accessToken,
+        org,
+        team_slug,
+        page: 2,
+      });
+      githubAPINocks.getTeamMembers({
+        accessToken,
+        org,
+        team_slug,
+        page: 3,
       });
       GitHub.getTeamMembers(accessToken, org, team_slug)
         .then((members) => {
@@ -661,12 +833,15 @@ describe('GitHub', () => {
       const org = 'federalist-users';
       const team_slug = 'failTeam';
 
-      githubAPINocks.getTeamMembers({ accessToken, org, team_slug });
-      GitHub.getTeamMembers(accessToken, org, team_slug)
-        .catch((err) => {
-          expect(err.status).to.exist;
-          done();
-        });
+      githubAPINocks.getTeamMembers({
+        accessToken,
+        org,
+        team_slug,
+      });
+      GitHub.getTeamMembers(accessToken, org, team_slug).catch((err) => {
+        expect(err.status).to.exist;
+        done();
+      });
     });
   });
 
@@ -685,7 +860,9 @@ describe('GitHub', () => {
         context,
       };
 
-      const failOptions = { ...options };
+      const failOptions = {
+        ...options,
+      };
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);
@@ -698,7 +875,8 @@ describe('GitHub', () => {
         .then(() => {
           expect(statusNock.isDone()).to.be.true;
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('sends a github status request and failOptions', (done) => {
@@ -715,7 +893,9 @@ describe('GitHub', () => {
         context,
       };
 
-      const failOptions = { ...options };
+      const failOptions = {
+        ...options,
+      };
       failOptions.response = [404, 'File not found'];
 
       githubAPINocks.status(failOptions);
@@ -729,7 +909,8 @@ describe('GitHub', () => {
           expect(err.status).to.equal(404);
           expect(err.message).to.equal('File not found');
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
   });
 
@@ -738,23 +919,38 @@ describe('GitHub', () => {
     const username = 'some-user';
 
     it('rejects when the user is not a member of the team', async () => {
-      githubAPINocks.getMembershipForUserInOrg({ accessToken, username, state: 'unknown' });
+      githubAPINocks.getMembershipForUserInOrg({
+        accessToken,
+        username,
+        state: 'unknown',
+      });
 
-      const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(e => e);
+      const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(
+        (e) => e,
+      );
 
       expect(err.status).to.eq(404);
     });
 
     it('rejects when the user is a pending member of the team', async () => {
-      githubAPINocks.getMembershipForUserInOrg({ accessToken, username, state: 'pending' });
+      githubAPINocks.getMembershipForUserInOrg({
+        accessToken,
+        username,
+        state: 'pending',
+      });
 
-      const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(e => e);
+      const err = await GitHub.ensureFederalistAdmin(accessToken, username).catch(
+        (e) => e,
+      );
 
       expect(err.message).to.eq(`You are not a ${config.app.appName} admin.`);
     });
 
     it('resolves when the user is a member of the team', async () => {
-      githubAPINocks.getMembershipForUserInOrg({ accessToken, username });
+      githubAPINocks.getMembershipForUserInOrg({
+        accessToken,
+        username,
+      });
 
       const result = await GitHub.ensureFederalistAdmin(accessToken, username);
 
@@ -762,7 +958,11 @@ describe('GitHub', () => {
     });
 
     it('resolves when the user is a maintainer of the team', async () => {
-      githubAPINocks.getMembershipForUserInOrg({ accessToken, username, state: 'maintainer' });
+      githubAPINocks.getMembershipForUserInOrg({
+        accessToken,
+        username,
+        state: 'maintainer',
+      });
 
       const result = await GitHub.ensureFederalistAdmin(accessToken, username);
 
@@ -780,42 +980,81 @@ describe('GitHub', () => {
     it('returns a file based on the supplied parameters', async () => {
       const content = 'helloworld';
 
-      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content });
+      githubAPINocks.getContent({
+        accessToken,
+        owner,
+        repo,
+        path,
+        ref,
+        content,
+      });
 
       const resp = await GitHub.getContent(accessToken, owner, repo, path, ref);
       expect(resp).to.equal('helloworld');
     });
 
-    it('returns a file based on the supplied parameters without ref (sha/branch)', async () => {
+    it(`returns a file based on the supplied
+        parameters without ref (sha/branch)`, async () => {
       const content = 'helloworld';
 
-      githubAPINocks.getContent({ accessToken, owner, repo, path, content });
+      githubAPINocks.getContent({
+        accessToken,
+        owner,
+        repo,
+        path,
+        content,
+      });
 
       const resp = await GitHub.getContent(accessToken, owner, repo, path);
       expect(resp).to.equal('helloworld');
     });
 
-    it('returns an array (ie: dir files meta data) based on the supplied parameters', async () => {
+    it(`returns an array (ie: dir files meta data)
+        based on the supplied parameters`, async () => {
       const content = [1, 2, 3];
       const type = undefined;
 
-      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, content, type });
+      githubAPINocks.getContent({
+        accessToken,
+        owner,
+        repo,
+        path,
+        ref,
+        content,
+        type,
+      });
 
       const resp = await GitHub.getContent(accessToken, owner, repo, path, ref);
       expect(resp).to.eql(content);
     });
 
     it('returns a 404 based on invalid supplied parameters', async () => {
-      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 404 });
+      githubAPINocks.getContent({
+        accessToken,
+        owner,
+        repo,
+        path,
+        ref,
+        responseCode: 404,
+      });
 
       const content = await GitHub.getContent(accessToken, owner, repo, path, ref);
       expect(content).to.be.null;
     });
 
     it('returns a 403 based on invalid supplied parameters', async () => {
-      githubAPINocks.getContent({ accessToken, owner, repo, path, ref, responseCode: 403 });
+      githubAPINocks.getContent({
+        accessToken,
+        owner,
+        repo,
+        path,
+        ref,
+        responseCode: 403,
+      });
 
-      const err = await GitHub.getContent(accessToken, owner, repo, path, ref).catch(err => err);
+      const err = await GitHub.getContent(accessToken, owner, repo, path, ref).catch(
+        (err) => err,
+      );
       expect(err.status).to.equal(403);
       expect(err.message).to.equal('Error Encountered');
     });

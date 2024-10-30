@@ -3,7 +3,11 @@ const sinon = require('sinon');
 const BaseSerializer = require('../../../../api/serializers/base');
 
 describe('Base Serializer', () => {
-  const defaultModel = { get(attr) { return this[attr]; } };
+  const defaultModel = {
+    get(attr) {
+      return this[attr];
+    },
+  };
 
   it('generates a serializer with `serialize` and `serializeMany` functions', () => {
     const serializer = new BaseSerializer({}, {});
@@ -20,29 +24,39 @@ describe('Base Serializer', () => {
         foo: date,
       };
 
-      const attributes = { foo: 'date' };
+      const attributes = {
+        foo: 'date',
+      };
       const serializer = new BaseSerializer(attributes);
 
       const result = serializer.serialize(model);
 
-      expect(result).to.deep.eq({ foo: date.toISOString() });
+      expect(result).to.deep.eq({
+        foo: date.toISOString(),
+      });
     });
 
     it('transforms yaml to strings', () => {
-      const value = { bar: 'baz' };
+      const value = {
+        bar: 'baz',
+      };
 
       const model = {
         ...defaultModel,
         foo: value,
       };
 
-      const attributes = { foo: 'yaml' };
+      const attributes = {
+        foo: 'yaml',
+      };
 
       const serializer = new BaseSerializer(attributes);
 
       const result = serializer.serialize(model);
 
-      expect(result).to.deep.eq({ foo: 'bar: baz\n' });
+      expect(result).to.deep.eq({
+        foo: 'bar: baz\n',
+      });
     });
 
     it('calls custom transformers with the value, model and `isSystemAdmin`', () => {
@@ -55,13 +69,17 @@ describe('Base Serializer', () => {
         foo: value,
       };
 
-      const attributes = { foo: stub };
+      const attributes = {
+        foo: stub,
+      };
 
       const serializer = new BaseSerializer(attributes, {});
 
       const result = serializer.serialize(model, isSystemAdmin);
 
-      expect(result).to.deep.eq({ foo: 'bar' });
+      expect(result).to.deep.eq({
+        foo: 'bar',
+      });
       sinon.assert.calledOnceWithExactly(stub, value, model, isSystemAdmin);
     });
 
@@ -72,13 +90,17 @@ describe('Base Serializer', () => {
         bar: 'bar',
       };
 
-      const attributes = { foo: '' };
+      const attributes = {
+        foo: '',
+      };
       const adminAttributes = { bar: '' };
       const { serialize } = new BaseSerializer(attributes, adminAttributes);
 
       const result = serialize(model);
 
-      expect(result).to.deep.eq({ foo: 'foo' });
+      expect(result).to.deep.eq({
+        foo: 'foo',
+      });
     });
 
     context('when isSystemAdmin is not provided', () => {
@@ -95,7 +117,9 @@ describe('Base Serializer', () => {
 
         const result = serializer.serialize(model);
 
-        expect(result).to.deep.eq({ foo: 'foo' });
+        expect(result).to.deep.eq({
+          foo: 'foo',
+        });
       });
     });
 
@@ -114,13 +138,17 @@ describe('Base Serializer', () => {
 
         const result = serializer.serialize(model, true);
 
-        expect(result).to.deep.eq({ foo: 'foo', bar: 'bar' });
+        expect(result).to.deep.eq({
+          foo: 'foo',
+          bar: 'bar',
+        });
       });
     });
   });
 
   context('serializer .serializeMany', () => {
-    it('returns the values of calling `serialize` with each model, passing through `isSystemAdmin', () => {
+    it(`returns the values of calling \`serialize\`
+        with each model, passing through \`isSystemAdmin\``, () => {
       const models = [1, 2];
       const isSystemAdmin = true;
 

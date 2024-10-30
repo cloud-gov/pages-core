@@ -22,7 +22,18 @@ function SettingsForm(props) {
         <span className="usa-error-message" id="input-error-message" role="alert">
           {errorMessage}
         </span>
-        <table className="usa-table usa-table--borderless usa-table--stacked log-table log-table__site-settings org-member-table width-full table-full-width">
+        <table
+          className={`
+            usa-table
+            usa-table--borderless
+            usa-table--stacked
+            log-table
+            log-table__site-settings
+            org-member-table
+            width-full
+            table-full-width
+          `}
+        >
           <thead>
             <tr>
               <th scope="col">Repository</th>
@@ -31,15 +42,14 @@ function SettingsForm(props) {
             </tr>
           </thead>
           <tbody>
-            {sites.map(site => (
+            {sites.map((site) => (
               <tr key={site.id}>
                 <th scope="row" data-title="Repository" className="font-body-sm">
-                  {site.owner}
-                  /
-                  {site.repository}
+                  {site.owner}/{site.repository}
                 </th>
                 <td data-title="Organization" className="font-body-sm">
-                  {organizations.find(org => org.id === site.organizationId)?.name || '-'}
+                  {organizations.find((org) => org.id === site.organizationId)?.name ||
+                    '-'}
                 </td>
                 <td>
                   <div className="grid-row">
@@ -52,7 +62,12 @@ function SettingsForm(props) {
                         id={`${site.id}-none`}
                         value="none"
                       />
-                      <label className="usa-radio__label font-body-xs" htmlFor={`${site.id}-none`}>None</label>
+                      <label
+                        className="usa-radio__label font-body-xs"
+                        htmlFor={`${site.id}-none`}
+                      >
+                        None
+                      </label>
                     </div>
                     <div className="flex-1 usa-radio">
                       <Field
@@ -63,7 +78,12 @@ function SettingsForm(props) {
                         id={`${site.id}-builds`}
                         value="builds"
                       />
-                      <label className="usa-radio__label font-body-xs" htmlFor={`${site.id}-builds`}>Only Mine</label>
+                      <label
+                        className="usa-radio__label font-body-xs"
+                        htmlFor={`${site.id}-builds`}
+                      >
+                        Only Mine
+                      </label>
                     </div>
                     <div className="flex-1 usa-radio">
                       <Field
@@ -74,7 +94,12 @@ function SettingsForm(props) {
                         id={`${site.id}-site`}
                         value="site"
                       />
-                      <label className="usa-radio__label font-body-xs" htmlFor={`${site.id}-site`}>All</label>
+                      <label
+                        className="usa-radio__label font-body-xs"
+                        htmlFor={`${site.id}-site`}
+                      >
+                        All
+                      </label>
                     </div>
                   </div>
                 </td>

@@ -13,7 +13,10 @@ function create(params) {
 }
 
 function truncate() {
-  return Role.truncate({ force: true, cascade: true });
+  return Role.truncate({
+    force: true,
+    cascade: true,
+  });
 }
 
 module.exports = {

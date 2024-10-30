@@ -12,11 +12,7 @@ export const validateBranchName = (value) => {
 };
 
 const BranchField = ({ ...props }) => (
-  <Field
-    component={InputWithErrorField}
-    validate={[validateBranchName]}
-    {...props}
-  />
+  <Field component={InputWithErrorField} validate={[validateBranchName]} {...props} />
 );
 
 export default BranchField;

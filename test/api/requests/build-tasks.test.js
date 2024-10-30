@@ -5,28 +5,51 @@ const app = require('../../../app');
 const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const {
-  BuildTask, BuildTaskType, Build, User,
-} = require('../../../api/models');
+const { BuildTask, BuildTaskType, Build, User } = require('../../../api/models');
 
 function clean() {
   return Promise.all([
-    Build.truncate({ force: true, cascade: true }),
-    BuildTask.truncate({ force: true, cascade: true }),
-    BuildTaskType.truncate({ force: true, cascade: true }),
-    User.truncate({ force: true, cascade: true }),
+    Build.truncate({
+      force: true,
+      cascade: true,
+    }),
+    BuildTask.truncate({
+      force: true,
+      cascade: true,
+    }),
+    BuildTaskType.truncate({
+      force: true,
+      cascade: true,
+    }),
+    User.truncate({
+      force: true,
+      cascade: true,
+    }),
   ]);
 }
 
 async function prepTasks() {
   const user = await factory.user();
   const cookie = await authenticatedSession(user);
-  const site = await factory.site({ users: [user] });
-  const build = await factory.build({ user, site });
+  const site = await factory.site({
+    users: [user],
+  });
+  const build = await factory.build({
+    user,
+    site,
+  });
 
-  const task = await factory.buildTask({ build });
-  await factory.buildTask({ build });
-  return { cookie, build, task };
+  const task = await factory.buildTask({
+    build,
+  });
+  await factory.buildTask({
+    build,
+  });
+  return {
+    cookie,
+    build,
+    task,
+  };
 }
 
 describe('Build Task API', () => {
@@ -41,13 +64,16 @@ describe('Build Task API', () => {
 
   describe('GET /v0/build/:build_id/tasks', () => {
     it('should require authentication', (done) => {
-      factory.buildTask().then(buildTask => request(app)
-        .get(`/v0/build/${buildTask.buildId}/tasks`)
-        .expect(403))
+      factory
+        .buildTask()
+        .then((buildTask) =>
+          request(app).get(`/v0/build/${buildTask.buildId}/tasks`).expect(403),
+        )
         .then((response) => {
           validateAgainstJSONSchema('GET', '/build/{build_id}/tasks', 403, response.body);
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('should list build tasks', async () => {
@@ -91,13 +117,23 @@ describe('Build Task API', () => {
 
   describe('GET /v0/build/:build_id/tasks/:task_id', () => {
     it('should require authentication', (done) => {
-      factory.buildTask().then(buildTask => request(app)
-        .get(`/v0/build/${buildTask.buildId}/tasks/${buildTask.id}`)
-        .expect(403))
+      factory
+        .buildTask()
+        .then((buildTask) =>
+          request(app)
+            .get(`/v0/build/${buildTask.buildId}/tasks/${buildTask.id}`)
+            .expect(403),
+        )
         .then((response) => {
-          validateAgainstJSONSchema('GET', '/build/{build_id}/tasks/{task_id}', 404, response.body);
+          validateAgainstJSONSchema(
+            'GET',
+            '/build/{build_id}/tasks/{task_id}',
+            404,
+            response.body,
+          );
           done();
-        }).catch(done);
+        })
+        .catch(done);
     });
 
     it('should fetch one build task', async () => {
@@ -108,7 +144,12 @@ describe('Build Task API', () => {
         .set('Cookie', cookie)
         .expect(200);
 
-      validateAgainstJSONSchema('GET', '/build/{build_id}/tasks/{task_id}', 200, response.body);
+      validateAgainstJSONSchema(
+        'GET',
+        '/build/{build_id}/tasks/{task_id}',
+        200,
+        response.body,
+      );
       expect(response.body).to.be.an('object');
       expect(response.body).to.have.keys([
         'artifact',
@@ -138,7 +179,8 @@ describe('Build Task API', () => {
       validateAgainstJSONSchema('GET', '/build/{build_id}/tasks', 404, response.body);
     });
 
-    it('should not get build task if the build is not associated to the build task', async () => {
+    it(`should not get build task
+        if the build is not associated to the build task`, async () => {
       const anotherBuild = await factory.build();
       const { task, cookie } = await prepTasks();
 
@@ -155,9 +197,14 @@ describe('Build Task API', () => {
     it('should create build tasks for a build', async () => {
       const user = await factory.user();
       const cookie = await authenticatedSession(user);
-      const site = await factory.site({ users: [user] });
+      const site = await factory.site({
+        users: [user],
+      });
       const buildTaskType = await factory.buildTaskType();
-      const build = await factory.build({ user, site });
+      const build = await factory.build({
+        user,
+        site,
+      });
       await factory.siteBuildTask({
         siteId: site.id,
         buildTaskTypeId: buildTaskType.id,
@@ -189,7 +236,7 @@ describe('Build Task API', () => {
         .expect(403);
     });
 
-    it('should return a 404 when a task isn\'t found', async () => {
+    it("should return a 404 when a task isn't found", async () => {
       const { task } = await prepTasks();
 
       return request(app)
@@ -225,7 +272,9 @@ describe('Build Task API', () => {
 
     it('should not update a build task for certain statuses', async () => {
       const { task } = await prepTasks();
-      await task.update({ status: BuildTask.Statuses.Error });
+      await task.update({
+        status: BuildTask.Statuses.Error,
+      });
       const newTask = {
         name: 'new name',
         artifact: 'new artifact',

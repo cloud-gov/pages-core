@@ -10,10 +10,12 @@ export const useOrganizationRoles = () => {
   const [state, setState] = useState(initState);
 
   useEffect(() => {
-    api.fetchOrganizationRoles().then(data => setState({
-      isLoading: false,
-      orgRoles: data,
-    }));
+    api.fetchOrganizationRoles().then((data) =>
+      setState({
+        isLoading: false,
+        orgRoles: data,
+      }),
+    );
   }, []);
 
   return state;

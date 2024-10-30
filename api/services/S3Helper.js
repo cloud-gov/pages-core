@@ -23,7 +23,13 @@ class S3Client {
 
   async waitForBucket() {
     const { bucket, client } = this;
-    await waitUntilBucketExists({ client, maxWaitTime: 60 }, { Bucket: bucket });
+    await waitUntilBucketExists(
+      {
+        client,
+        maxWaitTime: 60,
+      },
+      { Bucket: bucket },
+    );
   }
 
   async listHelper(prefix, property) {
@@ -34,10 +40,13 @@ class S3Client {
      * from the results (e.g. `CommonPrefixes` or `Contents`).
      */
     const paginationsConfig = { client: this.client };
-    const listCommandInput = { Bucket: this.bucket, Prefix: prefix, Delimiter: '/' };
+    const listCommandInput = {
+      Bucket: this.bucket,
+      Prefix: prefix,
+      Delimiter: '/',
+    };
     const paginator = paginateListObjectsV2(paginationsConfig, listCommandInput);
     const results = [];
-    // eslint-disable-next-line no-restricted-syntax
     for await (const page of paginator) {
       if (page.KeyCount > 0) {
         results.push(...page[property]);
@@ -91,7 +100,6 @@ class S3Client {
 
     let wereS3ResultsTruncated = false;
     // Concatenate S3 pages until there are enough for OUR page size
-    // eslint-disable-next-line no-restricted-syntax
     for await (const page of paginator) {
       objects.push(...page.Contents);
       if (objects.length >= totalMaxObjects) {
@@ -102,7 +110,8 @@ class S3Client {
 
     // Truncate results before returning if there are more than our page size
     const truncatedObjects = objects.slice(0, totalMaxObjects);
-    const isTruncated = (wereS3ResultsTruncated || truncatedObjects.length < objects.length);
+    const isTruncated =
+      wereS3ResultsTruncated || truncatedObjects.length < objects.length;
 
     return {
       isTruncated,
@@ -113,18 +122,21 @@ class S3Client {
   async deleteAllBucketObjects() {
     const { bucket, client } = this;
     const paginationsConfig = { client };
-    const listCommandInput = { Bucket: bucket };
+    const listCommandInput = {
+      Bucket: bucket,
+    };
 
     // Iterate by page over all of the objects in the bucket
     const paginator = paginateListObjectsV2(paginationsConfig, listCommandInput);
 
-    // eslint-disable-next-line no-restricted-syntax
     for await (const page of paginator) {
       // Delete all of the objects in the current page
       const commandInput = {
         Bucket: this.bucket,
         Delete: {
-          Objects: page.Contents.map(object => ({ Key: object.Key })),
+          Objects: page.Contents.map((object) => ({
+            Key: object.Key,
+          })),
         },
       };
       const command = new DeleteObjectsCommand(commandInput);
@@ -155,4 +167,7 @@ class S3Client {
   }
 }
 
-module.exports = { S3_DEFAULT_MAX_KEYS, S3Client };
+module.exports = {
+  S3_DEFAULT_MAX_KEYS,
+  S3Client,
+};

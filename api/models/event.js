@@ -42,39 +42,43 @@ module.exports = (sequelize, DataTypes) => {
 
   const associate = () => {};
 
-  const Event = sequelize.define('Event', {
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isValidType,
+  const Event = sequelize.define(
+    'Event',
+    {
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isValidType,
+        },
+      },
+      label: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isValidLabel,
+        },
+      },
+      modelId: {
+        type: DataTypes.INTEGER,
+      },
+      model: {
+        type: DataTypes.STRING,
+        validate: {
+          isValidModel,
+        },
+      },
+      body: {
+        type: DataTypes.JSONB,
+        defaultValue: {},
       },
     },
-    label: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isValidLabel,
-      },
+    {
+      tableName: 'event',
+      timestamps: true,
+      updatedAt: false,
     },
-    modelId: {
-      type: DataTypes.INTEGER,
-    },
-    model: {
-      type: DataTypes.STRING,
-      validate: {
-        isValidModel,
-      },
-    },
-    body: {
-      type: DataTypes.JSONB,
-      defaultValue: {},
-    },
-  }, {
-    tableName: 'event',
-    timestamps: true,
-    updatedAt: false,
-  });
+  );
 
   Event.associate = associate;
   Event.labels = labels;

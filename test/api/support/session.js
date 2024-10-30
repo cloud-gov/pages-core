@@ -5,7 +5,11 @@ const sessionConfig = require('../../../api/init/sessionConfig');
 const factory = require('./factory');
 const csrfToken = require('./csrfToken');
 
-function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionConfig } = {}) {
+function unauthenticatedSession({
+  oauthState,
+  authRedirectPath,
+  cfg = sessionConfig,
+} = {}) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   const sessionBody = {
@@ -18,19 +22,20 @@ function unauthenticatedSession({ oauthState, authRedirectPath, cfg = sessionCon
     flash: {},
     authenticated: false,
     csrfSecret: csrfToken.TEST_CSRF_SECRET,
-    'oauth2:uaa': { state: oauthState },
+    'oauth2:uaa': {
+      state: oauthState,
+    },
     authRedirectPath,
   };
 
-  return cfg.store.set(sessionKey, sessionBody)
-    .then(() => {
-      const signedSessionKey = `${sessionKey}.${crypto
-        .createHmac('sha256', cfg.secret)
-        .update(sessionKey)
-        .digest('base64')
-        .replace(/=+$/, '')}`;
-      return `${cfg.key}=s%3A${signedSessionKey}`;
-    });
+  return cfg.store.set(sessionKey, sessionBody).then(() => {
+    const signedSessionKey = `${sessionKey}.${crypto
+      .createHmac('sha256', cfg.secret)
+      .update(sessionKey)
+      .digest('base64')
+      .replace(/=+$/, '')}`;
+    return `${cfg.key}=s%3A${signedSessionKey}`;
+  });
 }
 
 function authenticatedSession(user, cfg = sessionConfig) {
@@ -65,7 +70,11 @@ function authenticatedSession(user, cfg = sessionConfig) {
     });
 }
 
-function authenticatedAdminOrSupportSession(user, cfg = sessionConfig, role = 'pages.admin') {
+function authenticatedAdminOrSupportSession(
+  user,
+  cfg = sessionConfig,
+  role = 'pages.admin',
+) {
   const sessionKey = crypto.randomBytes(8).toString('hex');
 
   return Promise.resolve(user || factory.user())
@@ -78,7 +87,10 @@ function authenticatedAdminOrSupportSession(user, cfg = sessionConfig, role = 'p
           path: '/',
         },
         passport: {
-          user: { id: u.id, role },
+          user: {
+            id: u.id,
+            role,
+          },
         },
         flash: {},
         authenticated: true,

@@ -4,12 +4,21 @@ const { User } = require('../api/models');
 
 async function createUser(uaaUser) {
   const {
-    emails: [{ value: email }], id: uaaId, origin, userName,
+    emails: [{ value: email }],
+    id: uaaId,
+    origin,
+    userName,
   } = uaaUser;
 
-  const user = await User.create({ email, username: userName });
+  const user = await User.create({
+    email,
+    username: userName,
+  });
   await user.createUAAIdentity({
-    uaaId, email, origin, userName,
+    uaaId,
+    email,
+    origin,
+    userName,
   });
   return user;
 }
@@ -29,8 +38,9 @@ if (!groupName) {
 }
 
 try {
-  bootstrapAdmins(groupName)
-    .then(users => console.log(`Bootstrapped ${users.length} users.`));
+  bootstrapAdmins(groupName).then((users) =>
+    console.log(`Bootstrapped ${users.length} users.`),
+  );
 } catch (err) {
   console.error(err);
   process.exit(1);

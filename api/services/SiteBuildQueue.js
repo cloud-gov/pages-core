@@ -16,16 +16,18 @@ const S3Helper = require('./S3Helper');
 const apiClient = new CloudFoundryAPIClient();
 
 const siteConfig = (build, siteBranchConfigs = []) => {
-  const configRecord = siteBranchConfigs.find(c => c.branch === build.branch)
-    || siteBranchConfigs.find(c => c.context === 'preview')
-    || null;
+  const configRecord =
+    siteBranchConfigs.find((c) => c.branch === build.branch) ||
+    siteBranchConfigs.find((c) => c.context === 'preview') ||
+    null;
 
   return configRecord?.config || {};
 };
 
-const baseURLForDomain = rawDomain => url.parse(rawDomain).path.replace(/(\/)+$/, '');
+const baseURLForDomain = (rawDomain) => url.parse(rawDomain).path.replace(/(\/)+$/, '');
 
-const sitePrefixForBuild = rawDomain => baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
+const sitePrefixForBuild = (rawDomain) =>
+  baseURLForDomain(rawDomain).replace(/^(\/)+/, '');
 
 const baseURLForBuild = (build) => {
   const link = buildViewLink(build, build.Site);
@@ -33,28 +35,22 @@ const baseURLForBuild = (build) => {
   return urlObject.pathname.replace(/(\/)+$/, '');
 };
 
-const statusCallbackURL = build => [
-  url.resolve(config.app.hostname, '/v0/build'),
-  build.id,
-  'status',
-  build.token,
-].join('/');
+const statusCallbackURL = (build) =>
+  [url.resolve(config.app.hostname, '/v0/build'), build.id, 'status', build.token].join(
+    '/',
+  );
 
-const buildUEVs = uevs => (uevs
-  ? uevs.map(uev => ({
-    name: uev.name,
-    ciphertext: uev.ciphertext,
-  }))
-  : []);
+const buildUEVs = (uevs) =>
+  uevs
+    ? uevs.map((uev) => ({
+        name: uev.name,
+        ciphertext: uev.ciphertext,
+      }))
+    : [];
 
 const generateDefaultCredentials = async (build) => {
-  const {
-    engine,
-    owner,
-    repository,
-    UserEnvironmentVariables,
-    SiteBranchConfigs,
-  } = build.Site;
+  const { engine, owner, repository, UserEnvironmentVariables, SiteBranchConfigs } =
+    build.Site;
 
   const baseUrl = baseURLForBuild(build);
 
@@ -69,9 +65,7 @@ const generateDefaultCredentials = async (build) => {
     GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
     GENERATOR: engine,
     BUILD_ID: build.id,
-    USER_ENVIRONMENT_VARIABLES: JSON.stringify(
-      buildUEVs(UserEnvironmentVariables)
-    ),
+    USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(UserEnvironmentVariables)),
   };
 };
 
@@ -79,12 +73,13 @@ const buildContainerEnvironment = async (build) => {
   const defaultCredentials = await generateDefaultCredentials(build);
 
   if (!defaultCredentials.GITHUB_TOKEN) {
-    defaultCredentials.GITHUB_TOKEN = await GithubBuildHelper.loadBuildUserAccessToken(build);
+    defaultCredentials.GITHUB_TOKEN =
+      await GithubBuildHelper.loadBuildUserAccessToken(build);
   }
 
   return apiClient
     .fetchServiceInstanceCredentials(build.Site.s3ServiceName)
-    .then(credentials => ({
+    .then((credentials) => ({
       ...defaultCredentials,
       AWS_DEFAULT_REGION: credentials.region,
       AWS_ACCESS_KEY_ID: credentials.access_key_id,
@@ -99,18 +94,13 @@ SiteBuildQueue.setupBucket = async (build, buildCount) => {
   if (buildCount > 1) return true;
 
   const credentials = await apiClient.fetchServiceInstanceCredentials(
-    build.Site.s3ServiceName
+    build.Site.s3ServiceName,
   );
-  const {
-    access_key_id, // eslint-disable-line
-    bucket,
-    region,
-    secret_access_key, // eslint-disable-line
-  } = credentials;
+  const { access_key_id, bucket, region, secret_access_key } = credentials;
 
   const s3Client = new S3Helper.S3Client({
-    accessKeyId: access_key_id, // eslint-disable-line
-    secretAccessKey: secret_access_key, // eslint-disable-line
+    accessKeyId: access_key_id,
+    secretAccessKey: secret_access_key,
     bucket,
     region,
   });
@@ -122,9 +112,9 @@ SiteBuildQueue.setupBucket = async (build, buildCount) => {
   return true;
 };
 
-SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
-  .then(environment => ({
-    environment: Object.keys(environment).map(key => ({
+SiteBuildQueue.messageBodyForBuild = (build) =>
+  buildContainerEnvironment(build).then((environment) => ({
+    environment: Object.keys(environment).map((key) => ({
       name: key,
       value: environment[key],
     })),
@@ -134,7 +124,9 @@ SiteBuildQueue.messageBodyForBuild = build => buildContainerEnvironment(build)
 
 SiteBuildQueue.setupTaskEnv = async (buildId) => {
   const build = await Build.findOne({
-    where: { id: buildId },
+    where: {
+      id: buildId,
+    },
     include: [
       User,
       {
@@ -146,7 +138,9 @@ SiteBuildQueue.setupTaskEnv = async (buildId) => {
   });
 
   const count = await Build.count({
-    where: { site: build.site },
+    where: {
+      site: build.site,
+    },
   });
 
   await SiteBuildQueue.setupBucket(build, count);

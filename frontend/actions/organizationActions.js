@@ -7,9 +7,8 @@ import {
 } from './actionCreators/organizationActions';
 
 const dispatchOrganizationsFetchStartedAction = () => dispatch(organizationsFetchStarted);
-const dispatchOrganizationsReceivedAction = organizations => (
-  dispatch(organizationsReceived(organizations))
-);
+const dispatchOrganizationsReceivedAction = (organizations) =>
+  dispatch(organizationsReceived(organizations));
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
@@ -19,7 +18,8 @@ const alertError = (error) => {
 export default {
   fetchOrganizations() {
     dispatchOrganizationsFetchStartedAction();
-    return federalist.fetchOrganizations()
+    return federalist
+      .fetchOrganizations()
       .then(dispatchOrganizationsReceivedAction)
       .catch(alertError);
   },

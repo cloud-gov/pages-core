@@ -1,9 +1,13 @@
 import { expect } from 'chai';
 import {
-  userEnvironmentVariablesFetchStarted, userEnvironmentVariablesFetchStartedType,
-  userEnvironmentVariablesReceived, userEnvironmentVariablesReceivedType,
-  userEnvironmentVariableAdded, userEnvironmentVariableAddedType,
-  userEnvironmentVariableDeleted, userEnvironmentVariableDeletedType,
+  userEnvironmentVariablesFetchStarted,
+  userEnvironmentVariablesFetchStartedType,
+  userEnvironmentVariablesReceived,
+  userEnvironmentVariablesReceivedType,
+  userEnvironmentVariableAdded,
+  userEnvironmentVariableAddedType,
+  userEnvironmentVariableDeleted,
+  userEnvironmentVariableDeletedType,
 } from '../../../../frontend/actions/actionCreators/userEnvironmentVariableActions';
 
 describe('userEnvironmentVariableActions actionCreators', () => {
@@ -29,7 +33,10 @@ describe('userEnvironmentVariableActions actionCreators', () => {
 
       expect(actual).to.deep.equal({
         type: userEnvironmentVariablesReceivedType,
-        payload: { siteId, userEnvironmentVariables },
+        payload: {
+          siteId,
+          userEnvironmentVariables,
+        },
       });
     });
   });
@@ -43,7 +50,10 @@ describe('userEnvironmentVariableActions actionCreators', () => {
 
       expect(actual).to.deep.equal({
         type: userEnvironmentVariableAddedType,
-        payload: { siteId, userEnvironmentVariable },
+        payload: {
+          siteId,
+          userEnvironmentVariable,
+        },
       });
     });
   });
@@ -57,7 +67,10 @@ describe('userEnvironmentVariableActions actionCreators', () => {
 
       expect(actual).to.deep.equal({
         type: userEnvironmentVariableDeletedType,
-        payload: { siteId, userEnvironmentVariableId },
+        payload: {
+          siteId,
+          userEnvironmentVariableId,
+        },
       });
     });
   });

@@ -1,13 +1,13 @@
-import { expect } from "chai";
-import proxyquire from "proxyquire";
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
 
 proxyquire.noCallThru();
 
-describe("alertReducer", () => {
+describe('alertReducer', () => {
   let fixture;
 
   // Action types
-  const HTTP_ERROR = "errant HTTP";
+  const HTTP_ERROR = 'errant HTTP';
   const HTTP_SUCCESS = 'success';
   const CLEAR = 'clear';
   const SET_STALE = 'set stale';
@@ -20,48 +20,52 @@ describe("alertReducer", () => {
   const initialState = {
     message: '',
     status: '',
-    stale: false
+    stale: false,
   };
 
   const successState = {
     message: 'yey',
     status: 'info',
-    stale: false
+    stale: false,
   };
 
   beforeEach(() => {
-    fixture = proxyquire("../../../frontend/reducers/alert", {
-      "../actions/actionCreators/alertActions": {
+    fixture = proxyquire('../../../frontend/reducers/alert', {
+      '../actions/actionCreators/alertActions': {
         httpErrorType: HTTP_ERROR,
         httpSuccessType: HTTP_SUCCESS,
         clearType: CLEAR,
-        setStaleType: SET_STALE
-      }
+        setStaleType: SET_STALE,
+      },
     }).default;
   });
 
-  it("defaults to an object with `message` and `status` keys and ignores other actions", () => {
+  it('defaults to an object with `message` and `status` keys and ignores other actions', () => {
     const actual = fixture(undefined, {
-      type: "not the error",
-      hello: "world"
+      type: 'not the error',
+      hello: 'world',
     });
 
-    expect(actual).to.deep.equal({'message': '', 'status': '', stale: false});
+    expect(actual).to.deep.equal({
+      message: '',
+      status: '',
+      stale: false,
+    });
   });
 
-  it("keeps track of an error", () => {
-    const SOME_ERROR = "HTTP 418";
+  it('keeps track of an error', () => {
+    const SOME_ERROR = 'HTTP 418';
 
     const actual = fixture(initialState, {
       type: HTTP_ERROR,
       message: SOME_ERROR,
-      status: ERROR_STATUS
+      status: ERROR_STATUS,
     });
 
     expect(actual).to.deep.equal({
-      'message': SOME_ERROR,
-      'status': ERROR_STATUS,
-      'stale': false
+      message: SOME_ERROR,
+      status: ERROR_STATUS,
+      stale: false,
     });
   });
 
@@ -70,35 +74,35 @@ describe("alertReducer", () => {
     const actual = fixture(initialState, {
       type: HTTP_SUCCESS,
       message: SUCCESS,
-      status: INFO_STATUS
+      status: INFO_STATUS,
     });
 
     expect(actual).to.deep.equal({
-      'message': SUCCESS,
-      'status': INFO_STATUS,
-      'stale': false
+      message: SUCCESS,
+      status: INFO_STATUS,
+      stale: false,
     });
   });
 
-  it("overrides an existing alert", () => {
-    const SOME_ERROR = "HTTP 418";
+  it('overrides an existing alert', () => {
+    const SOME_ERROR = 'HTTP 418';
 
     const actual = fixture(successState, {
       type: HTTP_ERROR,
       message: SOME_ERROR,
-      status: ERROR_STATUS
+      status: ERROR_STATUS,
     });
 
     expect(actual).to.deep.equal({
       message: SOME_ERROR,
       status: ERROR_STATUS,
-      stale: false
+      stale: false,
     });
   });
 
   it('manages alert freshness', () => {
     const actual = fixture(successState, {
-      type: SET_STALE
+      type: SET_STALE,
     });
 
     expect(actual).to.have.deep.property('stale', true);
@@ -106,7 +110,7 @@ describe("alertReducer", () => {
 
   it('provides the initial empty state on clear', () => {
     const actual = fixture(successState, {
-      type: CLEAR
+      type: CLEAR,
     });
 
     expect(actual).to.deep.equal(initialState);

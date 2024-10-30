@@ -16,9 +16,13 @@ describe('UserSerializer', () => {
   describe('.toJSON(serializable)', () => {
     it('should serialize a user object correctly', async () => {
       const uaaEmail = 'bar@foo.com';
-      const user = await factory.user({ adminEmail: 'foo@bar.com' });
+      const user = await factory.user({
+        adminEmail: 'foo@bar.com',
+      });
       await user.createUAAIdentity(uaaIdentityFactory.uaaUser({ email: uaaEmail }));
-      await user.reload({ include: ['UAAIdentity'] });
+      await user.reload({
+        include: ['UAAIdentity'],
+      });
 
       const userJson = UserSerializer.toJSON(user);
       const result = validateJSONSchema(userJson, userSchema);
@@ -30,7 +34,9 @@ describe('UserSerializer', () => {
 
     it('includes admin attributes', async () => {
       const adminEmail = 'foo@bar.com';
-      const user = await factory.user({ adminEmail });
+      const user = await factory.user({
+        adminEmail,
+      });
       const userJson = UserSerializer.toJSON(user, true);
       const result = validateJSONSchema(userJson, userSchema);
 
@@ -42,7 +48,9 @@ describe('UserSerializer', () => {
       const uaaEmail = 'foo@bar.com';
       const user = await factory.user();
       await user.createUAAIdentity(uaaIdentityFactory.uaaUser({ email: uaaEmail }));
-      await user.reload({ include: ['UAAIdentity'] });
+      await user.reload({
+        include: ['UAAIdentity'],
+      });
 
       const userJson = UserSerializer.toJSON(user, true);
       const result = validateJSONSchema(userJson, userSchema);
@@ -54,11 +62,7 @@ describe('UserSerializer', () => {
 
   describe('.serializeMany(serializables)', () => {
     it('should serialize an array of user objects correctly', async () => {
-      const users = await Promise.all([
-        factory.user(),
-        factory.user(),
-        factory.user(),
-      ]);
+      const users = await Promise.all([factory.user(), factory.user(), factory.user()]);
 
       const usersJson = UserSerializer.serializeMany(users);
       const result = validateJSONSchema(usersJson, arraySchema);

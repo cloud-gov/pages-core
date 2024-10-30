@@ -7,8 +7,11 @@ const verifyNextRepo = (site, userIndex = 0) => {
   return GitHub.getRepository(site.Users[userIndex], site.owner, site.repository)
     .then((repo) => {
       found = repo;
-      if (found) { // found can be null
-        return site.update({ repoLastVerified: new Date() });
+      if (found) {
+        // found can be null
+        return site.update({
+          repoLastVerified: new Date(),
+        });
       }
       return Promise.resolve();
     })
@@ -21,13 +24,11 @@ const verifyNextRepo = (site, userIndex = 0) => {
     });
 };
 
-const verifyRepos = () => Site.findAll({
-  include: [User.scope('withGithub')],
-  order: [
-    [User, 'signedInAt', 'DESC'],
-  ],
-})
-  .then(sites => Promise.allSettled(sites.map(site => verifyNextRepo(site))));
+const verifyRepos = () =>
+  Site.findAll({
+    include: [User.scope('withGithub')],
+    order: [[User, 'signedInAt', 'DESC']],
+  }).then((sites) => Promise.allSettled(sites.map((site) => verifyNextRepo(site))));
 
 const verifyUserRepos = async (user) => {
   const repoLastVerified = new Date();
@@ -40,11 +41,18 @@ const verifyUserRepos = async (user) => {
   const verified = sites
     .filter((site) => {
       const fullName = [site.owner, site.repository].join('/').toUpperCase();
-      return repos.find(repo => repo.full_name.toUpperCase() === fullName);
+      return repos.find((repo) => repo.full_name.toUpperCase() === fullName);
     })
-    .map(site => site.update({ repoLastVerified }));
+    .map((site) =>
+      site.update({
+        repoLastVerified,
+      }),
+    );
 
   return Promise.all(verified);
 };
 
-module.exports = { verifyRepos, verifyUserRepos };
+module.exports = {
+  verifyRepos,
+  verifyUserRepos,
+};

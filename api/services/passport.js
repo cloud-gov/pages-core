@@ -8,6 +8,7 @@ const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
 
 const passport = new Passport.Passport();
 const flashMessage = {
+  // eslint-disable-next-line max-len
   message: `Apologies; you are not authorized to access ${config.app.appName}! Please contact the ${config.app.appName} team if this is in error.`,
 };
 
@@ -33,7 +34,6 @@ const {
 async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
   try {
     const username = profile.username.toLowerCase();
-    // eslint-disable-next-line no-underscore-dangle
     const { email } = profile._json;
 
     const user = {
@@ -49,7 +49,7 @@ async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
       'User authenticated',
       {
         user,
-      }
+      },
     );
 
     return callback(null, user);
@@ -60,10 +60,7 @@ async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
   }
 }
 
-passport.use(
-  'github2',
-  new GitHubStrategy(githubAuthorizationOptions, verifyGithub2)
-);
+passport.use('github2', new GitHubStrategy(githubAuthorizationOptions, verifyGithub2));
 
 let uaaLogoutRedirectURL = '';
 

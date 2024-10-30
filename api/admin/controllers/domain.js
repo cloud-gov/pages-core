@@ -1,11 +1,5 @@
 const json2csv = require('@json2csv/plainjs');
-const {
-  Domain,
-  Event,
-  Organization,
-  Site,
-  SiteBranchConfig,
-} = require('../../models');
+const { Domain, Event, Organization, Site, SiteBranchConfig } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 const { siteViewOrigin } = require('../../utils/site');
@@ -15,9 +9,7 @@ const domainSerializer = require('../../serializers/domain');
 
 module.exports = wrapHandlers({
   async list(req, res) {
-    const {
-      limit, page, search, site, state,
-    } = req.query;
+    const { limit, page, search, site, state } = req.query;
 
     const scopes = ['withSite'];
 
@@ -36,9 +28,11 @@ module.exports = wrapHandlers({
     const [pagination, sites] = await Promise.all([
       paginate(
         Domain.scope(scopes),
-        domains => domainSerializer.serializeMany(domains, true),
+        (domains) => domainSerializer.serializeMany(domains, true),
         { limit, page },
-        { order: ['names', 'context'] }
+        {
+          order: ['names', 'context'],
+        },
       ),
       Site.findAll({
         attributes: ['id', 'owner', 'repository', 'demoBranch'],
@@ -69,11 +63,15 @@ module.exports = wrapHandlers({
     const [pagination, orgs] = await Promise.all([
       paginate(
         Domain.scope(scopes),
-        domains => domainSerializer.serializeMany(domains, true),
+        (domains) => domainSerializer.serializeMany(domains, true),
         { limit, page },
-        { order: ['names', 'context'] }
+        {
+          order: ['names', 'context'],
+        },
       ),
-      Organization.findAll({ raw: true }),
+      Organization.findAll({
+        raw: true,
+      }),
     ]);
 
     const json = {
@@ -87,9 +85,7 @@ module.exports = wrapHandlers({
   },
 
   async listPublishedCSV(req, res) {
-    const domains = await Domain.scope(
-      'provisionedWithSiteAndOrganization'
-    ).findAll();
+    const domains = await Domain.scope('provisionedWithSiteAndOrganization').findAll();
 
     const fields = [
       {
@@ -118,7 +114,9 @@ module.exports = wrapHandlers({
       },
     ];
 
-    const parser = new json2csv.Parser({ fields });
+    const parser = new json2csv.Parser({
+      fields,
+    });
     const csv = parser.parse(domains);
     res.attachment('published-sites.csv');
     return res.send(csv);
@@ -158,9 +156,9 @@ module.exports = wrapHandlers({
     }
 
     if (sbc.siteId !== siteId) {
-      return res
-        .status(400)
-        .send({ message: 'The site and site branch config are not related.' });
+      return res.status(400).send({
+        message: 'The site and site branch config are not related.',
+      });
     }
 
     if (sbc.context === 'preview') {
@@ -181,12 +179,9 @@ module.exports = wrapHandlers({
         path: sbc.s3Key,
         serviceName,
       });
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'Domain Created',
-        { domain }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Created', {
+        domain,
+      });
       return res.json(domainSerializer.serialize(domain, true));
     } catch (err) {
       if (!err.errors) {
@@ -197,7 +192,7 @@ module.exports = wrapHandlers({
           ...obj,
           [error.path]: error.message,
         }),
-        {}
+        {},
       );
 
       return res.unprocessableEntity({
@@ -219,12 +214,9 @@ module.exports = wrapHandlers({
 
     try {
       await DomainService.destroy(domain);
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'Domain Destroyed',
-        { domain }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Destroyed', {
+        domain,
+      });
       return res.json({});
     } catch (error) {
       return res.unprocessableEntity(error);
@@ -284,12 +276,9 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.deprovision(domain);
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'Domain Deprovisioned',
-        { domain: updatedDomain }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Deprovisioned', {
+        domain: updatedDomain,
+      });
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),
@@ -313,12 +302,9 @@ module.exports = wrapHandlers({
 
     try {
       const updatedDomain = await DomainService.provision(domain, dnsResults);
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'Domain Provisioned',
-        { domain: updatedDomain }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Provisioned', {
+        domain: updatedDomain,
+      });
       return res.json({
         dnsRecords: DomainService.buildDnsRecords(updatedDomain),
         domain: domainSerializer.serialize(updatedDomain, true),

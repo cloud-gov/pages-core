@@ -1,6 +1,6 @@
 const { Site } = require('../models');
 
-const getSiteRoom = siteId => `site-${siteId}`;
+const getSiteRoom = (siteId) => `site-${siteId}`;
 const getBuilderRoom = (siteId, userId) => `site-${siteId}-user-${userId}`;
 
 const joinRooms = async (socket) => {
@@ -24,4 +24,8 @@ const joinRooms = async (socket) => {
   });
 };
 
-module.exports = { joinRooms, getSiteRoom, getBuilderRoom };
+module.exports = {
+  joinRooms,
+  getSiteRoom,
+  getBuilderRoom,
+};

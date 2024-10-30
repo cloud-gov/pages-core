@@ -2,11 +2,7 @@ const yaml = require('js-yaml');
 const { omitBy, pick } = require('../utils');
 const { Organization, Site, User } = require('../models');
 const userSerializer = require('./user');
-const {
-  siteViewLink,
-  siteViewDomain,
-  hideBasicAuthPassword,
-} = require('../utils/site');
+const { siteViewLink, siteViewDomain, hideBasicAuthPassword } = require('../utils/site');
 const DomainService = require('../services/Domain');
 
 const allowedAttributes = [
@@ -64,18 +60,20 @@ const viewLinks = {
 
 // Eventually replace `serialize`
 function serializeNew(site, isSystemAdmin = false) {
-  const object = site.get({ plain: true });
+  const object = site.get({
+    plain: true,
+  });
 
   const filtered = pick(allowedAttributes, object);
 
   dateFields
-    .filter(dateField => object[dateField])
+    .filter((dateField) => object[dateField])
     .forEach((dateField) => {
       filtered[dateField] = object[dateField].toISOString();
     });
 
   yamlFields
-    .filter(yamlField => object[yamlField])
+    .filter((yamlField) => object[yamlField])
     .forEach((yamlField) => {
       filtered[yamlField] = yaml.dump(object[yamlField]);
     });
@@ -92,25 +90,38 @@ function serializeNew(site, isSystemAdmin = false) {
     filtered.containerConfig = site.containerConfig;
   }
 
-  return omitBy(v => v === null, filtered);
+  return omitBy((v) => v === null, filtered);
 }
 
 const serializeObject = (site, isSystemAdmin) => {
   const json = serializeNew(site, isSystemAdmin);
 
   if (json.Domains) {
-    json.domains = site.Domains.map(d => pick(allowedDomainAttributes, d.get({ plain: true })));
+    json.domains = site.Domains.map((d) =>
+      pick(
+        allowedDomainAttributes,
+        d.get({
+          plain: true,
+        }),
+      ),
+    );
     delete json.Domains;
   }
 
   if (json.SiteBranchConfigs) {
-    json.siteBranchConfigs = site.SiteBranchConfigs
-      .map(sbc => pick(allowedSBCAttributes, sbc.get({ plain: true })));
+    json.siteBranchConfigs = site.SiteBranchConfigs.map((sbc) =>
+      pick(
+        allowedSBCAttributes,
+        sbc.get({
+          plain: true,
+        }),
+      ),
+    );
     delete json.SiteBranchConfigs;
   }
 
   if (json.Users) {
-    json.users = site.Users.map(u => userSerializer.toJSON(u));
+    json.users = site.Users.map((u) => userSerializer.toJSON(u));
     delete json.Users;
   }
 
@@ -123,12 +134,12 @@ const serializeObject = (site, isSystemAdmin) => {
     json.canEditLiveUrl = !DomainService.isSiteUrlManagedByDomain(
       site,
       site.Domains,
-      'site'
+      'site',
     );
     json.canEditDemoUrl = !DomainService.isSiteUrlManagedByDomain(
       site,
       site.Domains,
-      'demo'
+      'demo',
     );
   }
 
@@ -137,16 +148,21 @@ const serializeObject = (site, isSystemAdmin) => {
 
 // Eventually replace `serialize` for arrays
 function serializeMany(sites, isSystemAdmin) {
-  return sites.map(site => serializeObject(site, isSystemAdmin));
+  return sites.map((site) => serializeObject(site, isSystemAdmin));
 }
 
 const serialize = (serializable) => {
   const include = [User.scope('withGithub'), Organization];
 
   if (serializable.length !== undefined) {
-    const siteIds = serializable.map(site => site.id);
-    const query = Site.findAll({ where: { id: siteIds }, include });
-    return query.then(sites => sites.map(site => serializeObject(site)));
+    const siteIds = serializable.map((site) => site.id);
+    const query = Site.findAll({
+      where: {
+        id: siteIds,
+      },
+      include,
+    });
+    return query.then((sites) => sites.map((site) => serializeObject(site)));
   }
 
   const query = Site.findByPk(serializable.id, { include });

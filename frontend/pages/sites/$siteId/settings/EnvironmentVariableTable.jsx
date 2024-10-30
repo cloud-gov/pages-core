@@ -11,13 +11,17 @@ const EnvironmentVariableTable = ({ uevs, onDelete }) => (
       <tr>
         <th scope="col">Name</th>
         <th scope="col">Value</th>
-        <th scope="col" className="text-right">Remove</th>
+        <th scope="col" className="text-right">
+          Remove
+        </th>
       </tr>
     </thead>
     <tbody>
-      {uevs.map(uev => (
+      {uevs.map((uev) => (
         <tr key={uev.id}>
-          <th className="font-mono-sm" scope="row">{uev.name}</th>
+          <th className="font-mono-sm" scope="row">
+            {uev.name}
+          </th>
           <td className="font-mono-sm">{`xxxx${uev.hint}`}</td>
           <td className="text-right">
             <button

@@ -3,7 +3,14 @@ import pluginJs from '@eslint/js';
 import eslintPluginSvelte from 'eslint-plugin-svelte';
 
 export default [
-  { languageOptions: { globals: { ...globals.browser, process: false } } },
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        process: false,
+      },
+    },
+  },
   { files: ['**/*.svelte'] },
   {
     ignores: ['public/build', 'rollup.config.js'],

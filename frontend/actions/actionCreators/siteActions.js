@@ -13,58 +13,67 @@ const sitesFetchStarted = () => ({
   type: sitesFetchStartedType,
 });
 
-const sitesReceived = sites => ({
+const sitesReceived = (sites) => ({
   type: sitesReceivedType,
   sites,
 });
 
-const siteAdded = site => ({
+const siteAdded = (site) => ({
   type: siteAddedType,
   site,
 });
 
-const siteUpdated = site => ({
+const siteUpdated = (site) => ({
   type: siteUpdatedType,
   siteId: site.id,
   site,
 });
 
-const siteDeleted = siteId => ({
+const siteDeleted = (siteId) => ({
   type: siteDeletedType,
   siteId,
 });
 
-const siteUserAdded = site => ({
+const siteUserAdded = (site) => ({
   type: siteUserAddedType,
   site,
 });
 
-const siteUserRemoved = site => ({
+const siteUserRemoved = (site) => ({
   type: siteUserRemovedType,
   site,
 });
 
-const siteBasicAuthSaved = site => ({
+const siteBasicAuthSaved = (site) => ({
   type: siteBasicAuthSavedType,
   siteId: site.id,
   site,
 });
 
-const siteBasicAuthRemoved = site => ({
+const siteBasicAuthRemoved = (site) => ({
   type: siteBasicAuthRemovedType,
   siteId: site.id,
   site,
 });
 
 export {
-  sitesFetchStarted, sitesFetchStartedType,
-  sitesReceived, sitesReceivedType,
-  siteAdded, siteAddedType,
-  siteUpdated, siteUpdatedType,
-  siteDeleted, siteDeletedType,
-  siteUserAdded, siteUserAddedType,
-  siteUserRemoved, siteUserRemovedType,
+  sitesFetchStarted,
+  sitesFetchStartedType,
+  sitesReceived,
+  sitesReceivedType,
+  siteAdded,
+  siteAddedType,
+  siteUpdated,
+  siteUpdatedType,
+  siteDeleted,
+  siteDeletedType,
+  siteUserAdded,
+  siteUserAddedType,
+  siteUserRemoved,
+  siteUserRemovedType,
   siteBranchesReceivedType,
-  siteBasicAuthSaved, siteBasicAuthSavedType,
-  siteBasicAuthRemoved, siteBasicAuthRemovedType,
+  siteBasicAuthSaved,
+  siteBasicAuthSavedType,
+  siteBasicAuthRemoved,
+  siteBasicAuthRemovedType,
 };

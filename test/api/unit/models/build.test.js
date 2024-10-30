@@ -14,7 +14,12 @@ describe('Build model', () => {
   describe('before validate hook', () => {
     it('should add a build token', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, user: 1, username: 'username', branch: 'branch' });
+      const build = await Build.build({
+        site: site.id,
+        user: 1,
+        username: 'username',
+        branch: 'branch',
+      });
 
       await build.validate();
 
@@ -23,7 +28,12 @@ describe('Build model', () => {
 
     it('should not override a build token if one exists', async () => {
       const site = await factory.site();
-      const build = await Build.build({ site: site.id, token: '123abc', username: 'username', branch: 'branch' });
+      const build = await Build.build({
+        site: site.id,
+        token: '123abc',
+        username: 'username',
+        branch: 'branch',
+      });
 
       build.validate();
 
@@ -36,9 +46,13 @@ describe('Build model', () => {
       const stubStartSiteBuild = sinon.stub(QueueJobs.prototype, 'startSiteBuild');
 
       const site = await factory.site();
-      const build = await factory.build({ site });
+      const build = await factory.build({
+        site,
+      });
       const queuedBuild = await Build.findOne({
-        where: { id: build.id },
+        where: {
+          id: build.id,
+        },
         include: [Site],
       });
       stubStartSiteBuild.resolves(queuedBuild);
@@ -63,16 +77,30 @@ describe('Build model', () => {
       const stubStartSiteBuild = sinon.stub(QueueJobs.prototype, 'startSiteBuild');
 
       const site = await factory.site();
-      const build = await factory.build({ site });
+      const build = await factory.build({
+        site,
+      });
       await Promise.all([
-        factory.build({ site }),
-        factory.build({ site }),
-        factory.build({ site }),
-        factory.build({ site }),
-        factory.build({ site }),
+        factory.build({
+          site,
+        }),
+        factory.build({
+          site,
+        }),
+        factory.build({
+          site,
+        }),
+        factory.build({
+          site,
+        }),
+        factory.build({
+          site,
+        }),
       ]);
       const queuedBuild = await Build.findOne({
-        where: { id: build.id },
+        where: {
+          id: build.id,
+        },
         include: [Site],
       });
       stubStartSiteBuild.resolves(queuedBuild);
@@ -99,12 +127,16 @@ describe('Build model', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build({ state: 'created' });
+        build = await factory.build({
+          state: 'created',
+        });
       });
 
       describe('to `processing`', () => {
         it('should update the startedAt and state', async () => {
-          await build.updateJobStatus({ status: 'processing' });
+          await build.updateJobStatus({
+            status: 'processing',
+          });
 
           expect(build.state).to.equal('processing');
           expect(build.startedAt).to.be.a('date');
@@ -115,7 +147,10 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'this is an error',
+          });
 
           expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
@@ -125,7 +160,10 @@ describe('Build model', () => {
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'http://123abc@github.com' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'http://123abc@github.com',
+          });
 
           expect(build.error).not.to.match(/123abc/);
         });
@@ -135,12 +173,16 @@ describe('Build model', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build({ state: 'queued' });
+        build = await factory.build({
+          state: 'queued',
+        });
       });
 
       describe('to `processing`', () => {
         it('should update the startedAt and state', async () => {
-          await build.updateJobStatus({ status: 'processing' });
+          await build.updateJobStatus({
+            status: 'processing',
+          });
 
           expect(build.state).to.equal('processing');
           expect(build.startedAt).to.be.a('date');
@@ -151,7 +193,10 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'this is an error',
+          });
 
           expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
@@ -161,7 +206,10 @@ describe('Build model', () => {
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'http://123abc@github.com' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'http://123abc@github.com',
+          });
 
           expect(build.error).not.to.match(/123abc/);
         });
@@ -172,12 +220,16 @@ describe('Build model', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build({ state: 'tasked' });
+        build = await factory.build({
+          state: 'tasked',
+        });
       });
 
       describe('to `processing`', () => {
         it('should update the startedAt and state', async () => {
-          await build.updateJobStatus({ status: 'processing' });
+          await build.updateJobStatus({
+            status: 'processing',
+          });
 
           expect(build.state).to.equal('processing');
           expect(build.startedAt).to.be.a('date');
@@ -188,7 +240,10 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'this is an error',
+          });
 
           expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
@@ -198,7 +253,10 @@ describe('Build model', () => {
         });
 
         it('should sanitize GitHub access tokens from error message', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'http://123abc@github.com' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'http://123abc@github.com',
+          });
 
           expect(build.error).not.to.match(/123abc/);
         });
@@ -210,13 +268,21 @@ describe('Build model', () => {
       let build;
 
       beforeEach(async () => {
-        build = await factory.build({ status: 'processing', startedAt, branch: 'some-branch' });
+        build = await factory.build({
+          status: 'processing',
+          startedAt,
+          branch: 'some-branch',
+        });
       });
 
       describe('to `success`', () => {
-        it('should update the site\'s publishedAt timestamp if the build is successful', async () => {
+        it(`should update the site's publishedAt timestamp
+            if the build is successful`, async () => {
           const commitSha = 'abcdef0123456789001234567890012345678901';
-          build = await build.updateJobStatus({ status: 'success', commitSha });
+          build = await build.updateJobStatus({
+            status: 'success',
+            commitSha,
+          });
 
           expect(build.state).to.be.eql('success');
           expect(build.completedAt).to.be.a('date');
@@ -238,7 +304,10 @@ describe('Build model', () => {
 
       describe('to `error`', () => {
         it('should mark a build errored with a message and w/o commitSha', async () => {
-          await build.updateJobStatus({ status: Build.States.Error, message: 'this is an error' });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message: 'this is an error',
+          });
 
           expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal('this is an error');
@@ -251,7 +320,11 @@ describe('Build model', () => {
         it('should mark a build errored with a message and commitSha', async () => {
           const commitSha = 'abcdef0123456789001234567890012345678901';
           const message = 'this is an error with commitsha';
-          await build.updateJobStatus({ status: Build.States.Error, message , commitSha });
+          await build.updateJobStatus({
+            status: Build.States.Error,
+            message,
+            commitSha,
+          });
 
           expect(build.state).to.equal(Build.States.Error);
           expect(build.error).to.equal(message);
@@ -265,21 +338,35 @@ describe('Build model', () => {
   });
 
   describe('validations', () => {
-    const branchNameError = 'Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.'
-    const branchNameLengthError = 'Validation error: Invalid branch name — branch names are limitted to 299 characters.'
+    const branchNameError =
+      // eslint-disable-next-line max-len
+      'Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.';
+    const branchNameLengthError =
+      // eslint-disable-next-line max-len
+      'Validation error: Invalid branch name — branch names are limitted to 299 characters.';
 
     it('should require a site object before saving', () => {
-      const buildPromise = Build.create({ user: 1, site: null });
+      const buildPromise = Build.create({
+        user: 1,
+        site: null,
+      });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'notNull Violation: Build.site cannot be null');
+      return expect(buildPromise).to.be.rejectedWith(
+        ValidationError,
+        'notNull Violation: Build.site cannot be null',
+      );
     });
 
     it('should require a username before saving', () => {
-      const buildPromise = Build.create({ username: null, site: 1 });
+      const buildPromise = Build.create({
+        username: null,
+        site: 1,
+      });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'notNull Violation: Build.username cannot be null');
+      return expect(buildPromise).to.be.rejectedWith(
+        ValidationError,
+        'notNull Violation: Build.username cannot be null',
+      );
     });
 
     it('should require a valid requestedCommitSha before saving', () => {
@@ -289,8 +376,10 @@ describe('Build model', () => {
         requestedCommitSha: 'not-a-real-sha.biz',
       });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on requestedCommitSha failed');
+      return expect(buildPromise).to.be.rejectedWith(
+        ValidationError,
+        'Validation error: Validation is on requestedCommitSha failed',
+      );
     });
 
     it('should require a valid clonedCommitSha before saving', () => {
@@ -300,15 +389,23 @@ describe('Build model', () => {
         clonedCommitSha: 'not-a-real-sha.biz',
       });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'Validation error: Validation is on clonedCommitSha failed');
+      return expect(buildPromise).to.be.rejectedWith(
+        ValidationError,
+        'Validation error: Validation is on clonedCommitSha failed',
+      );
     });
 
     it('should require a branch before saving', () => {
-      const buildPromise = Build.create({ username: 'username', site: 1, branch: null });
+      const buildPromise = Build.create({
+        username: 'username',
+        site: 1,
+        branch: null,
+      });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, 'notNull Violation: Build.branch cannot be null');
+      return expect(buildPromise).to.be.rejectedWith(
+        ValidationError,
+        'notNull Violation: Build.branch cannot be null',
+      );
     });
 
     it('requires a valid branch name before saving', () => {
@@ -319,8 +416,7 @@ describe('Build model', () => {
         branch: 'not*real',
       });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, branchNameError);
+      return expect(buildPromise).to.be.rejectedWith(ValidationError, branchNameError);
     });
 
     it('requires a valid branch name before saving no end slash', () => {
@@ -331,8 +427,7 @@ describe('Build model', () => {
         branch: 'not-real/',
       });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, branchNameError);
+      return expect(buildPromise).to.be.rejectedWith(ValidationError, branchNameError);
     });
 
     it('requires a valid branch name before saving no begin /', () => {
@@ -343,12 +438,12 @@ describe('Build model', () => {
         branch: '/not-real',
       });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, branchNameError);
+      return expect(buildPromise).to.be.rejectedWith(ValidationError, branchNameError);
     });
 
-    it('requires a valid branch name before saving and it cannot be >= 300 characters /', () => {
-      const branch = Array(301).join("b")
+    it(`requires a valid branch name before saving
+        and it cannot be >= 300 characters /`, () => {
+      const branch = Array(301).join('b');
       const buildPromise = Build.create({
         user: 1,
         site: 1,
@@ -356,8 +451,10 @@ describe('Build model', () => {
         branch,
       });
 
-      return expect(buildPromise).to.be
-        .rejectedWith(ValidationError, branchNameLengthError);
+      return expect(buildPromise).to.be.rejectedWith(
+        ValidationError,
+        branchNameLengthError,
+      );
     });
   });
 
@@ -401,32 +498,58 @@ describe('Build model', () => {
 
   describe('.orgScope()', () => {
     it('returns builds by organization', async () => {
-      const organizationA = await factory.organization.create({name: 'Org A'});
-      const siteA = await factory.site({organizationId: organizationA.id });
-      const buildA1 = await factory.build({site: siteA.id});
-      const buildA2 = await factory.build({site: siteA.id});
+      const organizationA = await factory.organization.create({
+        name: 'Org A',
+      });
+      const siteA = await factory.site({
+        organizationId: organizationA.id,
+      });
+      const buildA1 = await factory.build({
+        site: siteA.id,
+      });
+      const buildA2 = await factory.build({
+        site: siteA.id,
+      });
 
-      const siteAA = await factory.site({organizationId: organizationA.id });
-      const buildAA = await factory.build({site: siteAA.id});
+      const siteAA = await factory.site({
+        organizationId: organizationA.id,
+      });
+      const buildAA = await factory.build({
+        site: siteAA.id,
+      });
 
-      const organizationB = await factory.organization.create({name: 'Org B'});
-      const siteB = await factory.site({organizationId: organizationB.id });
-      const buildB = await factory.build({site: siteB.id});
+      const organizationB = await factory.organization.create({
+        name: 'Org B',
+      });
+      const siteB = await factory.site({
+        organizationId: organizationB.id,
+      });
+      const buildB = await factory.build({
+        site: siteB.id,
+      });
 
       const siteD = await factory.site(); // Site without an Organization
-      const buildD = await factory.build({site: siteD.id});
+      const buildD = await factory.build({
+        site: siteD.id,
+      });
 
       const result = await Build.scope(Build.orgScope(organizationA.id)).findAll();
 
-      expect(result.map(build => build.id)).to.have.members([buildA1.id, buildA2.id, buildAA.id]);
-      expect(result.map(build => build.id)).to.not.have.members([buildB.id, buildD.id]);
+      expect(result.map((build) => build.id)).to.have.members([
+        buildA1.id,
+        buildA2.id,
+        buildAA.id,
+      ]);
+      expect(result.map((build) => build.id)).to.not.have.members([buildB.id, buildD.id]);
     });
   });
 
   describe('forSiteUser scope', () => {
     it('returns the build for the associated user', async () => {
       const user = await factory.user();
-      const build = await factory.build({ user });
+      const build = await factory.build({
+        user,
+      });
 
       const buildQuery = await Build.forSiteUser(user).findByPk(build.id);
 
@@ -436,8 +559,13 @@ describe('Build model', () => {
 
     it('returns the build for any user who has access to the site', async () => {
       const [user1, user2] = await Promise.all([factory.user(), factory.user()]);
-      const site = await factory.site({ users: [user1, user2] });
-      const build = await factory.build({ user: user1, site });
+      const site = await factory.site({
+        users: [user1, user2],
+      });
+      const build = await factory.build({
+        user: user1,
+        site,
+      });
 
       const buildQuery = await Build.forSiteUser(user2).findByPk(build.id);
 
@@ -446,7 +574,9 @@ describe('Build model', () => {
     });
 
     it('does not return the build for a different user', async () => {
-      const user = { id: 99999 };
+      const user = {
+        id: 99999,
+      };
       const build = await factory.build();
 
       const buildQuery = await Build.forSiteUser(user).findByPk(build.id);

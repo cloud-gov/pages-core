@@ -25,8 +25,11 @@ function tokenAuth(token) {
  * @param {{error:string}=} error
  */
 function mockAddUserToGroup(groupId, { userId }, token, error) {
-  const n = nock(uaaHost, tokenAuth(token))
-    .post(`/Groups/${groupId}/members`, { origin: 'uaa', type: 'USER', value: userId });
+  const n = nock(uaaHost, tokenAuth(token)).post(`/Groups/${groupId}/members`, {
+    origin: 'uaa',
+    type: 'USER',
+    value: userId,
+  });
 
   if (error) {
     return n.reply(400, error);
@@ -49,7 +52,9 @@ function mockFetchClientToken(returnAccessToken, scope) {
       response_type: 'token',
       ...(scope && { scope }),
     })
-    .reply(200, { access_token: returnAccessToken });
+    .reply(200, {
+      access_token: returnAccessToken,
+    });
 }
 
 /**
@@ -60,7 +65,9 @@ function mockFetchClientToken(returnAccessToken, scope) {
 function mockFetchGroupId(groupName, returnGroupId, token) {
   return nock(uaaHost, tokenAuth(token))
     .get('/Groups')
-    .query({ filter: `displayName eq "${groupName}"` })
+    .query({
+      filter: `displayName eq "${groupName}"`,
+    })
     .reply(200, {
       resources: [{ id: returnGroupId }],
     });
@@ -74,8 +81,15 @@ function mockFetchGroupId(groupName, returnGroupId, token) {
 function mockFetchGroupMembers(groupId, returnUsers, token) {
   return nock(uaaHost, tokenAuth(token))
     .get(`/Groups/${groupId}/members`)
-    .query({ returnEntities: true })
-    .reply(200, returnUsers.map(u => ({ entity: u })));
+    .query({
+      returnEntities: true,
+    })
+    .reply(
+      200,
+      returnUsers.map((u) => ({
+        entity: u,
+      })),
+    );
 }
 
 /**
@@ -86,7 +100,9 @@ function mockFetchGroupMembers(groupId, returnUsers, token) {
 function mockFetchUser(userId, profile, token) {
   return nock(uaaHost, tokenAuth(token))
     .get(`/Users/${userId}`)
-    .reply(200, { ...profile });
+    .reply(200, {
+      ...profile,
+    });
 }
 
 /**
@@ -97,7 +113,9 @@ function mockFetchUser(userId, profile, token) {
 function mockFetchUserByEmail(email, token, profile) {
   return nock(uaaHost, tokenAuth(token))
     .get('/Users')
-    .query({ filter: `email eq "${email}"` })
+    .query({
+      filter: `email eq "${email}"`,
+    })
     .reply(200, {
       resources: profile ? [profile] : [],
     });
@@ -109,17 +127,23 @@ function mockFetchUserByEmail(email, token, profile) {
  */
 function mockInviteUser(email, token, profile) {
   return nock(uaaHost, tokenAuth(token))
-    .post('/invite_users', { emails: [email] })
-    .query({ redirect_uri: config.app.hostname })
+    .post('/invite_users', {
+      emails: [email],
+    })
+    .query({
+      redirect_uri: config.app.hostname,
+    })
     .reply(200, {
-      new_invites: profile ? [
-        {
-          email,
-          success: true,
-          inviteLink: '',
-          ...profile,
-        },
-      ] : [],
+      new_invites: profile
+        ? [
+            {
+              email,
+              success: true,
+              inviteLink: '',
+              ...profile,
+            },
+          ]
+        : [],
     });
 }
 
@@ -155,7 +179,9 @@ function mockUserProfile(profile, accessToken) {
   const url = new URL(uaaConfig.userURL);
   return nock(url.origin)
     .get(url.pathname)
-    .query({ access_token: accessToken })
+    .query({
+      access_token: accessToken,
+    })
     .reply(200, profile);
 }
 
@@ -163,12 +189,14 @@ function mockExchangeToken(code, accessToken) {
   const url = new URL(uaaConfig.tokenURL);
 
   return nock(url.origin)
-    .post(url.pathname, body => (
-      body.code === code
-      && body.grant_type === 'authorization_code'
-      && body.client_id === uaaConfig.clientID
-      && body.client_secret === uaaConfig.clientSecret
-    ))
+    .post(
+      url.pathname,
+      (body) =>
+        body.code === code &&
+        body.grant_type === 'authorization_code' &&
+        body.client_id === uaaConfig.clientID &&
+        body.client_secret === uaaConfig.clientSecret,
+    )
     .reply(200, {
       access_token: accessToken,
       refresh_token: 'def456',
@@ -180,15 +208,17 @@ function mockFailedExchange(code) {
   const url = new URL(uaaConfig.tokenURL);
 
   return nock(url.origin)
-    .post(url.pathname, body => (
-      body.code === code
-      && body.grant_type === 'authorization_code'
-      && body.client_id === uaaConfig.clientID
-      && body.client_secret === uaaConfig.clientSecret
-    ))
+    .post(
+      url.pathname,
+      (body) =>
+        body.code === code &&
+        body.grant_type === 'authorization_code' &&
+        body.client_id === uaaConfig.clientID &&
+        body.client_secret === uaaConfig.clientSecret,
+    )
     .reply(401, {
       error: 'unauthorized',
-      error_description: 'An Authentication object was not found in the SecurityContext'
+      error_description: 'An Authentication object was not found in the SecurityContext',
     });
 }
 
@@ -217,7 +247,11 @@ function mockVerifyUserGroup(userId, profile) {
 function mockInviteUserToUserGroup(email, userToken, groupName) {
   const clientToken = 'token';
   const groupId = '1';
-  const profile = { groups: [groupName], userId: 'userId', origin: 'example.com' };
+  const profile = {
+    groups: [groupName],
+    userId: 'userId',
+    origin: 'example.com',
+  };
 
   mockFetchClientToken(clientToken);
   mockFetchUserByEmail(email, clientToken);
@@ -242,8 +276,7 @@ function mockInviteUserToUserGroup(email, userToken, groupName) {
  */
 function mockServerErrorStatus(status, path, message, accessToken, method = 'get') {
   const httpMethod = method.toLowerCase();
-  return nock(uaaHost, tokenAuth(accessToken))[httpMethod](path)
-    .reply(status, message);
+  return nock(uaaHost, tokenAuth(accessToken))[httpMethod](path).reply(status, message);
 }
 
 module.exports = {

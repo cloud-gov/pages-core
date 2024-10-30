@@ -1,10 +1,15 @@
 import { expect } from 'chai';
 import {
-  authError, authErrorType,
-  httpError, httpErrorType,
-  httpSuccess, httpSuccessType,
-  setStale, setStaleType,
-  clear, clearType,
+  authError,
+  authErrorType,
+  httpError,
+  httpErrorType,
+  httpSuccess,
+  httpSuccessType,
+  setStale,
+  setStaleType,
+  clear,
+  clearType,
 } from '../../../../frontend/actions/actionCreators/alertActions';
 
 describe('alertActions actionCreators', () => {

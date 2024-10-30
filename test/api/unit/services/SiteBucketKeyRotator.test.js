@@ -17,7 +17,12 @@ const mockTokenRequest = require('../../support/cfAuthNock');
 const cfApi = new CFApiClient();
 
 describe('SiteBucketKeyRotator', () => {
-  afterEach(() => Site.truncate({ force: true, cascade: true }));
+  afterEach(() =>
+    Site.truncate({
+      force: true,
+      cascade: true,
+    }),
+  );
 
   beforeEach(() => {
     mockTokenRequest();
@@ -49,7 +54,9 @@ describe('SiteBucketKeyRotator', () => {
       sinon
         .stub(cfApi, 'fetchCredentialBindingsInstance')
         .withArgs(`${site.s3ServiceName}-key`)
-        .resolves({ guid: credentialsGuid });
+        .resolves({
+          guid: credentialsGuid,
+        });
       sinon
         .stub(cfApi, 'deleteServiceInstanceCredentials')
         .withArgs(credentialsGuid)
@@ -62,11 +69,12 @@ describe('SiteBucketKeyRotator', () => {
       const result = await rotateBucketKey(site, cfApi, 0);
 
       expect(result.awsBucketKeyUpdatedAt).to.be.greaterThan(
-        awsBucketKeyUpdatedAtInitial
+        awsBucketKeyUpdatedAtInitial,
       );
     });
 
-    it('should rotate a service instance credential if credential is not found', async () => {
+    it(`should rotate a service instance credential
+        if credential is not found`, async () => {
       const awsBucketKeyUpdatedAtInitial = new Date(1000000);
       const site = await factory.site({
         awsBucketKeyUpdatedAt: awsBucketKeyUpdatedAtInitial,
@@ -85,7 +93,9 @@ describe('SiteBucketKeyRotator', () => {
       sinon
         .stub(cfApi, 'fetchCredentialBindingsInstance')
         .withArgs(`${site.s3ServiceName}-key`)
-        .rejects({ message: 'Not Found' });
+        .rejects({
+          message: 'Not Found',
+        });
       sinon
         .stub(cfApi, 'createServiceKey')
         .withArgs(site.s3ServiceName, `${site.s3ServiceName}-key`)
@@ -94,7 +104,7 @@ describe('SiteBucketKeyRotator', () => {
       const result = await rotateBucketKey(site, cfApi);
 
       expect(result.awsBucketKeyUpdatedAt).to.be.greaterThan(
-        awsBucketKeyUpdatedAtInitial
+        awsBucketKeyUpdatedAtInitial,
       );
     });
   });
@@ -110,7 +120,10 @@ describe('SiteBucketKeyRotator', () => {
       const awsBucketKeyUpdatedAt = new Date(1000000);
       const credentialsInstance = {
         guid: 'credentials-guid',
-        credentials: { a: 1, b: 'two' },
+        credentials: {
+          a: 1,
+          b: 'two',
+        },
       };
       const [site1] = await Promise.all([
         factory.site({
@@ -129,7 +142,10 @@ describe('SiteBucketKeyRotator', () => {
         credentialsInstance,
       });
 
-      const results = await rotateSitesBucketKeys({ limit: 1, sleepNumber: 0 });
+      const results = await rotateSitesBucketKeys({
+        limit: 1,
+        sleepNumber: 0,
+      });
 
       expect(results).to.have.length(1);
       results.map((r) => {
@@ -158,7 +174,10 @@ describe('SiteBucketKeyRotator', () => {
         serviceInstanceGuid,
       });
 
-      const results = await rotateSitesBucketKeys({ limit: 1, sleepNumber: 0 });
+      const results = await rotateSitesBucketKeys({
+        limit: 1,
+        sleepNumber: 0,
+      });
 
       expect(results).to.have.length(1);
       results.map((r) => {
@@ -177,7 +196,10 @@ describe('SiteBucketKeyRotator', () => {
         factory.site(),
       ]);
 
-      const results = await rotateSitesBucketKeys({ limit, sleepNumber: 0 });
+      const results = await rotateSitesBucketKeys({
+        limit,
+        sleepNumber: 0,
+      });
 
       expect(results).to.have.length(limit);
       results.map((r) => {

@@ -24,7 +24,7 @@ module.exports = {
     if (!req.session.authenticated) {
       req.flash(
         'error',
-        'You are not permitted to perform this action. Are you sure you are logged in?'
+        'You are not permitted to perform this action. Are you sure you are logged in?',
       );
       return res.redirect('/');
     }
@@ -51,7 +51,7 @@ module.exports = {
     if (!req.session.authenticated) {
       req.flash(
         'error',
-        'You are not permitted to perform this action. Are you sure you are logged in?'
+        'You are not permitted to perform this action. Are you sure you are logged in?',
       );
       return res.redirect('/');
     }

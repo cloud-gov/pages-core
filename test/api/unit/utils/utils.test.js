@@ -14,12 +14,25 @@ const filenameJs = `${filename}.js`;
 const filenameCss = `${filename}.css`;
 
 const MockWebpackConfig = {
-  output: { filename: filenameJs, publicPath },
-  plugins: [{ options: { filename: filenameCss } }],
-  entry: { bundle: './js/to/bundle.js' },
+  output: {
+    filename: filenameJs,
+    publicPath,
+  },
+  plugins: [
+    {
+      options: {
+        filename: filenameCss,
+      },
+    },
+  ],
+  entry: {
+    bundle: './js/to/bundle.js',
+  },
 };
 
-const utils = proxyquire('../../../../api/utils', { '../../webpack.config.js': MockWebpackConfig });
+const utils = proxyquire('../../../../api/utils', {
+  '../../webpack.config.js': MockWebpackConfig,
+});
 
 describe('utils', () => {
   describe('.buildEnum', () => {
@@ -56,7 +69,8 @@ describe('utils', () => {
       done();
     });
 
-    it('should truncate names over 46 characters to account for CF service name limits', (done) => {
+    it(`should truncate names over 46
+        characters to account for CF service name limits`, (done) => {
       const owner = 'hello-world-owner';
       const repository = 'hello-world-really-long-repository-name';
       const output = utils.generateS3ServiceName(owner, repository);
@@ -67,7 +81,8 @@ describe('utils', () => {
       done();
     });
 
-    it('should return undefined when owner or repository or both are undefined or empty strings', (done) => {
+    it(`should return undefined when owner or repository
+        or both are undefined or empty strings`, (done) => {
       const aString = 'hello';
       const emptyString = '';
 
@@ -80,7 +95,8 @@ describe('utils', () => {
   });
 
   describe('.toSubdomainPart', () => {
-    it('replaces invalid character sequences with single `-`, removes leading and trailing `-`, and lowercases', () => {
+    it(`replaces invalid character sequences with single \` -
+        \`, removes leading and trailing \` - \`, and lowercases`, () => {
       const str = '*&^He_?llo--W9o`--';
       const expected = 'he-llo-w9o';
 
@@ -94,7 +110,8 @@ describe('utils', () => {
     });
 
     it('restricts the value to 63 chars', () => {
-      const str = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
+      const str =
+        'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
       const expected = str.substring(0, 62);
       expect(utils.toSubdomainPart(str)).to.equal(expected);
     });
@@ -104,7 +121,9 @@ describe('utils', () => {
     it('should return toSubdomainPart of owner and repo separated by `--`', () => {
       const owner = 'Hel.lo';
       const repository = 'Hello.Wo..rld';
-      const expected = `${utils.toSubdomainPart(owner)}--${utils.toSubdomainPart(repository)}`;
+      const subDomainPartOwner = utils.toSubdomainPart(owner);
+      const subDomainPartRepo = utils.toSubdomainPart(repository);
+      const expected = `${subDomainPartOwner}--${subDomainPartRepo}`;
 
       expect(utils.generateSubdomain(owner, repository)).to.equal(expected);
     });
@@ -119,14 +138,20 @@ describe('utils', () => {
   describe('.isPastAuthThreshold', () => {
     const threshAmount = config.policies.authRevalidationMinutes;
 
-    it(`returns true when given datetime is older than ${threshAmount} minutes`, (done) => {
-      const expiredAuthDate = moment().subtract(threshAmount + 5, 'minutes').toDate();
+    it(`returns true when given datetime
+        is older than ${threshAmount} minutes`, (done) => {
+      const expiredAuthDate = moment()
+        .subtract(threshAmount + 5, 'minutes')
+        .toDate();
       expect(utils.isPastAuthThreshold(expiredAuthDate)).to.equal(true);
       done();
     });
 
-    it(`returns false when given datetime is newer than ${threshAmount} minutes`, (done) => {
-      const goodAuthDate = moment().subtract(threshAmount - 5, 'minutes').toDate();
+    it(`returns false when given
+        datetime is newer than ${threshAmount} minutes`, (done) => {
+      const goodAuthDate = moment()
+        .subtract(threshAmount - 5, 'minutes')
+        .toDate();
       expect(utils.isPastAuthThreshold(goodAuthDate)).to.equal(false);
       done();
     });
@@ -147,9 +172,7 @@ describe('utils', () => {
       const fsReaddirStub = sinon.stub(fs, 'readdirSync');
       const fsStatStub = sinon.stub(fs, 'statSync');
 
-      fsReaddirStub
-        .withArgs('mydir')
-        .returns(Object.keys(directoryStructure.mydir));
+      fsReaddirStub.withArgs('mydir').returns(Object.keys(directoryStructure.mydir));
       fsStatStub.withArgs('mydir/foobar.html').returns({
         isDirectory: () => false,
       });
@@ -198,7 +221,11 @@ describe('utils', () => {
   describe('.loadProductionManifest', () => {
     beforeEach(() => {
       sinon.stub(fs, 'existsSync').returns(true);
-      sinon.stub(fs, 'readFileSync').returns(JSON.stringify({ manifest: 'yay' }));
+      sinon.stub(fs, 'readFileSync').returns(
+        JSON.stringify({
+          manifest: 'yay',
+        }),
+      );
     });
 
     afterEach(() => {
@@ -207,14 +234,18 @@ describe('utils', () => {
 
     it('loads webpack-manifest.json', () => {
       const result = utils.loadProductionManifest();
-      expect(result).to.deep.eq({ manifest: 'yay' });
+      expect(result).to.deep.eq({
+        manifest: 'yay',
+      });
     });
   });
 
   describe('.loadAssetManifest', () => {
     beforeEach(() => {
       fsMock({
-        'webpack-manifest.json': JSON.stringify({ manifest: 'yay' }),
+        'webpack-manifest.json': JSON.stringify({
+          manifest: 'yay',
+        }),
       });
     });
 
@@ -259,20 +290,27 @@ describe('utils', () => {
   });
 
   describe('.mapValues', () => {
-    it('maps a function over the values of an object and returns a new object with the original keys and updated values', () => {
+    it(`maps a function over the values
+        of an object and returns a new object
+        with the original keys and updated values`, () => {
       const obj = {
         foo: 1,
         bar: 5,
       };
 
-      const fn = d => d * 2;
+      const fn = (d) => d * 2;
 
-      expect(utils.mapValues(fn, obj)).to.deep.equal({ foo: 2, bar: 10 });
+      expect(utils.mapValues(fn, obj)).to.deep.equal({
+        foo: 2,
+        bar: 10,
+      });
     });
   });
 
   describe('.wrapHandler', () => {
-    it('wraps an async function with a catch clause and calls the `error` function of the 2nd argument', async () => {
+    it(`wraps an async function with a catch
+      clause and calls the \`error\`
+      function of the 2nd argument`, async () => {
       const spy = sinon.spy();
       const error = new Error('foobar');
 
@@ -282,7 +320,7 @@ describe('utils', () => {
 
       const wrappedFn = utils.wrapHandler(handler);
 
-      await wrappedFn({}, { error: spy }, () => { });
+      await wrappedFn({}, { error: spy }, () => {});
 
       expect(spy.calledWith(error));
     });
@@ -297,12 +335,12 @@ describe('utils', () => {
         foo: async (_req, _res, _next) => {
           throw error;
         },
-        bar: async () => { },
+        bar: async () => {},
       };
 
       const wrappedObj = utils.wrapHandlers(handlers);
 
-      await wrappedObj.foo({}, { error: spy }, () => { });
+      await wrappedObj.foo({}, { error: spy }, () => {});
 
       expect(spy.calledWith(error));
     });

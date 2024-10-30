@@ -38,9 +38,7 @@ if (encryptCreds) {
 }
 
 // S3 Configs for Build Logs
-const s3BuildLogsCreds = appEnv.getServiceCreds(
-  `${servicePrefix}-s3-build-logs`
-);
+const s3BuildLogsCreds = appEnv.getServiceCreds(`${servicePrefix}-s3-build-logs`);
 if (s3BuildLogsCreds) {
   module.exports.s3BuildLogs = {
     accessKeyId: s3BuildLogsCreds.access_key_id,

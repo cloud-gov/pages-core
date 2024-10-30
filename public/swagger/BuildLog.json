@@ -1,13 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "build",
-    "state",
-    "origin",
-    "offset",
-    "output_count",
-    "output"
-  ],
+  "required": ["build", "state", "origin", "offset", "output_count", "output"],
   "properties": {
     "build": {
       "type": "number"

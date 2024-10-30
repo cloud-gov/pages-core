@@ -11,8 +11,18 @@ const { set, subscribe, update } = store;
 
 export default {
   csrfToken: () => get(store).csrfToken,
-  login: ({ csrfToken, ...user }) => set({ authenticated: true, csrfToken, user }),
+  login: ({ csrfToken, ...user }) =>
+    set({
+      authenticated: true,
+      csrfToken,
+      user,
+    }),
   logout: () => set(initial),
-  updateUser: ({ csrfToken, ...user }) => update((s) => ({ ...s, csrfToken, user })),
+  updateUser: ({ csrfToken, ...user }) =>
+    update((s) => ({
+      ...s,
+      csrfToken,
+      user,
+    })),
   subscribe,
 };

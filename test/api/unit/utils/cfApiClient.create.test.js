@@ -16,7 +16,10 @@ describe('CloudFoundryAPIClient', () => {
       const planName = 'basic-vpc';
       const planGuid = crypto.randomUUID();
 
-      const requestBody = { name, service_plan_guid: planGuid };
+      const requestBody = {
+        name,
+        service_plan_guid: planGuid,
+      };
 
       const planResource = factory.createCFAPIResource({
         guid: planGuid,
@@ -25,7 +28,10 @@ describe('CloudFoundryAPIClient', () => {
       const listPlans = factory.createCFAPIResourceList({
         resources: [planResource],
       });
-      const serviceResource = factory.createCFAPIResource({ guid: 1234, name });
+      const serviceResource = factory.createCFAPIResource({
+        guid: 1234,
+        name,
+      });
 
       mockTokenRequest();
       apiNocks.mockFetchS3ServicePlanGUID(listPlans, planName);
@@ -37,7 +43,7 @@ describe('CloudFoundryAPIClient', () => {
           name,
           planName,
           config.env.cfSpaceGuid,
-          config.env.s3ServicePlanId
+          config.env.s3ServicePlanId,
         )
         .then((res) => {
           expect(res).to.be.an('object');
@@ -82,7 +88,8 @@ describe('CloudFoundryAPIClient', () => {
       };
 
       mockTokenRequest();
-      apiNocks.mockCreateServiceKeyPost(requestBody);(requestBody);
+      apiNocks.mockCreateServiceKeyPost(requestBody);
+      requestBody;
 
       const apiClient = new CloudFoundryAPIClient();
       apiClient
@@ -101,7 +108,10 @@ describe('CloudFoundryAPIClient', () => {
       const planGuid = crypto.randomUUID();
       const keyName = `${name}-key`;
       const serviceInstanceGuid = 'service-instance-guid';
-      const requestBody = { name, service_plan_guid: planGuid };
+      const requestBody = {
+        name,
+        service_plan_guid: planGuid,
+      };
       const planResource = factory.createCFAPIResource({
         guid: planGuid,
         name: planName,
@@ -135,17 +145,12 @@ describe('CloudFoundryAPIClient', () => {
 
       const apiClient = new CloudFoundryAPIClient();
       apiClient
-        .createSiteBucket(
-          name,
-          config.env.cfSpaceGuid,
-          'key',
-          planName
-        )
+        .createSiteBucket(name, config.env.cfSpaceGuid, 'key', planName)
         .then((res) => {
           expect(res).to.be.an('object');
           expect(res.name).to.equal(keyName);
           expect(res.relationships.service_instance.data.guid).to.equal(
-            serviceResource.guid
+            serviceResource.guid,
           );
           done();
         });
@@ -170,7 +175,7 @@ describe('CloudFoundryAPIClient', () => {
           origin,
           path,
         },
-        {}
+        {},
       );
 
       const apiClient = new CloudFoundryAPIClient();

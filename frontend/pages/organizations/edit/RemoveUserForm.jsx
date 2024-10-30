@@ -2,10 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm } from 'redux-form';
 
-const RemoveUserForm = ({
-  handleSubmit,
-  submitting,
-}) => (
+const RemoveUserForm = ({ handleSubmit, submitting }) => (
   <form onSubmit={handleSubmit}>
     <button
       type="submit"

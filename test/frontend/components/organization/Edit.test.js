@@ -11,7 +11,9 @@ proxyquire.noCallThru();
 const useSelectorStub = sinon.stub().returns({ id: 1 });
 
 const { Edit } = proxyquire('../../../../frontend/components/organization/Edit', {
-  'react-redux': { useSelector: useSelectorStub },
+  'react-redux': {
+    useSelector: useSelectorStub,
+  },
 });
 
 describe('<Edit />', () => {

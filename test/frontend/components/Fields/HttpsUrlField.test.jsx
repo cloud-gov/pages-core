@@ -2,7 +2,9 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
 
-import HttpsUrlField, { isHttpsUrlWithoutPath } from '../../../../frontend/components/Fields/HttpsUrlField';
+import HttpsUrlField, {
+  isHttpsUrlWithoutPath,
+} from '../../../../frontend/components/Fields/HttpsUrlField';
 
 describe('<HttpsUrlField />', () => {
   it('renders', () => {
@@ -30,7 +32,8 @@ describe('<HttpsUrlField />', () => {
 
   describe('isHttpsUrlWithoutPath validator', () => {
     it('validates', () => {
-      const msg = 'Please enter a URL that starts with "https://" and has no trailing path';
+      const msg =
+        'Please enter a URL that starts with "https://" and has no trailing path';
       expect(isHttpsUrlWithoutPath()).to.be.undefined;
       expect(isHttpsUrlWithoutPath('')).to.be.undefined;
 
@@ -43,7 +46,8 @@ describe('<HttpsUrlField />', () => {
 
       expect(isHttpsUrlWithoutPath('https://example.com')).to.be.undefined;
       expect(isHttpsUrlWithoutPath('https://subdomain.example.com')).to.be.undefined;
-      expect(isHttpsUrlWithoutPath('https://has-hyphens-and-123.example.com')).to.be.undefined;
+      expect(isHttpsUrlWithoutPath('https://has-hyphens-and-123.example.com')).to.be
+        .undefined;
       expect(isHttpsUrlWithoutPath('https://a.b.example.com')).to.be.undefined;
     });
   });

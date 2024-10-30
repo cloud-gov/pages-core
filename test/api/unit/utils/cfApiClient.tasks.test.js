@@ -31,17 +31,25 @@ describe('CloudFoundryAPIClient', () => {
       const ciphertext = JSON.stringify({
         [commandParam.name]: commandParam.value,
       });
-      sinon.stub(Encryptor, 'encrypt')
-        .returns({ ciphertext });
+      sinon.stub(Encryptor, 'encrypt').returns({
+        ciphertext,
+      });
       const taskParams = {
         disk_in_mb: 4 * 1024,
         memory_in_mb: 2 * 1024,
         name: `build-${jobId}`,
         command: `cd app && python main.py -p '${ciphertext}'`,
-        metadata: { labels: { type: 'build-task' } },
+        metadata: {
+          labels: {
+            type: 'build-task',
+          },
+        },
       };
 
-      const stubFetchTaskAppGUID = sinon.stub(CloudFoundryAPIClient.prototype, 'fetchTaskAppGUID');
+      const stubFetchTaskAppGUID = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'fetchTaskAppGUID',
+      );
       stubFetchTaskAppGUID.resolves(guid);
 
       const stubAuthRequest = sinon.stub(CloudFoundryAPIClient.prototype, 'authRequest');
@@ -54,7 +62,8 @@ describe('CloudFoundryAPIClient', () => {
       sinon.assert.calledOnceWithExactly(stubAuthRequest, method, path, taskParams);
     });
 
-    it('should start a site build cf task with containerSize large settings', async () => {
+    it(`should start a site build cf task
+        with containerSize large settings`, async () => {
       const guid = 123;
       const jobId = 456;
       const state = 'SUCCEEDED';
@@ -74,17 +83,25 @@ describe('CloudFoundryAPIClient', () => {
       const ciphertext = JSON.stringify({
         [commandParam.name]: commandParam.value,
       });
-      sinon.stub(Encryptor, 'encrypt')
-        .returns({ ciphertext });
+      sinon.stub(Encryptor, 'encrypt').returns({
+        ciphertext,
+      });
       const taskParams = {
         disk_in_mb: 7 * 1024,
         memory_in_mb: 8 * 1024,
         name: `build-${jobId}`,
         command: `cd app && python main.py -p '${ciphertext}'`,
-        metadata: { labels: { type: 'build-task' } },
+        metadata: {
+          labels: {
+            type: 'build-task',
+          },
+        },
       };
 
-      const stubFetchTaskAppGUID = sinon.stub(CloudFoundryAPIClient.prototype, 'fetchTaskAppGUID');
+      const stubFetchTaskAppGUID = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'fetchTaskAppGUID',
+      );
       stubFetchTaskAppGUID.resolves(guid);
 
       const stubAuthRequest = sinon.stub(CloudFoundryAPIClient.prototype, 'authRequest');
@@ -116,17 +133,25 @@ describe('CloudFoundryAPIClient', () => {
       const ciphertext = JSON.stringify({
         [commandParam.name]: commandParam.value,
       });
-      sinon.stub(Encryptor, 'encrypt')
-        .returns({ ciphertext });
+      sinon.stub(Encryptor, 'encrypt').returns({
+        ciphertext,
+      });
       const taskParams = {
         disk_in_mb: 4 * 1024,
         memory_in_mb: 2 * 1024,
         name: `build-${jobId}`,
         command: `cd app && python main.py -p '${ciphertext}'`,
-        metadata: { labels: { type: 'build-task' } },
+        metadata: {
+          labels: {
+            type: 'build-task',
+          },
+        },
       };
 
-      const stubFetchTaskAppGUID = sinon.stub(CloudFoundryAPIClient.prototype, 'fetchTaskAppGUID');
+      const stubFetchTaskAppGUID = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'fetchTaskAppGUID',
+      );
       stubFetchTaskAppGUID.resolves(guid);
 
       const stubAuthRequest = sinon.stub(CloudFoundryAPIClient.prototype, 'authRequest');
@@ -138,7 +163,9 @@ describe('CloudFoundryAPIClient', () => {
         .onThirdCall()
         .resolves({ state });
 
-      const res = await apiClient.startSiteBuildTask(message, jobId, { sleepInterval: 0 });
+      const res = await apiClient.startSiteBuildTask(message, jobId, {
+        sleepInterval: 0,
+      });
 
       expect(res.state).to.equal('SUCCEEDED');
       expect(stubAuthRequest.callCount).to.equal(3);
@@ -146,7 +173,8 @@ describe('CloudFoundryAPIClient', () => {
       sinon.assert.calledWithExactly(stubAuthRequest, method, path, taskParams);
     });
 
-    it('should not start a task and return an error if the command is over 4096 characters', async () => {
+    it(`should not start a task and return an error
+        if the command is over 4096 characters`, async () => {
       const jobId = 456;
       const value = randomBytes(2100).toString('hex');
       const message = {
@@ -161,14 +189,16 @@ describe('CloudFoundryAPIClient', () => {
       const ciphertext = JSON.stringify({
         [commandParam.name]: commandParam.value,
       });
-      sinon.stub(Encryptor, 'encrypt').returns({ ciphertext });
+      sinon.stub(Encryptor, 'encrypt').returns({
+        ciphertext,
+      });
 
       const res = await apiClient
         .startSiteBuildTask(message, jobId)
-        .catch(error => error);
+        .catch((error) => error);
 
       expect(res.message).to.equal(
-        `Command params for site build job ${jobId} are greater than 4096 characters.`
+        `Command params for site build job ${jobId} are greater than 4096 characters.`,
       );
     });
   });

@@ -11,4 +11,6 @@ function createJobLogger(job) {
   };
 }
 
-module.exports = { createJobLogger };
+module.exports = {
+  createJobLogger,
+};

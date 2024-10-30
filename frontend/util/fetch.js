@@ -9,9 +9,10 @@ const defaultHeaders = {
 };
 
 function mergeParams(url, params) {
-  return Object.keys(params).reduce((memo, param, index) => (
-    `${memo}${!index ? '?' : '&'}${param}=${params[param]}`),
-  url);
+  return Object.keys(params).reduce(
+    (memo, param, index) => `${memo}${!index ? '?' : '&'}${param}=${params[param]}`,
+    url,
+  );
 }
 
 function checkStatus(response) {
@@ -52,25 +53,30 @@ function parseJSON(response) {
 function fetchWrapper(url, configs = {}) {
   const baseConfigs = {
     credentials: configs.credentials || credentials,
-    headers: { ...defaultHeaders, ...configs.headers || {} },
+    headers: {
+      ...defaultHeaders,
+      ...(configs.headers || {}),
+    },
     method: configs.method || defaultMethod,
   };
 
   let requestConfigs;
 
-  if (configs.method && !(/get|delete/i).test(configs.method)) {
-    requestConfigs = Object.assign(baseConfigs, {}, {
-      body: JSON.stringify(configs.data),
-    });
+  if (configs.method && !/get|delete/i.test(configs.method)) {
+    requestConfigs = Object.assign(
+      baseConfigs,
+      {},
+      {
+        body: JSON.stringify(configs.data),
+      },
+    );
   } else {
     requestConfigs = baseConfigs;
   }
 
   const requestUrl = configs.params ? mergeParams(url, configs.params) : url;
 
-  return fetch(requestUrl, requestConfigs)
-    .then(checkStatus)
-    .then(parseJSON);
+  return fetch(requestUrl, requestConfigs).then(checkStatus).then(parseJSON);
 }
 
 export default fetchWrapper;

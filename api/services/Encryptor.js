@@ -24,7 +24,7 @@ function encrypt(value, encryptionKey, { hintSize = 4 } = {}) {
 
   // Prepend the authentication tag and initialization vector to the encrypted buffer
   const ciphertext = [authTag, iv, encrypted]
-    .map(buf => buf.toString('hex')) // Convert all values to hex
+    .map((buf) => buf.toString('hex')) // Convert all values to hex
     .join(':'); // Return a `:` delimited hex string
 
   // Create the hint
@@ -36,7 +36,7 @@ function encrypt(value, encryptionKey, { hintSize = 4 } = {}) {
 function encryptObjectValues(
   obj,
   encryptionKey,
-  { hintSize = 4, onlyEncryptKeys = [] } = {}
+  { hintSize = 4, onlyEncryptKeys = [] } = {},
 ) {
   const returnEncrypted = (item, shouldEncrypt = true) => {
     if (_.isString(item) && shouldEncrypt) {
@@ -44,8 +44,7 @@ function encryptObjectValues(
     }
 
     if (_.isNumber(item) && shouldEncrypt) {
-      return encrypt(item.toString(), encryptionKey, { hintSize })
-        .ciphertext;
+      return encrypt(item.toString(), encryptionKey, { hintSize }).ciphertext;
     }
 
     return item;

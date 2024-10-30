@@ -39,10 +39,7 @@ describe('UAAIdentitySerializer', () => {
         items: uaaIdentitySchema,
       };
 
-      const uaaIdentities = await Promise.all([
-        buildUAAIdentity(),
-        buildUAAIdentity(),
-      ]);
+      const uaaIdentities = await Promise.all([buildUAAIdentity(), buildUAAIdentity()]);
 
       const uaaIdentitiesJson = UAAIdentitySerializer.serializeMany(uaaIdentities);
 

@@ -22,13 +22,13 @@ export const availableEngines = [
 
 function makeOptions(opts) {
   return opts.map(({ label, value }) => (
-    <option key={value} value={value}>{label}</option>
+    <option key={value} value={value}>
+      {label}
+    </option>
   ));
 }
 
-const SelectSiteEngine = ({
-  value, onChange, name, id, className,
-}) => (
+const SelectSiteEngine = ({ value, onChange, name, id, className }) => (
   <select
     className={`usa-select ${className}`}
     {...{ name, id }}

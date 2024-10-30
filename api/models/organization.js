@@ -3,13 +3,7 @@ const moment = require('moment');
 const { toInt } = require('../utils');
 const { sandboxDays } = require('../../config').app;
 
-const associate = ({
-  Organization,
-  OrganizationRole,
-  Role,
-  Site,
-  User,
-}) => {
+const associate = ({ Organization, OrganizationRole, Role, Site, User }) => {
   // Associations
   Organization.belongsToMany(User, {
     through: OrganizationRole,
@@ -32,13 +26,15 @@ const associate = ({
       query.where = { id };
     } else {
       query.where = {
-        name: { [Op.substring]: search },
+        name: {
+          [Op.substring]: search,
+        },
       };
     }
     return query;
   });
 
-  Organization.addScope('forUser', user => ({
+  Organization.addScope('forUser', (user) => ({
     include: [
       {
         model: User,
@@ -57,92 +53,104 @@ const associate = ({
     ],
   }));
 
-  Organization.addScope('forManagerRole', user => ({
+  Organization.addScope('forManagerRole', (user) => ({
     where: {
       isActive: true,
     },
-    include: [{
-      model: OrganizationRole,
-      required: true,
-      where: {
-        userId: user.id,
-      },
-      include: [{
-        model: Role,
+    include: [
+      {
+        model: OrganizationRole,
         required: true,
         where: {
-          name: 'manager',
+          userId: user.id,
         },
-      }],
-    }],
+        include: [
+          {
+            model: Role,
+            required: true,
+            where: {
+              name: 'manager',
+            },
+          },
+        ],
+      },
+    ],
   }));
 
   Organization.addScope('byName', {
-    order: [
-      ['name', 'ASC'],
-    ],
+    order: [['name', 'ASC']],
   });
 };
 
 module.exports = (sequelize, DataTypes) => {
-  const Organization = sequelize.define('Organization', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    isSandbox: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    sandboxNextCleaningAt: {
-      type: DataTypes.DATE,
-    },
-    daysUntilSandboxCleaning: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        if (!this.isSandbox || !this.sandboxNextCleaningAt) {
-          return null;
-        }
-        const start = moment(this.sandboxNextCleaningAt).endOf('day');
-        const diff = start.diff(moment().endOf('day'));
-        return moment.duration(diff).asDays();
+  const Organization = sequelize.define(
+    'Organization',
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      isSandbox: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      sandboxNextCleaningAt: {
+        type: DataTypes.DATE,
+      },
+      daysUntilSandboxCleaning: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          if (!this.isSandbox || !this.sandboxNextCleaningAt) {
+            return null;
+          }
+          const start = moment(this.sandboxNextCleaningAt).endOf('day');
+          const diff = start.diff(moment().endOf('day'));
+          return moment.duration(diff).asDays();
+        },
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      agency: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      isSelfAuthorized: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-    agency: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    isSelfAuthorized: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-  }, {
-    paranoid: true,
-    tableName: 'organization',
-    hooks: {
-      beforeValidate: (org) => {
-        /* eslint-disable no-param-reassign */
-        if (!org.isSandbox) {
-          org.sandboxNextCleaningAt = null;
-        } else if (!org.sandboxNextCleaningAt) {
-          org.sandboxNextCleaningAt = moment().add(sandboxDays, 'days').endOf('day');
-        }
-        /* eslint-enable no-param-reassign */
+    {
+      paranoid: true,
+      tableName: 'organization',
+      hooks: {
+        beforeValidate: (org) => {
+          if (!org.isSandbox) {
+            org.sandboxNextCleaningAt = null;
+          } else if (!org.sandboxNextCleaningAt) {
+            org.sandboxNextCleaningAt = moment().add(sandboxDays, 'days').endOf('day');
+          }
+        },
       },
     },
-  });
+  );
 
   Organization.associate = associate;
-  Organization.searchScope = search => ({ method: ['byIdOrName', search] });
-  Organization.forUser = user => Organization.scope({ method: ['forUser', user] });
-  Organization.forManagerRole = user => Organization.scope({ method: ['forManagerRole', user] });
+  Organization.searchScope = (search) => ({
+    method: ['byIdOrName', search],
+  });
+  Organization.forUser = (user) =>
+    Organization.scope({
+      method: ['forUser', user],
+    });
+  Organization.forManagerRole = (user) =>
+    Organization.scope({
+      method: ['forManagerRole', user],
+    });
   return Organization;
 };

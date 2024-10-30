@@ -7,17 +7,10 @@ const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const { wrapHandlers } = require('../utils');
-const {
-  Build,
-  Domain,
-  User,
-  Event,
-  Site,
-  SiteBranchConfig,
-} = require('../models');
+const { Build, Domain, User, Event, Site, SiteBranchConfig } = require('../models');
 const { getSocket } = require('../socketIO');
 
-const decodeb64 = str => Buffer.from(str, 'base64').toString('utf8');
+const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
 
 const emitBuildStatus = async (build) => {
   try {
@@ -50,7 +43,9 @@ module.exports = wrapHandlers({
     await siteAuthorizer.findOne(req.user, site);
     const builds = await Build.findAll({
       attributes: ['id'],
-      where: { site: site.id },
+      where: {
+        site: site.id,
+      },
       order: [['createdAt', 'desc']],
       limit: 100,
     });
@@ -61,13 +56,15 @@ module.exports = wrapHandlers({
   /**
    * req.body will contain some combination of a `siteId` property, and either
    * a `buildId` or a `branch` and `sha`.
-   * For example: { buildId: 1, siteId: 1 } OR { siteId: 1, branch: 'master', sha: '123abc' }
+   * For example: { buildId: 1, siteId: 1 } OR
+   * { siteId: 1, branch: 'master', sha: '123abc' }
    *
    * We may want to consider just using shas in the future, although there are edge cases
    * in which a build record can be saved without a sha.
    *
-   * It might also be worth nesting builds within a site, since they are only ever used in that
-   * context. Then we don't have to explicity pass the site id as a param to this controller
+   * It might also be worth nesting builds within a site,
+   * since they are only ever used in that context.
+   * Then we don't have to explicity pass the site id as a param to this controller
    *
    * e.g. `sites/1/builds/1`
    */
@@ -84,13 +81,24 @@ module.exports = wrapHandlers({
   },
 
   async create(req, res) {
-    await siteAuthorizer.createBuild(req.user, { id: req.body.siteId });
+    await siteAuthorizer.createBuild(req.user, {
+      id: req.body.siteId,
+    });
     const requestBuild = await Build.findOne({
       where: {
         id: req.body.buildId,
         site: req.body.siteId,
       },
-      include: [{ model: Site, include: [{ model: User }] }],
+      include: [
+        {
+          model: Site,
+          include: [
+            {
+              model: User,
+            },
+          ],
+        },
+      ],
     });
 
     if (!requestBuild) {
@@ -111,7 +119,8 @@ module.exports = wrapHandlers({
         site: requestBuild.site,
         user: req.user.id,
         username: req.user.username,
-        requestedCommitSha: requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
+        requestedCommitSha:
+          requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
       });
       await rebuild.enqueue();
       rebuild.Site = requestBuild.Site;
@@ -127,7 +136,16 @@ module.exports = wrapHandlers({
 
     const build = await fetchModelById(params.id, Build, {
       include: [
-        { model: Site, include: [{ model: User }, Domain, SiteBranchConfig] },
+        {
+          model: Site,
+          include: [
+            {
+              model: User,
+            },
+            Domain,
+            SiteBranchConfig,
+          ],
+        },
       ],
     });
 
@@ -146,7 +164,9 @@ module.exports = wrapHandlers({
     try {
       buildStatus.message = decodeb64(body.message);
     } catch (err) {
-      EventCreator.error(Event.labels.BUILD_STATUS, err, { buildId: build.id });
+      EventCreator.error(Event.labels.BUILD_STATUS, err, {
+        buildId: build.id,
+      });
     }
 
     await build.updateJobStatus(buildStatus);
@@ -167,7 +187,16 @@ module.exports = wrapHandlers({
 
     const build = await fetchModelById(params.id, Build, {
       include: [
-        { model: Site, include: [{ model: User }, Domain, SiteBranchConfig] },
+        {
+          model: Site,
+          include: [
+            {
+              model: User,
+            },
+            Domain,
+            SiteBranchConfig,
+          ],
+        },
       ],
     });
 
@@ -180,7 +209,9 @@ module.exports = wrapHandlers({
 
     // use the full body to update the metrics, requires merge for nested metrics
     const metrics = merge({}, build.metrics, body);
-    await build.update({ metrics });
+    await build.update({
+      metrics,
+    });
 
     return res.ok();
   },

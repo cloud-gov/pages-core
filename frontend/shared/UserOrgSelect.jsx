@@ -5,11 +5,7 @@ import { ORGANIZATION } from '../propTypes';
 
 function makeOptions(opts) {
   return opts.map(({ id, name }) => (
-    <option
-      key={`org-select-${id}`}
-      className="user-org-select-option"
-      value={id}
-    >
+    <option key={`org-select-${id}`} className="user-org-select-option" value={id}>
       {name}
     </option>
   ));
@@ -28,24 +24,21 @@ const UserOrgSelect = ({
   value,
 }) => (
   <div>
-    <label htmlFor={name} className="usa-label text-bold">{label}</label>
-    {touched && (error && <span className="usa-error-message">{error}</span>)}
+    <label htmlFor={name} className="usa-label text-bold">
+      {label}
+    </label>
+    {touched && error && <span className="usa-error-message">{error}</span>}
     <select
       {...{ name, id }}
       value={value}
       onChange={onChange}
       className={`usa-select ${touched && error ? 'usa-select--error' : ''} ${className}`}
     >
-      {
-        mustChooseOption ? (
-          <option
-            className="user-org-select-option"
-            value=""
-          >
-            Please select an organization
-          </option>
-        ) : null
-      }
+      {mustChooseOption ? (
+        <option className="user-org-select-option" value="">
+          Please select an organization
+        </option>
+      ) : null}
       {makeOptions(orgData)}
     </select>
   </div>
@@ -53,10 +46,7 @@ const UserOrgSelect = ({
 
 UserOrgSelect.propTypes = {
   className: PropTypes.string,
-  id: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   label: PropTypes.string,
   touched: PropTypes.bool,
   error: PropTypes.string,
@@ -64,15 +54,12 @@ UserOrgSelect.propTypes = {
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
 UserOrgSelect.defaultProps = {
   className: null,
-  label: 'Select the site\'s organization',
+  label: "Select the site's organization",
   touched: false,
   error: null,
   mustChooseOption: false,

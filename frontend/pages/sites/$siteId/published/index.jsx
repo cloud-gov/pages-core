@@ -11,8 +11,8 @@ import BranchesTable from './BranchesTable';
 
 function PublishedBranchesTable() {
   const { id } = useParams();
-  const site = useSelector(state => currentSite(state.sites, id));
-  const publishedBranches = useSelector(state => state.publishedBranches);
+  const site = useSelector((state) => currentSite(state.sites, id));
+  const publishedBranches = useSelector((state) => state.publishedBranches);
 
   useEffect(() => {
     publishedBranchActions.fetchPublishedBranches({ id });

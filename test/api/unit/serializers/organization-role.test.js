@@ -9,10 +9,14 @@ const OrgFactory = require('../../support/factory/organization');
 const createUser = require('../../support/factory/user');
 
 const { OrganizationRole, Role } = require('../../../../api/models');
+// eslint-disable-next-line max-len
 const OrganizationRoleSerializer = require('../../../../api/serializers/organization-role');
 
 function clean() {
-  return OrganizationRole.truncate({ force: true, cascade: true });
+  return OrganizationRole.truncate({
+    force: true,
+    cascade: true,
+  });
 }
 
 const v = new Validator();
@@ -29,7 +33,11 @@ describe('OrganizationRoleSerializer', () => {
     it('should serialize an organization-role object correctly', async () => {
       const [org, role, user] = await Promise.all([
         OrgFactory.create(),
-        Role.findOne({ where: { name: 'user' } }),
+        Role.findOne({
+          where: {
+            name: 'user',
+          },
+        }),
         createUser(),
       ]);
 
@@ -45,10 +53,15 @@ describe('OrganizationRoleSerializer', () => {
       expect(result.errors).to.be.empty;
     });
 
-    it('should serialize an organization-role object with org and role correctly', async () => {
+    it(`should serialize an organization-role object
+        with org and role correctly`, async () => {
       const [org, role, user] = await Promise.all([
         OrgFactory.create(),
-        Role.findOne({ where: { name: 'user' } }),
+        Role.findOne({
+          where: {
+            name: 'user',
+          },
+        }),
         createUser(),
       ]);
 
@@ -58,8 +71,11 @@ describe('OrganizationRoleSerializer', () => {
         userId: user.id,
       });
 
-      const orgRole = await OrganizationRole.forUser(user)
-        .findOne({ where: { organizationId: org.id } });
+      const orgRole = await OrganizationRole.forUser(user).findOne({
+        where: {
+          organizationId: org.id,
+        },
+      });
 
       expect(orgRole.Organization.id).to.eq(org.id);
       expect(orgRole.Role.id).to.eq(role.id);
@@ -80,7 +96,11 @@ describe('OrganizationRoleSerializer', () => {
 
       const [org, role, user1, user2] = await Promise.all([
         OrgFactory.create(),
-        Role.findOne({ where: { name: 'user' } }),
+        Role.findOne({
+          where: {
+            name: 'user',
+          },
+        }),
         createUser(),
         createUser(),
       ]);

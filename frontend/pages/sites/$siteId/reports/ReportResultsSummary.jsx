@@ -2,7 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  IconCheckCircle, IconClock, IconExclamationCircle, IconSpinner, IconX, IconIgnore,
+  IconCheckCircle,
+  IconClock,
+  IconExclamationCircle,
+  IconSpinner,
+  IconX,
+  IconIgnore,
 } from '../../../../shared/icons';
 
 const reportResultsIcon = (status, count) => {
@@ -51,17 +56,16 @@ const ReportResultsSummary = (props) => {
 
   return (
     <div className="scan-status">
-      { icon && (
-        <span className="scan-status-icon">
-          { React.createElement(icon) }
-        </span>
-      )}
-      <h4 className={['scan-status-title', (Number.isInteger(count) ? '' : 'scan-status-title-no-results')].join(' ')}>
-        { results }
+      {icon && <span className="scan-status-icon">{React.createElement(icon)}</span>}
+      <h4
+        className={[
+          'scan-status-title',
+          Number.isInteger(count) ? '' : 'scan-status-title-no-results',
+        ].join(' ')}
+      >
+        {results}
       </h4>
-      <div className="scan-status-details">
-        {children}
-      </div>
+      <div className="scan-status-details">{children}</div>
     </div>
   );
 };

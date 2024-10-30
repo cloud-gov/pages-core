@@ -7,7 +7,9 @@ import proxyquire from 'proxyquire';
 proxyquire.noCallThru();
 
 const PagesHeader = proxyquire('../../../../frontend/components/site/PagesHeader', {
-  './icons': { IconView: 'IconView' },
+  './icons': {
+    IconView: 'IconView',
+  },
 }).default;
 
 describe('<PagesHeader />', () => {

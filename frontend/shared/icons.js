@@ -4,6 +4,7 @@ import IconCheckCircle from '../../public/images/icons/icon-check-circle-solid.s
 import IconClock from '../../public/images/icons/icon-clock.svg';
 import IconCloudUpload from '../../public/images/icons/icon-cloud_upload.svg';
 import IconEnvelope from '../../public/images/icons/icon-envelope.svg';
+// eslint-disable-next-line max-len
 import IconExclamationCircle from '../../public/images/icons/icon-exclamation-circle-solid.svg';
 import IconExperiment from '../../public/images/icons/icon-experiment.svg';
 import IconExternalLink from '../../public/images/icons/icon-external-link.svg';

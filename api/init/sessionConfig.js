@@ -10,6 +10,9 @@ const store = new PostgresStore({
   modelKey: 'Sessions',
 });
 
-const sessionConfig = { ...config.session, store };
+const sessionConfig = {
+  ...config.session,
+  store,
+};
 
 module.exports = sessionConfig;

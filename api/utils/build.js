@@ -1,7 +1,7 @@
 const config = require('../../config');
 
 function buildPath(build, site) {
-  const sbc = site?.SiteBranchConfigs?.find(c => c.branch === build.branch);
+  const sbc = site?.SiteBranchConfigs?.find((c) => c.branch === build.branch);
 
   if (sbc) {
     return sbc.s3Key;
@@ -31,16 +31,14 @@ function buildViewLink(build, site) {
     return `https://${build.url}/`;
   }
 
-  const siteBranchConfig = SiteBranchConfigs.find(
-    sbc => sbc.branch === build.branch
-  );
+  const siteBranchConfig = SiteBranchConfigs.find((sbc) => sbc.branch === build.branch);
 
   if (!siteBranchConfig) {
     return `${buildUrl(build, site)}/`;
   }
 
   const domain = Domains.find(
-    d => d.siteBranchConfigId === siteBranchConfig.id && d.state === 'provisioned'
+    (d) => d.siteBranchConfigId === siteBranchConfig.id && d.state === 'provisioned',
   );
 
   if (!domain) {
@@ -52,4 +50,7 @@ function buildViewLink(build, site) {
   return `https://${domainName.replace(/\/+$/, '')}/`;
 }
 
-module.exports = { buildViewLink, buildUrl };
+module.exports = {
+  buildViewLink,
+  buildUrl,
+};

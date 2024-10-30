@@ -49,7 +49,8 @@ describe.skip('<SiteBuildLogs/>', () => {
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(1);
     expect(wrapper.find('p')).to.have.length(0);
-    expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.false;
+    expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be
+      .false;
     expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(1);
   });
 
@@ -64,7 +65,9 @@ describe.skip('<SiteBuildLogs/>', () => {
 
   // Placeholder for when the containing .skip can be removed
   it('should render an explanatory message if the build is over 180 days old', () => {
-    const stubBuild = { completedAt: new Date(Date.now() - (181 * 86400000)) }; // 181 days ago
+    const stubBuild = {
+      completedAt: new Date(Date.now() - 181 * 86400000),
+    }; // 181 days ago
     const stub = sinon.stub(api, 'fetchBuild');
     stub.resolves(stubBuild);
 
@@ -73,7 +76,13 @@ describe.skip('<SiteBuildLogs/>', () => {
 
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(0);
-    expect(wrapper.find('p').contains('Builds more than 180 days old are deleted according to platform policy.')).to.be.true;
+    expect(
+      wrapper
+        .find('p')
+        .contains(
+          'Builds more than 180 days old are deleted according to platform policy.',
+        ),
+    ).to.be.true;
     expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(0);
   });
 
@@ -83,14 +92,17 @@ describe.skip('<SiteBuildLogs/>', () => {
 
     const wrapper = shallow(<SiteBuildLogs {...props} />);
     expect(wrapper.find('SiteBuildLogTable')).to.have.length(0);
-    expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be.true;
+    expect(wrapper.find('p').contains('This build does not have any build logs.')).to.be
+      .true;
     expect(wrapper.find('DownloadBuildLogsButton')).to.have.length(0);
   });
 
   it('should fetch the build logs on mount', () => {
     const spy = sinon.spy();
 
-    props.actions = { fetchBuildLogs: spy };
+    props.actions = {
+      fetchBuildLogs: spy,
+    };
 
     shallow(<SiteBuildLogs {...props} />);
     expect(spy.calledOnce).to.equal(true);

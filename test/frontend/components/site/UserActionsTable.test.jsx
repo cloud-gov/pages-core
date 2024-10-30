@@ -15,7 +15,7 @@ const { UserActionsTable } = proxyquire(
   '../../../../frontend/components/site/UserActionsTable',
   {
     '../../actions/userActions': userActionsSpy,
-  }
+  },
 );
 
 let state;
@@ -51,18 +51,30 @@ describe('<UserActionsTable/>', () => {
   it('should render a table of user actions', () => {
     state.userActions.data = [
       {
-        initiator: { username: 'test_user1' },
+        initiator: {
+          username: 'test_user1',
+        },
         targetType: 'user',
-        actionType: { action: 'remove' },
-        actionTarget: { username: 'test_user_1' },
+        actionType: {
+          action: 'remove',
+        },
+        actionTarget: {
+          username: 'test_user_1',
+        },
         createdAt: '2017-06-19T14:50:44.336Z',
         id: 1,
       },
       {
-        initiator: { username: 'test_user1' },
+        initiator: {
+          username: 'test_user1',
+        },
         targetType: 'user',
-        actionType: { action: 'remove' },
-        actionTarget: { username: 'test_user_2' },
+        actionType: {
+          action: 'remove',
+        },
+        actionTarget: {
+          username: 'test_user_2',
+        },
         createdAt: '2018-01-02T21:45:00.000+05:00', // with +5 offset
         id: 2,
       },

@@ -7,7 +7,7 @@ import AlertBanner from '../../../frontend/components/alertBanner';
 const statusTypes = ['error', 'info'];
 
 describe('<AlertBanner/>', () => {
-  it('outputs null when a message isn\'t supplied', () => {
+  it("outputs null when a message isn't supplied", () => {
     const component = shallow(<AlertBanner />);
     expect(component.html()).to.equal(null);
   });

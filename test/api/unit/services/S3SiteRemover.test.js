@@ -24,8 +24,10 @@ function createServiceNocks(serviceName, guid) {
   });
 
   apiNocks.mockFetchServiceInstancesRequest(
-    factory.createCFAPIResourceList({ resources: [serviceInstanceResponse] }),
-    serviceName
+    factory.createCFAPIResourceList({
+      resources: [serviceInstanceResponse],
+    }),
+    serviceName,
   );
 }
 
@@ -54,7 +56,7 @@ describe('S3SiteRemover', () => {
   afterEach(() => nock.cleanAll());
 
   describe('.removeSite(site)', () => {
-    it('should delete all objects in the site\'s S3 bucket', (done) => {
+    it("should delete all objects in the site's S3 bucket", (done) => {
       createCredentialsNock(s3ServiceName, s3ServiceGuid, awsBucketName);
       let site;
       const objectsToDelete = [
@@ -71,13 +73,17 @@ describe('S3SiteRemover', () => {
       let deletedObjects;
 
       s3Mock
-        .on(ListObjectsV2Command).resolves({
+        .on(ListObjectsV2Command)
+        .resolves({
           IsTruncated: false,
-          Contents: objectsToDelete.map(object => ({ Key: object })),
+          Contents: objectsToDelete.map((object) => ({
+            Key: object,
+          })),
           ContinuationToken: 'A',
           NextContinuationToken: null,
         })
-        .on(DeleteObjectsCommand).callsFake((input) => {
+        .on(DeleteObjectsCommand)
+        .callsFake((input) => {
           deletionBucket = input.Bucket;
           deletedObjects = input.Delete.Objects;
           return {};
@@ -86,19 +92,25 @@ describe('S3SiteRemover', () => {
       mockTokenRequest();
       apiNocks.mockDefaultCredentials();
 
-      factory.site({
-        awsBucketName,
-        s3ServiceName,
-      }).then((model) => {
-        site = model;
-        return S3SiteRemover.removeSite(site);
-      }).then(() => {
-        expect(deletionBucket).to.equal(awsBucketName);
-        expect(deletedObjects.length).to.equal(objectsToDelete.length);
-        expect(deletedObjects).to.have.deep
-          .members(objectsToDelete.map(object => ({ Key: object })));
-        done();
-      });
+      factory
+        .site({
+          awsBucketName,
+          s3ServiceName,
+        })
+        .then((model) => {
+          site = model;
+          return S3SiteRemover.removeSite(site);
+        })
+        .then(() => {
+          expect(deletionBucket).to.equal(awsBucketName);
+          expect(deletedObjects.length).to.equal(objectsToDelete.length);
+          expect(deletedObjects).to.have.deep.members(
+            objectsToDelete.map((object) => ({
+              Key: object,
+            })),
+          );
+          done();
+        });
     });
 
     it('should resolve if no bucket exists', (done) => {
@@ -110,7 +122,8 @@ describe('S3SiteRemover', () => {
           Bucket: undefined,
           ContinuationToken: undefined,
           MaxKeys: undefined,
-        }).resolves({
+        })
+        .resolves({
           IsTruncated: false,
           CommonPrefixes: [],
           Contents: [],
@@ -119,12 +132,15 @@ describe('S3SiteRemover', () => {
         })
         .on(DeleteObjectsCommand, {
           Bucket: undefined,
-          Delete: { Objects: [] },
-        }).resolves();
+          Delete: {
+            Objects: [],
+          },
+        })
+        .resolves();
 
       factory
         .site()
-        .then(site => S3SiteRemover.removeSite(site))
+        .then((site) => S3SiteRemover.removeSite(site))
         .then(done);
     });
   });
@@ -132,7 +148,8 @@ describe('S3SiteRemover', () => {
   describe('.removeInfrastructure', () => {
     beforeEach(() => createCredentialsNock(s3ServiceName, s3ServiceGuid, awsBucketName));
 
-    it('should delete the bucket and proxy route service when site is in a private bucket', (done) => {
+    it(`should delete the bucket and proxy route service
+        when site is in a private bucket`, (done) => {
       let site;
       const s3Service = 'this-is-a-s3-service';
       const s3Guid = '8675-three-o-9';

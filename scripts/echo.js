@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 const Http = require('http');
 
-const {
-  HOST = 'localhost',
-  PORT = 8989,
-} = process.env;
+const { HOST = 'localhost', PORT = 8989 } = process.env;
 
-const dateFormat = new Intl.DateTimeFormat('en', { dateStyle: 'short', timeStyle: 'medium' });
+const dateFormat = new Intl.DateTimeFormat('en', {
+  dateStyle: 'short',
+  timeStyle: 'medium',
+});
 
 const server = Http.createServer(async (req, res) => {
   res.writeHead(200);

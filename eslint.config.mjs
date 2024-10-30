@@ -13,7 +13,10 @@ export default [
     files: ['**/*.js'],
     ignores: ['frontend/**/*.{js,jsx}'],
     ...importPlugin.flatConfigs.recommended,
-    languageOptions: { globals: globals.node, sourceType: 'commonjs' },
+    languageOptions: {
+      globals: globals.node,
+      sourceType: 'commonjs',
+    },
   },
   {
     ignores: [
@@ -89,8 +92,13 @@ export default [
       'no-console': 'error',
       'no-param-reassign': 'error',
       'no-plusplus': 'error',
-      // ignore for a future PR to minimize noise
-      // 'max-len': ['error', { code: 80, ignoreUrls: true }],
+      'max-len': [
+        'error',
+        {
+          code: 90,
+          ignoreUrls: true,
+        },
+      ],
     },
   },
 ];

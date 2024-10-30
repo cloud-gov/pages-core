@@ -2,7 +2,7 @@ import fetch from './fetch';
 
 const API = 'https://api.github.com';
 
-const getRepoFor = site => `repos/${site.owner}/${site.repository}`;
+const getRepoFor = (site) => `repos/${site.owner}/${site.repository}`;
 
 const github = {
   fetch(path, params) {

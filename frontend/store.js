@@ -1,6 +1,4 @@
-import {
-  combineReducers, compose, createStore, applyMiddleware,
-} from 'redux';
+import { combineReducers, compose, createStore, applyMiddleware } from 'redux';
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
@@ -14,18 +12,12 @@ const reducer = combineReducers(reducers);
 // FRONTEND_CONFIG is a global variable rendered into the index
 // template by the Main controller. We use it to initialize our
 // store's state with configuration values from the server-side.
-const FRONTEND_CONFIG = typeof window !== 'undefined'
-  ? window.FRONTEND_CONFIG
-  : global.FRONTEND_CONFIG;
+const FRONTEND_CONFIG =
+  typeof window !== 'undefined' ? window.FRONTEND_CONFIG : global.FRONTEND_CONFIG;
 
-const middlewares = [
-  createNotifier(notificationSettings),
-  thunk,
-];
+const middlewares = [createNotifier(notificationSettings), thunk];
 
-const enhancers = [
-  applyMiddleware,
-];
+const enhancers = [applyMiddleware];
 
 if (!['production', 'test'].includes(process.env.NODE_ENV)) {
   middlewares.push(logger);
@@ -35,7 +27,7 @@ if (!['production', 'test'].includes(process.env.NODE_ENV)) {
 const store = createStore(
   reducer,
   { FRONTEND_CONFIG },
-  compose(...enhancers)(...middlewares)
+  compose(...enhancers)(...middlewares),
 );
 
 const { dispatch } = store;

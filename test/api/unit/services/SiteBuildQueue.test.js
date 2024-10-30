@@ -22,7 +22,10 @@ describe('SiteBuildQueue', () => {
   afterEach(() => {
     nock.cleanAll();
     sinon.restore();
-    return Site.truncate({ force: true, cascade: true });
+    return Site.truncate({
+      force: true,
+      cascade: true,
+    });
   });
 
   beforeEach(() => {
@@ -52,19 +55,17 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
           expect(messageEnv(message, 'AWS_ACCESS_KEY_ID')).to.equal(
-            config.s3.accessKeyId
+            config.s3.accessKeyId,
           );
           expect(messageEnv(message, 'AWS_SECRET_ACCESS_KEY')).to.equal(
-            config.s3.secretAccessKey
+            config.s3.secretAccessKey,
           );
-          expect(messageEnv(message, 'AWS_DEFAULT_REGION')).to.equal(
-            config.s3.region
-          );
+          expect(messageEnv(message, 'AWS_DEFAULT_REGION')).to.equal(config.s3.region);
           expect(messageEnv(message, 'BUCKET')).to.equal(config.s3.bucket);
           done();
         })
@@ -84,15 +85,15 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
-        .then(build => SiteBuildQueue.messageBodyForBuild(build)
-          .then((message) => {
+        .then((build) =>
+          SiteBuildQueue.messageBodyForBuild(build).then((message) => {
             expect(messageEnv(message, 'STATUS_CALLBACK')).to.equal(
-              `http://${config.app.domain}/v0/build/${build.id}/status/${build.token}`
+              `http://${config.app.domain}/v0/build/${build.id}/status/${build.token}`,
             );
             done();
-          })
+          }),
         )
         .catch(done);
     });
@@ -102,8 +103,12 @@ describe('SiteBuildQueue', () => {
         .build()
         .then((build) =>
           factory.userEnvironmentVariable
-            .create({ site: { id: build.site } })
-            .then(() => build)
+            .create({
+              site: {
+                id: build.site,
+              },
+            })
+            .then(() => build),
         )
         .then((build) =>
           Build.findByPk(build.id, {
@@ -114,7 +119,7 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => {
           return SiteBuildQueue.messageBodyForBuild(build).then((message) => {
@@ -123,7 +128,7 @@ describe('SiteBuildQueue', () => {
               ciphertext: uev.ciphertext,
             }));
             expect(
-              JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))
+              JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES')),
             ).to.deep.eq(uevs);
             done();
           });
@@ -143,12 +148,12 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => {
           return SiteBuildQueue.messageBodyForBuild(build).then((message) => {
             expect(
-              JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES'))
+              JSON.parse(messageEnv(message, 'USER_ENVIRONMENT_VARIABLES')),
             ).to.deep.eq([]);
             done();
           });
@@ -157,20 +162,25 @@ describe('SiteBuildQueue', () => {
     });
 
     context("building a site's default branch", () => {
-      it('should set an empty string for BASEURL in the message for a site with a custom domain', (done) => {
+      it(`should set an empty string for BASEURL
+          in the message for a site with a custom domain`, (done) => {
         const branch = 'main';
         const domains = ['https://example.com', 'https://example.com/'];
 
         const baseurlPromises = domains.map((domain) =>
           factory
-            .site({ domain, defaultBranch: branch })
+            .site({
+              domain,
+              defaultBranch: branch,
+            })
             .then((site) => {
-              const sbc = site.SiteBranchConfigs.find(
-                (c) => c.branch === branch
-              );
+              const sbc = site.SiteBranchConfigs.find((c) => c.branch === branch);
 
               return Promise.all([
-                factory.build({ site, branch }),
+                factory.build({
+                  site,
+                  branch,
+                }),
                 factory.domain.create({
                   siteId: site.id,
                   siteBranchConfigId: sbc.id,
@@ -188,10 +198,10 @@ describe('SiteBuildQueue', () => {
                   },
                   User,
                 ],
-              })
+              }),
             )
             .then((build) => SiteBuildQueue.messageBodyForBuild(build))
-            .then((message) => messageEnv(message, 'BASEURL'))
+            .then((message) => messageEnv(message, 'BASEURL')),
         );
 
         Promise.all(baseurlPromises)
@@ -202,7 +212,8 @@ describe('SiteBuildQueue', () => {
           .catch(done);
       });
 
-      it('it should set BASEURL in the message for a site without a custom domain', (done) => {
+      it(`it should set BASEURL in the message
+          for a site without a custom domain`, (done) => {
         factory
           .site({
             domain: '',
@@ -210,7 +221,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             defaultBranch: 'main',
           })
-          .then((site) => factory.build({ site, branch: 'main' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'main',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -221,7 +237,7 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
@@ -231,54 +247,6 @@ describe('SiteBuildQueue', () => {
           .catch(done);
       });
 
-      ///
-      //  Verify if we actually use the path in a domain name
-      //  since the Domain table validates names field to ensure
-      //  they are fully qualified domains without paths
-      ///
-      ///
-      // it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
-      //   const domains = [
-      //     'https://example.com/abc/def',
-      //     'https://example.com/abc/def/',
-      //   ];
-
-      //   const baseurlPromises = domains.map((domain) =>
-      //     factory
-      //       .site({ domain, defaultBranch: 'main' })
-      //       .then((site) => Promise.all([
-      //         factory.build({ site, branch: 'main' }),
-      //         factory.domain.create({
-      //           siteId: site.id,
-      //           siteBranchConfigId: site.SiteBranchConfigs[0].id,
-      //         })
-      //       ]))
-      //       .then(([build]) => {
-      //         return Build.findByPk(build.id, {
-      //           include: [
-      //             {
-      //               model: Site,
-      //               required: true,
-      //               include: [SiteBranchConfig, Domain],
-      //             },
-      //             User,
-      //           ],
-      //         })
-      //       })
-      //       .then((build) => SiteBuildQueue.messageBodyForBuild(build))
-      //       .then((message) => messageEnv(message, 'BASEURL'))
-      //   );
-
-      //   Promise.all(baseurlPromises)
-      //     .then((baseurls) => {
-      //       expect(baseurls).to.deep.equal(
-      //         Array(domains.length).fill('/abc/def')
-      //       );
-      //       done();
-      //     })
-      //     .catch(done);
-      // });
-
       it("should set SITE_PREFIX in the message to 'site/:owner/:repo/'", (done) => {
         factory
           .site({
@@ -287,7 +255,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             defaultBranch: 'main',
           })
-          .then((site) => factory.build({ site, branch: 'main' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'main',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -298,13 +271,11 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
-            expect(messageEnv(message, 'SITE_PREFIX')).to.equal(
-              'site/owner/repo'
-            );
+            expect(messageEnv(message, 'SITE_PREFIX')).to.equal('site/owner/repo');
             done();
           })
           .catch(done);
@@ -312,20 +283,25 @@ describe('SiteBuildQueue', () => {
     });
 
     context("building a site's demo branch", () => {
-      it('should set an empty string for BASEURL in the message for a site with a demo domain', (done) => {
+      it(`should set an empty string for
+          BASEURL in the message for a site with a demo domain`, (done) => {
         const branch = 'demo';
         const domains = ['https://example.com', 'https://example.com/'];
 
         const baseurlPromises = domains.map((domain) =>
           factory
-            .site({ demoDomain: domain, demoBranch: branch })
+            .site({
+              demoDomain: domain,
+              demoBranch: branch,
+            })
             .then((site) => {
-              const sbc = site.SiteBranchConfigs.find(
-                (c) => c.branch === branch
-              );
+              const sbc = site.SiteBranchConfigs.find((c) => c.branch === branch);
 
               return Promise.all([
-                factory.build({ site, branch }),
+                factory.build({
+                  site,
+                  branch,
+                }),
                 factory.domain.create({
                   siteId: site.id,
                   siteBranchConfigId: sbc.id,
@@ -343,10 +319,10 @@ describe('SiteBuildQueue', () => {
                   },
                   User,
                 ],
-              })
+              }),
             )
             .then((build) => SiteBuildQueue.messageBodyForBuild(build))
-            .then((message) => messageEnv(message, 'BASEURL'))
+            .then((message) => messageEnv(message, 'BASEURL')),
         );
 
         Promise.all(baseurlPromises)
@@ -357,7 +333,8 @@ describe('SiteBuildQueue', () => {
           .catch(done);
       });
 
-      it('it should set BASEURL in the message for a site without a demo domain', (done) => {
+      it(`it should set BASEURL in the message
+          for a site without a demo domain`, (done) => {
         factory
           .site({
             demoDomain: '',
@@ -365,7 +342,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             demoBranch: 'demo',
           })
-          .then((site) => factory.build({ site, branch: 'demo' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'demo',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -376,7 +358,7 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
@@ -386,48 +368,6 @@ describe('SiteBuildQueue', () => {
           .catch(done);
       });
 
-      /////////////////////////
-      //  Verify if we actually use the path in a domain name
-      //  since the Domain table validates names field to ensure
-      //  they are fully qualified domains without paths
-      ///////////////////////////////////////////////////////
-      /////////////////
-      // it('should respect the path component of a custom domain when setting BASEURL in the message', (done) => {
-      //   const domains = [
-      //     'https://example.com/abc/def',
-      //     'https://example.com/abc/def/',
-      //   ];
-
-      //   const baseurlPromises = domains.map((domain) =>
-      //     factory
-      //       .site({ demoDomain: domain, demoBranch: 'demo' })
-      //       .then((site) => factory.build({ site, branch: 'demo' }))
-      //       .then((build) =>
-      //         Build.findByPk(build.id, {
-      //           include: [
-      //             {
-      //               model: Site,
-      //               required: true,
-      //               include: [SiteBranchConfig, Domain],
-      //             },
-      //             User,
-      //           ],
-      //         })
-      //       )
-      //       .then((build) => SiteBuildQueue.messageBodyForBuild(build))
-      //       .then((message) => messageEnv(message, 'BASEURL'))
-      //   );
-
-      //   Promise.all(baseurlPromises)
-      //     .then((baseurls) => {
-      //       expect(baseurls).to.deep.equal(
-      //         Array(domains.length).fill('/abc/def')
-      //       );
-      //       done();
-      //     })
-      //     .catch(done);
-      // });
-
       it("should set SITE_PREFIX in the message to 'demo/:owner/:repo'", (done) => {
         factory
           .site({
@@ -436,7 +376,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             demoBranch: 'demo',
           })
-          .then((site) => factory.build({ site, branch: 'demo' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'demo',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -447,13 +392,11 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
-            expect(messageEnv(message, 'SITE_PREFIX')).to.equal(
-              'demo/owner/repo'
-            );
+            expect(messageEnv(message, 'SITE_PREFIX')).to.equal('demo/owner/repo');
             done();
           })
           .catch(done);
@@ -469,7 +412,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             defaultBranch: 'main',
           })
-          .then((site) => factory.build({ site, branch: 'branch' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'branch',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -480,19 +428,18 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
-            expect(messageEnv(message, 'BASEURL')).to.equal(
-              '/preview/owner/repo/branch'
-            );
+            expect(messageEnv(message, 'BASEURL')).to.equal('/preview/owner/repo/branch');
             done();
           })
           .catch(done);
       });
 
-      it('should set BASEURL in the message for a site without a custom domain', (done) => {
+      it(`should set BASEURL in the message
+          for a site without a custom domain`, (done) => {
         factory
           .site({
             domain: '',
@@ -500,7 +447,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             defaultBranch: 'main',
           })
-          .then((site) => factory.build({ site, branch: 'branch' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'branch',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -511,19 +463,18 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
-            expect(messageEnv(message, 'BASEURL')).to.equal(
-              '/preview/owner/repo/branch'
-            );
+            expect(messageEnv(message, 'BASEURL')).to.equal('/preview/owner/repo/branch');
             done();
           })
           .catch(done);
       });
 
-      it("should set SITE_PREFIX in the message to 'preview/:owner/:repo/:branch'", (done) => {
+      it(`should set SITE_PREFIX in the message
+          to 'preview/:owner/:repo/:branch'`, (done) => {
         factory
           .site({
             domain: '',
@@ -531,7 +482,12 @@ describe('SiteBuildQueue', () => {
             repository: 'repo',
             defaultBranch: 'main',
           })
-          .then((site) => factory.build({ site, branch: 'branch' }))
+          .then((site) =>
+            factory.build({
+              site,
+              branch: 'branch',
+            }),
+          )
           .then((build) =>
             Build.findByPk(build.id, {
               include: [
@@ -542,12 +498,12 @@ describe('SiteBuildQueue', () => {
                 },
                 User,
               ],
-            })
+            }),
           )
           .then((build) => SiteBuildQueue.messageBodyForBuild(build))
           .then((message) => {
             expect(messageEnv(message, 'SITE_PREFIX')).to.equal(
-              'preview/owner/repo/branch'
+              'preview/owner/repo/branch',
             );
             done();
           })
@@ -557,8 +513,16 @@ describe('SiteBuildQueue', () => {
 
     it("should set BRANCH in the message to the name build's branch", (done) => {
       factory
-        .site({ domain: '', defaultBranch: 'main' })
-        .then((site) => factory.build({ site, branch: 'branch' }))
+        .site({
+          domain: '',
+          defaultBranch: 'main',
+        })
+        .then((site) =>
+          factory.build({
+            site,
+            branch: 'branch',
+          }),
+        )
         .then((build) =>
           Build.findByPk(build.id, {
             include: [
@@ -569,7 +533,7 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
@@ -579,21 +543,35 @@ describe('SiteBuildQueue', () => {
         .catch(done);
     });
 
-    it('should set CONFIG in the message to the YAML config for the site on the default branch', async () => {
+    it(`should set CONFIG in the message to the
+        YAML config for the site on the default branch`, async () => {
       const branch = 'main';
-      const config = { plugins_dir: '_plugins' };
+      const config = {
+        plugins_dir: '_plugins',
+      };
       const diffBranch = 'diff-branch';
-      const diffConfig = { different: 'config' };
-      const site = await factory.site(undefined, { noSiteBranchConfig: true });
+      const diffConfig = {
+        different: 'config',
+      };
+      const site = await factory.site(undefined, {
+        noSiteBranchConfig: true,
+      });
 
-      await factory.siteBranchConfig.create({ site, branch, config });
+      await factory.siteBranchConfig.create({
+        site,
+        branch,
+        config,
+      });
       await factory.siteBranchConfig.create({
         site,
         branch: diffBranch,
         config: diffConfig,
       });
 
-      const build = await factory.build({ site, branch });
+      const build = await factory.build({
+        site,
+        branch,
+      });
       const buildRecord = await Build.findByPk(build.id, {
         include: [
           {
@@ -609,12 +587,19 @@ describe('SiteBuildQueue', () => {
       expect(messageEnv(message, 'CONFIG')).to.equal(JSON.stringify(config));
     });
 
-    it('should return the preview CONFIG if the branch does not have a specific config', async () => {
+    it(`should return the preview CONFIG
+        if the branch does not have a specific config`, async () => {
       const branch = 'main';
-      const config = { plugins_dir: '_plugins' };
+      const config = {
+        plugins_dir: '_plugins',
+      };
       const previewBranch = 'preview';
-      const previewConfig = { preview: 'config' };
-      const site = await factory.site(undefined, { noSiteBranchConfig: true });
+      const previewConfig = {
+        preview: 'config',
+      };
+      const site = await factory.site(undefined, {
+        noSiteBranchConfig: true,
+      });
 
       await factory.siteBranchConfig.create({
         site,
@@ -628,7 +613,10 @@ describe('SiteBuildQueue', () => {
         context: 'preview',
       });
 
-      const build = await factory.build({ site, branch: previewBranch });
+      const build = await factory.build({
+        site,
+        branch: previewBranch,
+      });
       const buildRecord = await Build.findByPk(build.id, {
         include: [
           {
@@ -641,15 +629,19 @@ describe('SiteBuildQueue', () => {
       });
       const message = await SiteBuildQueue.messageBodyForBuild(buildRecord);
 
-      expect(messageEnv(message, 'CONFIG')).to.equal(
-        JSON.stringify(previewConfig)
-      );
+      expect(messageEnv(message, 'CONFIG')).to.equal(JSON.stringify(previewConfig));
     });
 
     it("should set REPOSITORY in the message to the site's repo name", (done) => {
       factory
-        .site({ repository: 'site-repo' })
-        .then((site) => factory.build({ site }))
+        .site({
+          repository: 'site-repo',
+        })
+        .then((site) =>
+          factory.build({
+            site,
+          }),
+        )
         .then((build) =>
           Build.findByPk(build.id, {
             include: [
@@ -660,7 +652,7 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
@@ -672,8 +664,14 @@ describe('SiteBuildQueue', () => {
 
     it("should set OWNER in the message to the site's owner", (done) => {
       factory
-        .site({ owner: 'site-owner' })
-        .then((site) => factory.build({ site }))
+        .site({
+          owner: 'site-owner',
+        })
+        .then((site) =>
+          factory.build({
+            site,
+          }),
+        )
         .then((build) =>
           Build.findByPk(build.id, {
             include: [
@@ -684,7 +682,7 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
@@ -694,16 +692,24 @@ describe('SiteBuildQueue', () => {
         .catch(done);
     });
 
-    it("should set GITHUB_TOKEN in the message to the user's GitHub access token", (done) => {
+    it(`should set GITHUB_TOKEN in the
+        message to the user's GitHub access token`, (done) => {
       let user;
 
       factory
-        .user({ githubAccessToken: 'fake-github-token-123' })
+        .user({
+          githubAccessToken: 'fake-github-token-123',
+        })
         .then((model) => {
           user = model;
           return factory.site({ users: [user] });
         })
-        .then((site) => factory.build({ user, site }))
+        .then((site) =>
+          factory.build({
+            user,
+            site,
+          }),
+        )
         .then((build) =>
           Build.findByPk(build.id, {
             include: [
@@ -714,26 +720,29 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
-          expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal(
-            'fake-github-token-123'
-          );
+          expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
           done();
         })
         .catch(done);
     });
 
-    it('should find a github access token for a site user when the current user does not have one', async () => {
-      const [user1, user2] = await Promise.all([
-        factory.user(),
-        factory.user(),
-      ]);
-      await user1.update({ githubAccessToken: null });
-      const site = await factory.site({ users: [user1, user2] });
-      const build = await factory.build({ user: user1, site });
+    it(`should find a github access token
+        for a site user when the current user does not have one`, async () => {
+      const [user1, user2] = await Promise.all([factory.user(), factory.user()]);
+      await user1.update({
+        githubAccessToken: null,
+      });
+      const site = await factory.site({
+        users: [user1, user2],
+      });
+      const build = await factory.build({
+        user: user1,
+        site,
+      });
       await build.reload({
         include: [
           {
@@ -751,15 +760,20 @@ describe('SiteBuildQueue', () => {
 
       const message = await SiteBuildQueue.messageBodyForBuild(build);
 
-      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal(
-        user2.githubAccessToken
-      );
+      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal(user2.githubAccessToken);
     });
 
-    it("should set GENERATOR in the message to the site's build engine (e.g. 'jekyll')", (done) => {
+    it(`should set GENERATOR in the message
+        to the site's build engine (e.g. 'jekyll')`, (done) => {
       factory
-        .site({ engine: 'hugo' })
-        .then((site) => factory.build({ site }))
+        .site({
+          engine: 'hugo',
+        })
+        .then((site) =>
+          factory.build({
+            site,
+          }),
+        )
         .then((build) =>
           Build.findByPk(build.id, {
             include: [
@@ -770,7 +784,7 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
@@ -781,10 +795,19 @@ describe('SiteBuildQueue', () => {
     });
 
     it('should set containerName and containerSize in the message', () => {
-      const containerConfig = { name: 'default', size: 'large' };
+      const containerConfig = {
+        name: 'default',
+        size: 'large',
+      };
       return factory
-        .site({ containerConfig })
-        .then((site) => factory.build({ site }))
+        .site({
+          containerConfig,
+        })
+        .then((site) =>
+          factory.build({
+            site,
+          }),
+        )
         .then((build) =>
           Build.findByPk(build.id, {
             include: [
@@ -795,7 +818,7 @@ describe('SiteBuildQueue', () => {
               },
               User,
             ],
-          })
+          }),
         )
         .then((build) => SiteBuildQueue.messageBodyForBuild(build))
         .then((message) => {
@@ -806,7 +829,8 @@ describe('SiteBuildQueue', () => {
   });
 
   describe('.setupBucket', () => {
-    it('should immediately return true if there are more than one site builds', async () => {
+    it(`should immediately return true
+        if there are more than one site builds`, async () => {
       const build = {};
       const buildCount = 2;
 
@@ -816,7 +840,10 @@ describe('SiteBuildQueue', () => {
 
     it('should verify the site bucket is available', async () => {
       const buildCount = 1;
-      const stubCreds = sinon.stub(CFApiClient.prototype, 'fetchServiceInstanceCredentials');
+      const stubCreds = sinon.stub(
+        CFApiClient.prototype,
+        'fetchServiceInstanceCredentials',
+      );
       const stubS3 = sinon.stub(S3Helper.S3Client.prototype, 'waitForBucket').resolves();
       const factoryBuild = await factory.build();
       const build = await Build.findByPk(factoryBuild.id, {
@@ -846,7 +873,8 @@ describe('SiteBuildQueue', () => {
   });
 
   describe('.setupTaskEnv', () => {
-    it('shoudld find the build and associated tables to setup the cf task dev', async () => {
+    it(`shoudld find the build and
+        associated tables to setup the cf task dev`, async () => {
       const factoryBuild = await factory.build();
       const stub = sinon.stub(SiteBuildQueue, 'setupBucket');
       stub.resolves();
@@ -863,10 +891,15 @@ describe('SiteBuildQueue', () => {
       sinon.assert.calledOnceWithExactly(stub, build, 1);
     });
 
-    it('shoudld find the build with multiple site builds to setup the cf task dev', async () => {
+    it(`shoudld find the build with
+        multiple site builds to setup the cf task dev`, async () => {
       const site = await factory.site();
-      const fb1 = await factory.build({ site });
-      await factory.build({ site });
+      const fb1 = await factory.build({
+        site,
+      });
+      await factory.build({
+        site,
+      });
       const stub = sinon.stub(SiteBuildQueue, 'setupBucket');
       stub.resolves();
 

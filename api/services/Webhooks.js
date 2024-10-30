@@ -1,7 +1,5 @@
 const config = require('../../config');
-const {
-  Build, User, Site, Event, Organization,
-} = require('../models');
+const { Build, User, Site, Event, Organization } = require('../models');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const EventCreator = require('./EventCreator');
 
@@ -17,33 +15,35 @@ const findSiteForWebhookRequest = (payload) => {
   });
 };
 
-const shouldBuildForSite = site => site?.isActive
-  && (!site.Organization || site.Organization.isActive);
+const shouldBuildForSite = (site) =>
+  site?.isActive && (!site.Organization || site.Organization.isActive);
 
 const organizationWebhookRequest = async (payload) => {
   const {
     action,
     membership,
-    organization: {
-      login: orgName,
-    },
+    organization: { login: orgName },
   } = payload;
 
   if (
-    orgName !== config.federalistUsers.orgName
-    || !['member_added', 'member_removed'].includes(action)
+    orgName !== config.federalistUsers.orgName ||
+    !['member_added', 'member_removed'].includes(action)
   ) {
     return;
   }
 
   const { login } = membership.user;
   const username = login.toLowerCase();
-  let user = await User.scope('withUAAIdentity').findOne({ where: { username } });
+  let user = await User.scope('withUAAIdentity').findOne({
+    where: { username },
+  });
 
   const isActive = action === 'member_added';
 
   if (!user && isActive) {
-    user = await User.create({ username });
+    user = await User.create({
+      username,
+    });
   }
 
   if (user?.UAAIdentity) {
@@ -60,15 +60,19 @@ const createBuildForWebhookRequest = async (payload, site) => {
   const { pushed_at: pushedAt } = payload.repository;
   const username = login.toLowerCase();
 
-  let user = site.Users.find(u => u.username === username);
+  let user = site.Users.find((u) => u.username === username);
   if (!user) {
-    user = await User.findOne({ where: { username } });
+    user = await User.findOne({
+      where: { username },
+    });
     if (user) {
       await site.addUser(user);
     }
   }
   if (user) {
-    await user.update({ pushedAt: new Date(pushedAt * 1000) });
+    await user.update({
+      pushedAt: new Date(pushedAt * 1000),
+    });
   }
 
   const branch = payload.ref.replace('refs/heads/', '');
@@ -96,8 +100,7 @@ const createBuildForWebhookRequest = async (payload, site) => {
     site: site.id,
     user: user ? user.id : null,
     username,
-  })
-    .then(build => build.enqueue());
+  }).then((build) => build.enqueue());
 };
 
 const pushWebhookRequest = async (payload) => {
@@ -105,7 +108,18 @@ const pushWebhookRequest = async (payload) => {
     const site = await findSiteForWebhookRequest(payload);
     if (shouldBuildForSite(site)) {
       const build = await createBuildForWebhookRequest(payload, site);
-      await build.reload({ include: [{ model: Site, include: [{ model: User }] }] });
+      await build.reload({
+        include: [
+          {
+            model: Site,
+            include: [
+              {
+                model: User,
+              },
+            ],
+          },
+        ],
+      });
       await GithubBuildHelper.reportBuildStatus(build);
     }
   }

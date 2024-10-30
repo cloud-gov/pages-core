@@ -12,34 +12,75 @@ const NO_SITE_TEXT = 'No sites yet.';
 
 // sites can be empty as the test is rendering empty divs for children.
 const STORE_WITH_SITES = {
-  organizations: { isLoading: false, data: [] },
-  sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: { hasGithubAuth: true },
+  organizations: {
+    isLoading: false,
+    data: [],
+  },
+  sites: {
+    isLoading: false,
+    data: [{ id: 5 }, { id: 2 }, { id: 8 }],
+  },
+  user: {
+    hasGithubAuth: true,
+  },
 };
 
 const STORE_WITH_SITES_WITH_ORGS = {
   hasOrganizations: true,
-  organizations: { isLoading: false, data: [{ id: 1, name: 'org-1' }] },
-  sites: { isLoading: false, data: [{ id: 5 }, { id: 2 }, { id: 8 }] },
-  user: { hasGithubAuth: true },
+  organizations: {
+    isLoading: false,
+    data: [
+      {
+        id: 1,
+        name: 'org-1',
+      },
+    ],
+  },
+  sites: {
+    isLoading: false,
+    data: [{ id: 5 }, { id: 2 }, { id: 8 }],
+  },
+  user: {
+    hasGithubAuth: true,
+  },
 };
 
 const STORE_WITH_NO_SITES = {
-  organizations: { isLoading: false, data: [] },
-  sites: { isLoading: false, data: [] },
-  user: { hasGithubAuth: true },
+  organizations: {
+    isLoading: false,
+    data: [],
+  },
+  sites: {
+    isLoading: false,
+    data: [],
+  },
+  user: {
+    hasGithubAuth: true,
+  },
 };
 
 const STORE_LOADING_SITES = {
-  organizations: { isLoading: true },
+  organizations: {
+    isLoading: true,
+  },
   sites: { isLoading: true },
-  user: { hasGithubAuth: true },
+  user: {
+    hasGithubAuth: true,
+  },
 };
 
 const STORE_WITH_NO_SITES_OR_GH_AUTH = {
-  organizations: { isLoading: false, data: [] },
-  sites: { isLoading: false, data: [] },
-  user: { hasGithubAuth: false },
+  organizations: {
+    isLoading: false,
+    data: [],
+  },
+  sites: {
+    isLoading: false,
+    data: [],
+  },
+  user: {
+    hasGithubAuth: false,
+  },
 };
 
 describe('<SiteList />', () => {
@@ -49,7 +90,9 @@ describe('<SiteList />', () => {
   beforeEach(() => {
     SiteList = proxyquire('../../../../frontend/components/siteList/siteList', {
       './siteListItem': SiteListItem,
-      '../UsaIcon': { UsaIcon: 'UsaIcon' },
+      '../UsaIcon': {
+        UsaIcon: 'UsaIcon',
+      },
     }).SiteList;
   });
 
@@ -93,7 +136,9 @@ describe('<SiteList />', () => {
     });
 
     it('renders fallback content when user has no sites', () => {
-      const fallbackEl = wrapper.find('h1').filterWhere(el => el.text() === NO_SITE_TEXT);
+      const fallbackEl = wrapper
+        .find('h1')
+        .filterWhere((el) => el.text() === NO_SITE_TEXT);
 
       expect(fallbackEl.text()).to.equal(NO_SITE_TEXT);
     });
@@ -114,7 +159,7 @@ describe('<SiteList />', () => {
 
     it('renders sites in ascending order by id', () => {
       const items = wrapper.find(SiteListItem);
-      expect(items.getElements().map(e => e.key)).to.deep.equal(['2', '5', '8']);
+      expect(items.getElements().map((e) => e.key)).to.deep.equal(['2', '5', '8']);
     });
   });
 
@@ -130,7 +175,9 @@ describe('<SiteList />', () => {
     });
 
     it('renders no container for the filtering of sites by org', () => {
-      const store = { ...STORE_WITH_SITES };
+      const store = {
+        ...STORE_WITH_SITES,
+      };
       wrapper = shallow(<SiteList {...store} />);
       expect(wrapper.find('#filter-sites-by-org')).to.have.length(0);
     });

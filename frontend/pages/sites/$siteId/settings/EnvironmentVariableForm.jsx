@@ -3,18 +3,21 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import InputWithErrorField from '@shared/Fields/InputWithErrorField';
 
-export const validateName = name => (!name
-  ? 'name is required'
-  : undefined);
+export const validateName = (name) => (!name ? 'name is required' : undefined);
 
-export const validateValue = value => ((!value || value.length < 4)
-  ? 'value is required and must be at least 4 characters'
-  : undefined);
+export const validateValue = (value) =>
+  !value || value.length < 4
+    ? 'value is required and must be at least 4 characters'
+    : undefined;
 
 export const EnvironmentVariableForm = ({
-  handleSubmit, invalid, pristine, reset, submitting,
+  handleSubmit,
+  invalid,
+  pristine,
+  reset,
+  submitting,
 }) => (
-  <form onSubmit={data => handleSubmit(data).then(reset)}>
+  <form onSubmit={(data) => handleSubmit(data).then(reset)}>
     <fieldset className="usa-fieldset">
       <legend className="usa-sr-only">Add new environment variable</legend>
       <Field
@@ -39,10 +42,19 @@ export const EnvironmentVariableForm = ({
       />
     </fieldset>
     <div className="usa-button-group margin-y-2 margin-x-0">
-      <button type="button" className="usa-button usa-button--outline" disabled={pristine || submitting} onClick={reset}>
+      <button
+        type="button"
+        className="usa-button usa-button--outline"
+        disabled={pristine || submitting}
+        onClick={reset}
+      >
         Clear
       </button>
-      <button type="submit" className="usa-button usa-button--primary" disabled={invalid || submitting}>
+      <button
+        type="submit"
+        className="usa-button usa-button--primary"
+        disabled={invalid || submitting}
+      >
         Save
       </button>
     </div>

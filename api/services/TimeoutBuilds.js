@@ -33,9 +33,13 @@ const timeoutBuilds = async (date = new Date()) => {
   };
 
   const [, builds] = await Build.update(atts, options);
-  const buildIds = builds.map(b => b.id);
-  const cancels = await Promise.allSettled(buildIds.map(buildId => cfApi.cancelBuildTask(buildId)));
+  const buildIds = builds.map((b) => b.id);
+  const cancels = await Promise.allSettled(
+    buildIds.map((buildId) => cfApi.cancelBuildTask(buildId)),
+  );
   return zip(buildIds, cancels);
 };
 
-module.exports = { timeoutBuilds };
+module.exports = {
+  timeoutBuilds,
+};

@@ -1,11 +1,6 @@
 {
   "type": "object",
-  "required": [
-    "id",
-    "branch",
-    "config",
-    "context"
-  ],
+  "required": ["id", "branch", "config", "context"],
   "properties": {
     "id": {
       "type": "integer"

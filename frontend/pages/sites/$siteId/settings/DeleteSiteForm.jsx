@@ -4,21 +4,20 @@ import { reduxForm } from 'redux-form';
 
 import AlertBanner from '@shared/alertBanner';
 
-export const DeleteSiteForm = ({
-  handleSubmit,
-  submitting,
-}) => (
+export const DeleteSiteForm = ({ handleSubmit, submitting }) => (
   <form className="settings-form settings-form-advanced" onSubmit={handleSubmit}>
     <div className="well">
       {/* DELETE SITE */}
       <fieldset className="usa-fieldset">
         <legend className="usa-sr-only">Delete Site</legend>
         <p className="well-text margin-top-0">
-          Deleting a site removes the published site from our servers and
-          from the dashboards of all site users.
+          Deleting a site removes the published site from our servers and from the
+          dashboards of all site users.
         </p>
         <p>
-          <b>This will bring the entire site offline and make it inaccessible for users.</b>
+          <b>
+            This will bring the entire site offline and make it inaccessible for users.
+          </b>
         </p>
         <AlertBanner
           status="warning"
@@ -28,7 +27,11 @@ export const DeleteSiteForm = ({
                    administrators can use this feature."
           alertRole={false}
         >
-          <button disabled={submitting} className="usa-button usa-button--secondary margin-top-2" type="submit">
+          <button
+            disabled={submitting}
+            className="usa-button usa-button--secondary margin-top-2"
+            type="submit"
+          >
             Delete
           </button>
         </AlertBanner>
@@ -44,4 +47,6 @@ DeleteSiteForm.propTypes = {
 };
 
 // create a higher-order component with reduxForm and export that
-export default reduxForm({ form: 'deleteSite' })(DeleteSiteForm);
+export default reduxForm({
+  form: 'deleteSite',
+})(DeleteSiteForm);

@@ -3,20 +3,14 @@ import PropTypes from 'prop-types';
 import { IconRebuild } from '@shared/icons';
 
 function CreateBuildLink(props) {
-  const {
-    children, className, handleClick, handlerParams,
-  } = props;
+  const { children, className, handleClick, handlerParams } = props;
   function localHandleClick(event) {
     event.preventDefault();
-    const args = Object.keys(handlerParams).map(key => handlerParams[key]);
+    const args = Object.keys(handlerParams).map((key) => handlerParams[key]);
     handleClick(...args);
   }
   return (
-    <button
-      type="button"
-      onClick={localHandleClick}
-      className={className}
-    >
+    <button type="button" onClick={localHandleClick} className={className}>
       <IconRebuild />
       {children}
     </button>
@@ -26,7 +20,6 @@ function CreateBuildLink(props) {
 CreateBuildLink.propTypes = {
   // Handler params object is intentionally ambiguous to allow the parent
   // component to specify params for the handleClick function
-  // eslint-disable-next-line react/forbid-prop-types
   handlerParams: PropTypes.object,
   handleClick: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,

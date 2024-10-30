@@ -17,7 +17,11 @@ class Mailer {
         password: this.password,
         username: this.username,
       },
-      data: { to, subject, html },
+      data: {
+        to,
+        subject,
+        html,
+      },
     });
 
     return { data, status };

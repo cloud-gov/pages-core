@@ -7,11 +7,11 @@ import shortid from 'shortid';
 
 function ExpandableArea(props) {
   const id = `expandable-area-${shortid.generate()}`;
-  const {
-    bordered, children, isExpanded, title,
-  } = props;
+  const { bordered, children, isExpanded, title } = props;
   return (
-    <div className={`usa-accordion ${bordered ? 'usa-accordion--bordered' : ''} width-full`}>
+    <div
+      className={`usa-accordion ${bordered ? 'usa-accordion--bordered' : ''} width-full`}
+    >
       <div className="usa-accordion__heading">
         <button
           className="usa-accordion__button"
@@ -22,11 +22,7 @@ function ExpandableArea(props) {
           {title}
         </button>
       </div>
-      <div
-        id={id}
-        className="usa-accordion__content"
-        hidden={!isExpanded}
-      >
+      <div id={id} className="usa-accordion__content" hidden={!isExpanded}>
         {children}
       </div>
     </div>

@@ -13,10 +13,7 @@ async function checkStuckBuilds() {
     attributes: ['id'],
     where: {
       state: {
-        [Op.in]: [
-          Build.States.Created,
-          Build.States.Tasked,
-        ],
+        [Op.in]: [Build.States.Created, Build.States.Tasked],
       },
       updatedAt: {
         [Op.lt]: buildQueueTime.toDate(),
@@ -27,20 +24,25 @@ async function checkStuckBuilds() {
 
   const builds = await Build.findAll(options);
 
-  return builds.map(b => b.id);
+  return builds.map((b) => b.id);
 }
 
 async function failBuilds(buildIds) {
-  const [, updated] = await Build.update({ state: Build.States.Error }, {
-    where: {
-      id: {
-        [Op.in]: buildIds,
-      },
+  const [, updated] = await Build.update(
+    {
+      state: Build.States.Error,
     },
-    returning: ['id', 'state'],
-  });
+    {
+      where: {
+        id: {
+          [Op.in]: buildIds,
+        },
+      },
+      returning: ['id', 'state'],
+    },
+  );
 
-  const bulkLogs = updated.map(record => ({
+  const bulkLogs = updated.map((record) => ({
     build: record.id,
     source: 'ALL',
     output: 'An error occurred while trying to build this branch. Please rebuild branch.',
@@ -48,7 +50,7 @@ async function failBuilds(buildIds) {
 
   await BuildLog.bulkCreate(bulkLogs);
 
-  return updated.map(b => b);
+  return updated.map((b) => b);
 }
 
 async function runFailStuckBuilds() {
@@ -59,4 +61,6 @@ async function runFailStuckBuilds() {
   return failBuilds(buildIds);
 }
 
-module.exports = { runFailStuckBuilds };
+module.exports = {
+  runFailStuckBuilds,
+};

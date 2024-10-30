@@ -4,12 +4,11 @@ const { serializeMany } = require('../../serializers/user-environment-variable')
 
 module.exports = wrapHandlers({
   async list(req, res) {
-    const {
-      site: siteId,
-    } = req.query;
+    const { site: siteId } = req.query;
 
-    const uevs = await UserEnvironmentVariable
-      .findAll({ where: { siteId } });
+    const uevs = await UserEnvironmentVariable.findAll({
+      where: { siteId },
+    });
 
     const json = serializeMany(uevs);
 

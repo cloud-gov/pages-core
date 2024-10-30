@@ -30,13 +30,13 @@ module.exports = wrapHandlers({
   },
 
   list: async (req, res) => {
-    const {
-      limit, page, organization, search,
-    } = req.query;
+    const { limit, page, organization, search } = req.query;
 
-    const query = { order: ['owner', 'repository'] };
+    const query = {
+      order: ['owner', 'repository'],
+    };
 
-    const serialize = sites => serializeMany(sites, true);
+    const serialize = (sites) => serializeMany(sites, true);
 
     const scopes = [];
 
@@ -50,7 +50,10 @@ module.exports = wrapHandlers({
 
     const [pagination, orgs] = await Promise.all([
       paginate(Site.scope(scopes), serialize, { limit, page }, query),
-      Organization.findAll({ attributes: ['id', 'name'], raw: true }),
+      Organization.findAll({
+        attributes: ['id', 'name'],
+        raw: true,
+      }),
     ]);
 
     const json = {
@@ -92,7 +95,10 @@ module.exports = wrapHandlers({
       include: [
         SiteBranchConfig,
         Domain,
-        { model: SiteBuildTask, include: [BuildTaskType] },
+        {
+          model: SiteBuildTask,
+          include: [BuildTaskType],
+        },
       ],
     });
 
@@ -112,19 +118,11 @@ module.exports = wrapHandlers({
     await site.update(pick(updateableAttrs, body));
 
     if (site.isActive && body.isActive === false) {
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'Site Deactivated',
-        { site }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Deactivated', {
+        site,
+      });
     } else if (!site.isActive && body.isActive === true) {
-      EventCreator.audit(
-        Event.labels.ADMIN_ACTION,
-        req.user,
-        'Site Activated',
-        { site }
-      );
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Site Activated', { site });
     }
 
     return res.json(serializeNew(site, true));

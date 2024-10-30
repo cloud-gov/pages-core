@@ -16,16 +16,13 @@ passport.deserializeUser((id, next) => {
  */
 
 const createUAAStrategy = (options, verify) => {
-  const {
-    logoutCallbackURL, logoutURL, userURL, ...rest
-  } = options;
+  const { logoutCallbackURL, logoutURL, userURL, ...rest } = options;
 
   const opts = rest;
 
   const strategy = new Strategy(opts, verify);
 
   strategy.userProfile = (accessToken, callback) => {
-    // eslint-disable-next-line no-underscore-dangle
     strategy._oauth2.get(userURL, accessToken, (err, body) => {
       if (err) {
         return callback(err);
@@ -68,7 +65,9 @@ const verify = async (accessToken, refreshToken, profile, callback) => {
 
     if (!uaaId) return callback(null, false);
 
-    return callback(null, { id: uaaId });
+    return callback(null, {
+      id: uaaId,
+    });
   } catch (err) {
     return callback(err);
   }

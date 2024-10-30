@@ -6,18 +6,21 @@ const githubBranchesFetchStarted = () => ({
   type: githubBranchesFetchStartedType,
 });
 
-const githubBranchesReceived = branches => ({
+const githubBranchesReceived = (branches) => ({
   type: githubBranchesReceivedType,
   branches,
 });
 
-const githubBranchesFetchError = error => ({
+const githubBranchesFetchError = (error) => ({
   type: githubBranchesFetchErrorType,
   error,
 });
 
 export {
-  githubBranchesFetchStartedType, githubBranchesFetchStarted,
-  githubBranchesReceivedType, githubBranchesReceived,
-  githubBranchesFetchErrorType, githubBranchesFetchError,
+  githubBranchesFetchStartedType,
+  githubBranchesFetchStarted,
+  githubBranchesReceivedType,
+  githubBranchesReceived,
+  githubBranchesFetchErrorType,
+  githubBranchesFetchError,
 };

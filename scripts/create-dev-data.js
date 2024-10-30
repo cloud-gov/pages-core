@@ -24,7 +24,10 @@ const {
 const { site: siteFactory } = require('../test/api/support/factory');
 
 const localSiteBuildTasks = [];
-const localSiteBuildTasksFile = path.join(__dirname, '../config/local-site-build-tasks.json');
+const localSiteBuildTasksFile = path.join(
+  __dirname,
+  '../config/local-site-build-tasks.json',
+);
 
 const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
   Nullam fringilla, arcu ut ultricies auctor, elit quam
@@ -34,7 +37,7 @@ const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
   Aenean laoreet nulla ut porta semper.
 `.replace(/\s\s+/g, ' ');
 
-const log = msg => `${new Date().toUTCString()} INFO [main] - ${msg}`;
+const log = (msg) => `${new Date().toUTCString()} INFO [main] - ${msg}`;
 
 function memberAddedPayload() {
   return {
@@ -52,15 +55,12 @@ function memberAddedPayload() {
       events_url: 'https://api.github.com/users/apburnes/events{/privacy}',
       site_admin: false,
       gravatar_id: '',
-      starred_url:
-        'https://api.github.com/users/apburnes/starred{/owner}{/repo}',
+      starred_url: 'https://api.github.com/users/apburnes/starred{/owner}{/repo}',
       followers_url: 'https://api.github.com/users/apburnes/followers',
-      following_url:
-        'https://api.github.com/users/apburnes/following{/other_user}',
+      following_url: 'https://api.github.com/users/apburnes/following{/other_user}',
       organizations_url: 'https://api.github.com/users/apburnes/orgs',
       subscriptions_url: 'https://api.github.com/users/apburnes/subscriptions',
-      received_events_url:
-        'https://api.github.com/users/apburnes/received_events',
+      received_events_url: 'https://api.github.com/users/apburnes/received_events',
     },
     membership: {
       url: 'https://api.github.com/orgs/federalist-users/memberships/maryclair',
@@ -78,16 +78,12 @@ function memberAddedPayload() {
         events_url: 'https://api.github.com/users/maryclair/events{/privacy}',
         site_admin: false,
         gravatar_id: '',
-        starred_url:
-          'https://api.github.com/users/maryclair/starred{/owner}{/repo}',
+        starred_url: 'https://api.github.com/users/maryclair/starred{/owner}{/repo}',
         followers_url: 'https://api.github.com/users/maryclair/followers',
-        following_url:
-          'https://api.github.com/users/maryclair/following{/other_user}',
+        following_url: 'https://api.github.com/users/maryclair/following{/other_user}',
         organizations_url: 'https://api.github.com/users/maryclair/orgs',
-        subscriptions_url:
-          'https://api.github.com/users/maryclair/subscriptions',
-        received_events_url:
-          'https://api.github.com/users/maryclair/received_events',
+        subscriptions_url: 'https://api.github.com/users/maryclair/subscriptions',
+        received_events_url: 'https://api.github.com/users/maryclair/received_events',
       },
       state: 'pending',
       organization_url: 'https://api.github.com/orgs/federalist-users',
@@ -103,8 +99,7 @@ function memberAddedPayload() {
       events_url: 'https://api.github.com/orgs/federalist-users/events',
       issues_url: 'https://api.github.com/orgs/federalist-users/issues',
       description: 'federalist.18f.gov Users',
-      members_url:
-        'https://api.github.com/orgs/federalist-users/members{/member}',
+      members_url: 'https://api.github.com/orgs/federalist-users/members{/member}',
       public_members_url:
         'https://api.github.com/orgs/federalist-users/public_members{/member}',
     },
@@ -113,8 +108,22 @@ function memberAddedPayload() {
 
 function socketIOError() {
   return {
-    error:
-      "AbortError: PUBLISH can't be processed. The connection is already closed.\n at handle_offline_command (/home/vcap/app/node_modules/redis/index.js:779:15)\n at RedisClient.internal_send_command (/home/vcap/app/node_modules/redis/index.js:813:9)\n at RedisClient.publish (/home/vcap/app/node_modules/redis/lib/commands.js:46:25)\n at RedisAdapter.broadcast (/home/vcap/app/node_modules/socket.io-redis/dist/index.js:265:28)\n at Namespace.emit (/home/vcap/app/node_modules/socket.io/dist/namespace.js:175:22)\n at Server.<computed> [as emit] (/home/vcap/app/node_modules/socket.io/dist/index.js:445:33)\n at emitBuildStatus (/home/vcap/app/api/controllers/build.js:32:30)\n at runMicrotasks (<anonymous>)\n at processTicksAndRejections (internal/process/task_queues.js:93:5)",
+    error: `
+    AbortError: PUBLISH can't be processed. The connection is already closed.
+    at handle_offline_command (/home/vcap/app/node_modules/redis/index.js:779:15)
+    at RedisClient.internal_send_command
+    (/home/vcap/app/node_modules/redis/index.js:813:9)
+    at RedisClient.publish
+    (/home/vcap/app/node_modules/redis/lib/commands.js:46:25)
+    at RedisAdapter.broadcast
+    (/home/vcap/app/node_modules/socket.io-redis/dist/index.js:265:28)
+    at Namespace.emit (/home/vcap/app/node_modules/socket.io/dist/namespace.js:175:22)
+    at Server.<computed> [as emit]
+    (/home/vcap/app/node_modules/socket.io/dist/index.js:445:33)
+    at emitBuildStatus (/home/vcap/app/api/controllers/build.js:32:30)
+    at runMicrotasks (<anonymous>)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5)
+    `,
     message: 'redisAdapter pubClient error',
   };
 }
@@ -131,7 +140,11 @@ async function createUAAIdentity(user) {
 }
 
 async function addUserToOrg(user, org, role) {
-  await org.addUser(user, { through: { roleId: role.id } });
+  await org.addUser(user, {
+    through: {
+      roleId: role.id,
+    },
+  });
   return user;
 }
 
@@ -158,8 +171,12 @@ async function createData() {
    */
   console.log('Creating Roles');
   const [userRole, managerRole] = await Promise.all([
-    Role.create({ name: 'user' }),
-    Role.create({ name: 'manager' }),
+    Role.create({
+      name: 'user',
+    }),
+    Role.create({
+      name: 'manager',
+    }),
   ]);
 
   /** *****************************************
@@ -167,8 +184,14 @@ async function createData() {
    */
   console.log('Creating Organizations');
   const [agency1, agency2, agency3, agency4, sandbox] = await Promise.all([
-    Organization.create({ name: 'agency1', agency: 'GSA' }),
-    Organization.create({ name: 'agency2', agency: 'GSA' }),
+    Organization.create({
+      name: 'agency1',
+      agency: 'GSA',
+    }),
+    Organization.create({
+      name: 'agency2',
+      agency: 'GSA',
+    }),
     Organization.create({
       name: 'agency3',
       agency: 'Bureau of Testing',
@@ -178,137 +201,136 @@ async function createData() {
       name: 'agency4',
       agency: 'Demonstration Department',
     }),
-    Organization.create({ name: 'user1@example.com', isSandbox: true }),
+    Organization.create({
+      name: 'user1@example.com',
+      isSandbox: true,
+    }),
   ]);
 
   /** *****************************************
    *                 Users
    */
   console.log('Creating users...');
-  const [
-    user1,
-    user2,
-    user3,
-    user4,
-    userOrgless,
-    managerNoGithub,
-    managerWithGithub,
-  ] = await Promise.all([
-    /**
-     * Fake users
-     */
+  const [user1, user2, user3, user4, userOrgless, managerNoGithub, managerWithGithub] =
+    await Promise.all([
+      /**
+       * Fake users
+       */
 
-    // Users with Github credentials
-    User.create({
-      username: 'user1',
-      email: 'user1@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    }).then(async (user) => {
-      await Promise.all([
-        createUAAIdentity(user),
-        addUserToOrg(user, agency1, userRole),
-        addUserToOrg(user, agency2, userRole),
-        addUserToOrg(user, sandbox, managerRole),
-      ]);
-      return user;
-    }),
+      // Users with Github credentials
+      User.create({
+        username: 'user1',
+        email: 'user1@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      }).then(async (user) => {
+        await Promise.all([
+          createUAAIdentity(user),
+          addUserToOrg(user, agency1, userRole),
+          addUserToOrg(user, agency2, userRole),
+          addUserToOrg(user, sandbox, managerRole),
+        ]);
+        return user;
+      }),
 
-    User.create({
-      username: 'user2',
-      email: 'user2@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency1, userRole)),
+      User.create({
+        username: 'user2',
+        email: 'user2@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+        .then(createUAAIdentity)
+        .then((user) => addUserToOrg(user, agency1, userRole)),
 
-    User.create({
-      username: 'user3',
-      email: 'user3@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency3, userRole)),
+      User.create({
+        username: 'user3',
+        email: 'user3@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+        .then(createUAAIdentity)
+        .then((user) => addUserToOrg(user, agency3, userRole)),
 
-    User.create({
-      username: 'user4',
-      email: 'user4@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency4, userRole)),
+      User.create({
+        username: 'user4',
+        email: 'user4@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+        .then(createUAAIdentity)
+        .then((user) => addUserToOrg(user, agency4, userRole)),
 
-    User.create({
-      username: 'userorgless',
-      email: 'userorgless@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    }).then(createUAAIdentity),
+      User.create({
+        username: 'userorgless',
+        email: 'userorgless@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      }).then(createUAAIdentity),
 
-    // Manager without Github credentials
-    User.create({ username: 'manager_no_github' })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency1, managerRole)),
+      // Manager without Github credentials
+      User.create({
+        username: 'manager_no_github',
+      })
+        .then(createUAAIdentity)
+        .then((user) => addUserToOrg(user, agency1, managerRole)),
 
-    // Manager with Github credentials
-    User.create({
-      username: 'manager_with_github',
-      email: 'manager_with_github@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    })
-      .then(createUAAIdentity)
-      .then(user => addUserToOrg(user, agency1, userRole))
-      .then(user => addUserToOrg(user, agency2, managerRole)),
+      // Manager with Github credentials
+      User.create({
+        username: 'manager_with_github',
+        email: 'manager_with_github@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      })
+        .then(createUAAIdentity)
+        .then((user) => addUserToOrg(user, agency1, userRole))
+        .then((user) => addUserToOrg(user, agency2, managerRole)),
 
-    User.create({
-      username: 'support_role',
-      email: 'support_role@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    }).then(createUAAIdentity),
+      User.create({
+        username: 'support_role',
+        email: 'support_role@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      }).then(createUAAIdentity),
 
-    /**
-     * Actual Github users
-     *
-     * Initialized without Github credentials so we can test the process
-     */
-    User.create({
-      username: 'hursey013',
-      adminEmail: 'brian.hurst@gsa.gov',
-    }).then(createUAAIdentity),
+      /**
+       * Actual Github users
+       *
+       * Initialized without Github credentials so we can test the process
+       */
+      User.create({
+        username: 'hursey013',
+        adminEmail: 'brian.hurst@gsa.gov',
+      }).then(createUAAIdentity),
 
-    User.create({ username: 'svenaas', adminEmail: 'sven.aas@gsa.gov' }).then(
-      createUAAIdentity
-    ),
+      User.create({
+        username: 'svenaas',
+        adminEmail: 'sven.aas@gsa.gov',
+      }).then(createUAAIdentity),
 
-    User.create({
-      username: 'apburnes',
-      adminEmail: 'andrew.burnes@gsa.gov',
-    }).then(createUAAIdentity),
+      User.create({
+        username: 'apburnes',
+        adminEmail: 'andrew.burnes@gsa.gov',
+      }).then(createUAAIdentity),
 
-    User.create({
-      username: 'davemcorwin',
-      adminEmail: 'david.corwin@gsa.gov',
-    }).then(createUAAIdentity),
+      User.create({
+        username: 'davemcorwin',
+        adminEmail: 'david.corwin@gsa.gov',
+      }).then(createUAAIdentity),
 
-    // User without UAA
-    User.create({
-      username: 'user_no_uaa',
-      email: 'user_no_uaa@example.com',
-      githubAccessToken: 'access-token',
-      githubUserId: 123456,
-    }),
+      // User without UAA
+      User.create({
+        username: 'user_no_uaa',
+        email: 'user_no_uaa@example.com',
+        githubAccessToken: 'access-token',
+        githubUserId: 123456,
+      }),
 
-    // Auditor
-    User.create({
-      username: process.env.USER_AUDITOR,
-      email: 'auditor@example.com',
-    }),
-  ]);
+      // Auditor
+      User.create({
+        username: process.env.USER_AUDITOR,
+        email: 'auditor@example.com',
+      }),
+    ]);
 
   /** *****************************************
    *                 Sites
@@ -322,7 +344,9 @@ async function createData() {
       owner: user1.username,
       repository: 'example-site',
       users: [user1, userOrgless],
-      defaultConfig: { hello: 'world' },
+      defaultConfig: {
+        hello: 'world',
+      },
     }),
 
     siteFactory({
@@ -331,15 +355,17 @@ async function createData() {
       repository: 'example-node-site',
       users: [user1, managerWithGithub],
       demoBranch: 'demo1',
-      previewConfig: { hello: 'preview' },
-    }).then(site => addSiteToOrg(site, agency1)),
+      previewConfig: {
+        hello: 'preview',
+      },
+    }).then((site) => addSiteToOrg(site, agency1)),
 
     siteFactory({
       engine: 'hugo',
       owner: user1.username,
       repository: 'example-go-site',
       users: [user1, user2, managerNoGithub],
-    }).then(site => addSiteToOrg(site, agency2)),
+    }).then((site) => addSiteToOrg(site, agency2)),
 
     siteFactory({
       engine: 'hugo',
@@ -347,7 +373,7 @@ async function createData() {
       repository: 'another-example-hugo-site',
       users: [user3, managerWithGithub],
       demoBranch: 'demo3',
-    }).then(site => addSiteToOrg(site, agency3)),
+    }).then((site) => addSiteToOrg(site, agency3)),
 
     siteFactory({
       engine: 'node.js',
@@ -355,7 +381,7 @@ async function createData() {
       repository: 'another-example-node-site',
       users: [user4, managerWithGithub],
       demoBranch: 'demo4',
-    }).then(site => addSiteToOrg(site, agency4)),
+    }).then((site) => addSiteToOrg(site, agency4)),
 
     siteFactory({
       engine: 'node.js',
@@ -393,9 +419,11 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
-    })),
+    }).then((build) =>
+      build.update({
+        requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+      }),
+    ),
     Build.create({
       branch: site1.demoBranch,
       source: 'fake-build',
@@ -406,10 +434,12 @@ async function createData() {
       state: 'error',
       error: 'Something bad happened here',
       completedAt: addDays(new Date(), -6),
-    }).then(build => build.update({
-      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
-      clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
-    })),
+    }).then((build) =>
+      build.update({
+        requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
+        clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe2',
+      }),
+    ),
   ]);
 
   const nodeSiteBuilds = await Promise.all([
@@ -422,10 +452,12 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
-      requestedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
+        requestedCommitSha: 'be146bd919dcc2cb8675ccbc2d023f40f82a2dea',
+      }),
+    ),
     // skipped, looks like created
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -436,10 +468,12 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
-      requestedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
+        requestedCommitSha: '46bd919dcc2cb8675ccbc2d023f40f82a2deabe1',
+      }),
+    ),
     // queued, looks like created
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
@@ -450,10 +484,12 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
-      requestedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
+        requestedCommitSha: '2d023f40f82a2deabe157ce109dcc2cb8675ccbc',
+      }),
+    ),
     // in progress
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -465,10 +501,12 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
-      requestedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+        requestedCommitSha: '3f40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+      }),
+    ),
     // error/timed out
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -482,10 +520,12 @@ async function createData() {
       username: user1.username,
       token: 'fake-token',
       error: 'The build timed out',
-    }).then(build => build.update({
-      clonedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
-      requestedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
+        requestedCommitSha: '2a2deabe157ce109dcc2cb8675ccbc2d023f40f8',
+      }),
+    ),
     // completed on default branch
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -498,10 +538,12 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
-      requestedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
+        requestedCommitSha: '40f82a2deabe157ce109dcc2cb8675ccbc2d023f',
+      }),
+    ),
     // completed even earlier on default branch
     Build.create({
       branch: nodeSite.defaultBranch,
@@ -514,10 +556,12 @@ async function createData() {
       user: managerWithGithub.id,
       username: managerWithGithub.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: 'bd40f82a2deabe157ce109dcc2cb8675ccbc2d02',
-      requestedCommitSha: 'bd40f82a2deabe157ce109dcc2cb8675ccbc2d02',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: 'bd40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+        requestedCommitSha: 'bd40f82a2deabe157ce109dcc2cb8675ccbc2d02',
+      }),
+    ),
     // completed on another branch
     Build.create({
       branch: 'longer-branch-names-might-be-truncated',
@@ -530,15 +574,21 @@ async function createData() {
       user: user1.id,
       username: user1.username,
       token: 'fake-token',
-    }).then(build => build.update({
-      clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
-      requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
-    })),
+    }).then((build) =>
+      build.update({
+        clonedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+        requestedCommitSha: '57ce109dcc2cb8675ccbc2d023f40f82a2deabe1',
+      }),
+    ),
   ]);
 
   const taskType1 = await BuildTaskType.create({
     name: 'ZAP Vulnerability Report',
-    description: 'This report identifies potential website security issues like unintended exposure of sensitive data, SQL injection opportunities, cross-site scripting (XSS) flaws, and the use of components with known vulnerabilities.',
+    description: `
+      This report identifies potential website security issues
+      like unintended exposure of sensitive data, SQL injection opportunities,
+      cross-site scripting (XSS) flaws, and the use of
+      components with known vulnerabilities.`,
     metadata: {
       appName: 'pages-owasp-zap-task-dev',
     },
@@ -581,7 +631,10 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 0,
   });
-  localSiteBuildTasks.push({ id: btZap1.id, type: 'owasp-zap' });
+  localSiteBuildTasks.push({
+    id: btZap1.id,
+    type: 'owasp-zap',
+  });
 
   const btZap2 = await BuildTask.create({
     buildId: nodeSiteBuilds[6].id,
@@ -592,11 +645,20 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 42,
   });
-  localSiteBuildTasks.push({ id: btZap2.id, type: 'owasp-zap' });
+  localSiteBuildTasks.push({
+    id: btZap2.id,
+    type: 'owasp-zap',
+  });
 
   const taskType2 = await BuildTaskType.create({
     name: 'WCAG Accessibility Report',
-    description: 'This report detects accessibility issues and provides suggestions for remediation by inspecting focusable elements, HTML tags and attributes, images, data tables, color contrast, document structure, link and button usability, and visually hidden content against the WC3’s WCAG 2.2 Level A and AA requirements.',
+    description: `
+      This report detects accessibility issues and
+      provides suggestions for remediation by inspecting
+      focusable elements, HTML tags and attributes, images,
+      data tables, color contrast, document structure, link
+      and button usability, and visually hidden content against
+      the WC3’s WCAG 2.2 Level A and AA requirements.`,
     metadata: {
       appName: 'pages-a11y-task-dev',
     },
@@ -648,7 +710,10 @@ async function createData() {
     message: 'Scan successfully completed. See artifact for details.',
     count: 3,
   });
-  localSiteBuildTasks.push({ id: btA11y1.id, type: 'a11y' });
+  localSiteBuildTasks.push({
+    id: btA11y1.id,
+    type: 'a11y',
+  });
 
   // write localSiteBuildTasks.json file for viewing out reports
   await writeFile(localSiteBuildTasksFile, JSON.stringify(localSiteBuildTasks), 'utf-8');
@@ -724,7 +789,7 @@ async function createData() {
         output: log('This log has a source of ALL'),
         source: 'ALL',
         build: nodeSiteBuilds[0].id,
-      }))
+      })),
   );
 
   await BuildLog.bulkCreate(
@@ -732,11 +797,12 @@ async function createData() {
       .fill(0)
       .map((_v, idx) => ({
         output: log(
-          `Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`
+          // eslint-disable-next-line max-len
+          `Message ${idx} - A much longer log message to test that the horizontal scrolling is working the way we want.`,
         ),
         source: 'ALL',
         build: goSiteBuilds[0].id,
-      }))
+      })),
   );
 
   console.log('Uploading logs to S3');
@@ -744,7 +810,8 @@ async function createData() {
     await BuildLogs.archiveBuildLogs(nodeSite, nodeSiteBuilds[0]);
   } catch (_) {
     console.error(
-      'Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.'
+      // eslint-disable-next-line max-len
+      'Failed to upload logs to S3, probably because the credentials are not configured locally. This can be ignored.',
     );
   }
 
@@ -753,7 +820,9 @@ async function createData() {
    */
   console.log('Creating user actions...');
   const removeAction = await ActionType.findOne({
-    where: { action: 'remove' },
+    where: {
+      action: 'remove',
+    },
   });
   await UserAction.create({
     userId: user1.id,
@@ -774,17 +843,15 @@ async function createData() {
       Event.labels.AUTHENTICATION,
       user1,
       'member_added',
-      memberAddedPayload()
+      memberAddedPayload(),
     ),
   ]);
 
   console.log('Creating Error Events');
   await Promise.all([
-    EventCreator.error(
-      Event.labels.REQUEST_HANDLER,
-      new Error('A sample error'),
-      { some: 'info' }
-    ),
+    EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), {
+      some: 'info',
+    }),
     EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, {
       some: 'info',
     }),
@@ -862,9 +929,10 @@ console.log('This will DELETE all data in your development database.');
 createData()
   .then(() => {
     console.log('Done!');
-    console.log(
-      'You may have to log out and then back in to your local development instance of Federalist.'
-    );
+    console.log(`
+      You may have to log out and then back in
+      to your local development instance of Federalist.
+    `);
     process.exit();
   })
   .catch((error) => {

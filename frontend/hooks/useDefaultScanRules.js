@@ -10,10 +10,12 @@ export const useDefaultScanRules = () => {
   const [results, setResults] = useState(initResultsState);
 
   useEffect(() => {
-    api.getDefaultBuildScanRules().then(data => setResults({
-      isLoading: false,
-      defaultScanRules: data,
-    }));
+    api.getDefaultBuildScanRules().then((data) =>
+      setResults({
+        isLoading: false,
+        defaultScanRules: data,
+      }),
+    );
   }, []);
 
   return results;

@@ -53,11 +53,11 @@ describe('Encryptor', () => {
 
       expect(decryptedId).to.equal(data.id.toString());
       expect(decryptedName).to.equal(data.name);
-      output.numberlist.map((enc, idx) => expect(
-        Encryptor.decrypt(enc, key)).to.equal(data.numberlist[idx].toString())
+      output.numberlist.map((enc, idx) =>
+        expect(Encryptor.decrypt(enc, key)).to.equal(data.numberlist[idx].toString()),
       );
-      output.stringList.map((enc, idx) => expect(
-        Encryptor.decrypt(enc, key)).to.equal(data.stringList[idx])
+      output.stringList.map((enc, idx) =>
+        expect(Encryptor.decrypt(enc, key)).to.equal(data.stringList[idx]),
       );
       expect(typeof output.getFunction).to.equal('function');
     });
@@ -116,34 +116,22 @@ describe('Encryptor', () => {
       const output = Encryptor.encryptObjectValues(data, key);
       const decryptedId = Encryptor.decrypt(output.id, key);
       const decryptedName = Encryptor.decrypt(output.name, key);
-      const decryptedMetadataName = Encryptor.decrypt(
-        output.metadata.name,
-        key
-      );
-      const decryptedMetadataType = Encryptor.decrypt(
-        output.metadata.type,
-        key
-      );
-      const decryptedMetadataMetaName = Encryptor.decrypt(
-        output.metadata.meta.name,
-        key
-      );
-      const decryptedAttributesTotal = Encryptor.decrypt(
-        output.attributes.total,
-        key
-      );
+      const decryptedMetadataName = Encryptor.decrypt(output.metadata.name, key);
+      const decryptedMetadataType = Encryptor.decrypt(output.metadata.type, key);
+      const decryptedMetadataMetaName = Encryptor.decrypt(output.metadata.meta.name, key);
+      const decryptedAttributesTotal = Encryptor.decrypt(output.attributes.total, key);
 
       expect(decryptedId).to.equal(data.id.toString());
       expect(decryptedName).to.equal(data.name);
       expect(decryptedMetadataName).to.equal(data.metadata.name);
       expect(decryptedMetadataType).to.equal(data.metadata.type);
       expect(decryptedMetadataMetaName).to.equal(data.metadata.meta.name);
-      output.metadata.meta.list.map((enc, idx) => expect(
-        Encryptor.decrypt(enc, key)).to.equal(data.metadata.meta.list[idx].toString())
+      output.metadata.meta.list.map((enc, idx) =>
+        expect(Encryptor.decrypt(enc, key)).to.equal(
+          data.metadata.meta.list[idx].toString(),
+        ),
       );
-      expect(decryptedAttributesTotal).to.equal(
-        data.attributes.total.toString()
-      );
+      expect(decryptedAttributesTotal).to.equal(data.attributes.total.toString());
     });
   });
 });

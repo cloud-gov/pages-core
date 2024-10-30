@@ -17,12 +17,15 @@ export default function BranchFileRow({ file }) {
   return (
     <tr key={viewFileLink}>
       <th scope="row">{file.name}</th>
-      <td><a href={viewFileLink} target="_blank" rel="noopener noreferrer">View</a></td>
+      <td>
+        <a href={viewFileLink} target="_blank" rel="noopener noreferrer">
+          View
+        </a>
+      </td>
     </tr>
   );
 }
 
 BranchFileRow.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   file: PropTypes.object,
 };

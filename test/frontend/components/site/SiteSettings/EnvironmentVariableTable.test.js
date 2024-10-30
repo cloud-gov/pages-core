@@ -8,8 +8,16 @@ import EnvironmentVariableTable from '../../../../../frontend/components/site/Si
 const stubs = {};
 
 const uevs = [
-  { id: 1, name: 'foo', hint: 'abcd' },
-  { id: 2, name: 'bar', hint: '1234' },
+  {
+    id: 1,
+    name: 'foo',
+    hint: 'abcd',
+  },
+  {
+    id: 2,
+    name: 'bar',
+    hint: '1234',
+  },
 ];
 
 describe('<EnvironmentVariableTable/>', () => {
@@ -34,33 +42,40 @@ describe('<EnvironmentVariableTable/>', () => {
     });
 
     it('appropriate headers', () => {
-      const headers = wrapper.find('thead tr th').map(n => n.text());
+      const headers = wrapper.find('thead tr th').map((n) => n.text());
       expect(headers).to.deep.equal(['Name', 'Value', 'Remove']);
     });
 
     describe('for each uev', () => {
       it('a row keyed by `id`', () => {
-        const keys = wrapper.find('tbody tr').map(n => Number(n.key()));
-        expect(keys).to.deep.eq(uevs.map(uev => uev.id));
+        const keys = wrapper.find('tbody tr').map((n) => Number(n.key()));
+        expect(keys).to.deep.eq(uevs.map((uev) => uev.id));
       });
 
       it('including the `name`', () => {
-        const names = wrapper.find('tbody tr').map(n => n.find('th').first().text());
-        expect(names).to.deep.eq(uevs.map(uev => uev.name));
+        const names = wrapper.find('tbody tr').map((n) => n.find('th').first().text());
+        expect(names).to.deep.eq(uevs.map((uev) => uev.name));
       });
 
       it('including the `hint` prefixed by "xxxx"', () => {
-        const names = wrapper.find('tbody tr').map(n => n.find('td').first().text());
-        expect(names).to.deep.eq(uevs.map(uev => `xxxx${uev.hint}`));
+        const names = wrapper.find('tbody tr').map((n) => n.find('td').first().text());
+        expect(names).to.deep.eq(uevs.map((uev) => `xxxx${uev.hint}`));
       });
 
       it('including a delete button that calls `onDelete` with the uev id', () => {
-        const deleteButtons = wrapper.find('tbody tr').map(n => n.find('button').first());
-        expect(deleteButtons.map(deleteButton => deleteButton.text())).to.deep.eq(['Delete', 'Delete']);
+        const deleteButtons = wrapper
+          .find('tbody tr')
+          .map((n) => n.find('button').first());
+        expect(deleteButtons.map((deleteButton) => deleteButton.text())).to.deep.eq([
+          'Delete',
+          'Delete',
+        ]);
 
-        deleteButtons.forEach(deleteButton => deleteButton.simulate('click'));
+        deleteButtons.forEach((deleteButton) => deleteButton.simulate('click'));
 
-        uevs.forEach((uev, idx) => sinon.assert.calledWith(stubs.onDelete.getCall(idx), uev.id));
+        uevs.forEach((uev, idx) =>
+          sinon.assert.calledWith(stubs.onDelete.getCall(idx), uev.id),
+        );
       });
     });
   });

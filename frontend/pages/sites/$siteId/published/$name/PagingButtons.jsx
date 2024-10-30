@@ -14,8 +14,10 @@ export default function PagingButtons({ currentPage, lastPage, setCurrentPage })
     setCurrentPage(currentPage + 1);
   }
 
-  const prevButtonClass = `${shouldDisablePreviousPage ? 'usa-button-disabled' : 'usa-button'}`;
-  const nextButtonClass = `pull-right ${shouldDisableNextPage ? 'usa-button-disabled' : 'usa-button'}`;
+  const pbClassName = shouldDisablePreviousPage ? 'usa-button-disabled' : 'usa-button';
+  const prevButtonClass = pbClassName;
+  const nbClassName = shouldDisableNextPage ? 'usa-button-disabled' : 'usa-button';
+  const nextButtonClass = `pull-right ${nbClassName}`;
 
   if (!shouldShowButtons) {
     return null;

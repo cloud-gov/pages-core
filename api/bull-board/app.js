@@ -87,10 +87,13 @@ const idp = 'uaa';
 
 app.get('/login', redirectIfAuthenticated, passport.authenticate(idp));
 app.get('/logout', passport.logout(idp));
-app.get('/auth/github/callback', passport.authenticate(
-  'github',
-  { failureRedirect: '/loggedout' }
-), onSuccess);
+app.get(
+  '/auth/github/callback',
+  passport.authenticate('github', {
+    failureRedirect: '/loggedout',
+  }),
+  onSuccess,
+);
 
 if (idp === 'uaa') {
   app.get('/auth/uaa/callback', passport.authenticate('uaa'), onSuccess);
@@ -98,10 +101,12 @@ if (idp === 'uaa') {
 }
 
 app.get('/', (_, res) => res.redirect('/queues'));
-app.get('/loggedout', (_, res) => res.send(`
+app.get('/loggedout', (_, res) =>
+  res.send(`
   <h1>You have been logged out</h1>
   <a href="/login">login</a>
-`));
+`),
+);
 
 serverAdapter.setBasePath('/queues');
 app.use('/queues', ensureAuthenticated, serverAdapter.getRouter());

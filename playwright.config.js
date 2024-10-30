@@ -26,7 +26,13 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { host: '0.0.0.0', outputFolder: `playwright-report/${APP_ENV}/${GIT_COMMIT}` }],
+    [
+      'html',
+      {
+        host: '0.0.0.0',
+        outputFolder: `playwright-report/${APP_ENV}/${GIT_COMMIT}`,
+      },
+    ],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

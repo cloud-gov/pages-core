@@ -11,7 +11,10 @@ describe('userActions reducer', () => {
       type: 'NOT_ACCEPTED_ACTION',
     });
 
-    expect(actual).to.deep.equal({ isLoading: false, data: [] });
+    expect(actual).to.deep.equal({
+      isLoading: false,
+      data: [],
+    });
   });
 
   it('sets `isLoading` prop to true when fetch begins', () => {
@@ -34,10 +37,16 @@ describe('userActions reducer', () => {
     const firstState = ['a', 'b'];
     const nextState = ['c', 'd'];
 
-    const actual = userActions({
-      isLoading: true,
-      data: firstState,
-    }, { type: userActionReceivedType, userActions: nextState });
+    const actual = userActions(
+      {
+        isLoading: true,
+        data: firstState,
+      },
+      {
+        type: userActionReceivedType,
+        userActions: nextState,
+      },
+    );
 
     expect(actual).to.deep.equal({
       isLoading: false,

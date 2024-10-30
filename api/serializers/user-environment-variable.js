@@ -1,10 +1,6 @@
 const { pick } = require('../utils');
 
-const allowedAttributes = [
-  'id',
-  'name',
-  'hint',
-];
+const allowedAttributes = ['id', 'name', 'hint'];
 
 function serialize(userEnvVar) {
   const object = userEnvVar.get({
@@ -17,4 +13,7 @@ function serializeMany(userEnvVars) {
   return userEnvVars.map(serialize);
 }
 
-module.exports = { serialize, serializeMany };
+module.exports = {
+  serialize,
+  serializeMany,
+};

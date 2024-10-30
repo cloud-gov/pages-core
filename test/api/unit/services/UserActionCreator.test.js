@@ -5,8 +5,11 @@ const { ActionType } = require('../../../../api/models');
 const actionCreated = (userAction, type, done) => {
   expect(userAction).to.exist;
 
-  return ActionType.findOne({ where: { id: userAction.actionId } })
-  .then((action) => {
+  return ActionType.findOne({
+    where: {
+      id: userAction.actionId,
+    },
+  }).then((action) => {
     expect(action.get('action')).to.equal(type);
     done();
   });
@@ -23,24 +26,24 @@ describe('UserActionCreator', () => {
   describe('.addRemoveAction', () => {
     it('creates a new UserAction record with a pointer to the remove type', (done) => {
       UserActionCreator.addRemoveAction(props)
-      .then(userAction => actionCreated(userAction, 'remove', done))
-      .catch(done);
+        .then((userAction) => actionCreated(userAction, 'remove', done))
+        .catch(done);
     });
   });
 
   describe('.addCreateAction', () => {
     it('creates a new UserAction with a point to the add type', (done) => {
       UserActionCreator.addCreateAction(props)
-      .then(userAction => actionCreated(userAction, 'add', done))
-      .catch(done);
+        .then((userAction) => actionCreated(userAction, 'add', done))
+        .catch(done);
     });
   });
 
   describe('.addUpdateAction', () => {
     it('creates a new UserAction with a point to the update type', (done) => {
       UserActionCreator.addUpdateAction(props)
-      .then(userAction => actionCreated(userAction, 'update', done))
-      .catch(done);
+        .then((userAction) => actionCreated(userAction, 'update', done))
+        .catch(done);
     });
   });
 });

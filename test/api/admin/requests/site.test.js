@@ -15,8 +15,7 @@ const app = require('../../../../api/admin');
 
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
   it('should require admin authentication', async () => {
-    const response = await request(app)[method](path)
-      .expect(401);
+    const response = await request(app)[method](path).expect(401);
 
     validateAgainstJSONSchema('GET', schema, 401, response.body);
     expect(response.body.message).to.equal('Unauthorized');
@@ -24,10 +23,7 @@ const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
 };
 
 describe('Admin - Site API', () => {
-  afterEach(() => Promise.all([
-    User.truncate(),
-    Site.truncate(),
-  ]));
+  afterEach(() => Promise.all([User.truncate(), Site.truncate()]));
 
   describe('GET /admin/sites', () => {
     itShouldRequireAdminAuthentication('/sites', '/site');
@@ -47,7 +43,7 @@ describe('Admin - Site API', () => {
         .expect(200);
 
       validateAgainstJSONSchema('GET', '/site', 200, body.data);
-      expect(body.data.map(site => site.id)).to.deep.equal(sites.map(s => s.id));
+      expect(body.data.map((site) => site.id)).to.deep.equal(sites.map((s) => s.id));
       expect(body.data[0].containerConfig).to.deep.equal({});
     });
   });
@@ -56,11 +52,16 @@ describe('Admin - Site API', () => {
     itShouldRequireAdminAuthentication('/sites/1', '/site/{id}');
 
     it('returns the site with admin serialization', async () => {
-      const containerConfig = { name: 'name', size: 'size' };
+      const containerConfig = {
+        name: 'name',
+        size: 'size',
+      };
 
       const [user, site] = await Promise.all([
         factory.user(),
-        factory.site({ containerConfig }),
+        factory.site({
+          containerConfig,
+        }),
       ]);
 
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
@@ -78,13 +79,21 @@ describe('Admin - Site API', () => {
   describe('PUT /admin/sites/:id', () => {
     itShouldRequireAdminAuthentication('/sites/1', '/site/{id}', 'put');
 
-    const origContainerConfig = { name: 'exp', size: '' };
-    const newContainerConfig = { name: '', size: 'large' };
+    const origContainerConfig = {
+      name: 'exp',
+      size: '',
+    };
+    const newContainerConfig = {
+      name: '',
+      size: 'large',
+    };
     context('updates allowed fields', async () => {
       it('updates containerConfig', async () => {
         const [user, site] = await Promise.all([
           factory.user(),
-          factory.site({ containerConfig: origContainerConfig }),
+          factory.site({
+            containerConfig: origContainerConfig,
+          }),
         ]);
 
         const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
@@ -112,10 +121,7 @@ describe('Admin - Site API', () => {
       });
 
       it('updates isActive', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site(),
-        ]);
+        const [user, site] = await Promise.all([factory.user(), factory.site()]);
         expect(site.isActive).to.be.true;
         const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
         const putResponse = await request(app)
@@ -156,10 +162,7 @@ describe('Admin - Site API', () => {
       });
 
       it('deletes the following site', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site(),
-        ]);
+        const [user, site] = await Promise.all([factory.user(), factory.site()]);
 
         expect(site.isSoftDeleted()).to.be.false;
 
@@ -173,7 +176,9 @@ describe('Admin - Site API', () => {
 
         expect(deleteResponse.body).to.deep.eq({});
 
-        await site.reload({ paranoid: false });
+        await site.reload({
+          paranoid: false,
+        });
         expect(site.isSoftDeleted()).to.be.true;
 
         // Requery
@@ -195,10 +200,7 @@ describe('Admin - Site API', () => {
       });
 
       it('deletes the site', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site(),
-        ]);
+        const [user, site] = await Promise.all([factory.user(), factory.site()]);
 
         expect(site.isSoftDeleted()).to.be.false;
 
@@ -212,7 +214,9 @@ describe('Admin - Site API', () => {
 
         expect(deleteResponse.body).to.deep.eq({});
 
-        await site.reload({ paranoid: false });
+        await site.reload({
+          paranoid: false,
+        });
         expect(site.isSoftDeleted()).to.be.true;
 
         // Requery
@@ -226,12 +230,13 @@ describe('Admin - Site API', () => {
 
     describe('Support role', () => {
       it('fails for support role', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site(),
-        ]);
+        const [user, site] = await Promise.all([factory.user(), factory.site()]);
 
-        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig, 'pages.support');
+        const cookie = await authenticatedAdminOrSupportSession(
+          user,
+          sessionConfig,
+          'pages.support',
+        );
         await request(app)
           .delete(`/sites/${site.id}`)
           .set('Cookie', cookie)
