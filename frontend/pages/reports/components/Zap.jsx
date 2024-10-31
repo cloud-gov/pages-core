@@ -10,32 +10,39 @@ import ScanFindings from './ScanFindings';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import BackToTopButton from './BackToTopButton';
 
-export default function Zap({ data, buildId, siteId }) {
+export default function Zap({
+  report,
+  sbtCustomRules = [],
+  buildId,
+  siteId,
+  sbtId,
+  sbtType,
+}) {
   const scanTitle = 'Vulnerability';
   const pageTitle = `
-    Pages | ${scanTitle} report for ${data.site['@name']}
-    on ${data.generated} for build id ${buildId}
+    Pages | ${scanTitle} report for ${report.site['@name']}
+    on ${report.generated} for build id ${buildId}
   `;
 
   const navGroups = [...severity.zap].map((group) => ({
     ...group,
     usePill: true,
-    count: data.site.groupedAlerts[group?.riskCode]?.length || 0,
+    count: report.site.groupedAlerts[group?.riskCode]?.length || 0,
   }));
 
   navGroups.push(
     {
       label: 'Total results',
-      count: data.site.alerts?.length,
+      count: report.site.alerts?.length,
     },
     {
       label: 'All unsuppressed results',
-      count: data.site?.issueCount,
+      count: report.site?.issueCount,
       boldMe: true,
     },
   );
 
-  const summarizedResults = [...data.site.alerts].map((result) => ({
+  const summarizedResults = [...report.site.alerts].map((result) => ({
     ...result,
     anchor: result.alertRef,
     severity: getSeverityThemeToken(result.riskcode, 'zap'),
@@ -72,7 +79,7 @@ export default function Zap({ data, buildId, siteId }) {
               break-anywhere
             `}
           >
-            {data.site['@name']}
+            {report.site['@name']}
           </span>
           <span className="text-italic font-sans-lg text-normal margin-left-2">
             (all pages)
@@ -97,7 +104,7 @@ export default function Zap({ data, buildId, siteId }) {
       <div className="grid-row border-top-1px padding-top-1">
         <section className="tablet:grid-col-auto">
           <ScanNav
-            generated={data.generated}
+            generated={report.generated}
             buildId={buildId}
             siteId={siteId}
             groups={navGroups}
@@ -148,22 +155,24 @@ export default function Zap({ data, buildId, siteId }) {
               </div>
             </section>
             <ScanFindingsSummary
-              baseurl={data.site['@name']}
+              baseurl={report.site['@name']}
               suppressedFindings={suppressed}
               unsuppressedFindings={unsuppressed}
             />
             <ScanFindings
               siteId={siteId}
-              scanType="zap"
-              count={data.site.alerts.length}
-              groupedFindings={data.site.groupedAlerts}
+              sbtId={sbtId}
+              sbtType={sbtType}
+              sbtCustomRules={sbtCustomRules}
+              count={report.site.alerts.length}
+              groupedFindings={report.site.groupedAlerts}
             />
           </div>
           <About scanType="zap" siteId={siteId}>
             <p className="font-body-xs line-height-body-3">
               This report was generated for{' '}
               <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">
-                {data.site['@name']}
+                {report.site['@name']}
               </code>
               {' from '}
               <Link
@@ -173,7 +182,7 @@ export default function Zap({ data, buildId, siteId }) {
               >
                 build #{buildId}
               </Link>{' '}
-              scanned on {data.generated}
+              scanned on {report.generated}
             </p>
           </About>
         </div>
@@ -184,7 +193,11 @@ export default function Zap({ data, buildId, siteId }) {
 }
 
 Zap.propTypes = {
-  data: PropTypes.object.isRequired,
+  report: PropTypes.object.isRequired,
+   
+  sbtCustomRules: PropTypes.array,
   siteId: PropTypes.number.isRequired,
+  sbtId: PropTypes.number.isRequired,
+  sbtType: PropTypes.string.isRequired,
   buildId: PropTypes.number.isRequired,
 };

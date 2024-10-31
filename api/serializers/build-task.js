@@ -18,6 +18,10 @@ function miniBuildSerializer({
     createdAt,
   };
 }
+
+function miniSiteBuildTaskSerializer({ id, branch, metadata }) {
+  return { id, branch, metadata };
+}
 const attributes = {
   id: '',
   artifact: '',
@@ -27,8 +31,9 @@ const attributes = {
   createdAt: 'date',
   updatedAt: 'date',
   siteBuildTaskId: '',
-  BuildTaskType: (btt) => btt && bttSerializer.serialize(btt),
-  Build: (build) => build && miniBuildSerializer(build.toJSON()),
+  SiteBuildTask: sbt => sbt && miniSiteBuildTaskSerializer(sbt.toJSON()),
+  BuildTaskType: btt => btt && bttSerializer.serialize(btt),
+  Build: build => build && miniBuildSerializer(build.toJSON()),
   buildId: '',
 };
 

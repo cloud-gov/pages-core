@@ -8,16 +8,16 @@ import ScanPagePathAndReportLink from './ScanPagePathReportLink';
 import ScanFindingsSummary from './ScanFindingsSummary';
 import About from './about';
 
-export default function A11yScanIndex({ data, siteId, buildId }) {
+export default function A11yScanIndex({ report, siteId, buildId }) {
   const scanTitle = 'Accessibility';
   const pageTitle = `Pages
     | ${scanTitle} report index for
-    ${data.baseurl} on ${datetime.dateAndTimeSimple(data.reportPages[0].timestamp)}
+    ${report.baseurl} on ${datetime.dateAndTimeSimple(report.reportPages[0].timestamp)}
     for build id #${buildId}`;
   function findReportsPerURLs(url) {
-    return data.reportPages.find((page) => page.absoluteURL === url)?.path || '';
+    return report.reportPages.find((page) => page.absoluteURL === url)?.path || '';
   }
-  const summarizedResults = [...data.violatedRules].map((result) => ({
+  const summarizedResults = [...report.violatedRules].map((result) => ({
     ...result,
     name: result.help,
     ref: result.helpUrl,
@@ -50,7 +50,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
             break-anywhere
           `}
           >
-            {data.baseurl}{' '}
+            {report.baseurl}{' '}
           </span>
           <span className="text-italic font-sans-lg text-normal margin-left-2">
             (all pages)
@@ -122,7 +122,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           >
             All results{' '}
             <span className="font-body-lg text-secondary-vivid">
-              ({data.violatedRules.length})
+              ({report.violatedRules.length})
             </span>
           </h2>
         </div>
@@ -130,7 +130,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
       <div className="grid-row">
         <div className="grid-col">
           <ScanFindingsSummary
-            baseurl={data.baseurl}
+            baseurl={report.baseurl}
             suppressedFindings={suppressed}
             unsuppressedFindings={unsuppressed}
           />
@@ -149,14 +149,14 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
           >
             All reports{' '}
             <span className="font-body-lg text-accent-cool-darker">
-              ({data.reportPages.length})
+              ({report.reportPages.length})
             </span>
           </h2>
         </div>
       </div>
       <div className="grid-row">
         <div className="grid-col">
-          <ScanResultsChildPages pages={data.reportPages} baseurl={data.baseurl} />
+          <ScanResultsChildPages pages={report.reportPages} baseurl={report.baseurl} />
           <p className="font-body-2xs line-height-body-3">
             This report was generated for{' '}
             <Link
@@ -166,7 +166,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
             >
               build #{buildId}
             </Link>{' '}
-            scanned on {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}.
+            scanned on {datetime.dateAndTimeSimple(report.reportPages[0]?.timestamp)}.
           </p>
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
             <p className="font-body-xs line-height-body-3">
               This report was generated for{' '}
               <code className="narrow-mono font-mono-2xs bg-accent-cool-lighter">
-                {data.baseurl}
+                {report.baseurl}
               </code>
               {' from '}
               <Link
@@ -186,7 +186,7 @@ export default function A11yScanIndex({ data, siteId, buildId }) {
               >
                 build #{buildId}
               </Link>{' '}
-              scanned on {datetime.dateAndTimeSimple(data.reportPages[0]?.timestamp)}
+              scanned on {datetime.dateAndTimeSimple(report.reportPages[0]?.timestamp)}
             </p>
           </About>
         </div>
@@ -294,7 +294,8 @@ ScanResultsChildPages.propTypes = {
 };
 
 A11yScanIndex.propTypes = {
-  data: PropTypes.object.isRequired,
+  report: PropTypes.object.isRequired,
+   
   siteId: PropTypes.number.isRequired,
   buildId: PropTypes.number.isRequired,
 };
