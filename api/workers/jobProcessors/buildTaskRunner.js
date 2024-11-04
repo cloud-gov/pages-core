@@ -21,28 +21,12 @@ async function buildTaskRunner(job, { sleepNumber = 15000, totalAttempts = 240 }
 
     let cfResponse;
 
-    // TODO: rewrite; some tasks rely on scanning the final build url:
-    // for non-production sites, this is buildTaskId.Build.url
-    // for production sites, we overwrite that value with the production domain
-    const siteBranchConfig = site.SiteBranchConfigs.find(
-      (sbc) => sbc.branch === buildTask.Build.branch,
-    );
-
     if (taskTypeRunner === BuildTaskType.Runners.Cf_task) {
       try {
         logger.log(
           `Starting ${taskTypeRunner} for ${owner}/${repository} on branch ${branch}`,
         );
-
-        const rawTask = buildTask.get({
-          plain: true,
-        });
-
-        if (siteBranchConfig?.Domains?.length) {
-          const domain = siteBranchConfig.Domains[0]; // TODO: always the first domain
-          rawTask.Build.url = `https://${domain.names.split(',')[0]}`;
-        }
-
+        const rawTask = buildTask.get({ plain: true });
         cfResponse = await apiClient.startBuildTask(rawTask, { data }, { sleepInterval });
 
         if (cfResponse.state === 'FAILED') {
@@ -76,9 +60,7 @@ async function buildTaskRunner(job, { sleepNumber = 15000, totalAttempts = 240 }
             BuildTask.Statuses.Created,
           ].includes(failedTask.status)
         ) {
-          await failedTask.update({
-            status: BuildTask.Statuses.Error,
-          });
+          await failedTask.update({ status: BuildTask.Statuses.Error });
         }
       }
 
@@ -103,10 +85,7 @@ async function buildTaskRunner(job, { sleepNumber = 15000, totalAttempts = 240 }
   } catch (err) {
     logger.log(`An error occured: ${err?.message}`);
     const errorTask = await BuildTask.findByPk(buildTaskId);
-    await errorTask.update({
-      status: BuildTask.Statuses.Error,
-      message: err?.message,
-    });
+    await errorTask.update({ status: BuildTask.Statuses.Error, message: err?.message });
     throw err;
   }
 }

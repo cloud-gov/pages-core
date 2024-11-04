@@ -1,7 +1,6 @@
 const url = require('url');
 const GitHub = require('./GitHub');
 const config = require('../../config');
-const { buildViewLink } = require('../utils/build');
 
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
@@ -109,7 +108,7 @@ const reportBuildStatus = async (build) => {
     options.description = 'The build is running.';
   } else if (build.state === 'success') {
     options.state = 'success';
-    options.target_url = buildViewLink(build, site);
+    options.target_url = build.url;
     options.description = 'The build is complete!';
   } else if (build.state === 'error') {
     options.state = 'error';

@@ -1,95 +1,12 @@
 const expect = require('chai').expect;
 const { Domain, Site, SiteBranchConfig } = require('../../../../api/models');
-const { buildViewLink, buildUrl } = require('../../../../api/utils/build');
+const { buildUrl } = require('../../../../api/utils/build');
 const factory = require('../../support/factory');
 const config = require('../../../../config');
 
 const { proxyDomain } = config.app;
 
 describe('build utils', () => {
-  describe('buildUrl', () => {
-    let site;
-    before(async () => {
-      const { id } = await factory.site({
-        defaultBranch: 'main',
-        demoBranch: 'staging',
-      });
-      site = await Site.findByPk(id, {
-        include: [SiteBranchConfig, Domain],
-      });
-    });
-
-    it('default branch url start with site', async () => {
-      let build = await factory.build({
-        branch: site.defaultBranch,
-        site,
-      });
-      const url = [
-        `https://${site.awsBucketName}.${proxyDomain}`,
-        `/site/${site.owner}/${site.repository}`,
-      ].join('');
-      expect(buildUrl(build, site)).to.eql(url);
-    });
-
-    it('demo branch url start with demo', async () => {
-      const build = await factory.build({
-        branch: site.demoBranch,
-        site,
-      });
-      const url = [
-        `https://${site.awsBucketName}.${proxyDomain}`,
-        `/demo/${site.owner}/${site.repository}`,
-      ].join('');
-      expect(buildUrl(build, site)).to.eql(url);
-    });
-
-    it('non-default/demo branch url start with preview', async () => {
-      const build = await factory.build({
-        branch: 'other',
-        site,
-      });
-      const url = [
-        `https://${site.awsBucketName}.${proxyDomain}`,
-        `/preview/${site.owner}/${site.repository}/other`,
-      ].join('');
-      expect(buildUrl(build, site)).to.eql(url);
-    });
-  });
-
-  describe('buildUrl with other site branch context and s3Key', () => {
-    let site;
-    const branch = 'other-branch';
-    const context = 'other';
-    const s3Key = 'test/other';
-
-    before(async () => {
-      const interimSite = await factory.site(
-        {},
-        {
-          noSiteBranchConfig: true,
-        },
-      );
-      await SiteBranchConfig.create({
-        siteId: interimSite.id,
-        context,
-        branch,
-        s3Key,
-      });
-      site = await Site.findByPk(interimSite.id, {
-        include: [SiteBranchConfig],
-      });
-    });
-
-    it('branch url to have other s3Key', async () => {
-      let build = await factory.build({
-        branch,
-        site,
-      });
-      const url = [`https://${site.awsBucketName}.${proxyDomain}`, `/${s3Key}`].join('');
-      expect(buildUrl(build, site)).to.eql(url);
-    });
-  });
-
   describe('viewLink', () => {
     let site;
     const defaultBranch = 'main';
@@ -106,7 +23,7 @@ describe('build utils', () => {
       });
 
       site = await Site.findByPk(id, {
-        include: [SiteBranchConfig],
+        include: [SiteBranchConfig, Domain],
       });
     });
 
@@ -123,7 +40,7 @@ describe('build utils', () => {
       ]),
     );
 
-    it('default branch url start with site', async () => {
+    it('domained sites have the domain', async () => {
       const siteUrl = new URL(domain);
       const sbc = site.SiteBranchConfigs.find((c) => c.branch === defaultBranch);
       await factory.domain.create({
@@ -139,10 +56,10 @@ describe('build utils', () => {
       const updatedSite = await Site.findByPk(site.id, {
         include: [Domain, SiteBranchConfig],
       });
-      expect(buildViewLink(build, updatedSite)).to.eql('https://www.main.com/');
+      expect(buildUrl(build, updatedSite)).to.eql('https://www.main.com/');
     });
 
-    it('should show preview url when site domain is not provisioned', async () => {
+    it('should show site url when site domain is not provisioned', async () => {
       const siteUrl = new URL(domain);
       const sbc = site.SiteBranchConfigs.find((c) => c.branch === defaultBranch);
       await factory.domain.create({
@@ -158,47 +75,28 @@ describe('build utils', () => {
       const updatedSite = await Site.findByPk(site.id, {
         include: [Domain, SiteBranchConfig],
       });
-      expect(buildViewLink(build, updatedSite)).to.eql(
-        `https://${site.awsBucketName}.${proxyDomain}/site/${site.owner}/${site.repository}/`,
+
+      const host = `${site.awsBucketName}.${proxyDomain}`;
+
+      expect(buildUrl(build, updatedSite)).to.eql(
+        `https://${host}/site/${site.owner}/${site.repository}/`,
       );
+
+      expect(buildUrl(build, updatedSite)).to.eql(`https://${host}${sbc.s3Key}/`);
     });
 
-    it('demo branch url start with demo', async () => {
-      const siteUrl = new URL(demoDomain);
-      const sbc = site.SiteBranchConfigs.find((c) => c.branch === demoBranch);
-      await factory.domain.create({
-        siteId: site.id,
-        siteBranchConfigId: sbc.id,
-        names: siteUrl.host,
-        state: 'provisioned',
+    it('should show preview url without a branch configuration', async () => {
+      const branch = 'anotherbranch';
+      const build = await factory.build({
+        branch,
+        site,
       });
       const updatedSite = await Site.findByPk(site.id, {
         include: [Domain, SiteBranchConfig],
       });
-      const build = await factory.build({
-        branch: site.demoBranch,
-        site,
-      });
-      expect(buildViewLink(build, updatedSite)).to.eql(`${demoDomain}/`);
-    });
-
-    describe('should return configured domain', () => {
-      it('build.url does not exist', async () => {
-        const build = await factory.build({
-          branch: 'other',
-          site,
-        });
-        expect(buildViewLink(build, site)).to.equal(`${buildUrl(build, site)}/`);
-      });
-
-      it('build.url does exist', async () => {
-        const build = await factory.build({
-          branch: 'other',
-          site,
-          url: 'https://the.url',
-        });
-        expect(buildViewLink(build, site)).to.equal(`${build.url}/`);
-      });
+      expect(buildUrl(build, updatedSite)).to.eql(
+        `https://${site.awsBucketName}.${proxyDomain}/preview/${site.owner}/${site.repository}/${branch}/`,
+      );
     });
   });
 });

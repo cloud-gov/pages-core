@@ -77,7 +77,7 @@
           <LabeledItem label="completed at" value={formatDateTime(build.completedAt, true)} title={formatDateTime(build.completedAt)} />
           <LabeledItem label="source" value={build.source} />
           <div>
-            <ExternalLink href={build.viewLink}>Live</ExternalLink>
+            <ExternalLink href={build.url}>Live</ExternalLink>
             <ExternalLink
               icon="github"
               href="https://github.com/{build.site.owner}/{build.site.repository}">

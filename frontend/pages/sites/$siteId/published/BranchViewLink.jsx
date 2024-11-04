@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { SITE } from '../propTypes';
-import { IconView } from './icons';
-import globals from '../globals';
+import { SITE } from '@propTypes';
+import globals from '@globals';
 
 // Based on the site's related site branch configs and domains
 // This function determines the link for a built branch
@@ -32,17 +30,11 @@ const getViewLink = (branch, site) => {
   return `https://${domain.names.split(',')[0]}`;
 };
 
-export const BranchViewLink = ({ branchName, site, showIcon }) => {
+export const BranchViewLink = ({ branchName, site }) => {
   const domain = getViewLink(branchName, site);
 
   return (
-    <a
-      href={domain}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={showIcon ? 'view-site-link' : ''}
-    >
-      {showIcon && <IconView />}
+    <a href={domain} target="_blank" rel="noopener noreferrer">
       View site preview
     </a>
   );
@@ -51,11 +43,5 @@ export const BranchViewLink = ({ branchName, site, showIcon }) => {
 BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
   site: SITE.isRequired,
-  showIcon: PropTypes.bool,
 };
-
-BranchViewLink.defaultProps = {
-  showIcon: false,
-};
-
-export default connect()(BranchViewLink);
+export default BranchViewLink;

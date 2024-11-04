@@ -133,6 +133,12 @@ const beforeValidate = (build) => {
 const sanitizeCompleteJobErrorMessage = (message) =>
   message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
+async function beforeCreate(build) {
+  const { Site, SiteBranchConfig, Domain } = this.sequelize.models;
+  const site = await Site.findByPk(build.site, { include: [SiteBranchConfig, Domain] });
+  build.url = buildUrl(build, site);
+}
+
 const jobErrorMessage = (message = 'An unknown error occurred') =>
   sanitizeCompleteJobErrorMessage(message);
 
@@ -151,10 +157,6 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
 
   if (build.canComplete(buildStatus.status)) {
     atts.completedAt = timestamp;
-  }
-
-  if (buildStatus.status === States.Success) {
-    atts.url = buildUrl(build, site);
   }
 
   if (build.canStart(buildStatus.status)) {
@@ -318,6 +320,7 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'build',
       hooks: {
         beforeValidate,
+        beforeCreate,
       },
       paranoid: true,
     },

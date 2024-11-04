@@ -250,7 +250,7 @@ describe('buildTaskRunner', () => {
         branch: siteBranchConfig.branch,
       });
       const task = await factory.buildTask({ build });
-      const domain = await factory.domain.create({
+      await factory.domain.create({
         siteId: site.id,
         siteBranchConfigId: siteBranchConfig.id,
         state: 'provisioned',
@@ -259,7 +259,6 @@ describe('buildTaskRunner', () => {
       const rawTask = taskWithIncludes.get({
         plain: true,
       });
-      rawTask.Build.url = `https://${domain.names.split(',')[0]}`;
       sinon.stub(BuildTaskQueue, 'setupTaskEnv').resolves({
         buildTask: taskWithIncludes,
         ...jobData,

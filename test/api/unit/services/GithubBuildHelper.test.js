@@ -5,7 +5,7 @@ const config = require('../../../../config');
 const { Domain, Site, SiteBranchConfig, User } = require('../../../../api/models');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
-const { buildViewLink } = require('../../../../api/utils/build');
+const { buildUrl } = require('../../../../api/utils/build');
 const GitHub = require('../../../../api/services/GitHub');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 
@@ -770,6 +770,14 @@ describe('GithubBuildHelper', () => {
         await build.update({
           branch: 'preview-branch',
         });
+
+        await build.reload();
+
+        // this depends on branch so we update twice
+        await build.update({
+          url: buildUrl(build, site),
+        });
+
         const repoNock = githubAPINocks.repo({
           accessToken: user.githubAccessToken,
           owner: site.owner,
@@ -780,7 +788,7 @@ describe('GithubBuildHelper', () => {
           owner: site.owner,
           repo: site.repository,
           sha: clonedCommitSha,
-          targetURL: buildViewLink(build, site),
+          targetURL: buildUrl(build, site),
         });
 
         await build.reload({
@@ -791,6 +799,7 @@ describe('GithubBuildHelper', () => {
             },
           ],
         });
+
         await GithubBuildHelper.reportBuildStatus(build);
         expect(repoNock.isDone()).to.be.true;
         expect(statusNock.isDone()).to.be.true;

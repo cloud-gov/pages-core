@@ -296,7 +296,7 @@ describe('Build model', () => {
           expect(build.completedAt.getTime()).to.eql(site.publishedAt.getTime());
           const url = [
             `https://${site.awsBucketName}.${config.app.proxyDomain}`,
-            `/preview/${site.owner}/${site.repository}/${build.branch}`,
+            `/preview/${site.owner}/${site.repository}/${build.branch}/`,
           ].join('');
           expect(build.url).to.eql(url);
         });

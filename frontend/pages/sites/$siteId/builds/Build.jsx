@@ -8,7 +8,7 @@ import buildActions from '@actions/buildActions';
 
 import GithubBuildBranchLink from '@shared/GithubBuildBranchLink';
 import GithubBuildShaLink from '@shared/GithubBuildShaLink';
-import BranchViewLink from '@shared/BranchViewLink';
+import { IconView } from '@shared/icons';
 import {
   IconCheckCircle,
   IconClock,
@@ -207,12 +207,15 @@ const Build = ({ build, latestForBranch, showBuildTasks = false, site }) => {
       <td data-title="Results" className="table-actions">
         {latestForBranch && build.state === 'success' && (
           <p className="site-link">
-            <BranchViewLink
-              branchName={build.branch}
-              site={site}
-              showIcon
-              completedAt={build.completedAt}
-            />
+            <a
+              href={build.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={'view-site-link'}
+            >
+              <IconView />
+              View site preview
+            </a>
           </p>
         )}
         {latestForBranch && ['error', 'success'].includes(build.state) && (
