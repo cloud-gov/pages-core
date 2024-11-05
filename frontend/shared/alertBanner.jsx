@@ -23,7 +23,13 @@ const genericErrorMsg = (
 
 const cloudDotGovErrorRegex = /^404 Not Found: Requested route \('.*'\) does not exist./;
 
-const AlertBanner = ({ children, header, message, status, alertRole }) => {
+const AlertBanner = ({
+  children = null,
+  header = null,
+  message = null,
+  status = 'info',
+  alertRole = true,
+}) => {
   if (!message) {
     return null;
   }
@@ -65,14 +71,6 @@ AlertBanner.propTypes = {
    */
 
   alertRole: PropTypes.bool,
-};
-
-AlertBanner.defaultProps = {
-  message: null,
-  status: 'info',
-  children: null,
-  alertRole: true,
-  header: null,
 };
 
 export default AlertBanner;

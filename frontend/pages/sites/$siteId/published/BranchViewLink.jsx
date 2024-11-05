@@ -44,4 +44,5 @@ BranchViewLink.propTypes = {
   branchName: PropTypes.string.isRequired,
   site: SITE.isRequired,
 };
+
 export default BranchViewLink;

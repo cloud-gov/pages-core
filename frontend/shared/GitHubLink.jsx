@@ -9,16 +9,15 @@ const GitHubLink = ({
   owner,
   repository,
   text,
-  branch,
-  sha,
-  icon,
+  branch = null,
+  sha = null,
+  icon = 'repo',
   isButton = false,
-  ...props
 }) => {
   const baseHref = `${BASE}/${owner}/${repository}`;
 
-  let { title } = props;
   let href = baseHref;
+  let title = 'View repository on GitHub';
 
   if (branch) {
     href = `${baseHref}/tree/${encodeURIComponent(branch)}`;
@@ -64,16 +63,7 @@ GitHubLink.propTypes = {
   branch: PropTypes.string,
   isButton: PropTypes.bool,
   sha: PropTypes.string,
-  title: PropTypes.string,
   icon: PropTypes.string,
-};
-
-GitHubLink.defaultProps = {
-  branch: null,
-  isButton: false,
-  sha: null,
-  icon: 'repo',
-  title: 'View repository on GitHub',
 };
 
 export default GitHubLink;

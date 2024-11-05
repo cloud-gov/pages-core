@@ -65,6 +65,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.mocha,
+        ...globals.jest,
         global: false,
         process: false,
       },
