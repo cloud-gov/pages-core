@@ -9,7 +9,7 @@ const { getFeatureFlags } = require('./webpack-utils');
 
 const { NODE_ENV } = process.env;
 const isDev = NODE_ENV === 'development';
-const outputPath = isDev ? 'dist' : 'public';
+const outputPath = 'public';
 const jsDirectory = isDev ? '' : 'js/';
 const resourceFilename = isDev
   ? 'images/[name][ext]'
@@ -17,14 +17,6 @@ const resourceFilename = isDev
 const mode = isDev ? NODE_ENV : 'production';
 const devtool = isDev ? 'inline-source-map' : undefined;
 const stats = isDev ? 'minimal' : 'none';
-const devServer = isDev
-  ? {
-      static: {
-        directory: path.join(__dirname, 'dist'),
-        publicPath: '/',
-      },
-    }
-  : {};
 
 // Decide on how to use this later.
 // const bundleAnalyzer = isDev && new BundleAnalyzerPlugin({
@@ -111,7 +103,6 @@ module.exports = {
     report: './frontend/mainReport.jsx',
   },
   devtool,
-  devServer,
   stats,
   output: {
     filename: `${jsDirectory}[name].js`,

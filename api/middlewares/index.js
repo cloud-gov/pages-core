@@ -1,7 +1,6 @@
 const authorize = require('./authorize');
 const cacheControl = require('./cache-control');
 const csrfProtection = require('./csrf-protection');
-const devMiddleware = require('./dev-middleware');
 const ensureAuthenticated = require('./ensure-authenticated');
 const ensureOrigin = require('./ensure-origin');
 const errorHandler = require('./error-handler');
@@ -15,7 +14,6 @@ module.exports = {
   authorize,
   cacheControl,
   csrfProtection,
-  devMiddleware,
   ensureAuthenticated,
   ensureOrigin,
   errorHandler,
