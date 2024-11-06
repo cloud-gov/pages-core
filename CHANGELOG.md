@@ -1,3 +1,16 @@
+## 0.13.3 (2024-11-06)
+
+### Fixed
+
+- use single build url upon creation (#4323)
+
+### Maintenance
+
+- Decouple local app frontend build #4649
+- start rtl transition (#4635)
+- Run prettier formatting on codebase
+- Update linting and formatting
+
 ## 0.13.2 (2024-10-28)
 
 ### Maintenance
