@@ -17,6 +17,8 @@ public/img/*
 public/uswds3/*
 !public/uswds3/.keep
 public/fonts/*
+public/bundle.js
+public/report.js
 webpack-manifest.json
 webpackAssets
 public/stats.json

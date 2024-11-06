@@ -14,7 +14,6 @@ const adminApi = require('../admin');
 const externalAuth = require('../external-auth');
 const {
   cacheControl,
-  devMiddleware,
   errorHandler,
   parseJson,
   xssProtection,
@@ -24,8 +23,6 @@ const responses = require('../responses');
 const passport = require('../services/passport');
 const router = require('../routers');
 const sessionConfig = require('./sessionConfig');
-
-const { NODE_ENV } = process.env;
 
 function randomNonce(_, res, next) {
   res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
@@ -37,12 +34,6 @@ function configureViews(app) {
     autoescape: true,
     express: app,
   });
-}
-
-function maybeUseDevMiddleware(app) {
-  if (NODE_ENV === 'development') {
-    app.use(devMiddleware());
-  }
 }
 
 function setUserInLocals(req, res, next) {
@@ -84,7 +75,6 @@ function init(app) {
   const main = express();
   main.disable('x-powered-by');
   configureViews(main);
-  maybeUseDevMiddleware(main);
   main.use(session(sessionConfig));
   main.use(passport.initialize());
   main.use(passport.session());
