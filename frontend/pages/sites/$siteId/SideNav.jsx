@@ -20,6 +20,7 @@ const SideNav = ({ config, siteId }) => (
   >
     <ul className="usa-sidenav-list usa-list--unstyled">
       {config.map((conf) => {
+        // eslint-disable-next-line import/namespace
         const IconComponent = icons[conf.icon];
         return (
           <li className="margin-y-2" key={conf.route}>

@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { hasOrgs } from '../selectors/organization';
 
 const validAddRepoSiteForm = ({ repoOrganizationId, repoUrl }, { organizations }) => {
@@ -30,7 +30,7 @@ const validBasicAuthPassword = (s) =>
 
 function isValidYaml(yamlString) {
   try {
-    yaml.load(yamlString);
+    load(yamlString);
   } catch (_) {
     // for Sequelize validators, we need to throw an error
     // on invalid values
