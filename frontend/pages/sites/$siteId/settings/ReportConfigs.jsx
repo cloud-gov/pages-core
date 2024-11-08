@@ -270,7 +270,7 @@ function ReportConfigs({ siteId: id }) {
               target="_blank"
               rel="noopener noreferrer"
               title="Pages documentation on site reports"
-              href="https://cloud.gov/pages/documentation/automated-site-reports/#configuration"
+              href="https://cloud.gov/pages/documentation/automated-site-reports/#configuration#configuration"
             >
               documentation
             </a>

@@ -1,14 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { severity } from '@util/reports';
+import api from '@util/federalistApi';
+import notificationActions from '@actions/notificationActions';
+
 import ScanFinding from './ScanFinding';
 
-const ScanFindings = ({ count, groupedFindings, scanType, siteId }) => {
-  const groupKey = scanType === 'zap' ? 'riskCode' : 'name';
+const ScanFindings = ({
+  count,
+  groupedFindings,
+  siteId,
+  sbtId,
+  sbtType,
+  sbtCustomRules,
+}) => {
+  const scanGroup = sbtType === 'owasp-zap' ? 'zap' : 'a11y';
+  const groupKey = scanGroup === 'zap' ? 'riskCode' : 'name';
+
+  const [customerRules, setCustomerRules] = useState(sbtCustomRules);
+
+  function addNewRule(ruleId) {
+    const newRule = { id: ruleId, type: sbtType };
+    setCustomerRules(customerRules.concat([newRule]));
+  }
+
+  function deleteRule(ruleId) {
+    const newRules = customerRules.filter((r) => r.id !== ruleId);
+    setCustomerRules(newRules);
+  }
+
+  useEffect(() => {
+    api
+      .updateSiteBuildTask(siteId, sbtId, { rules: customerRules }, '?reportsuppression')
+      .then(() => notificationActions.success('Successfully saved report configuration.'))
+      .catch(() => notificationActions.success('Error saving report configuration.'));
+  }, [customerRules]);
+
   if (count && groupedFindings) {
     return (
       <>
-        {severity[scanType].map(({ [groupKey]: group, label, color }, groupIndex) => (
+        {severity[scanGroup].map(({ [groupKey]: group, label, color }, groupIndex) => (
           <React.Fragment key={group}>
             {groupedFindings[group] && groupedFindings[group]?.length > 0 && (
               <>
@@ -31,8 +62,11 @@ const ScanFindings = ({ count, groupedFindings, scanType, siteId }) => {
                       groupColor={color}
                       groupLabel={label}
                       groupIndex={groupIndex}
-                      scanType={scanType}
                       siteId={siteId}
+                      sbtType={sbtType}
+                      customerRules={customerRules}
+                      addNewRule={addNewRule}
+                      deleteRule={deleteRule}
                     />
                   ))}
                 </div>
@@ -49,8 +83,10 @@ const ScanFindings = ({ count, groupedFindings, scanType, siteId }) => {
 ScanFindings.propTypes = {
   count: PropTypes.number.isRequired,
   groupedFindings: PropTypes.object.isRequired,
-  scanType: PropTypes.string.isRequired,
   siteId: PropTypes.number.isRequired,
+  sbtId: PropTypes.number.isRequired,
+  sbtCustomRules: PropTypes.array,
+  sbtType: PropTypes.string.isRequired,
 };
 
 export default ScanFindings;

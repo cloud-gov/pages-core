@@ -40,7 +40,7 @@ function isValidYaml(yamlString) {
   return true;
 }
 
-export default {
+export {
   isValidYaml,
   validAddRepoSiteForm,
   validBranchName,

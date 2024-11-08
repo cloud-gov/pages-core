@@ -361,8 +361,8 @@ export default {
     return request(`/site/${siteId}/task`);
   },
 
-  updateSiteBuildTask(siteId, taskId, metadata) {
-    return request(`/site/${siteId}/task/${taskId}`, {
+  updateSiteBuildTask(siteId, taskId, metadata, query = '') {
+    return request(`/site/${siteId}/task/${taskId}${query}`, {
       method: 'PUT',
       data: {
         metadata,
