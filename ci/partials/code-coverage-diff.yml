@@ -1,0 +1,15 @@
+platform: linux
+inputs:
+  - name: src
+  - name: pipeline-tasks
+outputs: [name: src]
+params:
+  GH_EMAIL: ((pages-operations-github-user-info.email))
+  GH_USERNAME: ((pages-operations-github-user-info.username))
+  GH_BOT_GPG_KEY: ((pages-operations-github-user-gpg.private_key))
+  GH_BOT_SSH_KEY: ((pages-gpg-operations-github-sshkey.private_key))
+  GH_BOT_GPG_TRUST: ((pages-operations-github-user-gpg-trust))
+  GH_TOKEN: ((pages-operations-ci-github-token))
+run:
+  dir: src
+  path: ci/tasks/code-coverage-diff.sh
