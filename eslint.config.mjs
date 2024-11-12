@@ -1,3 +1,4 @@
+import path from 'node:path';
 import globals from 'globals';
 import pluginJs from '@eslint/js';
 import pluginReact from 'eslint-plugin-react';
@@ -50,9 +51,15 @@ export default [
   },
   {
     files: ['frontend/**/*.{js,jsx}'],
+    ...importPlugin.flatConfigs.recommended,
     settings: {
       react: {
         version: 'detect',
+      },
+      'import/resolver': {
+        webpack: {
+          config: path.resolve('.', './webpack.config.js'),
+        },
       },
     },
     languageOptions: {
@@ -73,7 +80,11 @@ export default [
   },
   {
     files: ['test/**/*.{js,jsx}', '**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+    ...importPlugin.flatConfigs.recommended,
     ...testingLibrary.configs['flat/react'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+    },
   },
   pluginReact.configs.flat['jsx-runtime'],
   pluginReact.configs.flat.recommended,
@@ -86,6 +97,11 @@ export default [
     settings: {
       react: {
         version: 'detect',
+      },
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        },
       },
     },
     rules: {

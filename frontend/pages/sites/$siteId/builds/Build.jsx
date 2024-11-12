@@ -8,7 +8,6 @@ import buildActions from '@actions/buildActions';
 
 import GithubBuildBranchLink from '@shared/GithubBuildBranchLink';
 import GithubBuildShaLink from '@shared/GithubBuildShaLink';
-import { IconView } from '@shared/icons';
 import {
   IconCheckCircle,
   IconClock,
@@ -17,6 +16,7 @@ import {
   IconX,
   IconRebuild,
   IconReport,
+  IconView,
 } from '@shared/icons';
 
 import { SITE, BUILD } from '@propTypes';

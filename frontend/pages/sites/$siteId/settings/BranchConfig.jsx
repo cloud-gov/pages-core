@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import yaml from 'js-yaml';
+import { dump } from 'js-yaml';
 import ExpandableArea from '@shared/ExpandableArea';
 import LoadingIndicator from '@shared/LoadingIndicator';
 import notificationActions from '@actions/notificationActions';
@@ -9,7 +9,7 @@ import { capitalize } from '@util';
 function formatConfig(config) {
   if (!config) return '';
 
-  return yaml.dump(config);
+  return dump(config);
 }
 
 function BranchConfig({ id, branch, config, context, handleUpdate, isExpanded }) {
