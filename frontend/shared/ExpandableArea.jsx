@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import shortid from 'shortid';
 
 // Based on the USWDS Accordion, but only ever has a single
 // item that can be expanded or collapsed
@@ -11,7 +10,10 @@ function ExpandableArea({
   children = null,
   isExpanded = false,
 }) {
-  const id = `expandable-area-${shortid.generate()}`;
+  // specifically don't generate this id with another library like nanoid
+  // https://github.com/ai/nanoid/?tab=readme-ov-file#usage
+  const partialId = useId();
+  const id = `expandable-area-${partialId}`;
   return (
     <div
       className={`usa-accordion ${bordered ? 'usa-accordion--bordered' : ''} width-full`}
