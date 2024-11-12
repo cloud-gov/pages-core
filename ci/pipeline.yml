@@ -364,6 +364,21 @@ jobs:
         on_failure: #@ slack_hook("failure", "Rotate site bucket keys")
         on_success: #@ slack_hook("success", ":arrows_counterclockwise: :key: Rotate site bucket keys")
 
+  #@ if/end env == 'dev':
+  - name: code-coverage-diff
+    plan:
+      - get: src
+        trigger: true
+        params:
+          integration_tool: checkout
+        passed:
+          - test-and-deploy-api-pages
+      - get: node
+      - get: pipeline-tasks
+      - task: code-coverage-diff
+        image: node
+        file: src/ci/partials/code-coverage-diff.yml
+
   #@ if/end env != 'production':
   - name: e2e-test
     plan:
