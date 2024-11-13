@@ -28,9 +28,12 @@ async function buildTasksScheduler(job) {
   const tasksToQueue = await Promise.all(
     siteBuildTasks.map(async (siteBuildTask) => {
       // always use the branch config with site context
-      const { branch } = siteBuildTask.Site.SiteBranchConfigs.find(
-        (sbc) => sbc.context === 'site',
-      );
+      const { branch } =
+        siteBuildTask.Site?.SiteBranchConfigs?.find((sbc) => sbc.context === 'site') ||
+        {};
+
+      if (!branch) return Promise.resolve(null);
+
       // find the latest build matching this branch
       // https://github.com/sequelize/sequelize/issues/7665
       const builds = await Build.findAll({
