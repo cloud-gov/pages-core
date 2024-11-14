@@ -120,6 +120,7 @@ module.exports = {
       '@pages': path.resolve(__dirname, 'frontend/pages'),
       '@globals': path.resolve(__dirname, 'frontend/globals'),
       '@propTypes': path.resolve(__dirname, 'frontend/propTypes'),
+      '@support': path.resolve(__dirname, 'frontend/support'),
     },
   },
   module: {

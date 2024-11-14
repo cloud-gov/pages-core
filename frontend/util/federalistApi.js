@@ -34,7 +34,13 @@ export default {
   request,
 
   fetchBuilds(site) {
-    return request(`site/${site.id}/build`);
+    return request(
+      `site/${site.id}/build`,
+      {},
+      {
+        handleHttpError: false,
+      },
+    );
   },
 
   fetchBuildLogs(build, offset = 0) {

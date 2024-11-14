@@ -3,7 +3,6 @@ import {
   buildsFetchStarted,
   buildsFetchStartedType,
   buildsReceived,
-  buildsReceivedType,
   buildRestarted,
   buildRestartedType,
 } from '../../../../frontend/actions/actionCreators/buildActions';
@@ -19,22 +18,6 @@ describe('buildActions actionCreators', () => {
 
     it('exports its type', () => {
       expect(buildsFetchStartedType).to.equal('BUILDS_FETCH_STARTED');
-    });
-  });
-
-  describe('builds received', () => {
-    it('constructs properly', () => {
-      const builds = ['🔧', '🔨', '⛏'];
-      const actual = buildsReceived(builds);
-
-      expect(actual).to.deep.equal({
-        type: buildsReceivedType,
-        builds,
-      });
-    });
-
-    it('exports its type', () => {
-      expect(buildsReceivedType).to.deep.equal('BUILDS_RECEIVED');
     });
   });
 

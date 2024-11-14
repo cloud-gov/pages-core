@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { useScannableBuild } from '@hooks/useScannableBuild';
 import { dateAndTimeSimple, duration, timeFrom } from '@util/datetime';
-import buildActions from '@actions/buildActions';
+import { useRebuild } from '@hooks/useBuilds';
 
 import GithubBuildBranchLink from '@shared/GithubBuildBranchLink';
 import GithubBuildShaLink from '@shared/GithubBuildShaLink';
@@ -18,11 +18,9 @@ import {
   IconReport,
   IconView,
 } from '@shared/icons';
+import CreateScanLink from './CreateScanLink';
 
 import { SITE, BUILD } from '@propTypes';
-
-import CreateBuildLink from './CreateBuildLink';
-import CreateScanLink from './CreateScanLink';
 
 function BuildLogsLink({ buildId, siteId }) {
   const cta = 'View build logs';
@@ -48,11 +46,18 @@ BuildLogsLink.propTypes = {
   siteId: PropTypes.number.isRequired,
 };
 
-const Build = ({ build, latestForBranch, showBuildTasks = false, site }) => {
+const Build = ({
+  build,
+  containerRef,
+  latestForBranch,
+  showBuildTasks = false,
+  site,
+}) => {
   const siteId = site.id;
   const buildHasBuildTasks = checkBuildHasBuildTasks(build);
   const isScannableBuild = checkIsScannableBuild(build, showBuildTasks, latestForBranch);
   const { isScanActionDisabled, startScan } = useScannableBuild(build);
+  const { isPending, rebuildBranch } = useRebuild(site.id, build.id, containerRef);
 
   const buildStateData = ({ state, error }) => {
     let messageStatusDoneIcon;
@@ -219,16 +224,15 @@ const Build = ({ build, latestForBranch, showBuildTasks = false, site }) => {
           </p>
         )}
         {latestForBranch && ['error', 'success'].includes(build.state) && (
-          <CreateBuildLink
-            handlerParams={{
-              buildId: build.id,
-              siteId,
-            }}
-            handleClick={buildActions.restartBuild}
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={rebuildBranch}
             className="usa-button small-button margin-top-1 rebuild-button"
           >
+            <IconRebuild />
             Rebuild
-          </CreateBuildLink>
+          </button>
         )}
       </td>
     </tr>
@@ -237,8 +241,8 @@ const Build = ({ build, latestForBranch, showBuildTasks = false, site }) => {
 
 Build.propTypes = {
   build: BUILD.isRequired,
-  // we're getting previewBuilds from the parent
-  latestForBranch: PropTypes.object.isRequired,
+  containerRef: PropTypes.object.isRequired,
+  latestForBranch: PropTypes.bool.isRequired,
   showBuildTasks: PropTypes.bool,
   site: SITE.isRequired,
 };
