@@ -11,4 +11,7 @@ module.exports = {
   userEnvVar: {
     key: 'shhhhhhhhhhh',
   },
+  rateLimiting: {
+    skip: () => true,
+  },
 };

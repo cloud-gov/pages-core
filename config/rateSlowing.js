@@ -5,5 +5,5 @@
 */
 module.exports = {
   delayAfter: 0,
-  delayMs: 0,
+  delayMs: () => 0,
 };
