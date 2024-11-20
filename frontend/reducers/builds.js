@@ -1,8 +1,4 @@
-import {
-  buildsFetchStartedType as BUILDS_FETCH_STARTED,
-  buildsReceivedType as BUILDS_RECEIVED,
-  buildRestartedType as BUILD_RESTARTED,
-} from '../actions/actionCreators/buildActions';
+import { buildRestartedType } from '../actions/actionCreators/buildActions';
 
 const initialState = {
   isLoading: false,
@@ -11,17 +7,7 @@ const initialState = {
 
 export default function builds(state = initialState, action) {
   switch (action.type) {
-    case BUILDS_FETCH_STARTED:
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case BUILDS_RECEIVED:
-      return {
-        isLoading: false,
-        data: action.builds || [],
-      };
-    case BUILD_RESTARTED:
+    case buildRestartedType:
       return {
         isLoading: false,
         data: [action.build, ...state.data],

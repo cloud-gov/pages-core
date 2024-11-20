@@ -11,6 +11,7 @@ module.exports = {
     '@actions(.*)$': '<rootDir>/frontend/actions$1',
     '@selectors(.*)$': '<rootDir>/frontend/selectors$1',
     '@util(.*)$': '<rootDir>/frontend/util$1',
+    '@support(.*)$': '<rootDir>/frontend/support$1',
   },
   testEnvironment: 'jsdom',
 };

@@ -12,7 +12,6 @@ describe('buildActions', () => {
   let buildFetchStartedActionCreator;
   let buildReceivedActionCreator;
   let buildRestartedActionCreator;
-  let fetchBuilds;
   let restartBuild;
   let alertSuccess;
 
@@ -48,31 +47,6 @@ describe('buildActions', () => {
         alertSuccess,
       },
     }).default;
-  });
-
-  it('fetchBuilds', (done) => {
-    const site = { id: '🎫' };
-    const builds = ['🔧', '🔨', '⛏'];
-    const buildsPromise = Promise.resolve(builds);
-    const startedAction = {
-      action: '🚦',
-    };
-    const receivedAction = {
-      action: '🏁',
-    };
-
-    fetchBuilds.withArgs(site).returns(buildsPromise);
-    buildsFetchStartedActionCreator.withArgs().returns(startedAction);
-    buildsReceivedActionCreator.withArgs(builds).returns(receivedAction);
-
-    const actual = fixture.fetchBuilds(site);
-
-    actual.then(() => {
-      expect(dispatch.calledTwice).to.be.true;
-      expect(dispatch.calledWith(startedAction)).to.be.true;
-      expect(dispatch.calledWith(receivedAction)).to.be.true;
-      done();
-    });
   });
 
   describe('restartBuild', () => {

@@ -1,5 +1,5 @@
 {
-  "include": ["frontend/**/*", "api/**/*"],
+  "include": ["frontend/**/*", "api/**/*", "test/frontend/support/data"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -10,7 +10,8 @@
       "@selectors/*": ["./frontend/selectors/*"],
       "@pages/*": ["./frontend/pages/*"],
       "@globals": ["./frontend/globals"],
-      "@propTypes": ["./frontend/propTypes"]
+      "@propTypes": ["./frontend/propTypes"],
+      "@support": ["./frontend/support"]
     }
   }
 }
