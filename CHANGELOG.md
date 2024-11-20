@@ -1,3 +1,24 @@
+## 0.14.0 (2024-11-20)
+
+### Added
+
+- allow rules to be suppressed from reports
+
+### Fixed
+
+- Site build polling and latest build branch
+- use single build url upon creation (#4323)
+
+### Maintenance
+
+- don't fail the scheduled worker with missing sites
+- Enable eslint-plugin-import for frontend and tests
+- add pr code coverage to ci (#4643)
+- Decouple local app frontend build #4649
+- start rtl transition (#4635)
+- Run prettier formatting on codebase
+- Update linting and formatting
+
 ## 0.13.2 (2024-10-28)
 
 ### Maintenance
