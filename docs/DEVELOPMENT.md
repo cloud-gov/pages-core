@@ -539,3 +539,25 @@ Additional information about a build can be sent back from [`pages-build-contain
    other: {} \\ other information from the build (e.g. file counts)
 }
 ```
+
+## Testing
+
+### Front-end
+
+Front-end tests are run via the [Jest](https://jestjs.io/) framework using [React Testing Library](https://testing-library.com/docs/react-testing-library/intro). Tests can be run using the following commands:
+
+```sh
+yarn test:rtl # runs all front-end tests
+yarn test:rtl:file example.test.jsx # runs a single test
+```
+
+Best practices for writing tests:
+- Tests should run against a single component, hook or utility file
+- Imported files or other necessary functions should be mocked as necessary to isolate tests against one component or function.
+  - In particular, tests should use `nock` to intercept and mock any HTTP requests associated with the function under test.
+- Test files are colocated with their code to test (i.e. `example.test.jsx` should be next to `example.jsx` in the file structure).
+- As much as possible, follow the [guiding principles](https://testing-library.com/docs/guiding-principles) of React Testing Library:
+  - Write tests to simulate how a user would interact with the application.
+  - Prefer click events to direct function calls
+  - [Query for elements](https://testing-library.com/docs/queries/about/#priority) based on role, label, or text before falling back to `test ids` (and never classes or ids)
+- Simulated data needed for tests ("fixtures") should be located outside the test file itself, except in the case of single values (e.g. fake `Build` model data should be in a separate file but having an inline variable like `const testText = 'sample-data'` is fine)
