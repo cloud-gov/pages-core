@@ -356,19 +356,19 @@ export default {
   },
 
   getBuildTaskTypes() {
-    return request('/tasks/types');
+    return request('tasks/types');
   },
 
   getDefaultBuildScanRules() {
-    return request('/tasks/default-rules');
+    return request('tasks/default-rules');
   },
 
   getSiteBuildTasks(siteId) {
-    return request(`/site/${siteId}/task`);
+    return request(`site/${siteId}/task`);
   },
 
   updateSiteBuildTask(siteId, taskId, metadata, query = '') {
-    return request(`/site/${siteId}/task/${taskId}${query}`, {
+    return request(`site/${siteId}/task/${taskId}${query}`, {
       method: 'PUT',
       data: {
         metadata,
@@ -382,7 +382,7 @@ export default {
 
   runScansForBuild(buildId) {
     return request(
-      `/build/${buildId}/task`,
+      `build/${buildId}/task`,
       { method: 'POST' },
       {
         handleHttpError: false,

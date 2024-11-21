@@ -99,4 +99,12 @@ module.exports = {
   userEnvVar: {
     key: 'shhhhhhhhhhh',
   },
+  rateLimiting: {
+    skip: () => true,
+  },
+  rateSlowing: {
+    validate: {
+      delayMs: false,
+    },
+  },
 };

@@ -33,7 +33,7 @@ services:
       NODE_ENV: development
       PORT: 1337
       PRODUCT: pages
-      UAA_HOST: http://localhost:9000
+      UAA_HOST: http://localhost:9001
       UAA_HOST_DOCKER_URL: http://uaa:8080
       USER_AUDITOR: federalist
       CLOUD_FOUNDRY_API_HOST: https://api.example.com
@@ -68,7 +68,7 @@ services:
       UAA_CLIENT_ID: pages-client
       UAA_CLIENT_SECRET: client-secret
       UAA_HOST_DOCKER_URL: http://uaa:8080
-      UAA_LOGIN_HOST: http://localhost:9000
+      UAA_LOGIN_HOST: http://localhost:9001
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin

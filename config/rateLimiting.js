@@ -5,4 +5,7 @@
 */
 module.exports = {
   max: 0,
+  validate: {
+    trustProxy: false,
+  },
 };

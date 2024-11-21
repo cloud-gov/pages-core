@@ -85,6 +85,6 @@ module.exports = {
   rateSlowing: {
     windowMs: 1 * 60 * 1000, // 1 minute window
     delayAfter: 25, // delay requests by delayMs after 25 are made in a window
-    delayMs: 500, // delay requests by 500 ms
+    delayMs: () => 500, // delay requests by 500 ms
   },
 };
