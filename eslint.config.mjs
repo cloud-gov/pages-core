@@ -22,6 +22,7 @@ export default [
   {
     ignores: [
       'test/frontend/**/*.{js,jsx}',
+      'rtl-test/**/*',
       'public/*',
       '!**/.eslintrc.*',
       'migrations',
