@@ -40,7 +40,6 @@
     "jsonwebtoken": "^9.0.2",
     "lodash.merge": "^4.6.2",
     "moment": "^2.29.2",
-    "node-schedule": "^2.1.1",
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-github": "^1.1.0",
