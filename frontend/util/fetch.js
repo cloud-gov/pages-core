@@ -1,5 +1,3 @@
-import 'whatwg-fetch';
-
 const defaultMethod = 'GET';
 const credentials = 'same-origin';
 
