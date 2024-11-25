@@ -107,7 +107,7 @@ If you are working on the front end of the application, the things you need to k
 1. It is built with `webpack`
 1. It lives in `/frontend`
 
-To analyze the contents of the front end JavaScript bundle, visit http://127.0.0.1:8888 while the application is running to see a visualization of the the bundle contents.
+To analyze the contents of the front end JavaScript bundle, visit http://localhost:8888 while the application is running to see a visualization of the the bundle contents.
 
 ### Deployment
 

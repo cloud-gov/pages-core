@@ -68,7 +68,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "build:dev": "NODE_ENV='development' --config webpack.config.js",
+    "build:dev": "NODE_ENV='development' webpack --config webpack.config.js",
     "build:test": "NODE_ENV='test' webpack --config webpack.config.js",
     "start": "node index.js",
     "start-workers": "node ./api/workers/index.js",
