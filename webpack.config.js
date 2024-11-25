@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const CopyPlugin = require('copy-webpack-plugin');
 const { getFeatureFlags } = require('./webpack-utils');
 
@@ -17,12 +17,6 @@ const resourceFilename = isDev
 const mode = isDev ? NODE_ENV : 'production';
 const devtool = isDev ? 'inline-source-map' : undefined;
 const stats = isDev ? 'minimal' : 'none';
-
-// Decide on how to use this later.
-// const bundleAnalyzer = isDev && new BundleAnalyzerPlugin({
-//   analyzerHost: '0.0.0.0',
-//   analyzerPort: '8888',
-// });
 
 const uswdsDist = './node_modules/@uswds/uswds/dist';
 
@@ -86,6 +80,15 @@ const plugins = [
     'PROXY_DOMAIN',
   ]),
 ];
+
+if (isDev) {
+  plugins.push(
+    new BundleAnalyzerPlugin({
+      analyzerHost: '0.0.0.0',
+      analyzerPort: '8888',
+    }),
+  );
+}
 
 if (!isDev) {
   plugins.push(
