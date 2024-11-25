@@ -44,11 +44,6 @@ function AddSite() {
 
   const navigate = useNavigate();
 
-  function onAddUserSubmit({ repoUrl }) {
-    const { owner, repository } = getOwnerAndRepo(repoUrl);
-    siteActions.addUserToSite({ owner, repository }, () => navigate('/sites'));
-  }
-
   function onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
     const { owner, repository } = getOwnerAndRepo(repoUrl);
     siteActions.addSite(
@@ -61,10 +56,6 @@ function AddSite() {
       navigate,
     );
   }
-
-  // select the function to use on form submit based on
-  // the showAddNewSiteFields flag
-  const formSubmitFunc = showAddNewSiteFields ? onCreateSiteSubmit : onAddUserSubmit;
 
   if (isLoading) {
     return <LoadingIndicator text="Creating your new site. Please wait..." />;
@@ -111,7 +102,7 @@ function AddSite() {
           }}
           organizations={organizations}
           showAddNewSiteFields={showAddNewSiteFields}
-          onSubmit={formSubmitFunc}
+          onSubmit={onCreateSiteSubmit}
         />
       </div>
       <div className="grid-col-12">

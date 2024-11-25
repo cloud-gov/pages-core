@@ -127,7 +127,7 @@ SiteBuildQueue.setupTaskEnv = async (buildId) => {
       {
         model: Site,
         required: true,
-        include: [UserEnvironmentVariable, User, SiteBranchConfig, Domain],
+        include: [UserEnvironmentVariable, SiteBranchConfig, Domain],
       },
     ],
   });

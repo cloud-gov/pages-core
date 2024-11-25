@@ -6,6 +6,7 @@ const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require('../../../../api/authorizers/site');
 const { Role } = require('../../../../api/models');
 const siteErrors = require('../../../../api/responses/siteErrors');
+const { createSiteUserOrg } = require('../../support/site-user');
 
 describe('Site authorizer', () => {
   describe('.create(user, params)', () => {
@@ -27,15 +28,7 @@ describe('Site authorizer', () => {
     });
 
     it('should resolve for user with organizations', async () => {
-      const [user, org, role] = await Promise.all([
-        factory.user(),
-        factory.organization.create(),
-        Role.findOne({
-          where: {
-            name: 'user',
-          },
-        }),
-      ]);
+      const { user, org } = await createSiteUserOrg();
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
         repository: crypto.randomBytes(3).toString('hex'),
@@ -44,11 +37,6 @@ describe('Site authorizer', () => {
         organizationId: org.id,
       };
 
-      await org.addUser(user, {
-        through: {
-          roleId: role.id,
-        },
-      });
       const expected = await authorizer.create(user, params);
 
       return expect(expected).to.be.undefined;
@@ -74,15 +62,7 @@ describe('Site authorizer', () => {
 
     it(`should throw an error for user with organizations
         and no organizationId specified`, async () => {
-      const [user, org, role] = await Promise.all([
-        factory.user(),
-        factory.organization.create(),
-        Role.findOne({
-          where: {
-            name: 'user',
-          },
-        }),
-      ]);
+      const { user } = await createSiteUserOrg();
       const params = {
         owner: crypto.randomBytes(3).toString('hex'),
         repository: crypto.randomBytes(3).toString('hex'),
@@ -90,11 +70,6 @@ describe('Site authorizer', () => {
         engine: 'jekyll',
       };
 
-      await org.addUser(user, {
-        through: {
-          roleId: role.id,
-        },
-      });
       const error = await authorizer.create(user, params).catch((err) => err);
 
       expect(error).to.be.throw;
@@ -134,16 +109,6 @@ describe('Site authorizer', () => {
   });
 
   describe('.findOne(user, site)', () => {
-    it('should resolve if the user is associated with the site', async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: Promise.all([user]),
-      });
-      const expected = await authorizer.findOne(user, site);
-
-      return expect(expected.id).to.equal(site.id);
-    });
-
     it('should reject if the user is not associated with the site', async () => {
       const [user, site] = await Promise.all([factory.user(), factory.site()]);
       const error = await authorizer.findOne(user, site).catch((err) => err);
@@ -154,12 +119,7 @@ describe('Site authorizer', () => {
     context('site that belongs to an inactive organization', () => {
       it(`should resolve if the site is associated
           with the active organization`, async () => {
-        const org = await factory.organization.create();
-        const user = await factory.user();
-        const site = await factory.site({
-          users: Promise.all([user]),
-          organizationId: org.id,
-        });
+        const { site, user } = await createSiteUserOrg();
         const expected = await authorizer.findOne(user, site);
 
         return expect(expected.id).to.equal(site.id);
@@ -167,15 +127,8 @@ describe('Site authorizer', () => {
 
       it(`should reject if the site is associated
           with the inactive organization`, async () => {
-        const org = await factory.organization.create({
-          isActive: false,
-        });
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site({
-            organizationId: org.id,
-          }),
-        ]);
+        const { site, user, org } = await createSiteUserOrg();
+        await org.update({ isActive: false });
         const error = await authorizer.findOne(user, site).catch((err) => err);
 
         expect(error).to.be.throw;
@@ -184,22 +137,15 @@ describe('Site authorizer', () => {
     });
     context('site is inactive', () => {
       it('should resolve if the site is active', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: Promise.all([user]),
-        });
+        const { site, user } = await createSiteUserOrg();
         const expected = await authorizer.findOne(user, site);
         expect(expected.isActive).to.be.true;
         return expect(expected.id).to.equal(site.id);
       });
 
       it('should reject if the site is inactive', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site({
-            isActive: false,
-          }),
-        ]);
+        const { site, user } = await createSiteUserOrg();
+        await site.update({ isActive: false });
         const error = await authorizer.findOne(user, site).catch((err) => err);
 
         expect(error).to.be.throw;
@@ -209,16 +155,6 @@ describe('Site authorizer', () => {
   });
 
   describe('.update(user, site)', () => {
-    it('should resolve if the user is associated with the site', async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: Promise.all([user]),
-      });
-      const expected = await authorizer.update(user, site);
-
-      return expect(expected.id).to.equal(site.id);
-    });
-
     it('should reject if the user is not associated with the site', async () => {
       const [user, site] = await Promise.all([factory.user(), factory.site()]);
       const error = await authorizer.update(user, site).catch((err) => err);
@@ -229,12 +165,7 @@ describe('Site authorizer', () => {
     context('site that belongs to an inactive organization', () => {
       it(`should resolve if the site is associated
           with the active organization`, async () => {
-        const org = await factory.organization.create();
-        const user = await factory.user();
-        const site = await factory.site({
-          users: Promise.all([user]),
-          organizationId: org.id,
-        });
+        const { site, user } = await createSiteUserOrg();
         const expected = await authorizer.update(user, site);
 
         return expect(expected.id).to.equal(site.id);
@@ -242,15 +173,9 @@ describe('Site authorizer', () => {
 
       it(`should reject if the site is associated
           with the inactive organization`, async () => {
-        const org = await factory.organization.create({
-          isActive: false,
-        });
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site({
-            organizationId: org.id,
-          }),
-        ]);
+        const { site, user, org } = await createSiteUserOrg();
+        await org.update({ isActive: false });
+
         const error = await authorizer.update(user, site).catch((err) => err);
 
         expect(error).to.be.throw;
@@ -259,10 +184,7 @@ describe('Site authorizer', () => {
     });
     context('site is active', () => {
       it('should resolve if the site is active', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: Promise.all([user]),
-        });
+        const { site, user } = await createSiteUserOrg();
         const expected = await authorizer.update(user, site);
         expect(expected.isActive).to.be.true;
 
@@ -270,12 +192,8 @@ describe('Site authorizer', () => {
       });
 
       it('should reject if the site is inactive', async () => {
-        const [user, site] = await Promise.all([
-          factory.user(),
-          factory.site({
-            isActive: false,
-          }),
-        ]);
+        const { site, user } = await createSiteUserOrg();
+        await site.update({ isActive: false });
         const error = await authorizer.update(user, site).catch((err) => err);
 
         expect(error).to.be.throw;
@@ -292,10 +210,7 @@ describe('Site authorizer', () => {
       nock.cleanAll();
     });
     it('should resolve if the user is associated with the site', async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: Promise.all([user]),
-      });
+      const { site, user } = await createSiteUserOrg();
 
       githubAPINocks.repo({
         owner: site.owner,
@@ -326,10 +241,7 @@ describe('Site authorizer', () => {
 
     it(`should reject if the user is associated
         with the site but not an admin`, async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: Promise.all([user]),
-      });
+      const { site, user } = await createSiteUserOrg();
 
       githubAPINocks.repo({
         owner: site.owner,
@@ -354,10 +266,7 @@ describe('Site authorizer', () => {
 
     it(`should accept if the user is associated
         with the site but site does not exist`, async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: Promise.all([user]),
-      });
+      const { site, user } = await createSiteUserOrg();
 
       githubAPINocks.repo({
         owner: site.owner,
@@ -371,10 +280,7 @@ describe('Site authorizer', () => {
 
     it(`should reject if the user is associated
         with the site but returns error`, async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: Promise.all([user]),
-      });
+      const { site, user } = await createSiteUserOrg();
 
       githubAPINocks.repo({
         owner: site.owner,

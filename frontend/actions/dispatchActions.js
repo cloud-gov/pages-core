@@ -6,8 +6,6 @@ import {
   siteAdded as createSiteAddedAction,
   siteUpdated as createSiteUpdatedAction,
   siteDeleted as createSiteDeletedAction,
-  siteUserAdded as createSiteUserAddedAction,
-  siteUserRemoved as siteUserRemovedAction,
   siteBasicAuthSaved as createSiteBasicAuthSavedAction,
   siteBasicAuthRemoved as createSiteBasicAuthRemovedAction,
 } from './actionCreators/siteActions';
@@ -36,14 +34,6 @@ const dispatchSiteDeletedAction = (siteId) => {
   dispatch(createSiteDeletedAction(siteId));
 };
 
-const dispatchUserAddedToSiteAction = (site) => {
-  dispatch(createSiteUserAddedAction(site));
-};
-
-const dispatchUserRemovedFromSiteAction = (site) => {
-  dispatch(siteUserRemovedAction(site));
-};
-
 const dispatchShowAddNewSiteFieldsAction = () => {
   dispatch(createShowAddNewSiteFieldsAction());
 };
@@ -66,8 +56,6 @@ export {
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
-  dispatchUserAddedToSiteAction,
-  dispatchUserRemovedFromSiteAction,
   dispatchShowAddNewSiteFieldsAction,
   dispatchHideAddNewSiteFieldsAction,
   dispatchResetFormAction,

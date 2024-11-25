@@ -1,4 +1,3 @@
-const userFactory = require('./user');
 const { Site, SiteBranchConfig } = require('../../../../api/models');
 const { generateSubdomain } = require('../../../../api/utils');
 
@@ -14,12 +13,6 @@ function generateUniqueAtts() {
 }
 
 function makeAttributes(overrides = {}) {
-  let { users } = overrides;
-
-  if (users === undefined) {
-    users = Promise.all([userFactory()]);
-  }
-
   const { owner, repository } = generateUniqueAtts();
 
   return {
@@ -31,7 +24,6 @@ function makeAttributes(overrides = {}) {
     awsBucketRegion: 'us-gov-west-1',
     defaultBranch: 'main',
     subdomain: generateSubdomain(owner, repository),
-    users,
     ...overrides,
   };
 }
@@ -78,22 +70,16 @@ async function addSiteBranchConfigs(site) {
 
 function site(overrides, options = {}) {
   let site;
-  let users;
 
   return Promise.props(makeAttributes(overrides))
     .then((attributes) => {
-      users = attributes.users.slice();
-      delete attributes.users;
-
       return Site.create(attributes);
     })
     .then(async (siteModel) => {
       site = siteModel;
-      const userPromises = users.map((user) => site.addUser(user));
       if (!options.noSiteBranchConfig) {
         await addSiteBranchConfigs(site);
       }
-      return Promise.all(userPromises);
     })
     .then(() =>
       Site.findByPk(site.id, {

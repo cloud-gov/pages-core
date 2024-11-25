@@ -4,6 +4,7 @@ const config = require('../../../../config');
 const factory = require('../../support/factory');
 const GitHub = require('../../../../api/services/GitHub');
 const githubAPINocks = require('../../support/githubAPINocks');
+const { createSiteUserOrg } = require('../../support/site-user');
 
 describe('GitHub', () => {
   afterEach(() => expect(nock.isDone()).to.be.true);
@@ -580,57 +581,42 @@ describe('GitHub', () => {
   });
 
   describe('.getBranch', () => {
-    let promised;
+    let user;
+    let site;
     let mockGHRequest;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       mockGHRequest = null;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-      });
-
-      promised = Promise.props({
-        user: userPromise,
-        site: sitePromise,
-      });
+      ({ site, user } = await createSiteUserOrg());
     });
 
-    it('returns a branch based on the supplied parameters', (done) => {
-      promised
-        .then((values) => {
-          const { owner, repository } = values.site;
-          const branch = 'main';
+    it('returns a branch based on the supplied parameters', async () => {
+      const { owner, repository } = site;
+      const branch = 'main';
 
-          mockGHRequest = githubAPINocks.getBranch({
-            owner,
-            repo: repository,
-            branch,
-          });
+      mockGHRequest = githubAPINocks.getBranch({
+        owner,
+        repo: repository,
+        branch,
+      });
 
-          return GitHub.getBranch(values.user, owner, repository, branch);
-        })
-        .then((branchInfo) => {
-          expect(branchInfo).to.exist;
-          expect(branchInfo.name).to.exist;
-          expect(branchInfo.commit).to.exist;
-          expect(mockGHRequest.isDone()).to.be.true;
-          done();
-        })
-        .catch(done);
+      const branchInfo = await GitHub.getBranch(user, owner, repository, branch);
+
+      expect(branchInfo).to.exist;
+      expect(branchInfo.name).to.exist;
+      expect(branchInfo.commit).to.exist;
+      expect(mockGHRequest.isDone()).to.be.true;
     });
 
     it('returns an error if branch is not defined', (done) => {
-      promised
-        .then((values) => {
-          const { owner, repository } = values.site;
+      const { owner, repository } = site;
 
-          return GitHub.getBranch(values.user, owner, repository).catch((err) => {
-            // octokit no longer validates the arguments client side so the error
-            // we are receiving here is actually the missing nock...
-            expect(err.status).to.equal(500);
-            done();
-          });
+      GitHub.getBranch(user, owner, repository)
+        .catch((err) => {
+          // octokit no longer validates the arguments client side so the error
+          // we are receiving here is actually the missing nock...
+          expect(err.status).to.equal(500);
+          done();
         })
         .catch(done);
     });

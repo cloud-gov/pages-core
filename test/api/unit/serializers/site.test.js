@@ -46,36 +46,8 @@ describe('SiteSerializer', () => {
         .catch(done);
     });
 
-    it('excludes users without a federalist account', (done) => {
-      const authUserCount = 3;
-      const nonGithubUser = factory.user({
-        githubAccessToken: null,
-      });
-      const otherUsers = Array(authUserCount)
-        .fill(0)
-        .map(() => factory.user());
-
-      Promise.all(otherUsers.concat(nonGithubUser))
-        .then((users) =>
-          factory.site({
-            users,
-          }),
-        )
-        .then(SiteSerializer.serialize)
-        .then((object) => {
-          expect(object.users.length).to.equal(authUserCount);
-          done();
-        })
-        .catch(done);
-    });
-
     it('includes organization name when associated to site', async () => {
-      const site = await factory.site({
-        basicAuth: {
-          username: 'username',
-          password: 'password',
-        },
-      });
+      const site = await factory.site();
       const org = await factory.organization.create();
       await org.addSite(site.id);
       await site.reload();
@@ -83,7 +55,6 @@ describe('SiteSerializer', () => {
 
       const result = validateJSONSchema(object, siteSchema);
       expect(result.errors).to.be.empty;
-      expect(object.basicAuth.password).to.eq('**********');
       expect(object.organizationId).to.equal(org.id);
     });
 

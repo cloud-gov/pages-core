@@ -11,7 +11,7 @@ const findSiteForWebhookRequest = (payload) => {
       owner: owner.toLowerCase(),
       repository: repository.toLowerCase(),
     },
-    include: [User, Organization],
+    include: [Organization],
   });
 };
 
@@ -60,15 +60,11 @@ const createBuildForWebhookRequest = async (payload, site) => {
   const { pushed_at: pushedAt } = payload.repository;
   const username = login.toLowerCase();
 
-  let user = site.Users.find((u) => u.username === username);
-  if (!user) {
-    user = await User.findOne({
-      where: { username },
-    });
-    if (user) {
-      await site.addUser(user);
-    }
-  }
+  // it's okay if we don't find a valid User here since we'll
+  // still search for a token in loadBuildUserAccessToken
+  const user = await User.findOne({
+    where: { username },
+  });
   if (user) {
     await user.update({
       pushedAt: new Date(pushedAt * 1000),
@@ -108,18 +104,7 @@ const pushWebhookRequest = async (payload) => {
     const site = await findSiteForWebhookRequest(payload);
     if (shouldBuildForSite(site)) {
       const build = await createBuildForWebhookRequest(payload, site);
-      await build.reload({
-        include: [
-          {
-            model: Site,
-            include: [
-              {
-                model: User,
-              },
-            ],
-          },
-        ],
-      });
+      await build.reload({ include: Site });
       await GithubBuildHelper.reportBuildStatus(build);
     }
   }

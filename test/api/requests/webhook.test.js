@@ -4,9 +4,8 @@ const request = require('supertest');
 const app = require('../../../app');
 const config = require('../../../config');
 const factory = require('../support/factory');
-const { User } = require('../../../api/models');
+const { createSiteUserOrg } = require('../support/site-user');
 const EventCreator = require('../../../api/services/EventCreator');
-
 const Webhooks = require('../../../api/services/Webhooks');
 
 describe('Webhook API', () => {
@@ -66,12 +65,9 @@ describe('Webhook API', () => {
     });
 
     it('should respond with a 400 if the signature is invalid', async () => {
-      const site = await factory.site();
-      await site.reload({
-        include: [User],
-      });
+      const { site, user } = await createSiteUserOrg();
 
-      const payload = buildWebhookPayload(site.Users[0], site);
+      const payload = buildWebhookPayload(user, site);
       const signature = '123abc';
 
       await request(app)
@@ -89,10 +85,7 @@ describe('Webhook API', () => {
 
     context('should call `pushWebhookRequest` with the payload if ok', () => {
       it('site is in not in an organization', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user],
-        });
+        const { site, user } = await createSiteUserOrg();
 
         const payload = buildWebhookPayload(user, site);
         const signature = signWebhookPayload(payload);
@@ -111,10 +104,7 @@ describe('Webhook API', () => {
       });
 
       it('site does not exist', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user],
-        });
+        const { site, user } = await createSiteUserOrg();
 
         const payload = buildWebhookPayload(user, site);
         const signature = signWebhookPayload(payload);
@@ -134,12 +124,7 @@ describe('Webhook API', () => {
     });
 
     it('site is in an active organization', async () => {
-      const org = await factory.organization.create();
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-        organizationId: org.id,
-      });
+      const { site, user } = await createSiteUserOrg();
 
       const payload = buildWebhookPayload(user, site);
       const signature = signWebhookPayload(payload);
@@ -158,12 +143,8 @@ describe('Webhook API', () => {
     });
 
     it('site is in an inactive organization', async () => {
-      const org = await factory.organization.create();
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-        organizationId: org.id,
-      });
+      const org = await factory.organization.create({ isActive: false });
+      const { site, user } = await createSiteUserOrg({ org });
 
       const payload = buildWebhookPayload(user, site);
       const signature = signWebhookPayload(payload);
@@ -182,11 +163,10 @@ describe('Webhook API', () => {
     });
 
     it('site is inactive', async () => {
-      const user = await factory.user();
       const site = await factory.site({
-        users: [user],
         isActive: false,
       });
+      const { user } = await createSiteUserOrg({ site });
 
       const payload = buildWebhookPayload(user, site);
       const signature = signWebhookPayload(payload);

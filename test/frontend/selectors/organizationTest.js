@@ -72,15 +72,11 @@ describe('organzizationSelectors', () => {
   });
 
   describe('.orgFilterOptions', () => {
-    it('returns array of objects with id and name while adding the "All" and "Unassociated" options', () => {
+    it('returns array of objects with id and name while adding the "All" option', () => {
       const grouped = orgFilterOptions(state);
       expect(grouped[0]).to.deep.equal({
         id: 'all-options',
         name: 'All',
-      });
-      expect(grouped[grouped.length - 1]).to.deep.equal({
-        id: 'unassociated',
-        name: 'Sites without an organization',
       });
       grouped.map((group) => expect(group).to.have.keys(['id', 'name']));
     });

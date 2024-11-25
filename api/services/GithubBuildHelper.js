@@ -4,9 +4,9 @@ const config = require('../../config');
 
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
-const getAccessTokenWithCertainPermissions = async (site, siteUsers, permission) => {
+const getAccessTokenWithCertainPermissions = async (site, users, permission) => {
   let count = 0;
-  const users = siteUsers
+  const filteredUsers = users
     .filter((u) => u.githubAccessToken && u.signedInAt)
     .sort((a, b) => b.signedInAt - a.signedInAt);
 
@@ -26,36 +26,36 @@ const getAccessTokenWithCertainPermissions = async (site, siteUsers, permission)
         return user.githubAccessToken;
       }
       count += 1;
-      return getNextToken(users[count]);
+      return getNextToken(filteredUsers[count]);
     } catch {
       count += 1;
-      return getNextToken(users[count]);
+      return getNextToken(filteredUsers[count]);
     }
   };
 
-  return getNextToken(users[count]);
+  return getNextToken(filteredUsers[count]);
 };
 
-const getAccessTokenWithPushPermissions = async (site, siteUsers) =>
-  getAccessTokenWithCertainPermissions(site, siteUsers, 'push');
+const getAccessTokenWithPushPermissions = async (site, users) =>
+  getAccessTokenWithCertainPermissions(site, users, 'push');
 
-const getAccessTokenWithAdminPermissions = async (site, siteUsers) =>
-  getAccessTokenWithCertainPermissions(site, siteUsers, 'admin');
+const getAccessTokenWithAdminPermissions = async (site, users) =>
+  getAccessTokenWithCertainPermissions(site, users, 'admin');
 
-const createSiteWebhook = async (site, siteUsers) => {
-  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, siteUsers);
+const createSiteWebhook = async (site, users) => {
+  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, users);
   return GitHub.setWebhook(site, githubAccessToken);
 };
 
-const listSiteWebhooks = async (site, siteUsers) => {
-  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, siteUsers);
+const listSiteWebhooks = async (site, users) => {
+  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, users);
   return GitHub.listSiteWebhooks(site, githubAccessToken);
 };
 
 const loadBuildUserAccessToken = async (build) => {
   let githubAccessToken;
   const site = build.Site;
-  const users = site.Users;
+  const users = await build.getSiteOrgUsers();
   const buildUser = users.find((u) => u.id === build.user);
   if (buildUser) {
     githubAccessToken = await getAccessTokenWithPushPermissions(site, [buildUser]);

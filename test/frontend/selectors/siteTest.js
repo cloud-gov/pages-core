@@ -51,13 +51,6 @@ describe('siteSelectors', () => {
       expect(grouped.data).to.deep.equal(sites.data);
     });
 
-    it('returns all sites without an organization Id associated', () => {
-      const orgId = 'unassociated';
-      const grouped = groupSitesByOrg(sites, orgId);
-      expect(grouped.data).to.have.length(1);
-      expect(grouped.data).to.deep.equal([sites.data[3]]);
-    });
-
     it('returns an sites data as an empty array with organization Id is not associated to any sites', () => {
       const orgId = 100;
       const grouped = groupSitesByOrg(sites, orgId);

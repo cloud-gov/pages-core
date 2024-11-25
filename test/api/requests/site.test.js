@@ -13,13 +13,12 @@ const apiNocks = require('../support/cfAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
+const { createSiteUserOrg } = require('../support/site-user');
 
-const { Build, Organization, Role, Site, User } = require('../../../api/models');
+const { Organization, Role, Site } = require('../../../api/models');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
-const siteErrors = require('../../../api/responses/siteErrors');
 const QueueJobs = require('../../../api/queue-jobs');
 const EventCreator = require('../../../api/services/EventCreator');
-const DomainService = require('../../../api/services/Domain');
 
 const authErrorMessage =
   'You are not permitted to perform this action. Are you sure you are logged in?';
@@ -58,56 +57,36 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should render a list of sites associated with the user', (done) => {
-      let user;
-      let sites;
-      let response;
+    it('should return a list of sites associated with the user', async () => {
+      const user = await factory.user();
+      const org = await factory.organization.create();
+      await org.addRoleUser(user);
 
-      factory
-        .user()
-        .then((model) => {
-          user = model;
-          const sitePromises = Array(3)
-            .fill(0)
-            .map(() =>
-              factory.site({
-                users: [user.id],
-              }),
-            );
-          return Promise.all(sitePromises);
-        })
-        .then((models) => {
-          sites = models;
-          return authenticatedSession(user);
-        })
-        .then((cookie) => request(app).get('/v0/site').set('Cookie', cookie).expect(200))
-        .then((resp) => {
-          response = resp;
+      const sites = await Promise.all(
+        Array(3)
+          .fill(0)
+          .map(async () => {
+            const { site } = await createSiteUserOrg({ user });
+            return site;
+          }),
+      );
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .get('/v0/site')
+        .set('Cookie', cookie)
+        .expect(200);
 
-          validateAgainstJSONSchema('GET', '/site', 200, response.body);
+      validateAgainstJSONSchema('GET', '/site', 200, response.body);
 
-          expect(response.body).to.be.a('array');
-          expect(response.body).to.have.length(3);
+      expect(response.body).to.be.a('array');
+      expect(response.body).to.have.length(3);
 
-          return Promise.all(
-            sites.map((site) =>
-              Site.findByPk(site.id, {
-                include: [User],
-              }),
-            ),
-          );
-        })
-        .then((foundSites) => {
-          foundSites.forEach((site) => {
-            const responseSite = response.body.find(
-              (candidate) => candidate.id === site.id,
-            );
-            expect(responseSite).not.to.be.undefined;
-            siteResponseExpectations(responseSite, site);
-          });
-          done();
-        })
-        .catch(done);
+      sites.forEach((site) => {
+        const responseSite = response.body.find((candidate) => candidate.id === site.id);
+        expect(responseSite).not.to.be.undefined;
+        siteResponseExpectations(responseSite, site);
+        expect(responseSite).to.include.keys('canEditLiveUrl', 'canEditDemoUrl');
+      });
     });
 
     it('should not render any sites not associated with the user', (done) => {
@@ -129,60 +108,6 @@ describe('Site API', () => {
         })
         .catch(done);
     });
-
-    it("should include sites' URL editability", (done) => {
-      let user;
-      let sites;
-      let response;
-
-      factory
-        .user()
-        .then((model) => {
-          user = model;
-          const sitePromises = Array(3)
-            .fill(0)
-            .map(() =>
-              factory.site({
-                users: [user.id],
-              }),
-            );
-
-          return Promise.all(sitePromises);
-        })
-        .then((models) => {
-          sites = models;
-          return authenticatedSession(user);
-        })
-        .then((cookie) => request(app).get('/v0/site').set('Cookie', cookie).expect(200))
-        .then((resp) => {
-          response = resp;
-
-          validateAgainstJSONSchema('GET', '/site', 200, response.body);
-
-          expect(response.body).to.be.a('array');
-          expect(response.body).to.have.length(3);
-
-          return Promise.all(
-            sites.map((site) =>
-              Site.findByPk(site.id, {
-                include: [User],
-              }),
-            ),
-          );
-        })
-        .then((foundSites) => {
-          foundSites.forEach((site) => {
-            const responseSite = response.body.find(
-              (candidate) => candidate.id === site.id,
-            );
-            expect(responseSite).not.to.be.undefined;
-            siteResponseExpectations(responseSite, site);
-            expect(responseSite).to.include.keys('canEditLiveUrl', 'canEditDemoUrl');
-          });
-          done();
-        })
-        .catch(done);
-    });
   });
 
   describe('GET /v0/site/:id', () => {
@@ -198,29 +123,15 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should render a JSON representation of the site', (done) => {
-      let site;
-
-      factory
-        .site()
-        .then((s) =>
-          Site.findByPk(s.id, {
-            include: [User],
-          }),
-        )
-        .then((model) => {
-          site = model;
-          return authenticatedSession(site.Users[0]);
-        })
-        .then((cookie) =>
-          request(app).get(`/v0/site/${site.id}`).set('Cookie', cookie).expect(200),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{id}', 200, response.body);
-          siteResponseExpectations(response.body, site);
-          done();
-        })
-        .catch(done);
+    it('should render a JSON representation of the site', async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .get(`/v0/site/${site.id}`)
+        .set('Cookie', cookie)
+        .expect(200);
+      validateAgainstJSONSchema('GET', '/site/{id}', 200, response.body);
+      siteResponseExpectations(response.body, site);
     });
 
     it(`should respond with a 404 if the user
@@ -388,53 +299,43 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should create a new site from an existing repository', (done) => {
+    it('should create a new site from an existing repository', async () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
       cfMockServices(siteOwner, siteRepository);
+      const user = await factory.user();
+      githubAPINocks.userOrganizations({
+        accessToken: user.githubAccessToken,
+        organizations: [
+          {
+            login: siteOwner,
+          },
+        ],
+      });
 
-      factory
-        .user()
-        .then((user) => {
-          githubAPINocks.userOrganizations({
-            accessToken: user.githubAccessToken,
-            organizations: [
-              {
-                login: siteOwner,
-              },
-            ],
-          });
+      const cookie = await authenticatedSession(user);
+      const response = request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'main',
+          engine: 'jekyll',
+        })
+        .set('Cookie', cookie)
+        .expect(200);
 
-          return authenticatedSession(user);
-        })
-        .then((cookie) =>
-          request(app)
-            .post('/v0/site')
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              owner: siteOwner,
-              repository: siteRepository,
-              defaultBranch: 'main',
-              engine: 'jekyll',
-            })
-            .set('Cookie', cookie)
-            .expect(200),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 200, response.body);
-          return Site.findOne({
-            where: {
-              owner: siteOwner,
-              repository: siteRepository,
-            },
-          });
-        })
-        .then((site) => {
-          expect(site).to.not.be.undefined;
-          done();
-        })
-        .catch(done);
+      validateAgainstJSONSchema('POST', '/site', 200, response.body);
+      const site = await Site.findOne({
+        where: {
+          owner: siteOwner,
+          repository: siteRepository,
+        },
+      });
+
+      expect(site).to.not.be.undefined;
     });
 
     it(`should create a new site from an existing repository
@@ -790,673 +691,6 @@ describe('Site API', () => {
     });
   });
 
-  describe('POST /v0/site/user', () => {
-    beforeEach(() => {
-      nock.cleanAll();
-      githubAPINocks.repo();
-    });
-
-    it('should require a valid csrf token', (done) => {
-      authenticatedSession()
-        .then((cookie) =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', 'bad-token')
-            .send({
-              owner: 'partner-org',
-              repository: 'partner-site',
-            })
-            .set('Cookie', cookie)
-            .expect(403),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 403, response.body);
-          expect(response.body.message).to.equal('Invalid CSRF token');
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should require authentication', (done) => {
-      unauthenticatedSession()
-        .then((cookie) => {
-          const newSiteRequest = request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              owner: 'partner-org',
-              repository: 'partner-site',
-            })
-            .set('Cookie', cookie)
-            .expect(403);
-
-          return newSiteRequest;
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 403, response.body);
-          expect(response.body.message).to.equal(authErrorMessage);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should add the user to the site', (done) => {
-      const userPromise = factory.user();
-      let user;
-      let site;
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site(),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((models) => {
-          ({ user, site } = models);
-
-          return request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', models.cookie)
-            .send({
-              owner: site.owner,
-              repository: site.repository,
-            })
-            .expect(200);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 200, response.body);
-          return Site.findByPk(site.id, {
-            include: [User],
-          });
-        })
-        .then((fetchedSite) => {
-          expect(fetchedSite.Users).to.be.an('array');
-          const userIDs = fetchedSite.Users.map((u) => u.id);
-          expect(userIDs).to.include(user.id);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 400 if no user or repository is specified', (done) => {
-      authenticatedSession()
-        .then((cookie) =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .send({})
-            .expect(400),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 400 if the user has already added the site', (done) => {
-      const userPromise = factory.user();
-
-      Promise.props({
-        site: factory.site({
-          users: Promise.all([userPromise]),
-        }),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then(({ site, cookie }) =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .send({
-              owner: site.owner,
-              repository: site.repository,
-            })
-            .expect(400),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-          expect(response.body.message).to.eq(
-            `You've already added this site to ${config.app.appName}`,
-          );
-          done();
-        })
-        .catch(done);
-    });
-
-    it(`should respond with a 400 if the user
-        does not have write access to repository`, (done) => {
-      const siteOwner = crypto.randomBytes(3).toString('hex');
-      const siteRepository = crypto.randomBytes(3).toString('hex');
-
-      nock.cleanAll();
-      githubAPINocks.repo({
-        owner: siteOwner,
-        repository: siteRepository,
-        response: [
-          200,
-          {
-            permissions: {
-              admin: false,
-              push: false,
-            },
-          },
-        ],
-      });
-      githubAPINocks.webhook();
-
-      Promise.props({
-        cookie: authenticatedSession(),
-        site: factory.site({
-          owner: siteOwner,
-          repository: siteRepository,
-        }),
-      })
-        .then(({ cookie, site }) =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .send({
-              owner: site.owner,
-              repository: site.repository,
-            })
-            .expect(400),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 400, response.body);
-          expect(response.body.message).to.eq(
-            'You do not have write access to this repository',
-          );
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 404 if the site does not exist', (done) => {
-      authenticatedSession()
-        .then((cookie) =>
-          request(app)
-            .post('/v0/site/user')
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .send({
-              owner: 'this-is',
-              repository: 'not-real',
-            })
-            .expect(404),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site/user', 404, response.body);
-          expect(response.body.message).to.eq(
-            'The site you are trying to add does not exist',
-          );
-          done();
-        })
-        .catch(done);
-    });
-  });
-
-  describe('DELETE /v0/site/:site_id/user/:user_id', () => {
-    const path = '/site/{site_id}/user/{user_id}';
-    const requestPath = (siteId, userId) => `/v0/site/${siteId}/user/${userId}`;
-
-    it('should require a valid csrf token', (done) => {
-      authenticatedSession()
-        .then((cookie) =>
-          request(app)
-            .delete(requestPath(1, 1))
-            .set('x-csrf-token', 'bad-token')
-            .set('Cookie', cookie)
-            .expect(403),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 403, response.body);
-          expect(response.body.message).to.equal('Invalid CSRF token');
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should require authentication', (done) => {
-      unauthenticatedSession()
-        .then((cookie) => {
-          const newSiteRequest = request(app)
-            .delete(requestPath(1, 1))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(403);
-          return newSiteRequest;
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 403, response.body);
-          expect(response.body.message).to.equal(authErrorMessage);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 400 if siteId or userId are not numbers', (done) => {
-      const userPromise = factory.user();
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site(),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((models) =>
-          request(app)
-            .delete(requestPath('a-site', 'a-user'))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', models.cookie)
-            .expect(400),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal('Bad Request');
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should return a 404 if the site cannot be found', (done) => {
-      const userPromise = factory.user();
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site(),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((models) =>
-          request(app)
-            .delete(requestPath(1000, models.user.id))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', models.cookie)
-            .expect(404),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 404, response.body);
-          expect(response.body.message).to.equal('Not found');
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should remove the user from the site', (done) => {
-      const mike = factory.user({
-        username: 'mike',
-      });
-      const jane = factory.user({
-        username: 'jane',
-      });
-      let currentSite;
-
-      Promise.props({
-        user: jane,
-        site: factory.site({
-          users: Promise.all([mike, jane]),
-        }),
-        cookie: authenticatedSession(jane),
-      })
-        .then(({ user, site, cookie }) => {
-          currentSite = site;
-
-          nock.cleanAll();
-          githubAPINocks.repo({
-            owner: site.owner,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(requestPath(site.id, user.id))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 200, response.body);
-          return Site.withUsers(currentSite.id);
-        })
-        .then((fetchedSite) => {
-          expect(fetchedSite.Users).to.be.an('array');
-          expect(fetchedSite.Users.length).to.equal(1);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should allow the owner to remove a user from the site', (done) => {
-      const username = 'b-user';
-      const userPromise = factory.user({
-        username,
-      });
-      const anotherUser = factory.user();
-      const siteProps = {
-        owner: username,
-        users: Promise.all([userPromise, anotherUser]),
-      };
-
-      let currentSite;
-
-      nock.cleanAll();
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site(siteProps),
-        cookie: authenticatedSession(userPromise),
-        anotherUser,
-      })
-        .then((models) => {
-          currentSite = models.site;
-
-          githubAPINocks.repo({
-            owner: username,
-            repository: models.site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(requestPath(models.site.id, models.anotherUser.id))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', models.cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 200, response.body);
-          return Site.withUsers(currentSite.id);
-        })
-        .then((fetchedSite) => {
-          expect(fetchedSite.Users).to.be.an('array');
-          expect(fetchedSite.Users.length).to.equal(1);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 400 when deleting the final user', (done) => {
-      const userPromise = factory.user();
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site({
-          users: Promise.all([userPromise]),
-        }),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then(({ user, site, cookie }) =>
-          request(app)
-            .delete(requestPath(site.id, user.id))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(400),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal(siteErrors.USER_REQUIRED);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 404 when the user to delete is not found', (done) => {
-      const userPromise = factory.user();
-      const otherUser = factory.user();
-
-      nock.cleanAll();
-
-      Promise.props({
-        site: factory.site({
-          users: Promise.all([userPromise, otherUser]),
-        }),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((models) => {
-          githubAPINocks.repo({
-            owner: 'james',
-            repository: models.site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(requestPath(models.site.id, 100000))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', models.cookie)
-            .expect(404);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 404, response.body);
-          expect(response.body.message).to.equal(siteErrors.NO_ASSOCIATED_USER);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 400 when any user attempts to remove the owner', (done) => {
-      const ownerName = 'owner';
-      const ownerUser = factory.user({
-        username: ownerName,
-      });
-      const normalUser = factory.user({
-        username: 'not-owner',
-      });
-
-      const siteProps = {
-        owner: ownerName,
-        users: Promise.all([ownerUser, normalUser]),
-      };
-
-      nock.cleanAll();
-
-      Promise.props({
-        user: ownerUser,
-        site: factory.site(siteProps),
-        cookie: authenticatedSession(normalUser),
-      })
-        .then(({ user, site, cookie }) => {
-          githubAPINocks.repo({
-            owner: ownerName,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(requestPath(site.id, user.id))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(400);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
-          done();
-        })
-        .catch(done);
-    });
-
-    it(`should respond with a 400
-        when the site owner attempts to remove themselves`, (done) => {
-      const username = 'a-user';
-      const userPromise = factory.user({
-        username,
-      });
-      const anotherUser = factory.user();
-      const siteProps = {
-        owner: username,
-        users: Promise.all([userPromise, anotherUser]),
-      };
-
-      nock.cleanAll();
-
-      Promise.props({
-        user: userPromise,
-        site: factory.site(siteProps),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then(({ user, site, cookie }) => {
-          githubAPINocks.repo({
-            owner: username,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(`/v0/site/${site.id}/user/${user.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(400);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal(siteErrors.OWNER_REMOVE);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should respond with a 400 if the user does not have admin access', (done) => {
-      const username = 'jane';
-      const userA = factory.user();
-      const userB = factory.user();
-      const repo = 'whatever';
-      const siteProps = {
-        owner: username,
-        repository: repo,
-        users: Promise.all([userA, userB]),
-      };
-
-      nock.cleanAll();
-
-      Promise.props({
-        user: userB,
-        site: factory.site(siteProps),
-        cookie: authenticatedSession(userA),
-      })
-        .then(({ user, site, cookie }) => {
-          githubAPINocks.repo({
-            owner: site.username,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: false,
-                  push: false,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(`/v0/site/${site.id}/user/${user.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(400);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 400, response.body);
-          expect(response.body.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
-          done();
-        })
-        .catch(done);
-    });
-
-    it(`should allow a user to remove themselves even
-        if they are not a repo write user`, (done) => {
-      const username = 'jane';
-      const userA = factory.user();
-      const userB = factory.user();
-      const repo = 'whatever';
-      const siteProps = {
-        owner: username,
-        repository: repo,
-        users: Promise.all([userA, userB]),
-      };
-      let currentSite;
-
-      nock.cleanAll();
-
-      Promise.props({
-        user: userA,
-        site: factory.site(siteProps),
-        cookie: authenticatedSession(userA),
-      })
-        .then(({ user, site, cookie }) => {
-          currentSite = site;
-          githubAPINocks.repo({
-            owner: site.username,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: false,
-                  push: false,
-                },
-              },
-            ],
-          });
-
-          return request(app)
-            .delete(requestPath(site.id, user.id))
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', path, 200, response.body);
-          return Site.withUsers(currentSite.id);
-        })
-        .then((fetchedSite) => {
-          expect(fetchedSite.Users).to.be.an('array');
-          expect(fetchedSite.Users.length).to.equal(1);
-          done();
-        })
-        .catch(done);
-    });
-  });
-
   describe('DELETE /v0/site/:id', () => {
     let queueDestroySiteInfra;
 
@@ -1532,63 +766,42 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should allow a user to delete a site associated with their account', (done) => {
-      let site;
-
-      factory
-        .site()
-        .then((s) =>
-          Site.findByPk(s.id, {
-            include: [User],
-          }),
-        )
-        .then((model) => {
-          site = model;
-          nock.cleanAll();
-          githubAPINocks.repo({
-            owner: site.owner,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
-          return authenticatedSession(site.Users[0]);
-        })
-        .then((cookie) =>
-          request(app)
-            .delete(`/v0/site/${site.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(200),
-        )
-        .then((response) => {
-          expect(response.body).to.deep.eq({});
-          return Site.findAll({
-            where: {
-              id: site.id,
+    it('should allow a user to delete a site associated with their account', async () => {
+      const { site, user } = await createSiteUserOrg();
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [
+          200,
+          {
+            permissions: {
+              admin: true,
+              push: true,
             },
-          });
-        })
-        .then((sites) => {
-          expect(sites).to.be.empty;
-          done();
-        })
-        .catch(done);
+          },
+        ],
+      });
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .delete(`/v0/site/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .expect(200);
+
+      expect(response.body).to.deep.eq({});
+      const sites = await Site.findAll({
+        where: {
+          id: site.id,
+        },
+      });
+      expect(sites).to.be.empty;
     });
 
     it('does not destroy the site when the site has a domain', async () => {
       nock.cleanAll();
 
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-      });
+      const { site, user } = await createSiteUserOrg();
       const domain = await factory.domain.create({ siteId: site.id });
 
       githubAPINocks.repo({
@@ -1653,103 +866,72 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it("should plan to remove all of the site's data from S3", (done) => {
-      let site;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
+    it("should plan to remove all of the site's data from S3", async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
+
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [
+          200,
+          {
+            permissions: {
+              admin: true,
+              push: true,
+            },
+          },
+        ],
       });
-      const sessionPromise = authenticatedSession(userPromise);
 
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: sessionPromise,
-      })
-        .then((results) => {
-          ({ site } = results);
-          nock.cleanAll();
-          githubAPINocks.repo({
-            owner: site.owner,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: true,
-                  push: true,
-                },
-              },
-            ],
-          });
+      await request(app)
+        .delete(`/v0/site/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .expect(200);
 
-          return request(app)
-            .delete(`/v0/site/${site.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', results.cookie)
-            .expect(200);
-        })
-        .then(() => {
-          sinon.assert.calledOnce(queueDestroySiteInfra);
-          expect(queueDestroySiteInfra.firstCall.args[0].id).to.eq(site.id);
-          done();
-        })
-        .catch(done);
+      sinon.assert.calledOnce(queueDestroySiteInfra);
+      expect(queueDestroySiteInfra.firstCall.args[0].id).to.eq(site.id);
     });
 
     it(`should not allow a user to delete a site
-        associated with their account if not admin`, (done) => {
-      let site;
+        associated with their account if not admin`, async () => {
+      const { site, user } = await createSiteUserOrg();
 
-      factory
-        .site()
-        .then((s) =>
-          Site.findByPk(s.id, {
-            include: [User],
-          }),
-        )
-        .then((model) => {
-          site = model;
-          nock.cleanAll();
-          githubAPINocks.repo({
-            owner: site.owner,
-            repository: site.repo,
-            response: [
-              200,
-              {
-                permissions: {
-                  admin: false,
-                  push: true,
-                },
-              },
-            ],
-          });
-
-          return authenticatedSession(site.Users[0]);
-        })
-        .then((cookie) =>
-          request(app)
-            .delete(`/v0/site/${site.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .set('Cookie', cookie)
-            .expect(403),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
-          expect(response.body.message).to.equal(
-            'You do not have administrative access to this repository',
-          );
-          return Site.findAll({
-            where: {
-              id: site.id,
+      nock.cleanAll();
+      githubAPINocks.repo({
+        owner: site.owner,
+        repository: site.repo,
+        response: [
+          200,
+          {
+            permissions: {
+              admin: false,
+              push: true,
             },
-          });
-        })
-        .then((sites) => {
-          expect(sites).to.not.be.empty;
-          done();
-        })
-        .catch(done);
+          },
+        ],
+      });
+
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .delete(`/v0/site/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .expect(403);
+
+      validateAgainstJSONSchema('DELETE', '/site/{id}', 403, response.body);
+      expect(response.body.message).to.equal(
+        'You do not have administrative access to this repository',
+      );
+      const sites = await Site.findAll({
+        where: {
+          id: site.id,
+        },
+      });
+
+      expect(sites).to.not.be.empty;
     });
   });
 
@@ -1841,150 +1023,29 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should trigger a rebuild of the site', () => {
-      let siteModel;
-      factory
-        .site({
-          repository: 'old-repo-name',
-        })
-        .then((site) =>
-          Site.findByPk(site.id, {
-            include: [User, Build],
-          }),
-        )
-        .then((model) => {
-          siteModel = model;
-          expect(siteModel.Builds).to.have.length(0);
-          return authenticatedSession(siteModel.Users[0]);
-        })
-        .then((cookie) =>
-          request(app)
-            .put(`/v0/site/${siteModel.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              repository: 'new-repo-name',
-            })
-            .set('Cookie', cookie)
-            .expect(200),
-        );
-    });
+    it('should update engine params', async () => {
+      const { site, user } = await createSiteUserOrg();
+      await site.update({ engine: 'jekyll' });
+      const cookie = await authenticatedSession(user);
 
-    it('should trigger a rebuild of the demo branch if one is present', () => {
-      let siteModel;
-      factory
-        .site({
-          repository: 'old-repo-name',
-          demoBranch: 'demo',
-          demoDomain: 'https://demo.example.gov',
+      const response = await request(app)
+        .put(`/v0/site/${site.id}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          engine: 'hugo',
         })
-        .then((site) =>
-          Site.findByPk(site.id, {
-            include: [User, Build],
-          }),
-        )
-        .then((model) => {
-          siteModel = model;
-          expect(siteModel.Builds).to.have.length(0);
-          return authenticatedSession(siteModel.Users[0]);
-        })
-        .then((cookie) =>
-          request(app)
-            .put(`/v0/site/${siteModel.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              repository: 'new-repo-name',
-            })
-            .set('Cookie', cookie)
-            .expect(200),
-        );
-    });
+        .set('Cookie', cookie)
+        .expect(200);
 
-    it(`should not override existing attributes
-        if they are not present in the request body`, (done) => {
-      let site;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-        domain: 'https://example.com',
-      });
-      const cookiePromise = authenticatedSession(userPromise);
+      validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
+      const foundSite = await Site.findByPk(site.id);
 
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: cookiePromise,
-      })
-        .then((results) => {
-          ({ site } = results);
-
-          return request(app)
-            .put(`/v0/site/${site.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              notAValue: 'new: true',
-            })
-            .set('Cookie', results.cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-          return Site.findByPk(site.id);
-        })
-        .then((foundSite) => {
-          expect(foundSite.domain).to.equal('https://example.com');
-          done();
-        })
-        .catch(done);
-    });
-
-    it(`should ignore domain URLs in the request body
-        if the URLs are managed by an associated domain`, (done) => {
-      let site;
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-        domain: 'https://example.com',
-        demoDomain: 'https://demo.example.com',
-      });
-      const cookiePromise = authenticatedSession(userPromise);
-      sinon.stub(DomainService, 'isSiteUrlManagedByDomain').returns(true);
-
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        cookie: cookiePromise,
-      })
-        .then((results) => {
-          ({ site } = results);
-
-          return request(app)
-            .put(`/v0/site/${site.id}`)
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              domain: 'https://changed.example.gov',
-              demoDomain: 'https://new.example.gov',
-            })
-            .set('Cookie', results.cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('PUT', '/site/{id}', 200, response.body);
-          return Site.findByPk(site.id);
-        })
-        .then((foundSite) => {
-          expect(foundSite.domain).to.equal('https://example.com');
-          expect(foundSite.demoDomain).to.equal('https://demo.example.com');
-          done();
-        })
-        .catch(done);
+      expect(foundSite).to.have.property('engine', 'hugo');
     });
 
     it('should ignore non-engine params', async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-        repository: 'original',
-      });
+      const { site, user } = await createSiteUserOrg();
+      await site.update({ repository: 'original' });
       const cookie = await authenticatedSession(user);
 
       const response = await request(app)
@@ -2003,309 +1064,99 @@ describe('Site API', () => {
     });
   });
 
-  describe('Site basic authentication API', () => {
-    describe('DELETE /v0/site/:site_id/basic-auth', () => {
-      describe('when the user is not authenticated', () => {
-        it('returns a 403', async () => {
-          const siteId = 1;
+  describe('GET /v0/site/:site_id/domains', () => {
+    it('should require authentication', async () => {
+      const siteId = 1;
+      const response = await request(app).get(`/v0/site/${siteId}/domains`).expect(403);
 
-          const { body } = await request(app)
-            .delete(`/v0/site/${siteId}/basic-auth`)
-            .expect(403);
+      validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 403, response.body);
+      expect(response.body.message).to.equal(authErrorMessage);
+    });
 
-          validateAgainstJSONSchema('DELETE', '/site/{site_id}/basic-auth', 403, body);
-        });
+    it('should return 404 not found with a site that does not exist', async () => {
+      const siteId = 8675309;
+      const user = await factory.user();
+
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .get(`/v0/site/${siteId}/domains`)
+        .set('Cookie', cookie)
+        .expect(404);
+
+      validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 404, response.body);
+    });
+
+    it('should render a list of domains associated with a site', async () => {
+      const site = await factory.site({
+        demoBranch: 'demo',
       });
+      const { user } = await createSiteUserOrg({ site });
 
-      describe('when the site does not exist', () => {
-        it('returns a 404', async () => {
-          const siteId = 1;
-          const user = await factory.user();
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .delete(`/v0/site/${siteId}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .expect(404);
-
-          validateAgainstJSONSchema('DELETE', '/site/{site_id}/basic-auth', 404, body);
-        });
+      const domain1 = await factory.domain.create({
+        siteId: site.id,
+        context: 'site',
       });
-
-      describe('when the user is not authorized to see the site', () => {
-        it('returns a 404', async () => {
-          const [site, user] = await Promise.all([factory.site(), factory.user()]);
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .delete(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .expect(404);
-
-          validateAgainstJSONSchema('DELETE', '/site/{site_id}/basic-auth', 404, body);
-        });
+      const domain2 = await factory.domain.create({
+        siteId: site.id,
+        context: 'demo',
       });
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .get(`/v0/site/${site.id}/domains`)
+        .set('Cookie', cookie)
+        .expect(200);
 
-      describe('when the parameters are valid', () => {
-        it('deletes basic auth from config and returns a 200', async () => {
-          const userPromise = await factory.user();
-          const siteConfig = {
-            basicAuth: {
-              username: 'user',
-              password: 'password',
-            },
-            blah: 'blahblah',
-          };
-          let site = await factory.site({
-            users: [userPromise],
-            config: siteConfig,
-          });
-
-          const cookie = await authenticatedSession(userPromise);
-          expect(site.config).to.deep.eq(siteConfig);
-          await request(app)
-            .delete(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .expect(200);
-
-          site = await site.reload();
-          expect(site.config).to.deep.equal({
-            basicAuth: {},
-            blah: 'blahblah',
-          });
-        });
+      validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 200, response.body);
+      expect(response.body).to.be.a('array');
+      expect(response.body).to.have.length(2);
+      response.body.map((record) => {
+        const foundDomains = [domain1, domain2].find((domain) => record.id === domain.id);
+        expect(foundDomains).not.to.be.undefined;
       });
     });
 
-    describe('POST /v0/site/:site_id/basic-auth', () => {
-      describe('when the user is not authenticated', () => {
-        it('returns a 403', async () => {
-          const siteId = 1;
-
-          const { body } = await request(app)
-            .post(`/v0/site/${siteId}/basic-auth`)
-            .type('json')
-            .expect(403);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 403, body);
-        });
-      });
-
-      describe('when there is no csrf token', () => {
-        it('returns a 403', async () => {
-          const siteId = 1;
-          const user = await factory.user();
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .post(`/v0/site/${siteId}/basic-auth`)
-            .set('Cookie', cookie)
-            .type('json')
-            .expect(403);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 403, body);
-        });
-      });
-
-      describe('when the site does not exist', () => {
-        it('returns a 404', async () => {
-          const siteId = 1;
-          const user = await factory.user();
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .post(`/v0/site/${siteId}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .expect(404);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 404, body);
-        });
-      });
-
-      describe('when the user is not authorized to see the site', () => {
-        it('returns a 404', async () => {
-          const [site, user] = await Promise.all([factory.site(), factory.user()]);
-          const cookie = await authenticatedSession(user);
-
-          const { body } = await request(app)
-            .post(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .expect(404);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 404, body);
-        });
-      });
-
-      describe('when the parameters are not valid', () => {
-        it('returns a 400', async () => {
-          const userPromise = await factory.user();
-          const site = await factory.site({
-            users: [userPromise],
-          });
-          const cookie = await authenticatedSession(userPromise);
-          const credentials = {
-            // invalid password
-            username: 'user',
-            password: 'password',
-          };
-
-          const { body } = await request(app)
-            .post(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .send(credentials)
-            .expect(400);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 400, body);
-        });
-      });
-
-      describe('when the parameters are valid', () => {
-        it('sets username and password for basic authentication', async () => {
-          const userPromise = await factory.user();
-          const site = await factory.site({
-            users: [userPromise],
-            config: {
-              blah: 'blahblahblah',
-            },
-          });
-          const cookie = await authenticatedSession(userPromise);
-          const credentials = {
-            username: 'user',
-            password: 'paSsw0rd',
-          };
-
-          const { body } = await request(app)
-            .post(`/v0/site/${site.id}/basic-auth`)
-            .set('Cookie', cookie)
-            .set('x-csrf-token', csrfToken.getToken())
-            .type('json')
-            .send(credentials)
-            .expect(200);
-
-          validateAgainstJSONSchema('POST', '/site/{site_id}/basic-auth', 200, body);
-          await site.reload();
-          expect(site.config).to.deep.equal({
-            basicAuth: credentials,
-            blah: 'blahblahblah',
-          });
-        });
-      });
-    });
-
-    describe('GET /v0/site/:site_id/domains', () => {
-      it('should require authentication', async () => {
-        const siteId = 1;
-        const response = await request(app).get(`/v0/site/${siteId}/domains`).expect(403);
-
-        validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 403, response.body);
-        expect(response.body.message).to.equal(authErrorMessage);
-      });
-
-      it('should return 404 not found with a site that does not exist', async () => {
-        const siteId = 8675309;
-        const user = await factory.user();
-
-        const cookie = await authenticatedSession(user);
-        const response = await request(app)
-          .get(`/v0/site/${siteId}/domains`)
-          .set('Cookie', cookie)
-          .expect(404);
-
-        validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 404, response.body);
-      });
-
-      it('should render a list of domains associated with a site', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user.id],
-          demoBranch: 'demo',
-        });
-        const domain1 = await factory.domain.create({
-          siteId: site.id,
-          context: 'site',
-        });
-        const domain2 = await factory.domain.create({
-          siteId: site.id,
-          context: 'demo',
-        });
-        const cookie = await authenticatedSession(user);
-        const response = await request(app)
-          .get(`/v0/site/${site.id}/domains`)
-          .set('Cookie', cookie)
-          .expect(200);
-
-        validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 200, response.body);
-        expect(response.body).to.be.a('array');
-        expect(response.body).to.have.length(2);
-        response.body.map((record) => {
-          const foundDomains = [domain1, domain2].find(
-            (domain) => record.id === domain.id,
-          );
-          expect(foundDomains).not.to.be.undefined;
-        });
-      });
-
-      it(`should return an empty list
+    it(`should return an empty list
           when no domains are associated with a site`, async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user.id],
-        });
-        const cookie = await authenticatedSession(user);
-        const response = await request(app)
-          .get(`/v0/site/${site.id}/domains`)
-          .set('Cookie', cookie)
-          .expect(200);
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .get(`/v0/site/${site.id}/domains`)
+        .set('Cookie', cookie)
+        .expect(200);
 
-        validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 200, response.body);
-        expect(response.body).to.be.a('array');
-        expect(response.body).to.have.length(0);
-      });
+      validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 200, response.body);
+      expect(response.body).to.be.a('array');
+      expect(response.body).to.have.length(0);
     });
+  });
 
-    describe('GET /v0/site/:site_id/tasks', () => {
-      it('should return tasks for a site', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user.id],
-        });
-        const build = await factory.build({ site });
-        const buildTaskType = await factory.buildTaskType();
-        const buildTask = await factory.buildTask({
-          buildTaskType,
-          build,
-        });
-
-        const cookie = await authenticatedSession(user);
-        const response = await request(app)
-          .get(`/v0/site/${site.id}/tasks`)
-          .set('Cookie', cookie)
-          .expect(200);
-
-        // TODO: update this validation for artifact (model is string, response is obj)
-        // validateAgainstJSONSchema(
-        //   'GET',
-        //   '/site/{site_id}/tasks',
-        //   200,
-        //   response.body
-        // );
-
-        expect(response.body).to.be.a('array');
-        expect(response.body).to.have.length(1);
-        expect(response.body[0]).to.have.property('id', buildTask.id);
+  describe('GET /v0/site/:site_id/tasks', () => {
+    it('should return tasks for a site', async () => {
+      const { user, site } = await createSiteUserOrg();
+      const build = await factory.build({ site });
+      const buildTaskType = await factory.buildTaskType();
+      const buildTask = await factory.buildTask({
+        buildTaskType,
+        build,
       });
+
+      const cookie = await authenticatedSession(user);
+      const response = await request(app)
+        .get(`/v0/site/${site.id}/tasks`)
+        .set('Cookie', cookie)
+        .expect(200);
+
+      // TODO: update this validation for artifact (model is string, response is obj)
+      // validateAgainstJSONSchema(
+      //   'GET',
+      //   '/site/{site_id}/tasks',
+      //   200,
+      //   response.body
+      // );
+
+      expect(response.body).to.be.a('array');
+      expect(response.body).to.have.length(1);
+      expect(response.body[0]).to.have.property('id', buildTask.id);
     });
   });
 });

@@ -1,7 +1,6 @@
 const yaml = require('js-yaml');
 const { omitBy, pick } = require('../utils');
-const { Organization, Site, User } = require('../models');
-const userSerializer = require('./user');
+const { Organization, Site } = require('../models');
 const { siteViewLink, siteViewDomain, hideBasicAuthPassword } = require('../utils/site');
 const DomainService = require('../services/Domain');
 
@@ -120,11 +119,6 @@ const serializeObject = (site, isSystemAdmin) => {
     delete json.SiteBranchConfigs;
   }
 
-  if (json.Users) {
-    json.users = site.Users.map((u) => userSerializer.toJSON(u));
-    delete json.Users;
-  }
-
   if (json.Organization) {
     json.organizationId = site.Organization.id;
     delete json.Organization;
@@ -152,7 +146,7 @@ function serializeMany(sites, isSystemAdmin) {
 }
 
 const serialize = (serializable) => {
-  const include = [User.scope('withGithub'), Organization];
+  const include = [Organization];
 
   if (serializable.length !== undefined) {
     const siteIds = serializable.map((site) => site.id);

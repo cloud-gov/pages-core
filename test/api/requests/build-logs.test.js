@@ -4,13 +4,8 @@ const app = require('../../../app');
 const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const {
-  BuildLog,
-  Organization,
-  OrganizationRole,
-  User,
-  Role,
-} = require('../../../api/models');
+const { createSiteUserOrg } = require('../support/site-user');
+const { BuildLog, Organization, OrganizationRole, User } = require('../../../api/models');
 
 function clean() {
   return Promise.all([
@@ -30,22 +25,8 @@ function clean() {
 }
 
 describe('Build Log API', () => {
-  let userRole;
-
   before(async () => {
     await clean();
-    [userRole] = await Promise.all([
-      Role.findOne({
-        where: {
-          name: 'user',
-        },
-      }),
-      Role.findOne({
-        where: {
-          name: 'manager',
-        },
-      }),
-    ]);
   });
 
   afterEach(clean);
@@ -65,50 +46,32 @@ describe('Build Log API', () => {
     });
 
     describe('successfully fetching build logs', () => {
-      const prepareAndFetchLogData = () => {
-        const userPromise = factory.user();
-        const sitePromise = factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const buildPromise = factory.build({
-          user: userPromise,
-          site: sitePromise,
-        });
+      it('should response with builds logs for the given build', async () => {
+        const { site, user } = await createSiteUserOrg();
+        const cookie = await authenticatedSession(user);
+        const build = await factory.build({ user, site });
 
-        return Promise.props({
-          user: userPromise,
-          site: sitePromise,
-          build: buildPromise,
-        })
-          .then(({ build, user }) =>
-            Promise.all([
-              BuildLog.bulkCreate(
-                Array(2000)
-                  .fill(0)
-                  .map(() => ({
-                    output:
-                      // eslint-disable-next-line max-len
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
-                    source: 'ALL',
-                    build: build.id,
-                  })),
-              ),
-              authenticatedSession(user),
-            ]),
-          )
-          .then(([logs, cookie]) => {
-            const buildId = logs[0].get({
-              plain: true,
-            }).build;
+        const logs = await BuildLog.bulkCreate(
+          Array(2000)
+            .fill(0)
+            .map(() => ({
+              output:
+                // eslint-disable-next-line max-len
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
+              source: 'ALL',
+              build: build.id,
+            })),
+        );
 
-            return request(app)
-              .get(`/v0/build/${buildId}/log`)
-              .set('Cookie', cookie)
-              .expect(200);
-          });
-      };
+        const buildId = logs[0].get({
+          plain: true,
+        }).build;
 
-      const expectedResponse = (response, done) => {
+        const response = await request(app)
+          .get(`/v0/build/${buildId}/log`)
+          .set('Cookie', cookie)
+          .expect(200);
+
         validateAgainstJSONSchema('GET', '/build/{build_id}/log', 200, response.body);
         expect(response.body).to.be.an('object');
         expect(response.body).to.have.keys([
@@ -124,74 +87,11 @@ describe('Build Log API', () => {
         expect(response.body.offset).to.equal(0);
         expect(response.body.output_count).to.equal('1000');
         expect(response.body.output).to.have.length(1000);
-        done();
-      };
-
-      it('should render builds logs for the given build', (done) => {
-        prepareAndFetchLogData()
-          .then((response) => expectedResponse(response, done))
-          .catch(done);
-      });
-
-      it('should render logs if user is not associated to the build', (done) => {
-        prepareAndFetchLogData()
-          .then((response) => expectedResponse(response, done))
-          .catch(done);
-      });
-    });
-
-    describe('successfully handling organization build logs', () => {
-      it('should accept organization user build log requests', async () => {
-        const user = await factory.user();
-        const orgUser = await factory.user();
-        const org = await factory.organization.create();
-        const site = await factory.site({
-          users: [user],
-          organizationId: org.id,
-        });
-        const build = await factory.build({
-          user,
-          site: site.id,
-        });
-
-        await org.addUser(orgUser, {
-          through: {
-            roleId: userRole.id,
-          },
-        });
-
-        const logs = await BuildLog.bulkCreate(
-          Array(20)
-            .fill(0)
-            .map(() => ({
-              output:
-                // eslint-disable-next-line max-len
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla, arcu ut ultricies auctor, elit quam consequat neque, eu blandit metus lorem non turpis.',
-              source: 'ALL',
-              build: build.id,
-            })),
-        );
-
-        await authenticatedSession(orgUser).then((cookie) => {
-          const buildId = logs[0].get({
-            plain: true,
-          }).build;
-
-          return request(app)
-            .get(`/v0/build/${buildId}/log`)
-            .set('Cookie', cookie)
-            .expect(200);
-        });
       });
 
       it('should reject non-organization user build log requests', async () => {
-        const user = await factory.user();
+        const { site, user } = await createSiteUserOrg();
         const nonOrgUser = await factory.user();
-        const org = await factory.organization.create();
-        const site = await factory.site({
-          users: [user],
-          organizationId: org.id,
-        });
         const build = await factory.build({
           user,
           site: site.id,
@@ -278,10 +178,7 @@ describe('Build Log API', () => {
       let cookie;
 
       beforeEach(async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user],
-        });
+        const { site, user } = await createSiteUserOrg();
         cookie = await authenticatedSession(user);
         build = await factory.build({ user, site });
       });

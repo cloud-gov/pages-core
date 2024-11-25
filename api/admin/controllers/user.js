@@ -80,7 +80,7 @@ module.exports = wrapHandlers({
   },
 
   async list(req, res) {
-    const { limit, page, organization, search, site } = req.query;
+    const { limit, page, organization, search } = req.query;
 
     const serialize = (users) => userSerializer.serializeMany(users, true);
 
@@ -88,10 +88,6 @@ module.exports = wrapHandlers({
 
     if (search) {
       scopes.push(User.searchScope(search));
-    }
-
-    if (site) {
-      scopes.push(User.siteScope(site));
     }
 
     if (organization) {

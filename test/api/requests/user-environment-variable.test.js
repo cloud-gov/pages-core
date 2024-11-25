@@ -7,8 +7,9 @@ const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const app = require('../../../app');
 const config = require('../../../config');
-const { Role, UserEnvironmentVariable } = require('../../../api/models');
+const { UserEnvironmentVariable } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
+const { createSiteUserOrg } = require('../support/site-user');
 
 describe('User Environment Variable API', () => {
   beforeEach(() => {
@@ -86,11 +87,7 @@ describe('User Environment Variable API', () => {
     describe('when the user environment variable does not exist', () => {
       it('returns a 404', async () => {
         const uevId = 1;
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -110,45 +107,8 @@ describe('User Environment Variable API', () => {
     });
 
     describe('when the parameters are valid', () => {
-      it('deletes the uev and returns a 200', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const [uev, user] = await Promise.all([
-          factory.userEnvironmentVariable.create({ site }),
-          userPromise,
-        ]);
-        const cookie = await authenticatedSession(user);
-
-        const beforeNumUEVs = await UserEnvironmentVariable.count();
-
-        await request(app)
-          .delete(`/v0/site/${site.id}/user-environment-variable/${uev.id}`)
-          .set('Cookie', cookie)
-          .set('x-csrf-token', csrfToken.getToken())
-          .type('json')
-          .expect(200);
-
-        const afterNumUEVs = await UserEnvironmentVariable.count();
-        expect(afterNumUEVs).to.eq(beforeNumUEVs - 1);
-      });
-
       it('allows an org user to delete the uev and returns a 200', async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
+        const { site, user } = await createSiteUserOrg();
 
         const uevs = await Promise.all([
           factory.userEnvironmentVariable.create({
@@ -240,11 +200,7 @@ describe('User Environment Variable API', () => {
 
     describe('when there are no user environment variables for the site', () => {
       it('returns an empty array', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -265,10 +221,8 @@ describe('User Environment Variable API', () => {
 
     describe('when there are user environment variables for the site', () => {
       it('returns an array containing only the uevs for the site', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { site, user } = await createSiteUserOrg();
+        const { site: site2 } = await createSiteUserOrg({ user });
         const uevs = await Promise.all([
           factory.userEnvironmentVariable.create({
             site,
@@ -284,67 +238,7 @@ describe('User Environment Variable API', () => {
           factory.userEnvironmentVariable.create(),
           // Same user, different site
           factory.userEnvironmentVariable.create({
-            site: await factory.site({
-              users: Promise.all([userPromise]),
-            }),
-          }),
-        ]);
-
-        const user = await userPromise;
-        const cookie = await authenticatedSession(user);
-
-        const { body } = await request(app)
-          .get(`/v0/site/${site.id}/user-environment-variable`)
-          .set('Cookie', cookie)
-          .type('json')
-          .expect(200);
-
-        validateAgainstJSONSchema(
-          'GET',
-          '/site/{site_id}/user-environment-variable',
-          200,
-          body,
-        );
-        expect(body).to.have.length(uevs.length);
-        expect(body.map((uev) => uev.id)).to.have.members(uevs.map((uev) => uev.id));
-      });
-
-      it(`returns an array containing only the uevs for a site
-          for an org user in the site org`, async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
-
-        const uevs = await Promise.all([
-          factory.userEnvironmentVariable.create({
-            site,
-            name: 'foo',
-          }),
-          factory.userEnvironmentVariable.create({
-            site,
-            name: 'bar',
-          }),
-        ]);
-
-        await Promise.all([
-          // Different user and site
-          factory.userEnvironmentVariable.create(),
-          // Same user, different site
-          factory.userEnvironmentVariable.create({
-            site: await factory.site({
-              users: Promise.all([user]),
-            }),
+            site: site2,
           }),
         ]);
 
@@ -453,11 +347,7 @@ describe('User Environment Variable API', () => {
 
     describe('when the parameters are not valid', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -479,11 +369,7 @@ describe('User Environment Variable API', () => {
 
     describe('when the name already exists', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const name = 'my-env-var';
         await factory.userEnvironmentVariable.create({
           name,
@@ -529,11 +415,7 @@ describe('User Environment Variable API', () => {
       });
 
       it('cannot encrypt without key and returns a 500', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
         const name = 'my-env-var';
         const value = 'secret1234';
@@ -553,57 +435,7 @@ describe('User Environment Variable API', () => {
 
     describe('when the parameters are valid', () => {
       it('creates and returns the uev', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
-        const cookie = await authenticatedSession(user);
-        const name = 'my-env-var';
-        const value = 'secret1234';
-
-        const beforeNumUEVs = await UserEnvironmentVariable.count();
-
-        const { body } = await request(app)
-          .post(`/v0/site/${site.id}/user-environment-variable`)
-          .set('Cookie', cookie)
-          .set('x-csrf-token', csrfToken.getToken())
-          .type('json')
-          .send({
-            name,
-            value,
-          })
-          .expect(200);
-
-        const afterNumUEVs = await UserEnvironmentVariable.count();
-
-        validateAgainstJSONSchema(
-          'POST',
-          '/site/{site_id}/user-environment-variable',
-          200,
-          body,
-        );
-        expect(body.name).to.eq(name);
-        expect(body.hint).to.eq('');
-        expect(afterNumUEVs).to.eq(beforeNumUEVs + 1);
-      });
-
-      it('allows an org user to create and return the uev', async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
-
+        const { site, user } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
         const name = 'my-env-var';
         const value = 'secret1234';

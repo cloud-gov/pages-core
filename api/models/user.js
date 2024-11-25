@@ -6,8 +6,6 @@ const associate = ({
   Organization,
   OrganizationRole,
   Role,
-  Site,
-  SiteUser,
   UAAIdentity,
   User,
   UserAction,
@@ -15,11 +13,6 @@ const associate = ({
   // Associations
   User.hasMany(Build, {
     foreignKey: 'user',
-  });
-  User.belongsToMany(Site, {
-    through: SiteUser,
-    foreignKey: 'user_sites',
-    timestamps: false,
   });
   User.hasMany(UserAction, {
     foreignKey: 'userId',
@@ -78,14 +71,6 @@ const associate = ({
     include: [
       {
         model: Organization,
-        where: { id },
-      },
-    ],
-  }));
-  User.addScope('bySite', (id) => ({
-    include: [
-      {
-        model: Site,
         where: { id },
       },
     ],
@@ -197,9 +182,6 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = associate;
   User.orgScope = (id) => ({
     method: ['byOrg', id],
-  });
-  User.siteScope = (id) => ({
-    method: ['bySite', id],
   });
   User.searchScope = (search) => ({
     method: ['byIdOrText', search],

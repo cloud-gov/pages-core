@@ -20,15 +20,7 @@ const States = buildEnum([
   'success',
 ]);
 
-const associate = ({
-  Build,
-  BuildLog,
-  BuildTask,
-  Organization,
-  Site,
-  User,
-  OrganizationRole,
-}) => {
+const associate = ({ Build, BuildLog, BuildTask, Organization, Site, User }) => {
   // Associations
   Build.hasMany(BuildLog, {
     foreignKey: 'build',
@@ -69,58 +61,27 @@ const associate = ({
       },
     ],
   }));
+  // this name is a relic from when Site's had Users, now it describes Users
+  // with access to the Site via an Organization
   Build.addScope('forSiteUser', (user) => ({
     where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            {
-              '$Site.Users.id$': {
-                [Op.not]: null,
-              },
-            },
-            {
-              '$Site.organizationId$': {
-                [Op.not]: null,
-              },
-            },
-          ],
-        },
-        {
-          [Op.or]: [
-            {
-              '$Site.Users.id$': user.id,
-            },
-            {
-              '$Site.Organization.OrganizationRoles.userId$': user.id,
-            },
-          ],
-        },
-      ],
+      '$Site.Organization.OrganizationRoles.userId$': user.id,
     },
-    include: [
-      {
-        model: Site,
-        required: true,
-        include: [
-          {
-            model: User,
-            required: false,
-          },
-          {
-            model: Organization,
-            required: false,
-            include: [
-              {
-                model: OrganizationRole,
-              },
-            ],
-          },
-        ],
-      },
-    ],
+    include: Site.scope('withOrgUsers'),
   }));
 };
+
+async function getSiteOrgUsers() {
+  const build = this;
+
+  const { Site } = build.sequelize.models;
+
+  if (!build.Site) {
+    await build.reload({ include: Site });
+  }
+
+  return build.Site.getOrgUsers();
+}
 
 const generateToken = () => URLSafeBase64.encode(crypto.randomBytes(32));
 
@@ -334,6 +295,7 @@ module.exports = (sequelize, DataTypes) => {
   Build.prototype.isComplete = isComplete;
   Build.prototype.isInProgress = isInProgress;
   Build.prototype.canStart = canStart;
+  Build.prototype.getSiteOrgUsers = getSiteOrgUsers;
   Build.States = States;
   Build.orgScope = (id) => ({
     method: ['byOrg', id],

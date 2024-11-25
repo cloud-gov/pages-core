@@ -5,6 +5,7 @@ const QueueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 const config = require('../../../../config');
+const { createSiteUserOrg } = require('../../support/site-user');
 
 describe('Build model', () => {
   afterEach(() => {
@@ -545,10 +546,11 @@ describe('Build model', () => {
   });
 
   describe('forSiteUser scope', () => {
-    it('returns the build for the associated user', async () => {
-      const user = await factory.user();
+    it('returns the build for any user who has access to the site', async () => {
+      const { site, user } = await createSiteUserOrg();
+
       const build = await factory.build({
-        user,
+        site,
       });
 
       const buildQuery = await Build.forSiteUser(user).findByPk(build.id);
@@ -557,23 +559,7 @@ describe('Build model', () => {
       expect(buildQuery.id).to.equal(build.id);
     });
 
-    it('returns the build for any user who has access to the site', async () => {
-      const [user1, user2] = await Promise.all([factory.user(), factory.user()]);
-      const site = await factory.site({
-        users: [user1, user2],
-      });
-      const build = await factory.build({
-        user: user1,
-        site,
-      });
-
-      const buildQuery = await Build.forSiteUser(user2).findByPk(build.id);
-
-      expect(buildQuery).to.not.be.null;
-      expect(buildQuery.id).to.equal(build.id);
-    });
-
-    it('does not return the build for a different user', async () => {
+    it('does not return the build for an arbitrary user', async () => {
       const user = {
         id: 99999,
       };
@@ -582,6 +568,20 @@ describe('Build model', () => {
       const buildQuery = await Build.forSiteUser(user).findByPk(build.id);
 
       expect(buildQuery).to.be.null;
+    });
+  });
+
+  describe('getSiteOrgUsers instance method', () => {
+    it("returns users associated a Build's Site", async () => {
+      const { site, user } = await createSiteUserOrg();
+
+      const build = await factory.build({
+        site,
+      });
+
+      expect(build).to.respondTo('getSiteOrgUsers');
+      const users = await build.getSiteOrgUsers();
+      expect(users[0].id).to.be.equal(user.id);
     });
   });
 });
