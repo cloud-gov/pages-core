@@ -12,19 +12,19 @@ function makeOptions(opts) {
 }
 
 const UserOrgSelect = ({
-  className,
+  className = '',
   id,
-  label,
-  touched,
+  label = "Select the site's organization",
+  touched = false,
   error,
-  mustChooseOption,
+  mustChooseOption = false,
   name,
   onChange,
   orgData,
   value,
 }) => (
   <div>
-    <label htmlFor={name} className="usa-label text-bold">
+    <label htmlFor={id} className="usa-label text-bold">
       {label}
     </label>
     {touched && error && <span className="usa-error-message">{error}</span>}
@@ -52,18 +52,9 @@ UserOrgSelect.propTypes = {
   error: PropTypes.string,
   mustChooseOption: PropTypes.bool,
   name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func.isRequired,
   orgData: PropTypes.arrayOf(ORGANIZATION).isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-};
-
-UserOrgSelect.defaultProps = {
-  className: null,
-  label: "Select the site's organization",
-  touched: false,
-  error: null,
-  mustChooseOption: false,
-  onChange: () => {},
 };
 
 export default UserOrgSelect;
