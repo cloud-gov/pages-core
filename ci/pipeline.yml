@@ -378,6 +378,9 @@ jobs:
       - task: code-coverage-diff
         image: node
         file: src/ci/partials/code-coverage-diff.yml
+        params:
+          APP_ENV: ((deploy-env))
+          APP_HOSTNAME: https://((((deploy-env))-pages-domain))
 
   #@ if/end env != 'production':
   - name: e2e-test
