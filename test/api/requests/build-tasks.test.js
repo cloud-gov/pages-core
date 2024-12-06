@@ -6,6 +6,7 @@ const factory = require('../support/factory');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const { BuildTask, BuildTaskType, Build, User } = require('../../../api/models');
+const { createSiteUserOrg } = require('../support/site-user');
 
 function clean() {
   return Promise.all([
@@ -29,11 +30,8 @@ function clean() {
 }
 
 async function prepTasks() {
-  const user = await factory.user();
+  const { site, user } = await createSiteUserOrg();
   const cookie = await authenticatedSession(user);
-  const site = await factory.site({
-    users: [user],
-  });
   const build = await factory.build({
     user,
     site,
@@ -195,11 +193,8 @@ describe('Build Task API', () => {
 
   describe('POST /v0/build/:build_id/task', () => {
     it('should create build tasks for a build', async () => {
-      const user = await factory.user();
+      const { site, user } = await createSiteUserOrg();
       const cookie = await authenticatedSession(user);
-      const site = await factory.site({
-        users: [user],
-      });
       const buildTaskType = await factory.buildTaskType();
       const build = await factory.build({
         user,

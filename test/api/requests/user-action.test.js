@@ -5,6 +5,7 @@ const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const factory = require('../support/factory');
 const userActionFactory = require('../support/factory/user-action');
+const { createSiteUserOrg } = require('../support/site-user');
 
 const version = '/v0';
 const resource = 'site';
@@ -69,51 +70,32 @@ describe('UserAction API', () => {
         .catch(done);
     });
 
-    it('returns a list of user actions associated with a site', (done) => {
+    it('returns a list of user actions associated with a site', async () => {
       const userActionCount = 3;
-      let currentUser;
-      let siteId;
 
-      factory
-        .user()
-        .then((user) => {
-          currentUser = user;
-          return userActionFactory.buildMany(userActionCount, { user });
-        })
-        .then((userActions) => {
-          siteId = userActions[0].siteId;
-          return buildAuthenticatedSession(currentUser);
-        })
-        .then((cookie) =>
-          makeGetRequest(200, {
-            id: siteId,
-            cookie,
-          }),
-        )
-        .then((response) => {
-          const { body } = response;
+      const { site, user } = await createSiteUserOrg();
 
-          expect(body.length).to.equal(userActionCount);
+      await userActionFactory.buildMany(userActionCount, { user, site });
+      const cookie = await buildAuthenticatedSession(user);
 
-          let lastCreatedAt = new Date().toISOString();
+      const { body } = await makeGetRequest(200, {
+        id: site.id,
+        cookie,
+      });
+      expect(body.length).to.equal(userActionCount);
 
-          body.forEach((action) => {
-            expect(action.actionTarget).to.have.all.keys(
-              'id',
-              'username',
-              'email',
-              'createdAt',
-            );
-            expect(action.actionType).to.have.all.keys('action');
-
-            // make sure they are in descending order by createdAt
-            expect(new Date(action.createdAt)).to.be.lte(new Date(lastCreatedAt));
-            lastCreatedAt = action.createdAt;
-          });
-
-          done();
-        })
-        .catch(done);
+      body.reduce((lastCreatedAt, action) => {
+        expect(action.actionTarget).to.have.all.keys(
+          'id',
+          'username',
+          'email',
+          'createdAt',
+        );
+        expect(action.actionType).to.have.all.keys('action');
+        // make sure they are in descending order by createdAt
+        expect(new Date(action.createdAt)).to.be.lte(new Date(lastCreatedAt));
+        return new Date(action.createdAt);
+      }, new Date().toISOString());
     });
   });
 });

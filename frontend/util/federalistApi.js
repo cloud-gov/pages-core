@@ -153,34 +153,6 @@ export default {
     return request(`site/${siteId}/user-action`);
   },
 
-  addUserToSite({ owner, repository }) {
-    return request(
-      'site/user',
-      {
-        method: 'POST',
-        data: {
-          owner,
-          repository,
-        },
-      },
-      {
-        // we want to handle the error elsewhere in order
-        // to show the additional AddSite fields
-        handleHttpError: false,
-      },
-    );
-  },
-
-  removeUserFromSite(siteId, userId) {
-    return request(
-      `site/${siteId}/user/${userId}`,
-      { method: 'DELETE' },
-      {
-        handleHttpError: false,
-      },
-    );
-  },
-
   addSite(site) {
     return request(
       'site',

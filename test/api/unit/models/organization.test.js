@@ -299,4 +299,31 @@ describe('Organization model', () => {
       expect(org.daysUntilSandboxCleaning).to.equal(sandboxDays);
     });
   });
+
+  describe('addRoleUser instance method', () => {
+    it('should add a user to an org', async () => {
+      const user = await createUser();
+      const org = await orgFactory.create();
+      expect(org).to.respondTo('addRoleUser');
+      await org.addRoleUser(user);
+
+      await org.reload({ include: OrganizationRole });
+      const members = await OrganizationRole.forOrganization(org).findAll();
+      expect(members[0].User.id).to.be.equal(user.id);
+      expect(members[0].Role.name).to.be.equal('user');
+    });
+
+    it('should add a manager to an org', async () => {
+      const manager = 'manager';
+      const user = await createUser();
+      const org = await orgFactory.create();
+      expect(org).to.respondTo('addRoleUser');
+      await org.addRoleUser(user, manager);
+
+      await org.reload({ include: OrganizationRole });
+      const members = await OrganizationRole.forOrganization(org).findAll();
+      expect(members[0].User.id).to.be.equal(user.id);
+      expect(members[0].Role.name).to.be.equal(manager);
+    });
+  });
 });

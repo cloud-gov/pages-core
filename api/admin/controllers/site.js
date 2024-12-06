@@ -69,8 +69,9 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const site = await Site.withUsers(id);
-    const hook = await GithubBuildHelper.createSiteWebhook(site, site.Users);
+    const site = await Site.findOne({ where: { id } });
+    const users = site.getOrgUsers();
+    const hook = await GithubBuildHelper.createSiteWebhook(site, users);
 
     return res.json(hook || []);
   },
@@ -80,8 +81,9 @@ module.exports = wrapHandlers({
       params: { id },
     } = req;
 
-    const site = await Site.withUsers(id);
-    const hooks = await GithubBuildHelper.listSiteWebhooks(site, site.Users);
+    const site = await Site.findOne({ where: { id } });
+    const users = site.getOrgUsers();
+    const hooks = await GithubBuildHelper.listSiteWebhooks(site, users);
 
     return res.json(hooks);
   },

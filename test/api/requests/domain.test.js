@@ -6,8 +6,9 @@ const csrfToken = require('../support/csrfToken');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const app = require('../../../app');
-const { Domain, Role, Site, SiteBranchConfig } = require('../../../api/models');
+const { Domain, Site, SiteBranchConfig } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
+const { createSiteUserOrg } = require('../support/site-user');
 
 function clean() {
   return Promise.all([
@@ -104,11 +105,7 @@ describe('Domain API', () => {
     describe('when the domain does not exist', () => {
       it('returns a 404', async () => {
         const domainId = 1;
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -129,11 +126,7 @@ describe('Domain API', () => {
 
     describe('when the parameters are valid', () => {
       it('deletes the domain when it is in a pending state', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const [user] = await Promise.all([userPromise]);
+        const { site, user } = await createSiteUserOrg();
         const domain = await factory.domain.create({
           siteId: site.id,
           siteBranchConfigId: site.SiteBranchConfigs[0].id,
@@ -154,59 +147,9 @@ describe('Domain API', () => {
         expect(afterNumSBC).to.eq(beforeNumSBC - 1);
       });
 
-      it('allows an org user to delete the domain in a pending state', async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
-
-        const domain = await factory.domain.create({
-          siteId: site.id,
-          siteBranchConfigId: site.SiteBranchConfigs[0].id,
-          state: 'pending',
-        });
-
-        const cookie = await authenticatedSession(user);
-
-        const beforeCount = await Domain.count();
-
-        await request(app)
-          .delete(`/v0/site/${site.id}/domain/${domain.id}`)
-          .set('Cookie', cookie)
-          .set('x-csrf-token', csrfToken.getToken())
-          .type('json')
-          .expect(200);
-
-        const afterCount = await Domain.count();
-        expect(afterCount).to.eq(beforeCount - 1);
-      });
-
       it(`does not allow a user to delete
           the domain when not in a pending state`, async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
+        const { site, user } = await createSiteUserOrg();
 
         const domain = await factory.domain.create({
           siteId: site.id,
@@ -296,11 +239,7 @@ describe('Domain API', () => {
 
     describe('when the name already exists for a site domain', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const branch = 'demo';
         const context = 'demo';
         const names = 'www.agency.gov';
@@ -339,11 +278,7 @@ describe('Domain API', () => {
 
     describe('when the branch config already exists for a site domain', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const names1 = 'www.agency.gov';
         const names2 = 'demo.agency.gov';
 
@@ -376,11 +311,7 @@ describe('Domain API', () => {
 
     describe('when the branch config does not exist for a site', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const names = 'www.agency.gov';
 
         const cookie = await authenticatedSession(user);
@@ -406,16 +337,12 @@ describe('Domain API', () => {
     describe(`when the branch config has a context
               of \`preview\` for a site domain`, () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { site, user } = await createSiteUserOrg();
         const sbc = await factory.siteBranchConfig.create({
           site,
           branch: 'preview',
           context: 'preview',
         });
-        const user = await userPromise;
         const names = 'www.agency.gov';
 
         const cookie = await authenticatedSession(user);
@@ -440,54 +367,7 @@ describe('Domain API', () => {
 
     describe('when the parameters are valid', () => {
       it('creates and returns the site domain', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const siteBranchConfigId = site.SiteBranchConfigs[0].id;
-        const user = await userPromise;
-        const names = 'www.agency.gov';
-
-        const cookie = await authenticatedSession(user);
-
-        const beforeCount = await Domain.count();
-
-        const { body } = await request(app)
-          .post(`/v0/site/${site.id}/domain`)
-          .set('Cookie', cookie)
-          .set('x-csrf-token', csrfToken.getToken())
-          .type('json')
-          .send({
-            siteBranchConfigId,
-            names,
-          })
-          .expect(200);
-
-        const afterCount = await Domain.count();
-
-        validateAgainstJSONSchema('POST', '/site/{site_id}/domain', 200, body);
-        expect(body.names).to.equal(names);
-        expect(body.state).to.equal('pending');
-        expect(body.siteId).to.equal(site.id);
-        expect(body.siteBranchConfigId).to.equal(siteBranchConfigId);
-        expect(afterCount).to.eq(beforeCount + 1);
-      });
-
-      it('allows an org user to create the site domain', async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
+        const { site, user } = await createSiteUserOrg();
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
         const names = 'www.agency.gov';
 
@@ -587,11 +467,7 @@ describe('Domain API', () => {
 
     describe('when the name already exists for a site domain', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const branch = 'demo';
         const context = 'demo';
         const names = 'www.agency.gov';
@@ -635,11 +511,7 @@ describe('Domain API', () => {
 
     describe('when the branch config already exists for a site domain', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const branch = 'demo';
         const context = 'demo';
         const names = 'www.agency.gov';
@@ -685,11 +557,7 @@ describe('Domain API', () => {
 
     describe('when the branch config does not exist for a site', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const names = 'www.agency.gov';
         const domain = await factory.domain.create({
           siteId: site.id,
@@ -720,11 +588,7 @@ describe('Domain API', () => {
     describe(`when the branch config has a context
               of \`preview\` for a site domain`, () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const sbc2 = await factory.siteBranchConfig.create({
           site,
           branch: 'preview',
@@ -757,11 +621,7 @@ describe('Domain API', () => {
 
     describe('when the domain is not in a pending state', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { site, user } = await createSiteUserOrg();
         const domain = await factory.domain.create({
           siteId: site.id,
           siteBranchConfigId: site.SiteBranchConfigs[0].id,
@@ -796,12 +656,8 @@ describe('Domain API', () => {
     describe('when the parameters are valid', () => {
       it('it updates a domain name', async () => {
         const updatedNames = 'updated.agency.gov';
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { site, user } = await createSiteUserOrg();
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
-        const user = await userPromise;
         const domain = await factory.domain.create({
           siteId: site.id,
           siteBranchConfigId,
@@ -832,12 +688,8 @@ describe('Domain API', () => {
 
       it('it updates a domain site branch config', async () => {
         const names = 'www.agency.gov';
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { site, user } = await createSiteUserOrg();
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
-        const user = await userPromise;
         const sbc2 = await factory.siteBranchConfig.create({
           site,
           branch: 'other',
@@ -875,12 +727,8 @@ describe('Domain API', () => {
       it('it updates a domain site branch config and names', async () => {
         const names = 'www.agency.gov';
         const updatedNames = 'updated.agency.gov';
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { site, user } = await createSiteUserOrg();
         const siteBranchConfigId = site.SiteBranchConfigs[0].id;
-        const user = await userPromise;
         const sbc2 = await factory.siteBranchConfig.create({
           site,
           branch: 'other',

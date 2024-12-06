@@ -35,7 +35,6 @@ const associate = ({
   Site,
   SiteBranchConfig,
   SiteBuildTask,
-  SiteUser,
   User,
   UserAction,
   UserEnvironmentVariable,
@@ -49,11 +48,6 @@ const associate = ({
   });
   Site.hasMany(SiteBranchConfig, {
     foreignKey: 'siteId',
-  });
-  Site.belongsToMany(User, {
-    through: SiteUser,
-    foreignKey: 'site_users',
-    timestamps: false,
   });
   Site.hasMany(UserAction, {
     as: 'userActions',
@@ -102,46 +96,25 @@ const associate = ({
       },
     ],
   }));
+  // this name is a relic from when Site's had Users, now it describes Users
+  // with access to the Site via an Organization
+  // don't call this scope directly because it requires the below `includes`
+  // from `withOrgUsers
   Site.addScope('forUser', (user) => ({
     where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            {
-              '$Users.id$': {
-                [Op.not]: null,
-              },
-            },
-            {
-              organizationId: {
-                [Op.not]: null,
-              },
-            },
-          ],
-        },
-        {
-          [Op.or]: [
-            {
-              '$Users.id$': user.id,
-            },
-            {
-              '$Organization.OrganizationRoles.userId$': user.id,
-            },
-          ],
-        },
-      ],
+      '$Organization.OrganizationRoles.userId$': user.id,
     },
+  }));
+
+  Site.addScope('withOrgUsers', () => ({
     include: [
-      {
-        model: User,
-        required: false,
-      },
       {
         model: Organization,
         required: false,
         include: [
           {
             model: OrganizationRole,
+            include: User,
           },
         ],
       },
@@ -157,6 +130,16 @@ const beforeValidate = (site) => {
     site.owner = site.owner.toLowerCase();
   }
 };
+
+async function getOrgUsers() {
+  const site = this;
+
+  const { Site } = site.sequelize.models;
+
+  const foundSite = await Site.withOrgUsers().findOne({ where: { id: site.id } });
+
+  return foundSite.Organization.OrganizationRoles.map((role) => role.User);
+}
 
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define(
@@ -293,10 +276,6 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Site.associate = associate;
-  Site.withUsers = (id) =>
-    Site.findByPk(id, {
-      include: [sequelize.models.User],
-    });
   Site.orgScope = (id) => ({
     method: ['byOrg', id],
   });
@@ -304,11 +283,14 @@ module.exports = (sequelize, DataTypes) => {
     method: ['byIdOrText', search],
   });
   Site.forUser = (user) =>
+    Site.scope([{ method: ['forUser', user] }, { method: ['withOrgUsers'] }]);
+  Site.withOrgUsers = () =>
     Site.scope({
-      method: ['forUser', user],
+      method: ['withOrgUsers'],
     });
   Site.domainFromContext = (context) => (context === 'site' ? 'domain' : 'demoDomain');
   Site.branchFromContext = (context) =>
     context === 'site' ? 'defaultBranch' : 'demoBranch';
+  Site.prototype.getOrgUsers = getOrgUsers;
   return Site;
 };

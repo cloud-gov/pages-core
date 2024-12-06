@@ -119,17 +119,17 @@ describe('Admin - Users API', () => {
       const org1 = await factory.organization.create();
       const org2 = await factory.organization.create();
 
-      org1.addUser(user1, {
+      await org1.addUser(user1, {
         through: {
           roleId: managerRole.id,
         },
       });
-      org1.addUser(user2, {
+      await org1.addUser(user2, {
         through: {
           roleId: userRole.id,
         },
       });
-      org2.addUser(user1, {
+      await org2.addUser(user1, {
         through: {
           roleId: userRole.id,
         },

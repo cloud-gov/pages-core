@@ -33,7 +33,6 @@ require('./build-task')(sequelize, DataTypes);
 require('./site')(sequelize, DataTypes);
 require('./site-branch-config')(sequelize, DataTypes);
 require('./site-build-task')(sequelize, DataTypes);
-require('./site-user')(sequelize, DataTypes);
 require('./user')(sequelize, DataTypes);
 require('./user-action')(sequelize, DataTypes);
 require('./action-type')(sequelize, DataTypes);

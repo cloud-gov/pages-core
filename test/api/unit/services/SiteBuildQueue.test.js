@@ -5,6 +5,7 @@ const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const config = require('../../../../config');
 const factory = require('../../support/factory');
+const { createSiteUserOrg } = require('../../support/site-user');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 const SiteBuildQueue = require('../../../../api/services/SiteBuildQueue');
 const {
@@ -577,7 +578,7 @@ describe('SiteBuildQueue', () => {
           {
             model: Site,
             required: true,
-            include: [User, SiteBranchConfig, Domain],
+            include: [SiteBranchConfig, Domain],
           },
           User,
         ],
@@ -622,7 +623,7 @@ describe('SiteBuildQueue', () => {
           {
             model: Site,
             required: true,
-            include: [User, SiteBranchConfig, Domain],
+            include: [SiteBranchConfig, Domain],
           },
           User,
         ],
@@ -693,52 +694,39 @@ describe('SiteBuildQueue', () => {
     });
 
     it(`should set GITHUB_TOKEN in the
-        message to the user's GitHub access token`, (done) => {
-      let user;
+        message to the user's GitHub access token`, async () => {
+      const user = await factory.user({
+        githubAccessToken: 'fake-github-token-123',
+      });
+      const { site } = await createSiteUserOrg({ user });
+      const build = await factory.build({
+        user,
+        site,
+      });
 
-      factory
-        .user({
-          githubAccessToken: 'fake-github-token-123',
-        })
-        .then((model) => {
-          user = model;
-          return factory.site({ users: [user] });
-        })
-        .then((site) =>
-          factory.build({
-            user,
-            site,
-          }),
-        )
-        .then((build) =>
-          Build.findByPk(build.id, {
-            include: [
-              {
-                model: Site,
-                required: true,
-                include: [SiteBranchConfig],
-              },
-              User,
-            ],
-          }),
-        )
-        .then((build) => SiteBuildQueue.messageBodyForBuild(build))
-        .then((message) => {
-          expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
-          done();
-        })
-        .catch(done);
+      const fullBuild = await Build.findByPk(build.id, {
+        include: [
+          {
+            model: Site,
+            required: true,
+            include: [SiteBranchConfig],
+          },
+          User,
+        ],
+      });
+
+      const message = await SiteBuildQueue.messageBodyForBuild(fullBuild);
+      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
     });
 
     it(`should find a github access token
         for a site user when the current user does not have one`, async () => {
-      const [user1, user2] = await Promise.all([factory.user(), factory.user()]);
-      await user1.update({
+      const user1 = await factory.user({
         githubAccessToken: null,
       });
-      const site = await factory.site({
-        users: [user1, user2],
-      });
+      const { site, user: user2, org } = await createSiteUserOrg();
+      await org.addRoleUser(user1);
+
       const build = await factory.build({
         user: user1,
         site,

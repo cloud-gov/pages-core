@@ -7,7 +7,7 @@ const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const { wrapHandlers } = require('../utils');
-const { Build, Domain, User, Event, Site, SiteBranchConfig } = require('../models');
+const { Build, Domain, Event, Site, SiteBranchConfig } = require('../models');
 const { getSocket } = require('../socketIO');
 
 const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
@@ -89,16 +89,7 @@ module.exports = wrapHandlers({
         id: req.body.buildId,
         site: req.body.siteId,
       },
-      include: [
-        {
-          model: Site,
-          include: [
-            {
-              model: User,
-            },
-          ],
-        },
-      ],
+      include: Site,
     });
 
     if (!requestBuild) {
@@ -134,20 +125,7 @@ module.exports = wrapHandlers({
   async status(req, res) {
     const { params, body } = req;
 
-    const build = await fetchModelById(params.id, Build, {
-      include: [
-        {
-          model: Site,
-          include: [
-            {
-              model: User,
-            },
-            Domain,
-            SiteBranchConfig,
-          ],
-        },
-      ],
-    });
+    const build = await fetchModelById(params.id, Build, { include: Site });
 
     if (!build) {
       return res.notFound();
@@ -189,13 +167,7 @@ module.exports = wrapHandlers({
       include: [
         {
           model: Site,
-          include: [
-            {
-              model: User,
-            },
-            Domain,
-            SiteBranchConfig,
-          ],
+          include: [Domain, SiteBranchConfig],
         },
       ],
     });

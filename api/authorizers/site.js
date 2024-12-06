@@ -101,8 +101,6 @@ const create = async (user, siteParams) => {
   }
 };
 
-const addUser = () => Promise.resolve();
-
 const createBuild = (user, site) => authorize(user, site);
 
 const showActions = (user, site) => authorize(user, site);
@@ -114,15 +112,11 @@ const update = (user, site) => authorize(user, site);
 const destroy = (user, site) =>
   authorize(user, site).then(() => authorizeRepositoryAdmin(user, site));
 
-const removeUser = (user, site) => authorize(user, site);
-
 module.exports = {
   create,
   findOne,
   update,
   destroy,
-  addUser,
-  removeUser,
   showActions,
   createBuild,
 };

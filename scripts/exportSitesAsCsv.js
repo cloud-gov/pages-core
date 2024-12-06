@@ -39,6 +39,7 @@ function consolidateOnSiteId(sites) {
 
   return ids.map((id, i) => {
     const sitesById = _.where(sites, { id });
+    // TODO: if using this again, need to replace site.users
     const users = sitesById.map((site) => site.users[0]);
 
     return {

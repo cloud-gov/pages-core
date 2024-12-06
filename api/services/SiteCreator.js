@@ -178,11 +178,7 @@ async function saveAndBuildSite({ site, user }) {
     user,
   });
 
-  await Promise.all([
-    site.addUser(user.id),
-    Build.create(buildParams).then((build) => build.enqueue()),
-  ]);
-
+  await Build.create(buildParams).then((build) => build.enqueue());
   return site;
 }
 

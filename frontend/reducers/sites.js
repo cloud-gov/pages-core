@@ -5,8 +5,6 @@ import {
   siteUpdatedType as SITE_UPDATED,
   siteDeletedType as SITE_DELETED,
   siteBranchesReceivedType as SITE_BRANCHES_RECEIVED,
-  siteUserAddedType as SITE_USER_ADDED,
-  siteUserRemovedType as SITE_USER_REMOVED,
   siteBasicAuthSavedType as SITE_BASIC_AUTH_SAVED,
   siteBasicAuthRemovedType as SITE_BASIC_AUTH_REMOVED,
 } from '../actions/actionCreators/siteActions';
@@ -78,21 +76,6 @@ export default function sites(state = initialState, action) {
         isLoading: false,
         data: state.data.filter((site) => site.id !== action.siteId),
       };
-
-    case SITE_USER_ADDED:
-      return action.site
-        ? {
-            isLoading: false,
-            data: state.data.concat(action.site),
-          }
-        : state;
-
-    case SITE_USER_REMOVED: {
-      return {
-        isLoading: false,
-        data: [action.site, ...state.data.filter((site) => site.id !== action.site.id)],
-      };
-    }
 
     default:
       return state;

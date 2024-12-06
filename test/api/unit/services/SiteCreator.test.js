@@ -9,7 +9,7 @@ const mockTokenRequest = require('../../support/cfAuthNock');
 const apiNocks = require('../../support/cfAPINocks');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
-const { Build, Site, User, SiteBranchConfig } = require('../../../../api/models');
+const { Build, Site, SiteBranchConfig } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
 
 describe('SiteCreator', () => {
@@ -39,8 +39,6 @@ describe('SiteCreator', () => {
       expect(site.s3ServiceName).to.equal(s3ServiceName);
       expect(site.awsBucketName).to.equal(awsBucketName);
       expect(site.awsBucketRegion).to.equal(awsBucketRegion);
-      expect(site.Users).to.have.length(1);
-      expect(site.Users[0].id).to.equal(user.id);
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
       expect(site.SiteBranchConfigs[0].branch).to.equal(defaultBranch);
@@ -53,7 +51,7 @@ describe('SiteCreator', () => {
           owner,
           repository,
         },
-        include: [User, Build, SiteBranchConfig],
+        include: [Build, SiteBranchConfig],
       });
 
     context('from a GitHub repo', () => {
@@ -152,7 +150,7 @@ describe('SiteCreator', () => {
 
       context('when the owner of the repo is an authorized federalist org', () => {
         it(`creates new site record for the given repository,
-            adds the user, webhook, and build`, (done) => {
+            adds the webhook and build`, (done) => {
           const defaultBranch = 'myDefaultBranch';
 
           factory
@@ -458,7 +456,7 @@ describe('SiteCreator', () => {
       });
 
       it(`should create a new site record
-          for the given repository and add the user`, (done) => {
+          for the given repository`, (done) => {
         factory
           .user()
           .then((model) => {
@@ -481,13 +479,10 @@ describe('SiteCreator', () => {
                 owner: siteParams.owner,
                 repository: siteParams.repository,
               },
-              include: [User],
             });
           })
           .then((site) => {
             expect(site).to.not.be.undefined;
-            expect(site.Users).to.have.length(1);
-            expect(site.Users[0].id).to.equal(user.id);
             done();
           })
           .catch(done);

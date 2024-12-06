@@ -9,6 +9,7 @@ const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
+const { createSiteUserOrg } = require('../../support/site-user');
 
 const Webhooks = require('../../../../api/services/Webhooks');
 
@@ -75,10 +76,7 @@ describe('Webhooks Service', () => {
     });
 
     it('should create a new site build for the sender', async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-      });
+      const { site, user } = await createSiteUserOrg();
       const numBuildsBefore = await Build.count({
         where: {
           site: site.id,
@@ -107,7 +105,7 @@ describe('Webhooks Service', () => {
         with the site for the sender if no user exists`, async () => {
       const username = crypto.randomBytes(3).toString('hex');
 
-      const site = await factory.site();
+      const { site } = await createSiteUserOrg();
       const payload = buildWebhookPayload({ username }, site);
 
       await Webhooks.pushWebhookRequest(payload);
@@ -126,10 +124,7 @@ describe('Webhooks Service', () => {
     it(`should find the site by the lowercased
         owner and repository and upper cased github user`, async () => {
       const reporterSpy = sinon.stub(GithubBuildHelper, 'reportBuildStatus').resolves();
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-      });
+      const { site, user } = await createSiteUserOrg();
 
       user.username = user.username.toUpperCase();
 
@@ -153,46 +148,30 @@ describe('Webhooks Service', () => {
       expect(reporterSpy.args[0][0].id).to.equal(build.id);
     });
 
-    it('should report the status of the new build to GitHub', (done) => {
+    it('should report the status of the new build to GitHub', async () => {
       nock.cleanAll();
       const statusNock = githubAPINocks.status({
         state: 'pending',
       });
 
-      const userProm = factory.user();
-      const siteProm = factory.site({
-        users: Promise.all([userProm]),
+      const { site, user } = await createSiteUserOrg();
+      const payload = buildWebhookPayload(user, site);
+      const fullName = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
+      payload.repository.full_name = fullName;
+
+      githubAPINocks.repo({
+        accessToken: user.githubAccessToken,
+        owner: site.owner,
+        repo: site.repository,
+        username: user.username,
       });
-      Promise.props({
-        user: userProm,
-        site: siteProm,
-      })
-        .then(({ user, site }) => {
-          const payload = buildWebhookPayload(user, site);
-          const fullName = `${site.owner.toUpperCase()}/${site.repository.toUpperCase()}`;
-          payload.repository.full_name = fullName;
 
-          githubAPINocks.repo({
-            accessToken: user.githubAccessToken,
-            owner: site.owner,
-            repo: site.repository,
-            username: user.username,
-          });
-
-          return Webhooks.pushWebhookRequest(payload);
-        })
-        .then(() => {
-          expect(statusNock.isDone()).to.be.true;
-          done();
-        })
-        .catch(done);
+      await Webhooks.pushWebhookRequest(payload);
+      expect(statusNock.isDone()).to.be.true;
     });
 
     it('should not schedule a build if there are no new commits', async () => {
-      const user = await factory.user();
-      const site = await factory.site({
-        users: [user],
-      });
+      const { site, user } = await createSiteUserOrg();
       const numBuildsBefore = await Build.count({
         where: {
           site: site.id,
@@ -230,11 +209,10 @@ describe('Webhooks Service', () => {
     });
 
     it('sites should not build if site is inactive', async () => {
-      const user = await factory.user();
       const site = await factory.site({
-        users: [user],
         isActive: false,
       });
+      const { user } = await createSiteUserOrg({ site });
       const payload = buildWebhookPayload(user, {
         owner: site.owner,
         repository: site.repository,
@@ -249,13 +227,9 @@ describe('Webhooks Service', () => {
     });
 
     it('sites should build if organization is active', async () => {
-      const user = await factory.user();
-      const org = await factory.organization.create();
+      const { site, user, org } = await createSiteUserOrg();
       expect(org.isActive).to.be.true;
-      const site = await factory.site({
-        users: [user],
-        organizationId: org.id,
-      });
+
       const numBuildsBefore = await Build.count({
         where: {
           site: site.id,
@@ -281,13 +255,10 @@ describe('Webhooks Service', () => {
     });
 
     it('sites should not build if organization is inactive', async () => {
-      const user = await factory.user();
       const org = await factory.organization.create({ isActive: false });
+      const { site, user } = await createSiteUserOrg({ org });
       expect(org.isActive).to.be.false;
-      const site = await factory.site({
-        users: [user],
-        organizationId: org.id,
-      });
+
       const numBuildsBefore = await Build.count({
         where: {
           site: site.id,
@@ -314,10 +285,7 @@ describe('Webhooks Service', () => {
 
     describe('when a queued build for the branch exists', () => {
       it('should not create a new build', async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user],
-        });
+        const { site, user } = await createSiteUserOrg();
         await Build.create(
           {
             site: site.id,
@@ -357,11 +325,10 @@ describe('Webhooks Service', () => {
       it('should update the requestedCommitSha and user of build', async () => {
         const branch = 'main';
         const origSha = 'aaa2b66a31319d456a448041a5b3c2a70c32d8b7';
-        const userProms = Promise.all([factory.user(), factory.user()]);
-        const site = await factory.site({
-          users: userProms,
-        });
-        const [user1, user2] = await userProms;
+        const { site, user: user1, org } = await createSiteUserOrg();
+        const user2 = await factory.user();
+        await org.addRoleUser(user2);
+
         await Build.create(
           {
             site: site.id,
@@ -406,11 +373,7 @@ describe('Webhooks Service', () => {
           state: 'pending',
         });
 
-        const userProm = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userProm]),
-        });
-        const user = await userProm;
+        const { site, user } = await createSiteUserOrg();
         await Build.create(
           {
             site: site.id,
@@ -443,11 +406,7 @@ describe('Webhooks Service', () => {
 
     describe('when a created build for the branch exists', () => {
       it('should not create a new build', async () => {
-        const userProm = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userProm]),
-        });
-        const user = await userProm;
+        const { site, user } = await createSiteUserOrg();
         await Build.create(
           {
             site: site.id,
@@ -487,11 +446,9 @@ describe('Webhooks Service', () => {
       it('should update the requestedCommitSha and user of build', async () => {
         const branch = 'main';
         const origSha = 'aaa2b66a31319d456a448041a5b3c2a70c32d8b7';
-        const userProms = Promise.all([factory.user(), factory.user()]);
-        const site = await factory.site({
-          users: userProms,
-        });
-        const [user1, user2] = await userProms;
+        const { site, user: user1, org } = await createSiteUserOrg();
+        const user2 = await factory.user();
+        await org.addRoleUser(user2);
         await Build.create(
           {
             site: site.id,
@@ -536,11 +493,7 @@ describe('Webhooks Service', () => {
           state: 'pending',
         });
 
-        const userProm = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userProm]),
-        });
-        const user = await userProm;
+        const { site, user } = await createSiteUserOrg();
         await Build.create(
           {
             site: site.id,

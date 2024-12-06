@@ -9,7 +9,6 @@
     fetchTasks,
     fetchBuildTaskTypes,
     fetchUserEnvironmentVariables,
-    fetchUsers,
     updateSite,
     addSiteBuildTask,
     updateSiteBuildTask,
@@ -29,7 +28,6 @@
     SiteFormWebhook,
     SiteMetadata,
     TaskTable,
-    UserTable,
   } from '../components';
   import { destroySite } from '../flows';
   import { selectSiteDomains, stateColor } from '../lib/utils';
@@ -43,7 +41,6 @@
   $: buildTasksPromise = fetchTasks({ site: id, limit: 10 });
   $: buildTaskTypesPromise = fetchBuildTaskTypes();
   $: orgsPromise = fetchOrganizations({ limit: 100 });
-  $: usersPromise = fetchUsers({ site: id });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
 
   const initEditedBuildTask = {
@@ -306,11 +303,6 @@
         </DataTable>
         <Await on={buildTasksPromise} let:response={buildTasks}>
           <TaskTable tasks={buildTasks.data} borderless={true} />
-        </Await>
-      </AccordionContent>
-      <AccordionContent title="Collaborators">
-        <Await on={usersPromise} let:response={users}>
-          <UserTable users={users.data} borderless={true} />
         </Await>
       </AccordionContent>
       <AccordionContent title="Delete Site">

@@ -28,10 +28,6 @@ export const orgFilterOptions = (state) => {
     id: 'all-options',
     name: 'All',
   });
-  keyValues.push({
-    id: 'unassociated',
-    name: 'Sites without an organization',
-  });
 
   return keyValues;
 };

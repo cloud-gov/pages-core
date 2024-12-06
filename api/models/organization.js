@@ -82,6 +82,23 @@ const associate = ({ Organization, OrganizationRole, Role, Site, User }) => {
   });
 };
 
+async function addRoleUser(user, roleName = 'user') {
+  const org = this;
+  const { Role } = this.sequelize.models;
+
+  const role = await Role.findOne({
+    where: {
+      name: roleName,
+    },
+  });
+
+  return org.addUser(user, {
+    through: {
+      roleId: role.id,
+    },
+  });
+}
+
 module.exports = (sequelize, DataTypes) => {
   const Organization = sequelize.define(
     'Organization',
@@ -152,5 +169,6 @@ module.exports = (sequelize, DataTypes) => {
     Organization.scope({
       method: ['forManagerRole', user],
     });
+  Organization.prototype.addRoleUser = addRoleUser;
   return Organization;
 };

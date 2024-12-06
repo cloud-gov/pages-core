@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const { OrganizationRole, Role, Site, User } = require('../../../../api/models');
 const orgFactory = require('../../support/factory/organization');
-const createSite = require('../../support/factory/site');
 const createUser = require('../../support/factory/user');
 const { createUAAIdentity } = require('../../support/factory/uaa-identity');
 
@@ -172,28 +171,6 @@ describe('User model', () => {
       expect(orgUsers.flatMap((u) => u.Organizations.map((o) => o.id))).to.have.members([
         org.id,
         org.id,
-      ]);
-    });
-  });
-
-  describe('siteScope', () => {
-    it('filters users by site and includes Site', async () => {
-      const [, user1, user2] = await Promise.all([
-        createUser(),
-        createUser(),
-        createUser(),
-      ]);
-
-      const site = await createSite({
-        users: [user1, user2],
-      });
-
-      const siteUsers = await User.scope(User.siteScope(site.id)).findAll();
-
-      expect(siteUsers.map((u) => u.id)).to.have.members([user1.id, user2.id]);
-      expect(siteUsers.flatMap((u) => u.Sites.map((s) => s.id))).to.have.members([
-        site.id,
-        site.id,
       ]);
     });
   });

@@ -6,8 +6,9 @@ const factory = require('../support/factory');
 const csrfToken = require('../support/csrfToken');
 const { authenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
+const { createSiteUserOrg } = require('../support/site-user');
 const app = require('../../../app');
-const { Build, Role, Site, SiteBranchConfig } = require('../../../api/models');
+const { Build, Site, SiteBranchConfig } = require('../../../api/models');
 const EventCreator = require('../../../api/services/EventCreator');
 
 function clean() {
@@ -105,11 +106,7 @@ describe('Site Branch Config API', () => {
     describe('when the site branch config does not exist', () => {
       it('returns a 404', async () => {
         const branchConfigId = 1;
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -130,14 +127,8 @@ describe('Site Branch Config API', () => {
 
     describe('when the parameters are valid', () => {
       it('deletes the site branch config and returns a 200', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const [sbc, user] = await Promise.all([
-          factory.siteBranchConfig.create({ site }),
-          userPromise,
-        ]);
+        const { user, site } = await createSiteUserOrg();
+        const sbc = await factory.siteBranchConfig.create({ site });
         const cookie = await authenticatedSession(user);
 
         const beforeNumSBC = await SiteBranchConfig.count();
@@ -155,20 +146,7 @@ describe('Site Branch Config API', () => {
 
       it(`allows an org user to delete the
           site branch config and returns a 200`, async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
+        const { user, site } = await createSiteUserOrg();
 
         const sbcs = await Promise.all([
           factory.siteBranchConfig.create({
@@ -245,16 +223,13 @@ describe('Site Branch Config API', () => {
 
     describe('when there are no site branch configs for the site', () => {
       it('returns an empty array', async () => {
-        const userPromise = factory.user();
         const site = await factory.site(
-          {
-            users: Promise.all([userPromise]),
-          },
+          {},
           {
             noSiteBranchConfig: true,
           },
         );
-        const user = await userPromise;
+        const { user } = await createSiteUserOrg({ site });
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -271,19 +246,14 @@ describe('Site Branch Config API', () => {
     describe('when there are site branch configs for the site', () => {
       it(`returns an array containing only
           the site branch configs for the site`, async () => {
-        const userPromise = factory.user();
         const site = await factory.site(
-          {
-            users: Promise.all([userPromise]),
-          },
+          {},
           {
             noSiteBranchConfig: true,
           },
         );
         const otherSite = await factory.site(
-          {
-            users: Promise.all([userPromise]),
-          },
+          {},
           {
             noSiteBranchConfig: true,
           },
@@ -325,58 +295,7 @@ describe('Site Branch Config API', () => {
           }),
         ]);
 
-        const user = await userPromise;
-        const cookie = await authenticatedSession(user);
-
-        const { body } = await request(app)
-          .get(`/v0/site/${site.id}/branch-config`)
-          .set('Cookie', cookie)
-          .type('json')
-          .expect(200);
-
-        validateAgainstJSONSchema('GET', '/site/{site_id}/branch-config', 200, body);
-        expect(body).to.have.length(sbcs.length);
-        expect(body.map((sbc) => sbc.id)).to.have.members(sbcs.map((sbc) => sbc.id));
-      });
-
-      it(`returns an array containing only the site branch configs
-          for a site for an org user in the site org`, async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site(undefined, {
-          noSiteBranchConfig: true,
-        });
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
-
-        const sbcs = await Promise.all([
-          factory.siteBranchConfig.create({
-            site,
-            branch: 'test1',
-          }),
-          factory.siteBranchConfig.create({
-            site,
-            branch: 'test2',
-          }),
-          factory.siteBranchConfig.create({
-            site,
-            branch: 'test3',
-          }),
-          factory.siteBranchConfig.create({
-            site,
-            branch: 'test4',
-          }),
-        ]);
-
+        const { user } = await createSiteUserOrg({ site });
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)
@@ -457,11 +376,7 @@ describe('Site Branch Config API', () => {
 
     describe('when the branch already exists for a site', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const branch = 'test1';
         const context = 'preview';
         await factory.siteBranchConfig.create({ site, branch });
@@ -488,11 +403,7 @@ describe('Site Branch Config API', () => {
 
     describe('when the branch name is invalid', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const branch = 'test bad branch name$';
         const cookie = await authenticatedSession(user);
         const context = 'preview';
@@ -516,11 +427,7 @@ describe('Site Branch Config API', () => {
       });
 
       it('returns a 400 when branch name is too long', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const branch = Array(301).join('b');
         const cookie = await authenticatedSession(user);
         const context = 'preview';
@@ -546,11 +453,7 @@ describe('Site Branch Config API', () => {
 
     describe('when the config is not valid', () => {
       it('returns a 400 with a number as a config', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const branch = 'test1';
         const config = '12345';
         const context = 'preview';
@@ -576,11 +479,7 @@ describe('Site Branch Config API', () => {
       });
 
       it('returns a 400 with a string as a config', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const branch = 'test1';
         const config = 'tests';
         const context = 'preview';
@@ -608,16 +507,13 @@ describe('Site Branch Config API', () => {
 
     describe('when the context is invalid', () => {
       it('returns a 400', async () => {
-        const userPromise = factory.user();
         const site = await factory.site(
-          {
-            users: Promise.all([userPromise]),
-          },
+          {},
           {
             noSiteBranchConfig: true,
           },
         );
-        const user = await userPromise;
+        const { user } = await createSiteUserOrg({ site });
         const branch = 'test bad branch name$';
         const cookie = await authenticatedSession(user);
 
@@ -642,11 +538,7 @@ describe('Site Branch Config API', () => {
 
     describe('when the parameters are valid', () => {
       it('creates and returns the site branch config', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
         const branch = 'my-test-branch';
         const config = {
@@ -678,11 +570,7 @@ describe('Site Branch Config API', () => {
       });
 
       it('creates s3key for site context', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
         const branch = 'my-test-branch';
         const config = {
@@ -718,11 +606,7 @@ describe('Site Branch Config API', () => {
       });
 
       it('creates s3Key for demo context and kicks off a build', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
         const branch = 'my-test-branch';
         const config = {
@@ -758,11 +642,7 @@ describe('Site Branch Config API', () => {
       });
 
       it('creates s3Key for other context type', async () => {
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
-        const user = await userPromise;
+        const { user, site } = await createSiteUserOrg();
         const cookie = await authenticatedSession(user);
         const branch = 'my-test-branch';
         const config = {
@@ -798,16 +678,13 @@ describe('Site Branch Config API', () => {
       });
 
       it('creates and returns the preview site branch config', async () => {
-        const userPromise = factory.user();
         const site = await factory.site(
-          {
-            users: Promise.all([userPromise]),
-          },
+          {},
           {
             noSiteBranchConfig: true,
           },
         );
-        const user = await userPromise;
+        const { user } = await createSiteUserOrg({ site });
         const cookie = await authenticatedSession(user);
         const context = 'preview';
         const config = {
@@ -838,57 +715,10 @@ describe('Site Branch Config API', () => {
         expect(build).to.eq(null);
         expect(afterNumSBC).to.eq(beforeNumSBCs + 1);
       });
-
-      it('allows an org user to create and return the site branch config', async () => {
-        const org = await factory.organization.create();
-        const role = await Role.findOne({
-          where: {
-            name: 'user',
-          },
-        });
-        const user = await factory.user();
-        const site = await factory.site();
-        await org.addUser(user, {
-          through: {
-            roleId: role.id,
-          },
-        });
-        await org.addSite(site);
-
-        const cookie = await authenticatedSession(user);
-        const branch = 'my-test-branch';
-        const config = {
-          hello: 'world',
-        };
-
-        const beforeNumSBCs = await SiteBranchConfig.count();
-
-        const { body } = await request(app)
-          .post(`/v0/site/${site.id}/branch-config`)
-          .set('Cookie', cookie)
-          .set('x-csrf-token', csrfToken.getToken())
-          .type('json')
-          .send({
-            branch,
-            config,
-          })
-          .expect(200);
-
-        const afterNumSBC = await SiteBranchConfig.count();
-
-        validateAgainstJSONSchema('POST', '/site/{site_id}/branch-config', 200, body);
-        expect(body.branch).to.eq(branch);
-        expect(body.config).to.deep.eq(config);
-        expect(afterNumSBC).to.eq(beforeNumSBCs + 1);
-      });
     });
 
     it('creates and returns the site branch config with a yaml config', async () => {
-      const userPromise = factory.user();
-      const site = await factory.site({
-        users: Promise.all([userPromise]),
-      });
-      const user = await userPromise;
+      const { user, site } = await createSiteUserOrg();
       const cookie = await authenticatedSession(user);
       const branch = 'my-test-branch';
       const configObject = {
@@ -929,16 +759,12 @@ describe('Site Branch Config API', () => {
         };
         const updatedBranch = 'updated-test-branch';
         const updatedConfig = { hello: 'again' };
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { user, site } = await createSiteUserOrg();
         const sbc = await factory.siteBranchConfig.create({
           site,
           branch: origBranch,
           config: origConfig,
         });
-        const user = await userPromise;
         const cookie = await authenticatedSession(user);
 
         const beforeNumSBCs = await SiteBranchConfig.count();
@@ -975,17 +801,13 @@ describe('Site Branch Config API', () => {
           hello: 'world',
         };
         const updatedConfig = { hello: 'again' };
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { user, site } = await createSiteUserOrg();
         const sbc = await factory.siteBranchConfig.create({
           site,
           branch,
           context,
           config: origConfig,
         });
-        const user = await userPromise;
         const cookie = await authenticatedSession(user);
 
         const beforeNumSBCs = await SiteBranchConfig.count();
@@ -1026,21 +848,18 @@ describe('Site Branch Config API', () => {
           hello: 'world',
         };
         const updatedConfig = { hello: 'again' };
-        const userPromise = factory.user();
         const site = await factory.site(
-          {
-            users: Promise.all([userPromise]),
-          },
+          {},
           {
             noSiteBranchConfig: true,
           },
         );
+        const { user } = await createSiteUserOrg({ site });
         const sbc = await factory.siteBranchConfig.create({
           site,
           context,
           config: origConfig,
         });
-        const user = await userPromise;
         const cookie = await authenticatedSession(user);
 
         const beforeNumSBCs = await SiteBranchConfig.count();
@@ -1080,10 +899,7 @@ describe('Site Branch Config API', () => {
         };
         const updatedBranch = 'updated-test-branch';
         const updatedConfig = { hello: 'again' };
-        const userPromise = factory.user();
-        const site = await factory.site({
-          users: Promise.all([userPromise]),
-        });
+        const { user, site } = await createSiteUserOrg();
         await factory.siteBranchConfig.create({
           site,
           branch: origBranch,
@@ -1091,7 +907,6 @@ describe('Site Branch Config API', () => {
           context: 'preview',
         });
         const notSBC = 90210;
-        const user = await userPromise;
         const cookie = await authenticatedSession(user);
 
         const { body } = await request(app)

@@ -12,6 +12,7 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const { Build } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
+const { createSiteUserOrg } = require('../support/site-user');
 
 const requestedCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
@@ -87,10 +88,7 @@ describe('Build API', () => {
 
       it(`returns a 404 if a build to restart
           is not associated with the site`, async () => {
-        const user = await factory.user();
-        const site = await factory.site({
-          users: [user],
-        });
+        const { site, user } = await createSiteUserOrg();
         const build = await factory.build({ user });
         const cookie = await authenticatedSession(user);
         const response = request(app)
@@ -135,10 +133,7 @@ describe('Build API', () => {
 
         beforeEach(async () => {
           nock.cleanAll();
-          user = await factory.user();
-          site = await factory.site({
-            users: [user],
-          });
+          ({ site, user } = await createSiteUserOrg());
           reqBuild = await factory.build({
             site,
             state: 'success',
@@ -238,162 +233,103 @@ describe('Build API', () => {
         .catch(done);
     });
 
-    it('should list builds for a site associated with the current user', (done) => {
-      let site;
-      let builds;
-
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-      });
-      const buildsPromise = Promise.all([
+    it('should list builds for a site associated with the current user', async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
+      const builds = await Promise.all([
         factory.build({
-          site: sitePromise,
+          site,
         }),
         factory.build({
-          site: sitePromise,
-          user: userPromise,
+          site,
+          user,
         }),
         factory.build({
-          site: sitePromise,
-          user: userPromise,
+          site,
+          user,
           state: 'error',
           error: 'The build timed out',
         }),
       ]);
 
-      Promise.props({
-        site: sitePromise,
-        builds: buildsPromise,
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((promisedValues) => {
-          ({ site, builds } = promisedValues);
-          const cookie = promisedValues.cookie;
+      const response = await request(app)
+        .get(`/v0/site/${site.id}/build`)
+        .set('Cookie', cookie)
+        .expect(200);
 
-          return request(app)
-            .get(`/v0/site/${site.id}/build`)
-            .set('Cookie', cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          expect(response.body).to.be.a('Array');
-          expect(response.body).to.have.length(3);
+      expect(response.body).to.be.a('Array');
+      expect(response.body).to.have.length(3);
 
-          builds.forEach((build) => {
-            const responseBuild = response.body.find(
-              (candidate) => candidate.id === build.id,
-            );
-            buildResponseExpectations(responseBuild, build);
-          });
+      builds.forEach((build) => {
+        const responseBuild = response.body.find(
+          (candidate) => candidate.id === build.id,
+        );
+        buildResponseExpectations(responseBuild, build);
+      });
 
-          validateAgainstJSONSchema('GET', '/site/{site_id}/build', 200, response.body);
-          done();
-        })
-        .catch(done);
+      validateAgainstJSONSchema('GET', '/site/{site_id}/build', 200, response.body);
     });
 
     it(`should not list builds for a site
-        not associated with the current user`, (done) => {
-      let site;
+        not associated with the current user`, async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
 
-      const userPromise = factory.user();
-      const sitePromise = factory.site();
-      const buildsPromise = Promise.all([
+      await Promise.all([
         factory.build({
-          site: sitePromise,
+          site,
         }),
         factory.build({
-          site: sitePromise,
-          user: userPromise,
-        }),
-      ]);
-
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        builds: buildsPromise,
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((promisedValues) => {
-          site = promisedValues.site;
-          const cookie = promisedValues.cookie;
-
-          return request(app)
-            .get(`/v0/site/${site.id}/build`)
-            .set('Cookie', cookie)
-            .expect(403);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{site_id}/build', 403, response.body);
-          done();
-        })
-        .catch(done);
-    });
-
-    it("shouldn't list more than 100 builds", (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-      });
-      const cookiePromise = authenticatedSession(userPromise);
-
-      Promise.props({
-        site: sitePromise,
-        cookie: cookiePromise,
-        user: userPromise,
-      })
-        .then((props) =>
-          factory
-            .bulkBuild(
-              {
-                site: props.site.id,
-                user: props.user.id,
-                username: props.user.username,
-              },
-              110,
-            )
-            .then(() => props),
-        )
-        .then(({ site, cookie }) =>
-          request(app).get(`/v0/site/${site.id}/build`).set('Cookie', cookie).expect(200),
-        )
-        .then((response) => {
-          expect(response.body).to.be.an('array');
-          expect(response.body).to.have.length(100);
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should not display unfound build', (done) => {
-      const userPromise = factory.user();
-      const sitePromise = factory.site();
-      const buildsPromise = Promise.all([
-        factory.build({
-          site: sitePromise,
-          user: userPromise,
+          site,
+          user,
         }),
       ]);
 
-      Promise.props({
-        user: userPromise,
-        site: sitePromise,
-        builds: buildsPromise,
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((promisedValues) => {
-          const cookie = promisedValues.cookie;
-          return request(app)
-            .get('/v0/site/-1000/build')
-            .set('Cookie', cookie)
-            .expect(404);
-        })
-        .then((response) => {
-          validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
-          done();
-        })
-        .catch(done);
+      const response = request(app)
+        .get(`/v0/site/${site.id}/build`)
+        .set('Cookie', cookie)
+        .expect(403);
+
+      validateAgainstJSONSchema('GET', '/site/{site_id}/build', 403, response.body);
+    });
+
+    it("shouldn't list more than 100 builds", async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
+
+      await factory.bulkBuild(
+        {
+          site: site.id,
+          user: user.id,
+          username: user.username,
+        },
+        110,
+      );
+      const response = await request(app)
+        .get(`/v0/site/${site.id}/build`)
+        .set('Cookie', cookie)
+        .expect(200);
+
+      expect(response.body).to.be.an('array');
+      expect(response.body).to.have.length(100);
+    });
+
+    it('should not display unfound build', async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
+      await Promise.all([
+        factory.build({
+          site,
+          user,
+        }),
+      ]);
+
+      const response = await request(app)
+        .get('/v0/site/-1000/build')
+        .set('Cookie', cookie)
+        .expect(404);
+
+      validateAgainstJSONSchema('GET', '/site/{site_id}/build', 404, response.body);
     });
 
     it('should not display build when site id is NaN', (done) => {
@@ -428,42 +364,26 @@ describe('Build API', () => {
         .catch(done);
     });
 
-    it('should return a single build matching the given build id', (done) => {
-      let build;
+    it('should return a single build matching the given build id', async () => {
+      const { site, user } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
 
-      const userPromise = factory.user();
-      const sitePromise = factory.site({
-        users: Promise.all([userPromise]),
-      });
-      const buildPromise = factory.build({
-        site: sitePromise,
-        user: userPromise,
+      const build = await factory.build({
+        site,
+        user,
         state: 'error',
         error: 'The build timed out',
       });
 
-      Promise.props({
-        site: sitePromise,
-        build: buildPromise,
-        cookie: authenticatedSession(userPromise),
-      })
-        .then((promisedValues) => {
-          ({ build } = promisedValues);
-          const cookie = promisedValues.cookie;
+      const response = await request(app)
+        .get(`/v0/build/${build.id}`)
+        .set('Cookie', cookie)
+        .expect(200);
 
-          return request(app)
-            .get(`/v0/build/${build.id}`)
-            .set('Cookie', cookie)
-            .expect(200);
-        })
-        .then((response) => {
-          const responseBuild = response.body;
-          expect(responseBuild).to.be.a('Object');
-          buildResponseExpectations(responseBuild, build);
-          validateAgainstJSONSchema('GET', '/build/{id}', 200, responseBuild);
-          done();
-        })
-        .catch(done);
+      const responseBuild = response.body;
+      expect(responseBuild).to.be.a('Object');
+      buildResponseExpectations(responseBuild, build);
+      validateAgainstJSONSchema('GET', '/build/{id}', 200, responseBuild);
     });
 
     it(`should not return the matching build
@@ -567,11 +487,13 @@ describe('Build API', () => {
       const fetchContentStub = sinon
         .stub(GithubBuildHelper, 'fetchContent')
         .resolves('{}');
+
+      const { site, user } = await createSiteUserOrg();
       const build = await factory.build({
         requestedCommitSha,
+        site,
+        user,
       });
-      const user = await build.getUser();
-      const site = await build.getSite();
 
       githubAPINocks.repo({
         accessToken: user.githubAccessToken,
@@ -597,12 +519,14 @@ describe('Build API', () => {
         state: 'success',
         commitSha: clonedCommitSha,
       });
+
+      const { site, user } = await createSiteUserOrg();
       const build = await factory.build({
         requestedCommitSha,
         clonedCommitSha,
+        site,
+        user,
       });
-      const user = await build.getUser();
-      const site = await build.getSite();
 
       githubAPINocks.repo({
         accessToken: user.githubAccessToken,
@@ -628,12 +552,13 @@ describe('Build API', () => {
         state: 'success',
         commitSha: clonedCommitSha,
       });
+      const { site, user } = await createSiteUserOrg();
       const build = await factory.build({
         requestedCommitSha,
         clonedCommitSha,
+        site,
+        user,
       });
-      const user = await build.getUser();
-      const site = await build.getSite();
 
       githubAPINocks.repo({
         accessToken: user.githubAccessToken,

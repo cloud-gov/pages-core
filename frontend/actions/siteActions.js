@@ -7,16 +7,11 @@ import {
   dispatchSiteAddedAction,
   dispatchSiteUpdatedAction,
   dispatchSiteDeletedAction,
-  dispatchUserAddedToSiteAction,
-  dispatchUserRemovedFromSiteAction,
-  dispatchShowAddNewSiteFieldsAction,
   dispatchHideAddNewSiteFieldsAction,
   dispatchResetFormAction,
   dispatchSiteBasicAuthRemovedAction,
   dispatchSiteBasicAuthSavedAction,
 } from './dispatchActions';
-
-import userActions from './userActions';
 
 const alertError = (error) => {
   window.scrollTo(0, 0);
@@ -50,36 +45,6 @@ export default {
       .catch((err) => {
         resetFormOnError(err);
       });
-  },
-
-  addUserToSite({ owner, repository }, navigate) {
-    return federalist
-      .addUserToSite({
-        owner,
-        repository,
-      })
-      .then(dispatchUserAddedToSiteAction)
-      .then(navigate)
-      .catch((err) => {
-        // Getting a 404 here signals that the site does not
-        // yet exist in Pages, so we want to show the
-        // additional Add New Site fields
-        if (err.response && err.response.status === 404) {
-          dispatchShowAddNewSiteFieldsAction();
-        } else {
-          resetFormOnError(err);
-        }
-      });
-  },
-
-  removeUserFromSite(siteId, userId) {
-    return federalist
-      .removeUserFromSite(siteId, userId)
-      .then(dispatchUserRemovedFromSiteAction)
-      .then(this.fetchSites)
-      .then(userActions.fetchUser)
-      .then(() => alertActions.alertSuccess('Successfully removed.'))
-      .catch(alertError);
   },
 
   updateSite(site, data) {
