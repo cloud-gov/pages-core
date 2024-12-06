@@ -1,3 +1,20 @@
+## 0.14.1 (2024-12-06)
+
+### Maintenance
+
+- remove SiteUser and associated concepts (#4339)
+- Test shared/GithubAuthButton #4671
+- Test shared user org select #4667
+- restore webpack bundle analyzer on dev (#4675)
+- remove jobs.js (#4677)
+- reconcile dependencies
+- upgrade to express 5 (#4611)
+- update docker uaa port to avoid zscaler conflict
+
+### Documentation
+
+- document testing strategies
+
 ## 0.14.0 (2024-11-20)
 
 ### Added
