@@ -561,3 +561,4 @@ Best practices for writing tests:
   - Prefer click events to direct function calls
   - [Query for elements](https://testing-library.com/docs/queries/about/#priority) based on role, label, or text before falling back to `test ids` (and never classes or ids)
 - Simulated data needed for tests ("fixtures") should be located outside the test file itself, except in the case of single values (e.g. fake `Build` model data should be in a separate file but having an inline variable like `const testText = 'sample-data'` is fine)
+- User events should use `@testing-library/user-event` since it simulates user interactions by dispatching the events that would happen if the interaction took place in a browser. Using the built-in `fireEvent` provides a browser's low-level `dispatchEvent` API but it cannot properly simulate more complex interactions like typing into a text box.

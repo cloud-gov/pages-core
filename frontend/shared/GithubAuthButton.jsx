@@ -53,7 +53,7 @@ function authorize(revokeFirst) {
   return authPromise();
 }
 
-const GithubAuthButton = ({ onFailure, onSuccess, text, revokeFirst }) => (
+const GithubAuthButton = ({ onFailure, onSuccess, text, revokeFirst = false }) => (
   <div className="bg-primary-lightest padding-2">
     <p className="usa-label margin-top-0">{text}</p>
     <button
@@ -61,22 +61,16 @@ const GithubAuthButton = ({ onFailure, onSuccess, text, revokeFirst }) => (
       className="usa-button github-auth-button"
       onClick={() => authorize(revokeFirst).then(onSuccess).catch(onFailure)}
     >
-      <IconGitHub /> Connect with Github
+      <IconGitHub /> Connect with GitHub
     </button>
   </div>
 );
 
 GithubAuthButton.propTypes = {
-  onFailure: PropTypes.func,
-  onSuccess: PropTypes.func,
-  text: PropTypes.string.isRequired,
+  onFailure: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
   revokeFirst: PropTypes.bool,
-};
-
-GithubAuthButton.defaultProps = {
-  onFailure: () => {},
-  onSuccess: () => {},
-  revokeFirst: false,
+  text: PropTypes.string.isRequired,
 };
 
 export default GithubAuthButton;
