@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import GitHubLink from './GitHubLink';
 
-export default function GithubBuildShaLink({ build, site }) {
+export default function GithubBuildBranchLink({ build, site }) {
   const { owner, repository } = site;
   const { branch } = build;
 
@@ -18,7 +18,7 @@ export default function GithubBuildShaLink({ build, site }) {
   );
 }
 
-GithubBuildShaLink.propTypes = {
+GithubBuildBranchLink.propTypes = {
   build: PropTypes.shape({
     branch: PropTypes.string.isRequired,
   }).isRequired,
