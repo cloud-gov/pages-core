@@ -1,53 +1,43 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { dateAndTime } from '@util/datetime';
 
 import GitHubLink from '@shared/GitHubLink';
-import ButtonLink from '@shared/ButtonLink';
-import siteActions from '@actions/siteActions';
 import { sandboxMsg } from '@util';
-import { ORGANIZATION, USER } from '@propTypes';
-
-import PublishedState from './PublishedState';
-import RepoLastVerified from './RepoLastVerified';
+import { ORGANIZATION } from '@propTypes';
 
 function getSiteName(site) {
   return `${site.owner}/${site.repository}`;
 }
 
-const handleRemoveSite = (site, user, navigate) => (event) => {
-  event.preventDefault();
-  siteActions
-    .removeUserFromSite(site.id, user.id)
-    .then(() => siteActions.fetchSites())
-    .then(() => navigate('/sites'));
-};
-
-function SiteListItem({ organization, site, user }) {
-  const navigate = useNavigate();
+function SiteListItem({ organization, site }) {
   return (
     <li className="usa-card tablet-lg:grid-col-6">
       <div className="usa-card__container bg-base-lightest">
         <div className="usa-card__header">
           <h2 className="usa-card__heading text-normal">
-            {!site.isActive || (organization && !organization.isActive) ? (
+            {(site && !site.isActive) || (organization && !organization.isActive) ? (
               `${getSiteName(site)} (Inactive)`
             ) : (
-              <Link to={`/sites/${site.id}`} title="View site settings">
+              <Link to={`/sites/${site.id}/builds`} title="View site builds">
                 {getSiteName(site)}
               </Link>
             )}{' '}
           </h2>
         </div>
         <div className="usa-card__body">
-          {organization && <h3>{`organization - ${organization.name}`}</h3>}
-          <RepoLastVerified site={site} userUpdated={user.updatedAt} />
-          {organization?.isSandbox && (
+          <h3>{`organization - ${organization && organization.name}`}</h3>
+          {organization && organization.isSandbox && (
             <p>
               <em>{sandboxMsg(organization.daysUntilSandboxCleaning, 'site')}</em>
             </p>
           )}
-          <PublishedState site={site} />
+          <p>
+            {site && site.publishedAt
+              ? `Last published on ${dateAndTime(site.publishedAt)}`
+              : 'Please wait for build to complete or check logs for error message.'}
+          </p>
         </div>
         <div className="usa-card__footer usa-button-group">
           <div className="usa-button-group__item">
@@ -58,16 +48,6 @@ function SiteListItem({ organization, site, user }) {
               isButton
             />
           </div>
-          {!organization && (
-            <div className="usa-button-group__item">
-              <ButtonLink
-                className="usa-button--secondary"
-                clickHandler={handleRemoveSite(site, user, navigate)}
-              >
-                Remove
-              </ButtonLink>
-            </div>
-          )}
         </div>
       </div>
     </li>
@@ -75,7 +55,7 @@ function SiteListItem({ organization, site, user }) {
 }
 
 SiteListItem.propTypes = {
-  organization: ORGANIZATION,
+  organization: ORGANIZATION.isRequired,
   site: PropTypes.shape({
     repository: PropTypes.string,
     owner: PropTypes.string,
@@ -86,11 +66,6 @@ SiteListItem.propTypes = {
     viewLink: PropTypes.string,
     isActive: PropTypes.bool,
   }).isRequired,
-  user: USER.isRequired,
-};
-
-SiteListItem.defaultProps = {
-  organization: null,
 };
 
 export default SiteListItem;
