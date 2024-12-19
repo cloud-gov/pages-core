@@ -1,8 +1,11 @@
 export function getSafeRepoName(name) {
-  return name
-    .replace(/[^\w.]+/g, '-') // replace non-alphabetic and periods with hyphens
-    .replace(/^-+/g, '') // remove starting hyphens
-    .replace(/-+$/g, ''); // remove ending hyphens
+  return (
+    name
+      .replace(/[^\w.]+/g, '-') // replace non-alphabetic and periods with hyphens
+      .replace(/^-+/g, '') // remove starting hyphens
+      // eslint-disable-next-line sonarjs/slow-regex
+      .replace(/-+$/g, '')
+  ); // remove ending hyphens
 }
 
 export function groupLogs(logs) {

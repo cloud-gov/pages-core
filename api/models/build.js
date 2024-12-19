@@ -92,6 +92,7 @@ const beforeValidate = (build) => {
 };
 
 const sanitizeCompleteJobErrorMessage = (message) =>
+  // eslint-disable-next-line sonarjs/slow-regex
   message.replace(/\/\/(.*)@github/g, '//[token_redacted]@github');
 
 async function beforeCreate(build) {

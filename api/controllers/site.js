@@ -1,4 +1,3 @@
-const _ = require('underscore');
 const authorizer = require('../authorizers/site');
 const SiteCreator = require('../services/SiteCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');

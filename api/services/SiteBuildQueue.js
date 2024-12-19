@@ -27,6 +27,7 @@ const siteConfig = (build, siteBranchConfigs = []) => {
 const baseURLForBuild = (build) => {
   const link = buildUrl(build, build.Site);
   const urlObject = new URL(link);
+  // eslint-disable-next-line sonarjs/slow-regex
   return urlObject.pathname.replace(/(\/)+$/, '');
 };
 
@@ -85,6 +86,7 @@ const buildContainerEnvironment = async (build) => {
 
 const SiteBuildQueue = {};
 
+// eslint-disable-next-line sonarjs/no-invariant-returns
 SiteBuildQueue.setupBucket = async (build, buildCount) => {
   if (buildCount > 1) return true;
 

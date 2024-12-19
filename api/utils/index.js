@@ -55,6 +55,7 @@ function generateS3ServiceName(owner, repository) {
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
     for (let i = 0; i < 6; i += 1) {
+      // eslint-disable-next-line sonarjs/pseudo-random
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
@@ -69,8 +70,10 @@ function toSubdomainPart(str) {
     // replace all invalid chars with '-'
     .replace(/[^a-zA-Z0-9-]+/g, '-')
     // remove leading and trailing '-'
+    // eslint-disable-next-line
     .replace(/(^[-]+|[-]+$)/g, '')
     // replace multiple sequential '-' with a single '-'
+    // eslint-disable-next-line sonarjs/single-char-in-character-classes
     .replace(/[-]{2,}/g, '-')
     .substring(0, 62)
     .toLowerCase();
@@ -79,6 +82,7 @@ function toSubdomainPart(str) {
   if (subdomain.length < 2) {
     // If we generate parts, make it longer
     while (subdomain.length < 5) {
+      // eslint-disable-next-line sonarjs/pseudo-random
       subdomain += characters[Math.floor(Math.random() * Math.floor(characters.length))];
     }
   }

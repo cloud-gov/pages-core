@@ -7,7 +7,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import testingLibrary from 'eslint-plugin-testing-library';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import importPlugin from 'eslint-plugin-import';
-// import sonarjsPlugin from 'eslint-plugin-sonarjs';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default [
   {
@@ -87,12 +87,19 @@ export default [
       ecmaVersion: 'latest',
     },
   },
+  {
+    ignores: ['**/*.test.*', 'test/**/*', 'scripts/**/*', 'e2e/**/*', 'config/**/*'],
+    ...sonarjs.configs.recommended,
+    rules: {
+      ...sonarjs.configs.recommended.rules,
+      'sonarjs/cognitive-complexity': ['error', 16],
+      'sonarjs/todo-tag': 'off',
+    },
+  },
   pluginReact.configs.flat['jsx-runtime'],
   pluginReact.configs.flat.recommended,
   jsxA11y.flatConfigs.recommended,
   pluginJs.configs.recommended,
-  // ignore for a future PR to minimize noise
-  // sonarjsPlugin.configs.recommended,
   eslintConfigPrettier,
   {
     settings: {

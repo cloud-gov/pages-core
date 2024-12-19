@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Error = () => (
+const ErrorMessage = () => (
   <div className="grid-container padding-y-6">
     <h1>An Unexpected Error Occurred</h1>
     <p>
@@ -11,4 +11,4 @@ const Error = () => (
   </div>
 );
 
-export default Error;
+export default ErrorMessage;

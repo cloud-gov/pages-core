@@ -60,14 +60,14 @@ module.exports = wrapHandlers({
   update: async (req, res) => {
     const { params, body } = req;
     const { build_task_id: buildTaskId, token } = params;
-    const { Error, Success } = BuildTask.Statuses;
+    const { Error: ErrorStatus, Success } = BuildTask.Statuses;
 
     const task = await BuildTask.findByPk(buildTaskId);
 
     if (!task) {
       return res.notFound();
     }
-    if (task.token !== token || [Error, Success].includes(task.status)) {
+    if (task.token !== token || [ErrorStatus, Success].includes(task.status)) {
       return res.forbidden();
     }
 
