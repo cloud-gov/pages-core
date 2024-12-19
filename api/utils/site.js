@@ -23,6 +23,7 @@ function siteViewLink(site, deployment = 'site') {
   } else {
     link = `${siteViewDomain(site)}${path(site, deployment)}`;
   }
+  // eslint-disable-next-line sonarjs/slow-regex
   return `${link.replace(/\/+$/, '')}/`;
 }
 
@@ -30,6 +31,7 @@ const hideBasicAuthPassword = ({ username, password }) => {
   if (password && password.length) {
     return {
       username,
+      // eslint-disable-next-line sonarjs/no-hardcoded-passwords
       password: '**********',
     };
   }

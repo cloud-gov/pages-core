@@ -51,6 +51,7 @@ function ReportConfigs({ siteId: id }) {
   function addNewRule(index) {
     // start with pseudo-random ids to avoid key collisions
     // default to the first type
+    // eslint-disable-next-line sonarjs/pseudo-random
     const ruleUid = `temp-${Math.random().toString(36).slice(2)}`;
     const newRule = {
       id: ruleUid,

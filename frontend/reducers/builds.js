@@ -6,13 +6,12 @@ const initialState = {
 };
 
 export default function builds(state = initialState, action) {
-  switch (action.type) {
-    case buildRestartedType:
-      return {
-        isLoading: false,
-        data: [action.build, ...state.data],
-      };
-    default:
-      return state;
+  if (action.type === buildRestartedType) {
+    return {
+      isLoading: false,
+      data: [action.build, ...state.data],
+    };
   }
+
+  return state;
 }

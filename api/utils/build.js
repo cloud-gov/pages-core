@@ -36,6 +36,7 @@ function buildUrl(build, site) {
 
   const domainName = domain.names.split(',')[0];
 
+  // eslint-disable-next-line sonarjs/slow-regex
   return `https://${domainName.replace(/\/+$/, '')}/`;
 }
 

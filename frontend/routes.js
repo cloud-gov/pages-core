@@ -19,7 +19,7 @@ import EditCustomDomain from '@pages/sites/$siteId/custom-domains/$domainId/edit
 import Reports from '@pages/sites/$siteId/reports';
 import Settings from '@pages/settings';
 import NotFound from '@pages/NotFound';
-import Error from '@pages/Error';
+import ErrorMessage from '@pages/ErrorMessage';
 
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
@@ -28,7 +28,7 @@ import organizationActions from './actions/organizationActions';
 const { NODE_ENV } = process.env;
 let ErrorElement = null;
 if (NODE_ENV !== 'development') {
-  ErrorElement = <Error />;
+  ErrorElement = <ErrorMessage />;
 }
 
 const fetchInitialData = () => {

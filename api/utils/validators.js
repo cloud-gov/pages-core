@@ -1,6 +1,7 @@
 const yaml = require('js-yaml');
 const validator = require('validator');
 
+// eslint-disable-next-line sonarjs/slow-regex
 const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
@@ -126,10 +127,6 @@ function isValidSubdomain(value) {
   }
 }
 
-const validBasicAuthUsername = (s) => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(s);
-
-const validBasicAuthPassword = (s) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
-
 const isDelimitedFQDN = (str) => {
   const msg = 'must be a comma-separated list of valid fully qualified domain names';
   const isValid = str.split(',').every((s) => validator.isFQDN(s));
@@ -150,8 +147,6 @@ module.exports = {
   isEmptyOrBranch,
   isEmptyOrUrl,
   ValidationError,
-  validBasicAuthUsername,
-  validBasicAuthPassword,
   isValidSubdomain,
   isDelimitedFQDN,
 };
