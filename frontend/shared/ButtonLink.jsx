@@ -9,12 +9,8 @@ const ButtonLink = ({ clickHandler, children, className = 'usa-button--outline' 
 
 ButtonLink.propTypes = {
   clickHandler: PropTypes.func.isRequired,
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   className: PropTypes.string,
-};
-
-ButtonLink.defaultProps = {
-  children: null,
 };
 
 export default ButtonLink;
