@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "required": ["currentPage", "totalPages", "totalItems", "data"],
+  "properties": {
+    "currentPage": {
+      "type": "integer"
+    },
+    "totalPages": {
+      "type": "integer"
+    },
+    "totalItems": {
+      "type": "integer"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "FileStorageFile.json"
+      }
+    }
+  }
+}
