@@ -1,3 +1,35 @@
+## 0.15.0 (2025-01-15)
+
+### Added
+
+- Add db migrations for file storage service #2077
+
+### Fixed
+
+- Promote Pages better in GitHub Status Checks
+
+### Maintenance
+
+- close outstanding dependeabot vulnerabilities
+- test @shared/ButtonLink.jsx #4672
+-  test @shared/UsaIcon.jsx #4668
+- Test frontend/pages/sites/SiteListItem.jsx and refactor/remove frontend/pages/sites/PublishedState.jsx
+- Reenable sonarjs linting rules #4652
+- Test shared/GithubBuildBranchLink #4670
+- Test shared/GithubBuildShaLink #4669
+- remove SiteUser and associated concepts (#4339)
+- Test shared/GithubAuthButton #4671
+- Test shared user org select #4667
+- restore webpack bundle analyzer on dev (#4675)
+- remove jobs.js (#4677)
+- reconcile dependencies
+- upgrade to express 5 (#4611)
+- update docker uaa port to avoid zscaler conflict
+
+### Documentation
+
+- document testing strategies
+
 ## 0.14.0 (2024-11-20)
 
 ### Added
