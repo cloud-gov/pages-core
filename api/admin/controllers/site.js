@@ -70,7 +70,7 @@ module.exports = wrapHandlers({
     } = req;
 
     const site = await Site.findOne({ where: { id } });
-    const users = site.getOrgUsers();
+    const users = await site.getOrgUsers();
     const hook = await GithubBuildHelper.createSiteWebhook(site, users);
 
     return res.json(hook || []);
@@ -82,7 +82,7 @@ module.exports = wrapHandlers({
     } = req;
 
     const site = await Site.findOne({ where: { id } });
-    const users = site.getOrgUsers();
+    const users = await site.getOrgUsers();
     const hooks = await GithubBuildHelper.listSiteWebhooks(site, users);
 
     return res.json(hooks);
