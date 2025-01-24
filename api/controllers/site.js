@@ -102,7 +102,7 @@ module.exports = wrapHandlers({
       site,
     });
     await site.reload({
-      include: [Organization],
+      include: [Organization, SiteBranchConfig, SiteBuildTask],
     });
     const siteJSON = siteSerializer.serializeNew(site);
     return res.json(siteJSON);
