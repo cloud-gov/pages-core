@@ -1,3 +1,11 @@
+## 0.15.1 (2025-01-27)
+
+### Fixed
+
+- add url to site build task response
+- send back additional site info on creation, avoid initial error (#4704)
+- restore admin webhook functionality (#4702)
+
 ## 0.15.0 (2025-01-15)
 
 ### Added
