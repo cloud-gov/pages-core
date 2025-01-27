@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "required": ["id", "name", "description", "startsWhen", "url"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "enum": ["a11y", "owasp-zap"]
+    },
+    "sbtId": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array"
+        },
+        "runDay": {
+          "type": "integer"
+        }
+      }
+    },
+    "url": {
+      "type": "string"
+    },
+    "branch": {
+      "type": "string"
+    }
+  }
+}

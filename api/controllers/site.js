@@ -196,6 +196,7 @@ module.exports = wrapHandlers({
       branch: sbt.branch,
       name: sbt.BuildTaskType.name,
       description: sbt.BuildTaskType.description,
+      url: sbt.BuildTaskType.url,
     }));
 
     return res.json(siteBuildTasks);
