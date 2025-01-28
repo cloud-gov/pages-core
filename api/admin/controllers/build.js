@@ -106,7 +106,7 @@ module.exports = wrapHandlers({
       include: [
         {
           model: Site,
-          include: [User, Domain, SiteBranchConfig],
+          include: [Domain, SiteBranchConfig],
         },
       ],
     });
