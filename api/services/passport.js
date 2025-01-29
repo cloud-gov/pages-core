@@ -76,11 +76,7 @@ const uaaOptions = {
 
 const verifyUAA = async (accessToken, refreshToken, profile, callback) => {
   try {
-    const user = await verifyUAAUser(accessToken, refreshToken, profile, [
-      'pages.user',
-      'pages.support',
-      'pages.admin',
-    ]);
+    const { user } = await verifyUAAUser(accessToken, refreshToken, profile);
 
     if (!user) return callback(null, false, flashMessage);
 

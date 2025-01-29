@@ -45,7 +45,7 @@ describe('verifyUAAUser', () => {
       uaaId,
       groups: [
         {
-          display: 'group.one',
+          display: 'pages.user',
         },
         {
           display: 'group.two',
@@ -63,12 +63,15 @@ describe('verifyUAAUser', () => {
     expect(identity.accessToken).to.be.null;
     expect(identity.refreshToken).to.be.null;
 
-    const verifiedUser = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
-      'group.one',
-    ]);
+    const { user: verifiedUser, role } = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      uaaUserProfile,
+    );
 
     await identity.reload();
 
+    expect(role).to.be.equal('pages.user');
     expect(verifiedUser.dataValues).to.deep.equal(user.dataValues);
     expect(identity.accessToken).to.equal(accessToken);
     expect(identity.refreshToken).to.equal(refreshToken);
@@ -99,11 +102,14 @@ describe('verifyUAAUser', () => {
 
     cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
-      'group.three',
-    ]);
+    const { user: result, role } = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      uaaUserProfile,
+    );
 
     expect(eventAuditStub.called).to.equal(true);
+    expect(role).to.be.null;
     return expect(result).to.be.null;
   });
 
@@ -131,11 +137,14 @@ describe('verifyUAAUser', () => {
 
     cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
-      'group.three',
-    ]);
+    const { user: result, role } = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      uaaUserProfile,
+    );
 
     expect(eventAuditStub.called).to.equal(true);
+    expect(role).to.be.null;
     return expect(result).to.be.null;
   });
 
@@ -149,7 +158,7 @@ describe('verifyUAAUser', () => {
       uaaId,
       groups: [
         {
-          display: 'group.one',
+          display: 'pages.user',
         },
         {
           display: 'group.two',
@@ -166,11 +175,14 @@ describe('verifyUAAUser', () => {
 
     await user.destroy();
 
-    const result = await verifyUAAUser(accessToken, refreshToken, uaaUserProfile, [
-      'group.one',
-    ]);
+    const { user: result, role } = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      uaaUserProfile,
+    );
 
     expect(eventAuditStub.called).to.equal(true);
+    expect(role).to.be.null;
     return expect(result).to.be.null;
   });
 });
