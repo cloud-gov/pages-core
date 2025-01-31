@@ -17,7 +17,7 @@ const app = require('../../../../api/admin');
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
   it('should require admin authentication', async () => {
     const response = await request(app)[method](path).expect(401);
-    validateAgainstJSONSchema('GET', schema, 401, response.body);
+    validateAgainstJSONSchema(method, schema, 401, response.body);
     expect(response.body.message).to.equal('Unauthorized');
   });
 };
@@ -132,6 +132,27 @@ describe('Admin - Site API', () => {
 
       expect(getResponse.body.state).to.deep.equal(newState);
       validateAgainstJSONSchema('PUT', '/build/{id}', 200, getResponse.body);
+    });
+  });
+
+  describe('POST /builds', () => {
+    describe('rebuild', () => {
+      it('rebuilds a specified build', async () => {
+        const [user, site] = await Promise.all([factory.user(), factory.site()]);
+        const build = await factory.build({ site });
+
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+        await request(app)
+          .post(`/builds`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            buildId: build.id,
+            siteId: site.id,
+          })
+          .expect(200);
+      });
     });
   });
 
