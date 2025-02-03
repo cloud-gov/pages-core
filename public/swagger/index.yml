@@ -279,6 +279,32 @@ paths:
           description: Not found
           schema:
             $ref: 'Error.json'
+  /file-storage/{file_storage_id}/directory:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+    post:
+      summary: Creates a directory given a name and directory path
+      responses:
+        200:
+          description: Acknowledgement that the directory was created
+          schema:
+            $ref: 'FileStorageFile.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
   /organization:
     get:
       summary: Fetch all of the current user's organizations

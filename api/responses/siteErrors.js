@@ -14,4 +14,5 @@ module.exports = {
   ORGANIZATION_USER_ACCESS: 'You do not have access to this organization.',
   SITE_FILE_STORAGE_EXISTS:
     'The site already has an existing file storage services available.',
+  SITE_DOES_NOT_EXIST: 'The specified site does not exist',
 };

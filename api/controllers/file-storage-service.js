@@ -1,6 +1,12 @@
 const EventCreator = require('../services/EventCreator');
-const { canCreateSiteStorage } = require('../authorizers/file-storage');
-const { serializeFileStorageService } = require('../serializers/file-storage');
+const {
+  canCreateSiteStorage,
+  isFileStorageUser,
+} = require('../authorizers/file-storage');
+const {
+  serializeFileStorageService,
+  serializeFileStorageFile,
+} = require('../serializers/file-storage');
 const { wrapHandlers } = require('../utils');
 const { Event } = require('../models');
 const { SiteFileStorageSerivce } = require('../services/file-storage');
@@ -14,7 +20,7 @@ module.exports = wrapHandlers({
       const { site } = await canCreateSiteStorage({ id: user.id }, { id: siteId });
 
       const siteStorageService = new SiteFileStorageSerivce(site, user.id);
-      const client = await siteStorageService.init();
+      const client = await siteStorageService.createClient();
       const fss = await client.createFileStorageService();
 
       EventCreator.audit(
@@ -25,6 +31,32 @@ module.exports = wrapHandlers({
       );
 
       const data = serializeFileStorageService(fss);
+      return res.send(data);
+    } catch (error) {
+      return res.status(error.status).send(error);
+    }
+  },
+
+  async createDirectory(req, res) {
+    const {
+      body: { parent, name },
+      params,
+      user,
+    } = req;
+
+    const fssId = parseInt(params.file_storage_id, 10);
+
+    try {
+      const { fileStorageService } = await isFileStorageUser(
+        { id: user.id },
+        { id: fssId },
+      );
+
+      const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
+      const client = await siteStorageService.createClient();
+      const fss = await client.createDirectory(parent, name);
+
+      const data = serializeFileStorageFile(fss);
       return res.send(data);
     } catch (error) {
       return res.status(error.status).send(error);

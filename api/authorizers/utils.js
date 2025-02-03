@@ -56,6 +56,35 @@ const isSiteOrgManager = async ({ id: userId }, { id: siteId }) => {
   return { site, organization };
 };
 
+const isOrgManager = async ({ id: userId }, { id: orgId }) => {
+  const organization = await fetchModelById(
+    orgId,
+    Organization.forManagerRole({ id: userId }),
+  );
+
+  if (!organization) {
+    throw {
+      status: 403,
+      message: siteErrors.ORGANIZATION_MANAGER_ACCESS,
+    };
+  }
+
+  return { organization };
+};
+
+const isOrgUser = async ({ id: userId }, { id: orgId }) => {
+  const organization = await fetchModelById(orgId, Organization.forUser({ id: userId }));
+
+  if (!organization) {
+    throw {
+      status: 403,
+      message: siteErrors.ORGANIZATION_USER_ACCESS,
+    };
+  }
+
+  return { organization };
+};
+
 const isSiteUser = authorize;
 
-module.exports = { authorize, isSiteOrgManager, isSiteUser };
+module.exports = { authorize, isOrgManager, isOrgUser, isSiteOrgManager, isSiteUser };

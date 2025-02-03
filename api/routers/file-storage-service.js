@@ -5,6 +5,9 @@ const { csrfProtection, sessionAuth } = require('../middlewares');
 router.use(sessionAuth);
 router.use(csrfProtection);
 
-router.post('/site/:site_id/file-storage-service', FileStorageServiceController.create);
+router.post(
+  '/file-storage/:file_storage_id/directory',
+  FileStorageServiceController.createDirectory,
+);
 
 module.exports = router;

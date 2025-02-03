@@ -58,6 +58,72 @@ describe('Utils authorizer', () => {
     });
   });
 
+  describe('.isOrgManager({ id: userId }, { id: orgId })', () => {
+    beforeEach(() => factory.organization.truncate());
+    afterEach(() => factory.organization.truncate());
+
+    it('should resolve when manager of org', async () => {
+      const { user, org } = await createSiteUserOrg({ roleName: 'manager' });
+
+      const expected = await authorizer.isOrgManager(user, org);
+
+      expect(expected.organization.id).to.equal(org.id);
+      expect(expected).to.have.all.keys('organization');
+    });
+
+    it('should throw when user of org', async () => {
+      const { user, org } = await createSiteUserOrg({ roleName: 'user' });
+
+      const error = await authorizer.isOrgManager(user, org).catch((e) => e);
+      expect(error).to.be.throw;
+      expect(error.status).to.be.equal(403);
+      expect(error.message).to.be.equal(siteErrors.ORGANIZATION_MANAGER_ACCESS);
+    });
+
+    it('should throw when user not in org', async () => {
+      const { org } = await createSiteUserOrg({ roleName: 'user' });
+      const { user: notOrgUser } = await createSiteUserOrg({ roleName: 'user' });
+
+      const error = await authorizer.isOrgManager(notOrgUser, org).catch((e) => e);
+      expect(error).to.be.throw;
+      expect(error.status).to.be.equal(403);
+      expect(error.message).to.be.equal(siteErrors.ORGANIZATION_MANAGER_ACCESS);
+    });
+  });
+
+  describe('.isOrgUser({ id: userId }, { id: orgId })', () => {
+    beforeEach(() => factory.organization.truncate());
+    afterEach(() => factory.organization.truncate());
+
+    it('should resolve when manager of org', async () => {
+      const { user, org } = await createSiteUserOrg({ roleName: 'manager' });
+
+      const expected = await authorizer.isOrgUser(user, org);
+
+      expect(expected.organization.id).to.equal(org.id);
+      expect(expected).to.have.all.keys('organization');
+    });
+
+    it('should resolve when user of org', async () => {
+      const { user, org } = await createSiteUserOrg({ roleName: 'user' });
+
+      const expected = await authorizer.isOrgUser(user, org);
+
+      expect(expected.organization.id).to.equal(org.id);
+      expect(expected).to.have.all.keys('organization');
+    });
+
+    it('should throw when user not in org', async () => {
+      const { org } = await createSiteUserOrg({ roleName: 'user' });
+      const { user: notOrgUser } = await createSiteUserOrg({ roleName: 'user' });
+
+      const error = await authorizer.isOrgUser(notOrgUser, org).catch((e) => e);
+      expect(error).to.be.throw;
+      expect(error.status).to.be.equal(403);
+      expect(error.message).to.be.equal(siteErrors.ORGANIZATION_USER_ACCESS);
+    });
+  });
+
   describe('.isSiteOrgManager({ id: userId }, { id: siteId })', () => {
     beforeEach(() => factory.organization.truncate());
     afterEach(() => factory.organization.truncate());

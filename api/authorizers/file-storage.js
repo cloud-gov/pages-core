@@ -1,6 +1,6 @@
 const siteErrors = require('../responses/siteErrors');
-const { FileStorageService } = require('../models');
-const { isSiteOrgManager, isSiteUser } = require('./utils');
+const { FileStorageService, Site } = require('../models');
+const { isSiteOrgManager, isOrgManager, isOrgUser } = require('./utils');
 
 const canCreateSiteStorage = async ({ id: userId }, { id: siteId }) => {
   const { site, organization } = await isSiteOrgManager({ id: userId }, { id: siteId });
@@ -17,10 +17,30 @@ const canCreateSiteStorage = async ({ id: userId }, { id: siteId }) => {
   return { site, organization };
 };
 
-async function canViewSiteStorageActions({ id: userId }, { id: siteId }) {
-  const { site, organization } = await isSiteOrgManager({ id: userId }, { id: siteId });
+const canAdminCreateSiteFileStorage = async ({ id: siteId }) => {
+  const site = await Site.findByPk(siteId);
 
-  const fileStorageService = await FileStorageService.findOne({ where: { siteId } });
+  if (!site) {
+    throw {
+      status: 403,
+      message: siteErrors.SITE_DOES_NOT_EXIST,
+    };
+  }
+
+  const fss = await FileStorageService.findOne({ where: { siteId } });
+
+  if (fss) {
+    throw {
+      status: 403,
+      message: siteErrors.SITE_FILE_STORAGE_EXISTS,
+    };
+  }
+
+  return { site };
+};
+
+async function hasFileStorage(fssId) {
+  const fileStorageService = await FileStorageService.findByPk(fssId);
 
   if (!fileStorageService) {
     throw {
@@ -29,26 +49,34 @@ async function canViewSiteStorageActions({ id: userId }, { id: siteId }) {
     };
   }
 
-  return { site, organization, fileStorageService };
+  return { fileStorageService };
 }
 
-async function canManageSiteStorageFile({ id: userId }, { id: siteId }) {
-  await isSiteUser({ id: userId }, { id: siteId });
+async function isFileStorageManager({ id: userId }, { id: fssId }) {
+  const { fileStorageService } = await hasFileStorage(fssId);
 
-  const fss = await FileStorageService.findOne({ where: { siteId } });
+  const { organization } = await isOrgManager(
+    { id: userId },
+    { id: fileStorageService.organizationId },
+  );
 
-  if (!fss) {
-    throw {
-      status: 404,
-      message: siteErrors.NOT_FOUND,
-    };
-  }
+  return { organization, fileStorageService };
+}
 
-  return true;
+async function isFileStorageUser({ id: userId }, { id: fssId }) {
+  const { fileStorageService } = await hasFileStorage(fssId);
+
+  const { organization } = await isOrgUser(
+    { id: userId },
+    { id: fileStorageService.organizationId },
+  );
+
+  return { fileStorageService, organization };
 }
 
 module.exports = {
+  canAdminCreateSiteFileStorage,
   canCreateSiteStorage,
-  canViewSiteStorageActions,
-  canManageSiteStorageFile,
+  isFileStorageManager,
+  isFileStorageUser,
 };

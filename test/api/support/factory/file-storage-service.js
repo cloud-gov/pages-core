@@ -9,7 +9,7 @@ function increment(key) {
 }
 
 async function build(params = {}) {
-  let { name, orgName, siteId, metadata, serviceId, serviceName } = params;
+  let { name, org, siteId, metadata, serviceId, serviceName } = params;
 
   if (!name) {
     name = increment('file-storage-service');
@@ -23,7 +23,9 @@ async function build(params = {}) {
     serviceName = increment('service-name-');
   }
 
-  const org = await organization.create({ name: orgName });
+  if (!org) {
+    org = await organization.create();
+  }
 
   return FileStorageService.create({
     name,
