@@ -246,33 +246,6 @@ const FindingRecommendation = ({ anchor, solution, sbtType }) => (
           ))}
         </>
       )}
-      {sbtType === 'a11y' && (
-        <>
-          {solution.split('\n\n').map((fixList, listindex) => (
-            <div key={`${anchor}-location-${listindex}`}>
-              {fixList.split('\n').map((str, i) =>
-                i === 0 ? (
-                  <h4 key={i} className="usa-summary-box__heading">
-                    {str}
-                    <a
-                      href={`#${anchor}-recommendation`}
-                      className="usa-link target-highlight anchor-indicator"
-                    >
-                      #
-                    </a>
-                  </h4>
-                ) : (
-                  <div key={i} className="usa-summary-box__body">
-                    <ul className="usa-list margin-bottom-2">
-                      <li className="font-body-md">{str}</li>
-                    </ul>
-                  </div>
-                ),
-              )}
-            </div>
-          ))}
-        </>
-      )}
     </div>
   </div>
 );
