@@ -1,3 +1,4 @@
+const path = require('node:path');
 const request = require('supertest');
 const sinon = require('sinon');
 const factory = require('../support/factory');
@@ -19,7 +20,7 @@ describe('File Storgage API', () => {
     await factory.organization.truncate();
   });
 
-  describe.only('POST /v0/file-storage/:file_storage_id/directory', () => {
+  describe('POST /v0/file-storage/:file_storage_id/directory', () => {
     const endpoint = '/file-storage/{file_storage_id}/directory';
 
     describe('when the user is not authenticated', () => {
@@ -51,8 +52,8 @@ describe('File Storgage API', () => {
       });
     });
 
-    describe('when a manager creates a valid site file storage', () => {
-      it.only('returns a 200', async () => {
+    describe('when a user creates a valid directory', () => {
+      it('returns a 200', async () => {
         const { site, org, user } = await stubSiteS3({
           roleName: 'manager',
         });
@@ -73,6 +74,140 @@ describe('File Storgage API', () => {
           .expect(200);
 
         validateAgainstJSONSchema('POST', endpoint, 200, body);
+      });
+    });
+  });
+
+  describe.only('POST /v0/file-storage/:file_storage_id/upload', () => {
+    const endpoint = '/file-storage/{file_storage_id}/upload';
+
+    describe('when the user is not authenticated', () => {
+      it('returns a 403', async () => {
+        const fssId = 1;
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fssId}/upload`)
+          .expect(403);
+
+        validateAgainstJSONSchema('POST', endpoint, 403, body);
+      });
+    });
+
+    describe('when there is no csrf token', () => {
+      it('returns a 403', async () => {
+        const siteId = 1;
+        const user = await factory.user();
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${siteId}/upload`)
+          .set('Cookie', cookie)
+          .expect(403);
+
+        validateAgainstJSONSchema('POST', endpoint, 403, body);
+      });
+    });
+
+    describe('when a user uploads a valid file', () => {
+      it('returns a 200', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+        const name = 'test.txt';
+        const parent = 'parent/';
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/upload`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .field('name', name)
+          .field('parent', parent)
+          .attach('file', path.join(__dirname, '../support/fixtures/lorem.txt'))
+          .expect(200);
+
+        validateAgainstJSONSchema('POST', endpoint, 200, body);
+      });
+    });
+
+    describe('when a user uploads a file without name field', () => {
+      it('returns a 400', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+        const parent = 'parent/';
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/upload`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .field('parent', parent)
+          .attach('file', path.join(__dirname, '../support/fixtures/lorem.txt'))
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      });
+    });
+
+    describe('when a user uploads a file without parent field', () => {
+      it('returns a 400', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+        const name = 'test.txt';
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/upload`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .field('name', name)
+          .attach('file', path.join(__dirname, '../support/fixtures/lorem.txt'))
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      });
+    });
+
+    describe('when a user does not upload a file', () => {
+      it('returns a 400', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+        const name = 'test.txt';
+        const parent = 'parent/';
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/upload`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .field('name', name)
+          .field('parent', parent)
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
       });
     });
   });

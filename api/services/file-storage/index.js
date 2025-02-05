@@ -6,6 +6,7 @@ const {
 } = require('../../models');
 const S3Helper = require('../S3Helper');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
+const { slugify } = require('../../utils');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -95,7 +96,8 @@ class SiteFileStorageSerivce {
   async createDirectory(parent, name) {
     await this._getSiteFileStorageService();
 
-    const directoryPath = path.join(this.S3_BASE_PATH, parent, name, '/');
+    const directoryName = slugify(name);
+    const directoryPath = path.join(this.S3_BASE_PATH, parent, directoryName, '/');
 
     await this.s3Client.putObject('', directoryPath);
 
@@ -140,9 +142,34 @@ class SiteFileStorageSerivce {
 
   async deleteDirectory() {}
 
-  async listDirectoryFiles() {}
+  // async listDirectoryFiles(parent, {}) {}
 
-  async uploadFile() {}
+  async uploadFile(name, fileBuffer, type, parent, metadata = {}) {
+    await this._getSiteFileStorageService();
+
+    const filename = slugify(name);
+    const directoryPath = path.join(this.S3_BASE_PATH, parent, filename);
+
+    await this.s3Client.putObject(fileBuffer, directoryPath);
+
+    const fsf = await FileStorageFile.create({
+      name,
+      key: directoryPath,
+      type: type,
+      metadata,
+      fileStorageServiceId: this.fileStorageServiceId,
+    });
+
+    await FileStorageUserAction.create({
+      userId: this.userId,
+      fileStorageServiceId: this.fileStorageServiceId,
+      fileStorageFileId: fsf.id,
+      method: FileStorageUserAction.METHODS.POST,
+      description: FileStorageUserAction.ACTION_TYPES.UPLOAD_FILE,
+    });
+
+    return fsf;
+  }
 
   _isInitialized() {
     if (!this.initialized) {

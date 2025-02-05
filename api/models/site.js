@@ -47,7 +47,7 @@ const associate = ({
   Site.hasMany(Domain, {
     foreignKey: 'siteId',
   });
-  Site.hasMany(FileStorageService, {
+  Site.hasOne(FileStorageService, {
     foreignKey: 'siteId',
   });
   Site.hasMany(SiteBranchConfig, {

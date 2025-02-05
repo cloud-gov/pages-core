@@ -10,6 +10,7 @@ const {
 const { wrapHandlers } = require('../utils');
 const { Event } = require('../models');
 const { SiteFileStorageSerivce } = require('../services/file-storage');
+const badRequest = require('../responses/badRequest');
 
 module.exports = wrapHandlers({
   async create(req, res) {
@@ -55,6 +56,52 @@ module.exports = wrapHandlers({
       const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
       const client = await siteStorageService.createClient();
       const fss = await client.createDirectory(parent, name);
+
+      const data = serializeFileStorageFile(fss);
+      return res.send(data);
+    } catch (error) {
+      return res.status(error.status).send(error);
+    }
+  },
+
+  // async listFiles(req, res) {
+  //   const { params, query, user } = req;
+  // },
+
+  async uploadFile(req, res) {
+    const { params, user } = req;
+
+    const fssId = parseInt(params.file_storage_id, 10);
+
+    try {
+      const { fileStorageService } = await isFileStorageUser(
+        { id: user.id },
+        { id: fssId },
+      );
+
+      const [file] = req.files;
+
+      if (!file) {
+        const err = new Error('No file uploaded.');
+        return badRequest(err, { res });
+      }
+
+      const { name, parent } = req.body;
+
+      if (!name || !parent) {
+        const err = new Error('No file name or parent directory defined.');
+        return badRequest(err, { res });
+      }
+
+      const { buffer: fileBuffer, originalname, encoding, mimetype, size } = file;
+
+      const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
+      const client = await siteStorageService.createClient();
+      const fss = await client.uploadFile(name, fileBuffer, mimetype, parent, {
+        encoding,
+        size,
+        originalname,
+      });
 
       const data = serializeFileStorageFile(fss);
       return res.send(data);

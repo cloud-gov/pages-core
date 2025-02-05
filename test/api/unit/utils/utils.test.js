@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const fs = require('node:fs');
 const path = require('node:path');
+const { randomBytes } = require('node:crypto');
 const sinon = require('sinon');
 const moment = require('moment');
 const fsMock = require('mock-fs');
@@ -387,6 +388,80 @@ describe('utils', () => {
 
       // Some extra padding for execution time
       expect(end - start).to.within(time - 10, time + 20);
+    });
+  });
+
+  describe('.slugify', () => {
+    it('should slugify a string', () => {
+      const input = 'Hello World';
+      const expected = 'hello-world';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should preserve file extension', () => {
+      const input = 'test.txt';
+      const expected = 'test.txt';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should preserve file extension when addition periods in name', () => {
+      const input = 'test.one two.txt';
+      const expected = 'testone-two.txt';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should slugify a number', () => {
+      const input = 25624;
+      const expected = '25624';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should remove accents and punctuation from a string', () => {
+      const input = 'Cazá, Cazá';
+      const expected = 'caza-caza';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should remove accents and punctuation from a string', () => {
+      const input = 'Cazá, Cazá';
+      const expected = 'caza-caza';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
+    it('throws if not a string or number', () => {
+      const input = { test: 1 };
+      const message = 'Text must be a string or number.';
+
+      try {
+        utils.slugify(input);
+      } catch (error) {
+        expect(error).to.be.throw;
+        expect(error.message).to.be.eq(message);
+      }
+    });
+
+    it('throws if string is 201+ characters', () => {
+      const input = randomBytes(101).toString('hex').slice(0, 201);
+      const message = 'Text must be less than or equal to 200 characters.';
+
+      try {
+        utils.slugify(input);
+      } catch (error) {
+        expect(error).to.be.throw;
+        expect(error.message).to.be.eq(message);
+      }
     });
   });
 });

@@ -15,10 +15,10 @@
       "type": "string"
     },
     "description": {
-      "type": "string"
+      "oneOf": [{ "type": ["null"] }, { "type": ["string"] }]
     },
     "metadata": {
-      "type": "json"
+      "oneOf": [{ "type": ["null"] }, { "type": ["json"] }]
     },
     "createdAt": {
       "type": "string",
