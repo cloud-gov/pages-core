@@ -13,6 +13,8 @@ const allowedFileStorageFileFields = [
 ];
 
 const serializeFileStorageFile = (serializable) => {
+  if (!serializable) return {};
+
   return pick(allowedFileStorageFileFields, serializable.dataValues);
 };
 

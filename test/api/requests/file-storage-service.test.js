@@ -9,6 +9,7 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const app = require('../../../app');
 const EventCreator = require('../../../api/services/EventCreator');
 const { stubSiteS3 } = require('../support/file-storage-service');
+const S3Helper = require('../../../api/services/S3Helper');
 
 describe('File Storgage API', () => {
   beforeEach(async () => {
@@ -186,6 +187,233 @@ describe('File Storgage API', () => {
       expect(body.data.length).to.be.eq(limit);
       expect(body.totalItems).to.be.eq(expectedCount);
       validateAgainstJSONSchema('GET', endpoint, 200, body);
+    });
+  });
+
+  describe('GET /v0/file-storage/:file_storage_id/file/:file_id', () => {
+    const endpoint = '/file-storage/{file_storage_id}/file/{file_id}';
+
+    it('returns a 403', async () => {
+      const fssId = 1;
+
+      const { body } = await request(app)
+        .get(`/v0/file-storage/${fssId}/file/123`)
+        .type('json')
+        .expect(403);
+
+      validateAgainstJSONSchema('GET', endpoint, 403, body);
+    });
+
+    it('must be a org user', async () => {
+      const nonOrgUser = await factory.user();
+      const { site, org } = await stubSiteS3();
+      const fss = await factory.fileStorageService.create({
+        siteId: site.id,
+        serviceName: site.s3ServiceName,
+        org,
+      });
+      const cookie = await authenticatedSession(nonOrgUser);
+
+      const { body } = await request(app)
+        .get(`/v0/file-storage/${fss.id}/file/123`)
+        .set('Cookie', cookie)
+        .set('x-csrf-token', csrfToken.getToken())
+        .type('json')
+        .expect(403);
+
+      validateAgainstJSONSchema('GET', endpoint, 403, body);
+    });
+
+    describe('when a user gets a file', () => {
+      it('returns a 404 when no file exists', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}/file/123`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(404);
+
+        validateAgainstJSONSchema('GET', endpoint, 404, body);
+      });
+
+      it('returns a 404 when file exists in differnt file service', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const otherFss = await factory.fileStorageService.create();
+        const file = await factory.fileStorageFile.create({
+          fileStorageServiceId: otherFss.id,
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}/file/${file.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(404);
+
+        validateAgainstJSONSchema('GET', endpoint, 404, body);
+      });
+
+      it('returns 200 with a file', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const file = await factory.fileStorageFile.create({
+          fileStorageServiceId: fss.id,
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}/file/${file.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(200);
+
+        expect(body.id).to.be.eq(file.id);
+        expect(body.name).to.be.eq(file.name);
+        expect(body.description).to.be.eq(file.description);
+        expect(body.key).to.be.eq(file.key);
+        expect(body.type).to.be.eq(file.type);
+        expect(body.metadata).to.be.eq(file.metadata);
+        validateAgainstJSONSchema('GET', endpoint, 200, body);
+      });
+    });
+  });
+
+  describe('DELETE /v0/file-storage/:file_storage_id/file/:file_id', () => {
+    const endpoint = '/file-storage/{file_storage_id}/file/{file_id}';
+
+    it('returns a 403', async () => {
+      const fssId = 1;
+
+      const { body } = await request(app)
+        .delete(`/v0/file-storage/${fssId}/file/123`)
+        .type('json')
+        .expect(403);
+
+      validateAgainstJSONSchema('DELETE', endpoint, 403, body);
+    });
+
+    it('must be a org user', async () => {
+      const nonOrgUser = await factory.user();
+      const { site, org } = await stubSiteS3();
+      const fss = await factory.fileStorageService.create({
+        siteId: site.id,
+        serviceName: site.s3ServiceName,
+        org,
+      });
+      const cookie = await authenticatedSession(nonOrgUser);
+
+      const { body } = await request(app)
+        .delete(`/v0/file-storage/${fss.id}/file/123`)
+        .set('Cookie', cookie)
+        .set('x-csrf-token', csrfToken.getToken())
+        .type('json')
+        .expect(403);
+
+      validateAgainstJSONSchema('DELETE', endpoint, 403, body);
+    });
+
+    describe('when a user deletes a file', () => {
+      it('returns a 404 when no file exists', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .delete(`/v0/file-storage/${fss.id}/file/123`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(404);
+
+        validateAgainstJSONSchema('DELETE', endpoint, 404, body);
+      });
+
+      it('returns a 404 when file exists in differnt file service', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const otherFss = await factory.fileStorageService.create();
+        const file = await factory.fileStorageFile.create({
+          fileStorageServiceId: otherFss.id,
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .delete(`/v0/file-storage/${fss.id}/file/${file.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(404);
+
+        validateAgainstJSONSchema('DELETE', endpoint, 404, body);
+      });
+
+      it('returns 200 with a file', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const file = await factory.fileStorageFile.create({
+          fileStorageServiceId: fss.id,
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const s3stub = sinon.stub(S3Helper.S3Client.prototype, 'deleteObject').resolves();
+
+        const { body } = await request(app)
+          .delete(`/v0/file-storage/${fss.id}/file/${file.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(200);
+
+        expect(s3stub.calledOnceWith(body.key)).to.be.eq(true);
+        expect(body.id).to.be.eq(file.id);
+        expect(body.name).to.be.eq(file.name);
+        expect(body.description).to.be.eq(file.description);
+        expect(body.key).to.be.eq(file.key);
+        expect(body.type).to.be.eq(file.type);
+        expect(body.metadata).to.be.eq(file.metadata);
+        validateAgainstJSONSchema('DELETE', endpoint, 200, body);
+      });
     });
   });
 

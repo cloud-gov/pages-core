@@ -1,3 +1,4 @@
+const { isEmpty } = require('underscore');
 const EventCreator = require('../services/EventCreator');
 const {
   canCreateSiteStorage,
@@ -65,6 +66,58 @@ module.exports = wrapHandlers({
     }
   },
 
+  async deleteFile(req, res) {
+    const { params, user } = req;
+
+    const fssId = parseInt(params.file_storage_id, 10);
+    const fileId = parseInt(params.file_id, 10);
+
+    try {
+      const { fileStorageService } = await isFileStorageUser(
+        { id: user.id },
+        { id: fssId },
+      );
+
+      const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
+      const client = await siteStorageService.createClient();
+      const results = await client.deleteFile(fileId);
+
+      if (!results) {
+        return res.notFound();
+      }
+
+      return res.send(results);
+    } catch (error) {
+      return res.status(error.status).send(error);
+    }
+  },
+
+  async getFile(req, res) {
+    const { params, user } = req;
+
+    const fssId = parseInt(params.file_storage_id, 10);
+    const fileId = parseInt(params.file_id, 10);
+
+    try {
+      const { fileStorageService } = await isFileStorageUser(
+        { id: user.id },
+        { id: fssId },
+      );
+
+      const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
+      const client = await siteStorageService.createClient();
+      const results = await client.getFile(fileId);
+
+      if (isEmpty(results)) {
+        return res.notFound();
+      }
+
+      return res.send(results);
+    } catch (error) {
+      return res.status(error.status).send(error);
+    }
+  },
+
   async listDirectoryFiles(req, res) {
     const { params, query, user } = req;
     const {
@@ -88,7 +141,7 @@ module.exports = wrapHandlers({
       const client = await siteStorageService.createClient();
       const results = await client.listDirectoryFiles(path, { limit, page, order });
 
-      res.send(results);
+      return res.send(results);
     } catch (error) {
       return res.status(error.status).send(error);
     }
@@ -115,7 +168,7 @@ module.exports = wrapHandlers({
         page,
       });
 
-      res.send(results);
+      return res.send(results);
     } catch (error) {
       return res.status(error.status).send(error);
     }

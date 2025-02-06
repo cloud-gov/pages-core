@@ -9,9 +9,11 @@ const S3Helper = require('../S3Helper');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
 const { normalizeDirectoryPath, paginate, slugify } = require('../../utils');
 const {
+  serializeFileStorageFile,
   serializeFileStorageFiles,
   serializeFileStorageUserActions,
 } = require('../../serializers/file-storage');
+const siteErrors = require('../../responses/siteErrors');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -143,9 +145,54 @@ class SiteFileStorageSerivce {
     return fss;
   }
 
-  async deleteFile() {}
+  async deleteFile(id) {
+    const record = await FileStorageFile.findOne({
+      where: { id, fileStorageServiceId: this.id },
+    });
+
+    if (!record) {
+      return null;
+    }
+
+    if (record.type === 'directory') {
+      const children = await FileStorageFile.count({
+        where: {
+          fileStorageServiceId: this.id,
+          key: { [Op.like]: `${record.key}%` },
+        },
+      });
+
+      if (children > 1) {
+        return {
+          message: siteErrors.DIRECTORY_MUST_BE_EMPTIED,
+        };
+      }
+    }
+
+    await this.s3Client.deleteObject(record.key);
+
+    const result = await record.destroy();
+
+    await FileStorageUserAction.create({
+      userId: this.userId,
+      fileStorageServiceId: this.id,
+      fileStorageFileId: id,
+      method: FileStorageUserAction.METHODS.DELETE,
+      description: FileStorageUserAction.ACTION_TYPES.DELETE_FILE,
+    });
+
+    return result;
+  }
 
   async deleteDirectory() {}
+
+  async getFile(id) {
+    const record = await FileStorageFile.findOne({
+      where: { id, fileStorageServiceId: this.id },
+    });
+
+    return serializeFileStorageFile(record);
+  }
 
   async listUserActions({ fileStorageFileId = null, limit = 50, page = 1 } = {}) {
     const order = ['createdAt', 'DESC'];

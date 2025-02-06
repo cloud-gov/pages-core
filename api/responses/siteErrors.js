@@ -15,4 +15,6 @@ module.exports = {
   SITE_FILE_STORAGE_EXISTS:
     'The site already has an existing file storage services available.',
   SITE_DOES_NOT_EXIST: 'The specified site does not exist',
+  DIRECTORY_MUST_BE_EMPTIED:
+    'This directory cannot be deleted. Please delete file contents first.',
 };

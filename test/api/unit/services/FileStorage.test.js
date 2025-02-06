@@ -11,6 +11,7 @@ const EventCreator = require('../../../../api/services/EventCreator');
 const S3Helper = require('../../../../api/services/S3Helper');
 const { FileStorageFile, FileStorageUserAction } = require('../../../../api/models');
 const { SiteFileStorageSerivce } = require('../../../../api/services/file-storage');
+const siteErrors = require('../../../../api/responses/siteErrors');
 
 function testUserActionResults(results, fss) {
   return results.data.map((result) => {
@@ -235,6 +236,145 @@ describe('FileStorage services', () => {
 
       expect(s3stub.calledOnceWith('', `${key}`)).to.be.eq(true);
       expect(fsua).to.be.empty;
+    });
+  });
+
+  describe('.deleteFile', () => {
+    it('should delete a file by id', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const file = await factory.fileStorageFile.create({ fileStorageServiceId: fss.id });
+      const s3stub = sinon.stub(S3Helper.S3Client.prototype, 'deleteObject').resolves();
+
+      const results = await client.deleteFile(file.id);
+
+      const fsua = await FileStorageUserAction.findOne({
+        where: {
+          fileStorageFileId: file.id,
+          method: FileStorageUserAction.METHODS.DELETE,
+          description: FileStorageUserAction.ACTION_TYPES.DELETE_FILE,
+        },
+      });
+
+      expect(fsua).to.not.be.empty;
+      expect(s3stub.calledOnceWith(file.key)).to.be.eq(true);
+      expect(results.id).to.be.eq(file.id);
+      expect(results.name).to.be.eq(file.name);
+      expect(results.description).to.be.eq(file.description);
+      expect(results.key).to.be.eq(file.key);
+      expect(results.type).to.be.eq(file.type);
+      expect(results.metadata).to.be.eq(file.metadata);
+      expect(results.deletedAt).to.be.not.null;
+    });
+
+    it('should return message if file is directory is not empty', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const baseDir = 'a/';
+      const childDir = `${baseDir}b/`;
+      const file = await factory.fileStorageFile.create({
+        fileStorageServiceId: fss.id,
+        type: 'directory',
+        key: childDir,
+      });
+
+      // Other files/directories on the same level
+      await factory.fileStorageFile.createBulk(fss.id, baseDir, {
+        files: 10,
+        directories: 2,
+      });
+
+      // Children files/directories
+      await factory.fileStorageFile.createBulk(fss.id, childDir, {
+        files: 10,
+        directories: 2,
+      });
+
+      const results = await client.deleteFile(file.id);
+
+      expect(results.message).to.be.eq(siteErrors.DIRECTORY_MUST_BE_EMPTIED);
+    });
+
+    it('should delete directory if empty', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const baseDir = 'a/';
+      const childDir = `${baseDir}b/`;
+      const file = await factory.fileStorageFile.create({
+        fileStorageServiceId: fss.id,
+        type: 'directory',
+        key: childDir,
+      });
+
+      // Other files/directories on the same level
+      await factory.fileStorageFile.createBulk(fss.id, baseDir, {
+        files: 10,
+        directories: 2,
+      });
+      const s3stub = sinon.stub(S3Helper.S3Client.prototype, 'deleteObject').resolves();
+      const results = await client.deleteFile(file.id);
+      const fsua = await FileStorageUserAction.findOne({
+        where: {
+          fileStorageFileId: file.id,
+          method: FileStorageUserAction.METHODS.DELETE,
+          description: FileStorageUserAction.ACTION_TYPES.DELETE_FILE,
+        },
+      });
+
+      expect(fsua).to.not.be.empty;
+      expect(s3stub.calledOnceWith(file.key)).to.be.eq(true);
+      expect(results.id).to.be.eq(file.id);
+      expect(results.name).to.be.eq(file.name);
+      expect(results.description).to.be.eq(file.description);
+      expect(results.key).to.be.eq(file.key);
+      expect(results.type).to.be.eq(file.type);
+      expect(results.metadata).to.be.eq(file.metadata);
+      expect(results.deletedAt).to.be.not.null;
+    });
+
+    it('should throw no file exists', async () => {
+      const { client } = await createFileStorageServiceClient();
+      const result = await client.deleteFile(123).catch((e) => e);
+
+      expect(result).to.be.null;
+    });
+
+    it('should throw if file exist in other file storage service', async () => {
+      const { client } = await createFileStorageServiceClient();
+      const otherFss = await factory.fileStorageService.create();
+      const otherFile = await factory.fileStorageFile.create({ fssId: otherFss.id });
+
+      const result = await client.deleteFile(otherFile.id).catch((e) => e);
+
+      expect(result).to.be.null;
+    });
+  });
+
+  describe('.getFile', () => {
+    it('should return a file by id', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const file = await factory.fileStorageFile.create({ fileStorageServiceId: fss.id });
+
+      const results = await client.getFile(file.id);
+
+      expect(results.id).to.be.eq(file.id);
+      expect(results.name).to.be.eq(file.name);
+      expect(results.description).to.be.eq(file.description);
+      expect(results.key).to.be.eq(file.key);
+      expect(results.type).to.be.eq(file.type);
+      expect(results.metadata).to.be.eq(file.metadata);
+    });
+
+    it('should return empty if no file exists', async () => {
+      const { client } = await createFileStorageServiceClient();
+      const results = await client.getFile(123);
+      expect(results).to.be.empty;
+    });
+
+    it('should return empty if file exist in other file storage service', async () => {
+      const { client } = await createFileStorageServiceClient();
+      const otherFss = await factory.fileStorageService.create();
+      const otherFile = await factory.fileStorageFile.create({ fssId: otherFss.id });
+      const results = await client.getFile(otherFile.id);
+
+      expect(results).to.be.empty;
     });
   });
 
