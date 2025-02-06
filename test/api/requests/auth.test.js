@@ -113,7 +113,7 @@ describe('Authentication requests', () => {
             const code = 'code';
 
             cfUAANocks.mockUAAAuth(uaaUserProfile, code);
-            cfUAANocks.mockVerifyUserGroup(uaaId, uaaUserInfo);
+            cfUAANocks.mockVerifyUser(uaaId, uaaUserInfo);
 
             const cookie = await unauthenticatedSession({
               oauthState,
@@ -153,7 +153,7 @@ describe('Authentication requests', () => {
             const code = 'code';
 
             cfUAANocks.mockUAAAuth(profile, code);
-            cfUAANocks.mockVerifyUserGroup(uaaId, userProfile);
+            cfUAANocks.mockVerifyUser(uaaId, userProfile);
 
             const cookie = await unauthenticatedSession({
               oauthState,

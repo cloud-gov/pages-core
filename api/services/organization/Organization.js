@@ -60,17 +60,6 @@ module.exports = {
   },
 
   /**
-   * @param {UAAIdentityType} currentUserUAAIdentity
-   */
-  async isUAAAdmin(currentUserUAAIdentity) {
-    const uaaClient = new UAAClient();
-    return uaaClient.verifyUserGroup(currentUserUAAIdentity.uaaId, [
-      'pages.admin',
-      'pages.support',
-    ]);
-  },
-
-  /**
    * @param {string} uaaEmail
    * @returns {Promise<UserType | null>}
    */
@@ -143,9 +132,16 @@ module.exports = {
    * @param {number} organizationId
    * @param {number} roleId
    * @param {string} targetUserEmail - the email address of the user to invite
+   * @param {boolean} isAdmin - called from the admin API
    * @returns {Promise<UAAClient.UAAUserAttributes>}
    */
-  async inviteUserToOrganization(currentUser, organizationId, roleId, targetUserEmail) {
+  async inviteUserToOrganization(
+    currentUser,
+    organizationId,
+    roleId,
+    targetUserEmail,
+    isAdmin = false,
+  ) {
     const currentUserUAAIdentity = await currentUser.getUAAIdentity();
 
     if (!currentUserUAAIdentity) {
@@ -155,20 +151,17 @@ module.exports = {
       );
     }
 
-    const [isAdmin, org] = await Promise.all([
-      this.isUAAAdmin(currentUserUAAIdentity),
-      Organization.findOne({
-        where: {
-          id: organizationId,
+    const org = await Organization.findOne({
+      where: {
+        id: organizationId,
+      },
+      include: [
+        {
+          model: OrganizationRole,
+          include: [Role, User],
         },
-        include: [
-          {
-            model: OrganizationRole,
-            include: [Role, User],
-          },
-        ],
-      }),
-    ]);
+      ],
+    });
 
     if (!isAdmin && !hasManager(org, currentUser)) {
       throwError(
@@ -213,32 +206,13 @@ module.exports = {
       );
     }
 
-    const isAdmin = await this.isUAAAdmin(currentUserUAAIdentity);
-
-    if (!isAdmin) {
-      throwError(
-        // eslint-disable-next-line max-len
-        `Current user ${currentUser.username} must be a Pages admin in UAA to create an organization.`,
-      );
-    }
-
     const [user, uaaUserAttributes] = await this.findOrCreateUAAUser(
       currentUserUAAIdentity,
       targetUserEmail,
     );
 
-    const managerRole = await Role.findOne({
-      where: {
-        name: 'manager',
-      },
-    });
-
     const org = await Organization.create(organizationParams);
-    await org.addUser(user, {
-      through: {
-        roleId: managerRole.id,
-      },
-    });
+    await org.addRoleUser(user, 'manager');
 
     return [org, uaaUserAttributes];
   },

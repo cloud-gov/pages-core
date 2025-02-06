@@ -169,6 +169,7 @@ module.exports = wrapHandlers({
       toInt(organizationId),
       toInt(roleId),
       uaaEmail,
+      true,
     );
     EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'User Invited', {
       organizationId,

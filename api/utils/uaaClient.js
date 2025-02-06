@@ -89,23 +89,6 @@ class UAAClient {
   }
 
   /**
-   * @param {string} userId - a UAA user id
-   * @param {[string]} groupNames - allowed UAA group names, ex: ['pages.user']
-   *
-   * Verifies that the UAA user is in the specified UAA group
-   */
-  async verifyUserGroup(userId, groupNames) {
-    const clientToken = await this.fetchClientToken();
-    const { groups, origin, verified } = await this.fetchUser(userId, clientToken);
-
-    if (origin === 'cloud.gov' && !verified) {
-      return false;
-    }
-
-    return this.userInGroup(groups, groupNames);
-  }
-
-  /**
    *
    * Utility
    *

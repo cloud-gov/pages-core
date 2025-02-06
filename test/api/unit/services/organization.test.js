@@ -252,9 +252,6 @@ describe('OrganizationService', () => {
           }),
         ]);
 
-        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-        isUAAAdminStub.resolves(false);
-
         const error = await OrganizationService.inviteUserToOrganization(
           currentUser,
           orgId,
@@ -289,9 +286,6 @@ describe('OrganizationService', () => {
             },
           });
 
-          const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-          isUAAAdminStub.resolves(false);
-
           const error = await OrganizationService.inviteUserToOrganization(
             currentUser,
             org.id,
@@ -325,9 +319,6 @@ describe('OrganizationService', () => {
           },
         });
 
-        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-        isUAAAdminStub.resolves(true);
-
         const error = await OrganizationService.inviteUserToOrganization(
           currentUser,
           org.id,
@@ -346,9 +337,6 @@ describe('OrganizationService', () => {
       () => {
         it('adds them to the org with the provided role', async () => {
           const uaaEmail = 'foo@bar.com';
-
-          const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-          isUAAAdminStub.resolves(false);
 
           const targetUser = await createUserWithUAAIdentity();
           const findOrCreateUAAUserStub = sinon.stub(
@@ -440,9 +428,6 @@ describe('OrganizationService', () => {
         it('adds them to the org with the provided role', async () => {
           const uaaEmail = 'foo@bar.com';
 
-          const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-          isUAAAdminStub.resolves(true);
-
           const targetUser = await createUserWithUAAIdentity();
           const findOrCreateUAAUserStub = sinon.stub(
             OrganizationService,
@@ -475,6 +460,7 @@ describe('OrganizationService', () => {
             org.id,
             userRole.id,
             uaaEmail,
+            true,
           );
 
           sinon.assert.calledOnceWithMatch(
@@ -536,22 +522,8 @@ describe('OrganizationService', () => {
     });
 
     context('when the current user is not a Pages admin in UAA', () => {
-      it('throws an error', async () => {
-        const currentUser = await createUserWithUAAIdentity();
-        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-        isUAAAdminStub.resolves(false);
-
-        const error = await OrganizationService.createOrganization(
-          {},
-          currentUser,
-          '',
-          false,
-          '',
-        ).catch((e) => e);
-
-        expect(error).to.be.an('Error');
-        expect(error.message).to.contain('must be a Pages admin in UAA');
-      });
+      // this case can't occur the only controller which calls this method
+      // is in the admin API
     });
 
     context('when the target user exists in Pages and UAA', () => {
@@ -561,8 +533,6 @@ describe('OrganizationService', () => {
         const uaaEmail = 'foo@bar.com';
 
         const targetUser = await createUserWithUAAIdentity();
-        const isUAAAdminStub = sinon.stub(OrganizationService, 'isUAAAdmin');
-        isUAAAdminStub.resolves(true);
         const findOrCreateUAAUserStub = sinon.stub(
           OrganizationService,
           'findOrCreateUAAUser',

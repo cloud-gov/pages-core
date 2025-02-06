@@ -58,7 +58,7 @@ describe('verifyUAAUser', () => {
       email: identity.email,
     });
 
-    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
+    cfUAANock.mockVerifyUser(uaaId, uaaUserResponse);
 
     expect(identity.accessToken).to.be.null;
     expect(identity.refreshToken).to.be.null;
@@ -100,7 +100,7 @@ describe('verifyUAAUser', () => {
       email: identity.email,
     });
 
-    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
+    cfUAANock.mockVerifyUser(uaaId, uaaUserResponse);
 
     const { user: result, role } = await verifyUAAUser(
       accessToken,
@@ -135,7 +135,7 @@ describe('verifyUAAUser', () => {
       email,
     });
 
-    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
+    cfUAANock.mockVerifyUser(uaaId, uaaUserResponse);
 
     const { user: result, role } = await verifyUAAUser(
       accessToken,
@@ -171,7 +171,7 @@ describe('verifyUAAUser', () => {
       email: identity.email,
     });
 
-    cfUAANock.mockVerifyUserGroup(uaaId, uaaUserResponse);
+    cfUAANock.mockVerifyUser(uaaId, uaaUserResponse);
 
     await user.destroy();
 
@@ -184,5 +184,84 @@ describe('verifyUAAUser', () => {
     expect(eventAuditStub.called).to.equal(true);
     expect(role).to.be.null;
     return expect(result).to.be.null;
+  });
+
+  it('should verify a user with cloud.gov origin and verified email', async () => {
+    const accessToken = 'a-token';
+    const refreshToken = 'refresh-token';
+    const user = await createUser();
+    const identity = await createUAAIdentity({ userId: user.id });
+    const { uaaId } = identity;
+    const userGroups = [
+      {
+        display: 'pages.user',
+      },
+      {
+        display: 'group.two',
+      },
+    ];
+
+    const uaaUserResponse = uaaUser({
+      uaaId,
+      groups: userGroups,
+      origin: 'cloud.gov',
+      verified: true,
+    });
+
+    const uaaUserProfile = uaaProfile({
+      userId: uaaId,
+      email: identity.email,
+    });
+
+    cfUAANock.mockVerifyUser(uaaId, uaaUserResponse);
+
+    const { user: result, role } = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      uaaUserProfile,
+    );
+
+    expect(role).to.equal('pages.user');
+    return expect(result.dataValues).to.deep.equal(user.dataValues);
+  });
+
+  it(`should not verify a user with cloud.gov
+      origin and unverified verified email`, async () => {
+    const accessToken = 'a-token';
+    const refreshToken = 'refresh-token';
+    const user = await createUser();
+    const identity = await createUAAIdentity({ userId: user.id });
+    const { uaaId } = identity;
+    const userGroups = [
+      {
+        display: 'pages.user',
+      },
+      {
+        display: 'group.two',
+      },
+    ];
+
+    const uaaUserResponse = uaaUser({
+      uaaId,
+      groups: userGroups,
+      origin: 'cloud.gov',
+      verified: false,
+    });
+
+    const uaaUserProfile = uaaProfile({
+      userId: uaaId,
+      email: identity.email,
+    });
+
+    cfUAANock.mockVerifyUser(uaaId, uaaUserResponse);
+
+    const { user: result, role } = await verifyUAAUser(
+      accessToken,
+      refreshToken,
+      uaaUserProfile,
+    );
+
+    expect(role).to.equal(null);
+    return expect(result).to.equal(null);
   });
 });
