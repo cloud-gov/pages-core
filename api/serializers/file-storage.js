@@ -40,10 +40,16 @@ const allowedFileStorageUserActionFields = [
   'description',
   'userId',
   'createdAt',
+  'email',
 ];
 
 const serializeFileStorageUserAction = (serializable) => {
-  return pick(allowedFileStorageUserActionFields, serializable.dataValues);
+  const { User, ...rest } = serializable.dataValues;
+
+  const { UAAIdentity } = User.dataValues;
+  const { email } = UAAIdentity.dataValues;
+
+  return pick(allowedFileStorageUserActionFields, { ...rest, email });
 };
 
 const serializeFileStorageUserActions = (list) => {

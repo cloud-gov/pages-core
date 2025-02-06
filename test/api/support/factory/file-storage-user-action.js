@@ -1,6 +1,7 @@
 const fileStorageFile = require('./file-storage-file');
 const fileStorageService = require('./file-storage-service');
 const user = require('./user');
+const uaaIdentity = require('./uaa-identity');
 const { FileStorageUserAction } = require('../../../../api/models');
 
 function getRandItem(kv) {
@@ -79,6 +80,8 @@ async function createBulk(
 async function createBulkRandom({ fileStorageServiceId }, actions = 1) {
   const fsf = await fileStorageFile.create({ fileStorageServiceId });
   const u = await user();
+  await uaaIdentity.createUAAIdentity({ userId: u.id });
+
   return createBulk(
     { fileStorageServiceId, fileStorageFileId: fsf.id, userId: u.id },
     actions,

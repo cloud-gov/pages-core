@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "fileStorageServiceId",
+    "fileStorageFileId",
+    "userId",
+    "email",
+    "method",
+    "description",
+    "createdAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "fileStorageServiceId": {
+      "type": "integer"
+    },
+    "fileStorageFileId": {
+      "type": "integer"
+    },
+    "userId": {
+      "type": "integer"
+    },
+    "email": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "description": {
+      "oneOf": [{ "type": ["null"] }, { "type": ["string"] }]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

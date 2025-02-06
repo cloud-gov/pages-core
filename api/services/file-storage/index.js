@@ -147,7 +147,7 @@ class SiteFileStorageSerivce {
 
   async deleteDirectory() {}
 
-  async getUserActions({ fileStorageFileId = null, limit = 50, page = 1 } = {}) {
+  async listUserActions({ fileStorageFileId = null, limit = 50, page = 1 } = {}) {
     const order = ['createdAt', 'DESC'];
 
     const where = {
@@ -156,7 +156,7 @@ class SiteFileStorageSerivce {
     };
 
     const results = await paginate(
-      FileStorageUserAction,
+      FileStorageUserAction.scope(['withUserIdentity']),
       serializeFileStorageUserActions,
       {
         limit,

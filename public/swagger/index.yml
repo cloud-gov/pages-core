@@ -290,9 +290,66 @@ paths:
       summary: Returns a list of files in a file storage service path
       responses:
         200:
-          description: Acknowledgement that the directory was created
+          description: A list of files
           schema:
             $ref: 'FileStorageList.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/user-actions:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+    get:
+      summary: Returns a list of user actions in a file storage service path
+      responses:
+        200:
+          description: Lists the user actions for a file storage service
+          schema:
+            $ref: 'FileStorageUserActionList.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/user-actions/{file_id}:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+      - name: file_id
+        in: path
+        description: The id of the file storage file
+        type: integer
+        required: true
+    get:
+      summary: Returns a list of user actions in a file storage file
+      responses:
+        200:
+          description: Lists the user actions for a file storage file
+          schema:
+            $ref: 'FileStorageUserActionList.json'
         400:
           description: Bad request
           schema:

@@ -2,6 +2,7 @@ const EventCreator = require('../services/EventCreator');
 const {
   canCreateSiteStorage,
   isFileStorageUser,
+  isFileStorageManager,
 } = require('../authorizers/file-storage');
 const {
   serializeFileStorageService,
@@ -86,6 +87,33 @@ module.exports = wrapHandlers({
       const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
       const client = await siteStorageService.createClient();
       const results = await client.listDirectoryFiles(path, { limit, page, order });
+
+      res.send(results);
+    } catch (error) {
+      return res.status(error.status).send(error);
+    }
+  },
+
+  async listUserActions(req, res) {
+    const { params, query, user } = req;
+    const { limit = 50, page = 1 } = query;
+
+    const fssId = parseInt(params.file_storage_id, 10);
+    const fileStorageFileId = params.file_id && parseInt(params.file_id, 10);
+
+    try {
+      const { fileStorageService } = await isFileStorageManager(
+        { id: user.id },
+        { id: fssId },
+      );
+
+      const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
+      const client = await siteStorageService.createClient();
+      const results = await client.listUserActions({
+        fileStorageFileId,
+        limit,
+        page,
+      });
 
       res.send(results);
     } catch (error) {

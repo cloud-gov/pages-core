@@ -12,6 +12,18 @@ const S3Helper = require('../../../../api/services/S3Helper');
 const { FileStorageFile, FileStorageUserAction } = require('../../../../api/models');
 const { SiteFileStorageSerivce } = require('../../../../api/services/file-storage');
 
+function testUserActionResults(results, fss) {
+  return results.data.map((result) => {
+    expect(typeof result.id).to.be.eq('number');
+    expect(result.fileStorageServiceId).to.be.eq(fss.id);
+    expect(typeof result.fileStorageFileId).to.be.eq('number');
+    expect(typeof result.method).to.be.eq('string');
+    expect(typeof result.description).to.be.eq('string');
+    expect(typeof result.userId).to.be.eq('number');
+    expect(typeof result.email).to.be.eq('string');
+  });
+}
+
 describe('FileStorage services', () => {
   beforeEach(async () =>
     Promise.all([
@@ -226,7 +238,7 @@ describe('FileStorage services', () => {
     });
   });
 
-  describe.only('.getUserActions', () => {
+  describe('.listUserActions', () => {
     it('should list user actions for a file storage service', async () => {
       const { client, fss } = await createFileStorageServiceClient();
       const fileActions1 = await factory.fileStorageUserActions.createBulkRandom(
@@ -239,8 +251,9 @@ describe('FileStorage services', () => {
       );
       const totalActionCount = fileActions1.length + fileActions2.length;
 
-      const results = await client.getUserActions();
+      const results = await client.listUserActions();
 
+      testUserActionResults(results, fss);
       expect(results.data.length).to.be.eq(totalActionCount);
       expect(results.totalItems).to.be.eq(totalActionCount);
       expect(results.currentPage).to.be.eq(1);
@@ -260,12 +273,42 @@ describe('FileStorage services', () => {
       );
       const totalActionCount = fileActions1.length;
 
-      const results = await client.getUserActions({ fileStorageFileId });
+      const results = await client.listUserActions({ fileStorageFileId });
 
+      testUserActionResults(results, fss);
       expect(results.data.length).to.be.eq(totalActionCount);
       expect(results.totalItems).to.be.eq(totalActionCount);
       expect(results.currentPage).to.be.eq(1);
       expect(results.totalPages).to.be.eq(1);
+    });
+
+    it('should list user actions with limit 2 on page 2', async () => {
+      const limit = 2;
+      const page = 2;
+
+      const { client, fss } = await createFileStorageServiceClient();
+      const fileActions1 = await factory.fileStorageUserActions.createBulkRandom(
+        { fileStorageServiceId: fss.id },
+        10,
+      );
+      const fileStorageFileId = fileActions1[0].fileStorageFileId;
+      await factory.fileStorageUserActions.createBulkRandom(
+        { fileStorageServiceId: fss.id },
+        5,
+      );
+      const totalActionCount = fileActions1.length;
+
+      const results = await client.listUserActions({
+        fileStorageFileId,
+        limit,
+        page,
+      });
+
+      testUserActionResults(results, fss);
+      expect(results.data.length).to.be.eq(limit);
+      expect(results.totalItems).to.be.eq(totalActionCount);
+      expect(results.currentPage).to.be.eq(page);
+      expect(results.totalPages).to.be.eq(totalActionCount / limit);
     });
   });
 

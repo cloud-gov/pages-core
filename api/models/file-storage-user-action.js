@@ -14,7 +14,13 @@ const METHODS = ['GET', 'POST', 'PUT', 'DELETE'].reduce((acc, cur) => {
   return { ...acc, [cur]: cur };
 }, {});
 
-function associate({ FileStorageFile, FileStorageService, FileStorageUserAction, User }) {
+function associate({
+  FileStorageFile,
+  FileStorageService,
+  FileStorageUserAction,
+  UAAIdentity,
+  User,
+}) {
   FileStorageUserAction.belongsTo(FileStorageService, {
     foreignKey: 'fileStorageServiceId',
   });
@@ -25,6 +31,14 @@ function associate({ FileStorageFile, FileStorageService, FileStorageUserAction,
 
   FileStorageUserAction.belongsTo(User, {
     foreignKey: 'userId',
+  });
+
+  FileStorageUserAction.addScope('withUserIdentity', {
+    include: {
+      model: User,
+      required: true,
+      include: { model: UAAIdentity, required: true },
+    },
   });
 }
 
