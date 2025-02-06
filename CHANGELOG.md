@@ -1,3 +1,15 @@
+## 0.15.2 (2025-02-06)
+
+### Fixed
+
+- Remove redundant a11y recommendation content
+- don't fetch site user model, allow admin rebuild
+
+### Maintenance
+
+- move initial uaa group checking to login/verify only
+- remove errant login logging
+
 ## 0.15.1 (2025-01-27)
 
 ### Fixed
