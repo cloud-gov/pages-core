@@ -54,9 +54,7 @@ describe('Admin authentication request', () => {
       });
 
       cfUAANock.mockUAAAuth(profile, code);
-      cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
-      // mocked twice for subsequent calls
-      cfUAANock.mockVerifyUserGroup(uaaId, userProfile);
+      cfUAANock.mockVerifyUser(uaaId, userProfile);
 
       return request(app)
         .get(`/admin/auth/uaa/callback?code=${code}&state=abc123`)
@@ -92,9 +90,7 @@ describe('Admin authentication request', () => {
 
       beforeEach(() => {
         cfUAANock.mockUAAAuth(uaaUserProfile, code);
-        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
-        // mocked twice for subsequent calls
-        cfUAANock.mockVerifyUserGroup(uaaId, uaaUserInfo);
+        cfUAANock.mockVerifyUser(uaaId, uaaUserInfo);
       });
 
       it('returns a script tag', (done) => {

@@ -31,24 +31,12 @@ const uaaOptions = {
 
 const verify = async (req, accessToken, refreshToken, profile, callback) => {
   try {
-    const supportUser = await verifyUAAUser(accessToken, refreshToken, profile, [
-      'pages.support',
-    ]);
+    const { user, role } = await verifyUAAUser(accessToken, refreshToken, profile);
 
-    if (supportUser) {
+    if (user && role) {
       return callback(null, {
-        ...supportUser.dataValues,
-        role: 'pages.support',
-      });
-    }
-
-    const adminUser = await verifyUAAUser(accessToken, refreshToken, profile, [
-      'pages.admin',
-    ]);
-    if (adminUser) {
-      return callback(null, {
-        ...adminUser.dataValues,
-        role: 'pages.admin',
+        ...user.dataValues,
+        role,
       });
     }
 

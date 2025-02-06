@@ -238,7 +238,7 @@ function mockUAAAuth(profile, code) {
  * @param {string} userId
  * @param {object} profile
  */
-function mockVerifyUserGroup(userId, profile) {
+function mockVerifyUser(userId, profile) {
   const token = 'token';
   mockFetchClientToken(token);
   mockFetchUser(userId, profile, token);
@@ -291,6 +291,6 @@ module.exports = {
   mockInviteUser,
   mockInviteUserToUserGroup,
   mockRefreshToken,
-  mockVerifyUserGroup,
+  mockVerifyUser,
   mockServerErrorStatus,
 };

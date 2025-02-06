@@ -34,12 +34,18 @@ function createUAAStrategy(options, verify) {
   return strategy;
 }
 
-async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
+async function verifyUAAUser(accessToken, refreshToken, profile) {
   const { user_id: uaaId, email } = profile;
   const client = new UAAClient();
-  const isVerified = await client.verifyUserGroup(uaaId, uaaGroups);
 
-  if (!isVerified) {
+  const clientToken = await client.fetchClientToken();
+  const { groups, origin, verified } = await client.fetchUser(uaaId, clientToken);
+  const userGroups = groups.map((g) => g.display).filter((g) => g.startsWith('pages'));
+
+  // the profile isn't verified if:
+  // unverified and cloud.gov origin OR
+  // no pages group membership
+  if ((origin === 'cloud.gov' && !verified) || !userGroups.length) {
     EventCreator.audit(
       Event.labels.AUTHENTICATION,
       null,
@@ -49,7 +55,7 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
       },
     );
 
-    return null;
+    return { user: null, role: null };
   }
 
   const identity = await UAAIdentity.findOne({
@@ -70,7 +76,7 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
         profile,
       },
     );
-    return null;
+    return { user: null, role: null };
   }
 
   if (!identity.User) {
@@ -83,7 +89,7 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
         identity,
       },
     );
-    return null;
+    return { user: null, role: null };
   }
 
   await identity.update({
@@ -92,7 +98,11 @@ async function verifyUAAUser(accessToken, refreshToken, profile, uaaGroups) {
     refreshToken,
   });
 
-  return identity.User;
+  // add role based on highest permissioned user group
+  const ordereredRoles = ['pages.admin', 'pages.support', 'pages.user'];
+  const role = ordereredRoles.find((or) => userGroups.includes(or));
+
+  return { user: identity.User, role };
 }
 
 module.exports = {
