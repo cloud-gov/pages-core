@@ -9,7 +9,7 @@ const {
 } = require('../../support/file-storage-service');
 const EventCreator = require('../../../../api/services/EventCreator');
 const S3Helper = require('../../../../api/services/S3Helper');
-const { FileStorageUserAction } = require('../../../../api/models');
+const { FileStorageFile, FileStorageUserAction } = require('../../../../api/models');
 const { SiteFileStorageSerivce } = require('../../../../api/services/file-storage');
 
 describe('FileStorage services', () => {
@@ -223,6 +223,185 @@ describe('FileStorage services', () => {
 
       expect(s3stub.calledOnceWith('', `${key}`)).to.be.eq(true);
       expect(fsua).to.be.empty;
+    });
+  });
+
+  describe.only('.getUserActions', () => {
+    it('should list user actions for a file storage service', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const fileActions1 = await factory.fileStorageUserActions.createBulkRandom(
+        { fileStorageServiceId: fss.id },
+        10,
+      );
+      const fileActions2 = await factory.fileStorageUserActions.createBulkRandom(
+        { fileStorageServiceId: fss.id },
+        10,
+      );
+      const totalActionCount = fileActions1.length + fileActions2.length;
+
+      const results = await client.getUserActions();
+
+      expect(results.data.length).to.be.eq(totalActionCount);
+      expect(results.totalItems).to.be.eq(totalActionCount);
+      expect(results.currentPage).to.be.eq(1);
+      expect(results.totalPages).to.be.eq(1);
+    });
+
+    it('should list user actions for a file storage file', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const fileActions1 = await factory.fileStorageUserActions.createBulkRandom(
+        { fileStorageServiceId: fss.id },
+        10,
+      );
+      const fileStorageFileId = fileActions1[0].fileStorageFileId;
+      await factory.fileStorageUserActions.createBulkRandom(
+        { fileStorageServiceId: fss.id },
+        5,
+      );
+      const totalActionCount = fileActions1.length;
+
+      const results = await client.getUserActions({ fileStorageFileId });
+
+      expect(results.data.length).to.be.eq(totalActionCount);
+      expect(results.totalItems).to.be.eq(totalActionCount);
+      expect(results.currentPage).to.be.eq(1);
+      expect(results.totalPages).to.be.eq(1);
+    });
+  });
+
+  describe('listDirectoryFiles', () => {
+    it('should list files in a directory', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const dir = 'a/b/c/';
+      const subdir = `${dir}/d/`;
+      const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+        files: 10,
+        directories: 2,
+      });
+      const expectedCount = expectedList.files.length + expectedList.directories.length;
+      const unexpectedList = await factory.fileStorageFile.createBulk(fss.id, subdir, {
+        files: 2,
+        directories: 1,
+      });
+      const unexpectedCount =
+        unexpectedList.files.length + unexpectedList.directories.length;
+      const allFileCount = expectedCount + unexpectedCount;
+      const results = await client.listDirectoryFiles(dir, { limit: 100 });
+
+      const files = await FileStorageFile.findAll({
+        where: { fileStorageServiceId: fss.id },
+      });
+
+      expect(results.currentPage).to.be.eq(1);
+      expect(results.totalPages).to.be.eq(1);
+      expect(results.data.length).to.be.eq(expectedCount);
+      expect(results.totalItems).to.be.eq(expectedCount);
+      expect(files.length).to.be.eq(allFileCount);
+    });
+
+    it('should list files for directory on multiple pages', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const dir = 'a/b/c/';
+      const subdir = `${dir}/d/`;
+      const limit = 2;
+      const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+        files: 10,
+        directories: 2,
+      });
+      const expectedCount = expectedList.files.length + expectedList.directories.length;
+      const unexpectedList = await factory.fileStorageFile.createBulk(fss.id, subdir, {
+        files: 2,
+        directories: 1,
+      });
+      const unexpectedCount =
+        unexpectedList.files.length + unexpectedList.directories.length;
+      const allFileCount = expectedCount + unexpectedCount;
+      const results = await client.listDirectoryFiles(dir, { limit });
+
+      const files = await FileStorageFile.findAll({
+        where: { fileStorageServiceId: fss.id },
+      });
+
+      const totalPages = expectedCount / limit;
+
+      expect(results.currentPage).to.be.eq(1);
+      expect(results.totalPages).to.be.eq(totalPages);
+      expect(results.data.length).to.be.eq(limit);
+      expect(results.totalItems).to.be.eq(expectedCount);
+      expect(files.length).to.be.eq(allFileCount);
+    });
+
+    it('should list files for directory from second page', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const dir = 'a/b/c/';
+      const subdir = `${dir}/d/`;
+      const limit = 2;
+      const page = 2;
+      const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+        files: 10,
+        directories: 2,
+      });
+      const expectedCount = expectedList.files.length + expectedList.directories.length;
+      const unexpectedList = await factory.fileStorageFile.createBulk(fss.id, subdir, {
+        files: 2,
+        directories: 1,
+      });
+      const unexpectedCount =
+        unexpectedList.files.length + unexpectedList.directories.length;
+      const allFileCount = expectedCount + unexpectedCount;
+      const results = await client.listDirectoryFiles(dir, { limit, page });
+
+      const files = await FileStorageFile.findAll({
+        where: { fileStorageServiceId: fss.id },
+      });
+
+      const totalPages = expectedCount / limit;
+
+      expect(results.currentPage).to.be.eq(page);
+      expect(results.totalPages).to.be.eq(totalPages);
+      expect(results.data.length).to.be.eq(limit);
+      expect(results.totalItems).to.be.eq(expectedCount);
+      expect(files.length).to.be.eq(allFileCount);
+    });
+
+    it('should sort by name desc', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const dir = 'a/b/c/';
+      const subdir = `${dir}/d/`;
+      const order = ['name', 'desc'];
+      const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+        files: 10,
+        directories: 2,
+      });
+      const expectedCount = expectedList.files.length + expectedList.directories.length;
+      const unexpectedList = await factory.fileStorageFile.createBulk(fss.id, subdir, {
+        files: 2,
+        directories: 1,
+      });
+      const unexpectedCount =
+        unexpectedList.files.length + unexpectedList.directories.length;
+      const allFileCount = expectedCount + unexpectedCount;
+      const results = await client.listDirectoryFiles(dir, { order });
+
+      const files = await FileStorageFile.findAll({
+        where: { fileStorageServiceId: fss.id },
+      });
+
+      const firstRecordIncrement = parseInt(
+        results.data[0].name.split('-').slice(-1)[0],
+        10,
+      );
+      const secondRecordIncrement = parseInt(
+        results.data[1].name.split('-').slice(-1)[0],
+        10,
+      );
+
+      expect(firstRecordIncrement).to.be.gt(secondRecordIncrement);
+      expect(results.currentPage).to.be.eq(1);
+      expect(results.totalPages).to.be.eq(1);
+      expect(results.data.length).to.be.eq(expectedCount);
+      expect(results.totalItems).to.be.eq(expectedCount);
+      expect(files.length).to.be.eq(allFileCount);
     });
   });
 

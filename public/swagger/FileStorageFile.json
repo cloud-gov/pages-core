@@ -18,7 +18,7 @@
       "oneOf": [{ "type": ["null"] }, { "type": ["string"] }]
     },
     "metadata": {
-      "oneOf": [{ "type": ["null"] }, { "type": ["json"] }]
+      "type": "json"
     },
     "createdAt": {
       "type": "string",

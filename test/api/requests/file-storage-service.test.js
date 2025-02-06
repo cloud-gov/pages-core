@@ -1,4 +1,5 @@
 const path = require('node:path');
+const { expect } = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
 const factory = require('../support/factory');
@@ -18,6 +19,174 @@ describe('File Storgage API', () => {
   afterEach(async () => {
     sinon.restore();
     await factory.organization.truncate();
+  });
+
+  describe('GET /v0/file-storage/:file_storage_id', () => {
+    const endpoint = '/file-storage/{file_storage_id}';
+
+    it('returns a 403', async () => {
+      const fssId = 1;
+
+      const { body } = await request(app)
+        .get(`/v0/file-storage/${fssId}`)
+        .type('json')
+        .expect(403);
+
+      validateAgainstJSONSchema('GET', endpoint, 403, body);
+    });
+
+    it('must be a org user', async () => {
+      const nonOrgUser = await factory.user();
+      const { site, org } = await stubSiteS3();
+      const fss = await factory.fileStorageService.create({
+        siteId: site.id,
+        serviceName: site.s3ServiceName,
+        org,
+      });
+      const cookie = await authenticatedSession(nonOrgUser);
+
+      const { body } = await request(app)
+        .get(`/v0/file-storage/${fss.id}`)
+        .set('Cookie', cookie)
+        .set('x-csrf-token', csrfToken.getToken())
+        .type('json')
+        .expect(403);
+
+      validateAgainstJSONSchema('GET', endpoint, 403, body);
+    });
+
+    describe('when a user lists directory', () => {
+      it('returns a 200 when empty', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(200);
+
+        validateAgainstJSONSchema('GET', endpoint, 200, body);
+      });
+
+      it('returns a list of items in the directory path', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const dir = '~assets/b/c/';
+        const subdir = `${dir}/d/`;
+        const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+          files: 10,
+          directories: 2,
+        });
+        const expectedCount = expectedList.files.length + expectedList.directories.length;
+        await factory.fileStorageFile.createBulk(fss.id, subdir, {
+          files: 2,
+          directories: 1,
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}?path=${dir}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(200);
+
+        expect(body.currentPage).to.be.eq(1);
+        expect(body.totalPages).to.be.eq(1);
+        expect(body.data.length).to.be.eq(expectedCount);
+        expect(body.totalItems).to.be.eq(expectedCount);
+        validateAgainstJSONSchema('GET', endpoint, 200, body);
+      });
+
+      it('returns a list of items in the default root directory', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const dir = '~assets/';
+        const subdir = `${dir}/d/`;
+        const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+          files: 10,
+          directories: 2,
+        });
+        const expectedCount = expectedList.files.length + expectedList.directories.length;
+        await factory.fileStorageFile.createBulk(fss.id, subdir, {
+          files: 2,
+          directories: 1,
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(200);
+
+        expect(body.currentPage).to.be.eq(1);
+        expect(body.totalPages).to.be.eq(1);
+        expect(body.data.length).to.be.eq(expectedCount);
+        expect(body.totalItems).to.be.eq(expectedCount);
+        validateAgainstJSONSchema('GET', endpoint, 200, body);
+      });
+    });
+
+    it('returns page 2 with a page size of 2 from the list', async () => {
+      const { site, org, user } = await stubSiteS3();
+      const fss = await factory.fileStorageService.create({
+        siteId: site.id,
+        serviceName: site.s3ServiceName,
+        org,
+      });
+
+      const dir = '~assets/a/';
+      const subdir = `${dir}/b/`;
+      const page = 2;
+      const limit = 2;
+      const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+        files: 10,
+        directories: 2,
+      });
+      const expectedCount = expectedList.files.length + expectedList.directories.length;
+      await factory.fileStorageFile.createBulk(fss.id, subdir, {
+        files: 2,
+        directories: 1,
+      });
+
+      const cookie = await authenticatedSession(user);
+
+      const { body } = await request(app)
+        .get(`/v0/file-storage/${fss.id}?path=${dir}&limit=${limit}&page=${page}`)
+        .set('Cookie', cookie)
+        .set('x-csrf-token', csrfToken.getToken())
+        .type('json')
+        .expect(200);
+
+      expect(body.currentPage).to.be.eq(page);
+      expect(body.totalPages).to.be.eq(expectedCount / limit);
+      expect(body.data.length).to.be.eq(limit);
+      expect(body.totalItems).to.be.eq(expectedCount);
+      validateAgainstJSONSchema('GET', endpoint, 200, body);
+    });
   });
 
   describe('POST /v0/file-storage/:file_storage_id/directory', () => {
@@ -78,7 +247,7 @@ describe('File Storgage API', () => {
     });
   });
 
-  describe.only('POST /v0/file-storage/:file_storage_id/upload', () => {
+  describe('POST /v0/file-storage/:file_storage_id/upload', () => {
     const endpoint = '/file-storage/{file_storage_id}/upload';
 
     describe('when the user is not authenticated', () => {

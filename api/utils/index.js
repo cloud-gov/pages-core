@@ -222,7 +222,6 @@ async function paginate(
     order: [order],
     ...query,
   };
-
   const { rows, count } = await model.findAndCountAll(pQuery);
 
   const totalPages = Math.trunc(count / limit) + (count % limit === 0 ? 0 : 1);
@@ -349,6 +348,20 @@ function slugify(text, len = 200) {
   return extension ? `${slugifiedBase}.${extension}` : slugifiedBase;
 }
 
+function normalizeDirectoryPath(dir) {
+  let normalized = path.normalize(dir);
+
+  if (normalized.startsWith('/') && normalized.endsWith('/')) {
+    normalized = normalized.slice(1);
+  }
+
+  if (!normalized.endsWith('/')) {
+    normalized += '/';
+  }
+
+  return normalized;
+}
+
 module.exports = {
   appMatch,
   buildEnum,
@@ -361,6 +374,7 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  normalizeDirectoryPath,
   omitBy,
   omit,
   paginate,

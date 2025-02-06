@@ -464,4 +464,37 @@ describe('utils', () => {
       }
     });
   });
+
+  describe('.normalizeDirectoryPath', () => {
+    it('should return a good dir path', () => {
+      const dir = 'asdf/asdf/';
+      const result = utils.normalizeDirectoryPath(dir);
+
+      expect(result).to.be.eq(dir);
+    });
+
+    it('should remove a leading slash', () => {
+      const expected = 'asdf/asdf/';
+      const dir = `/${expected}`;
+      const result = utils.normalizeDirectoryPath(dir);
+
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should remove add a trailing slash', () => {
+      const expected = 'asdf/asdf/';
+      const dir = `asdf/asdf`;
+      const result = utils.normalizeDirectoryPath(dir);
+
+      expect(result).to.be.eq(expected);
+    });
+
+    it('should normalize slashes', () => {
+      const expected = 'asdf/asdf/';
+      const dir = `/${expected}/`;
+      const result = utils.normalizeDirectoryPath(dir);
+
+      expect(result).to.be.eq(expected);
+    });
+  });
 });

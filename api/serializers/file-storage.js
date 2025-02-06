@@ -16,6 +16,10 @@ const serializeFileStorageFile = (serializable) => {
   return pick(allowedFileStorageFileFields, serializable.dataValues);
 };
 
+const serializeFileStorageFiles = (list) => {
+  return list.map((i) => serializeFileStorageFile(i));
+};
+
 const allowedFileStorageServiceFields = [
   'id',
   'organizationId',
@@ -28,7 +32,28 @@ const serializeFileStorageService = (serializable) => {
   return pick(allowedFileStorageServiceFields, serializable.dataValues);
 };
 
+const allowedFileStorageUserActionFields = [
+  'id',
+  'fileStorageServiceId',
+  'fileStorageFileId',
+  'method',
+  'description',
+  'userId',
+  'createdAt',
+];
+
+const serializeFileStorageUserAction = (serializable) => {
+  return pick(allowedFileStorageUserActionFields, serializable.dataValues);
+};
+
+const serializeFileStorageUserActions = (list) => {
+  return list.map((i) => serializeFileStorageUserAction(i));
+};
+
 module.exports = {
   serializeFileStorageFile,
+  serializeFileStorageFiles,
   serializeFileStorageService,
+  serializeFileStorageUserAction,
+  serializeFileStorageUserActions,
 };

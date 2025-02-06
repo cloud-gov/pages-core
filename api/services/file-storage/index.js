@@ -1,4 +1,5 @@
 const path = require('node:path');
+const { Op } = require('sequelize');
 const {
   FileStorageService,
   FileStorageFile,
@@ -6,7 +7,11 @@ const {
 } = require('../../models');
 const S3Helper = require('../S3Helper');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
-const { slugify } = require('../../utils');
+const { normalizeDirectoryPath, paginate, slugify } = require('../../utils');
+const {
+  serializeFileStorageFiles,
+  serializeFileStorageUserActions,
+} = require('../../serializers/file-storage');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -142,7 +147,56 @@ class SiteFileStorageSerivce {
 
   async deleteDirectory() {}
 
-  // async listDirectoryFiles(parent, {}) {}
+  async getUserActions({ fileStorageFileId = null, limit = 50, page = 1 } = {}) {
+    const order = ['createdAt', 'DESC'];
+
+    const where = {
+      fileStorageServiceId: this.id,
+      ...(fileStorageFileId && { fileStorageFileId }),
+    };
+
+    const results = await paginate(
+      FileStorageUserAction,
+      serializeFileStorageUserActions,
+      {
+        limit,
+        page,
+      },
+      {
+        where,
+      },
+      order,
+    );
+
+    return results;
+  }
+
+  async listDirectoryFiles(
+    directory,
+    { limit = 50, page = 1, order = ['name', 'ASC'] } = {},
+  ) {
+    const dir = normalizeDirectoryPath(directory);
+    const results = await paginate(
+      FileStorageFile,
+      serializeFileStorageFiles,
+      {
+        limit,
+        page,
+      },
+      {
+        where: {
+          fileStorageServiceId: this.id,
+          [Op.and]: [
+            { key: { [Op.like]: `${dir}%` } },
+            { key: { [Op.notLike]: `${dir}%/_%` } },
+          ],
+        },
+      },
+      order,
+    );
+
+    return results;
+  }
 
   async uploadFile(name, fileBuffer, type, parent, metadata = {}) {
     await this._getSiteFileStorageService();

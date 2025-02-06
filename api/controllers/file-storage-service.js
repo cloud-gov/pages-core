@@ -64,9 +64,34 @@ module.exports = wrapHandlers({
     }
   },
 
-  // async listFiles(req, res) {
-  //   const { params, query, user } = req;
-  // },
+  async listDirectoryFiles(req, res) {
+    const { params, query, user } = req;
+    const {
+      path = '~assets/',
+      limit = 50,
+      page = 1,
+      sortKey = 'updatedAt',
+      sortOrder = 'DESC',
+    } = query;
+    const order = [sortKey, sortOrder];
+
+    const fssId = parseInt(params.file_storage_id, 10);
+
+    try {
+      const { fileStorageService } = await isFileStorageUser(
+        { id: user.id },
+        { id: fssId },
+      );
+
+      const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
+      const client = await siteStorageService.createClient();
+      const results = await client.listDirectoryFiles(path, { limit, page, order });
+
+      res.send(results);
+    } catch (error) {
+      return res.status(error.status).send(error);
+    }
+  },
 
   async uploadFile(req, res) {
     const { params, user } = req;
