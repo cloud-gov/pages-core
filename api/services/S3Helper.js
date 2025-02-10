@@ -5,6 +5,7 @@ const {
   GetObjectCommand,
   waitUntilBucketExists,
   DeleteObjectsCommand,
+  DeleteObjectCommand,
 } = require('@aws-sdk/client-s3');
 
 const S3_DEFAULT_MAX_KEYS = 1000;
@@ -143,6 +144,16 @@ class S3Client {
 
       await client.send(command);
     }
+  }
+
+  async deleteObject(key, extras = {}) {
+    const { bucket, client } = this;
+    const command = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ...extras,
+    });
+    return client.send(command);
   }
 
   async putObject(body, key, extras = {}) {
