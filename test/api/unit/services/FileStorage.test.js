@@ -551,7 +551,7 @@ describe('FileStorage services', () => {
       const { client, fss } = await createFileStorageServiceClient();
       const dir = 'a/b/c/';
       const subdir = `${dir}/d/`;
-      const order = ['name', 'desc'];
+      const order = [['name', 'desc']];
       const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
         files: 10,
         directories: 2,

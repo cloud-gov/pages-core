@@ -2,8 +2,8 @@ const siteErrors = require('../responses/siteErrors');
 const { FileStorageService, Site } = require('../models');
 const { isSiteOrgManager, isOrgManager, isOrgUser } = require('./utils');
 
-const canCreateSiteStorage = async ({ id: userId }, { id: siteId }) => {
-  const { site, organization } = await isSiteOrgManager({ id: userId }, { id: siteId });
+const canCreateSiteStorage = async (userId, siteId) => {
+  const { site, organization } = await isSiteOrgManager(userId, siteId);
 
   const fss = await FileStorageService.findOne({ where: { siteId } });
 
@@ -17,7 +17,7 @@ const canCreateSiteStorage = async ({ id: userId }, { id: siteId }) => {
   return { site, organization };
 };
 
-const canAdminCreateSiteFileStorage = async ({ id: siteId }) => {
+const canAdminCreateSiteFileStorage = async (siteId) => {
   const site = await Site.findByPk(siteId);
 
   if (!site) {
@@ -52,24 +52,18 @@ async function hasFileStorage(fssId) {
   return { fileStorageService };
 }
 
-async function isFileStorageManager({ id: userId }, { id: fssId }) {
+async function isFileStorageManager(userId, fssId) {
   const { fileStorageService } = await hasFileStorage(fssId);
 
-  const { organization } = await isOrgManager(
-    { id: userId },
-    { id: fileStorageService.organizationId },
-  );
+  const { organization } = await isOrgManager(userId, fileStorageService.organizationId);
 
   return { organization, fileStorageService };
 }
 
-async function isFileStorageUser({ id: userId }, { id: fssId }) {
+async function isFileStorageUser(userId, fssId) {
   const { fileStorageService } = await hasFileStorage(fssId);
 
-  const { organization } = await isOrgUser(
-    { id: userId },
-    { id: fileStorageService.organizationId },
-  );
+  const { organization } = await isOrgUser(userId, fileStorageService.organizationId);
 
   return { fileStorageService, organization };
 }

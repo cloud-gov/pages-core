@@ -73,16 +73,16 @@ const create = async (user, siteParams) => {
   }
 };
 
-const createBuild = (user, site) => authorize(user, site);
+const createBuild = (user, site) => authorize(user.id, site.id);
 
-const showActions = (user, site) => authorize(user, site);
+const showActions = (user, site) => authorize(user.id, site.id);
 
-const findOne = (user, site) => authorize(user, site);
+const findOne = (user, site) => authorize(user.id, site.id);
 
-const update = (user, site) => authorize(user, site);
+const update = (user, site) => authorize(user.id, site.id);
 
 const destroy = (user, site) =>
-  authorize(user, site).then(() => authorizeRepositoryAdmin(user, site));
+  authorize(user.id, site.id).then(() => authorizeRepositoryAdmin(user, site));
 
 module.exports = {
   create,

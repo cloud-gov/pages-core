@@ -10,23 +10,18 @@ module.exports = wrapHandlers({
     const { params, user } = req;
 
     const siteId = parseInt(params.id, 10);
+    const { site } = await canAdminCreateSiteFileStorage(siteId);
 
-    try {
-      const { site } = await canAdminCreateSiteFileStorage({ id: siteId });
+    const fss = await adminCreateSiteFileStorage(site);
 
-      const fss = await adminCreateSiteFileStorage(site);
+    EventCreator.audit(
+      Event.labels.ADMIN,
+      user,
+      'Site File Storage Service Created',
+      fss,
+    );
 
-      EventCreator.audit(
-        Event.labels.ADMIN,
-        user,
-        'Site File Storage Service Created',
-        fss,
-      );
-
-      const data = serializeFileStorageService(fss);
-      return res.send(data);
-    } catch (error) {
-      return res.status(error.status).send(error);
-    }
+    const data = serializeFileStorageService(fss);
+    return res.send(data);
   },
 });

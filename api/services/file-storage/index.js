@@ -184,8 +184,6 @@ class SiteFileStorageSerivce {
     return result;
   }
 
-  async deleteDirectory() {}
-
   async getFile(id) {
     const record = await FileStorageFile.findOne({
       where: { id, fileStorageServiceId: this.id },
@@ -195,7 +193,7 @@ class SiteFileStorageSerivce {
   }
 
   async listUserActions({ fileStorageFileId = null, limit = 50, page = 1 } = {}) {
-    const order = ['createdAt', 'DESC'];
+    const order = [['createdAt', 'DESC']];
 
     const where = {
       fileStorageServiceId: this.id,
@@ -211,8 +209,8 @@ class SiteFileStorageSerivce {
       },
       {
         where,
+        order,
       },
-      order,
     );
 
     return results;
@@ -220,7 +218,7 @@ class SiteFileStorageSerivce {
 
   async listDirectoryFiles(
     directory,
-    { limit = 50, page = 1, order = ['name', 'ASC'] } = {},
+    { limit = 50, page = 1, order = [['name', 'ASC']] } = {},
   ) {
     const dir = normalizeDirectoryPath(directory);
     const results = await paginate(
@@ -238,8 +236,8 @@ class SiteFileStorageSerivce {
             { key: { [Op.notLike]: `${dir}%/_%` } },
           ],
         },
+        order,
       },
-      order,
     );
 
     return results;

@@ -205,13 +205,7 @@ function omitBy(fn, obj) {
   return pick(pickedKeys, obj);
 }
 
-async function paginate(
-  model,
-  serialize,
-  params,
-  query = {},
-  order = ['createdAt', 'DESC'],
-) {
+async function paginate(model, serialize, params, query = {}) {
   const limit = toInt(params.limit) || 25;
   const page = toInt(params.page) || 1;
   const offset = limit * (page - 1);
@@ -219,7 +213,7 @@ async function paginate(
   const pQuery = {
     limit,
     offset,
-    order: [order],
+    order: [['createdAt', 'DESC']],
     ...query,
   };
   const { rows, count } = await model.findAndCountAll(pQuery);
@@ -329,7 +323,7 @@ function slugify(text, len = 200) {
 
   const [base, extension] = splitFileExt(str);
 
-  if (str.length > 200) {
+  if (str.length > len) {
     throw new Error(`Text must be less than or equal to ${len} characters.`);
   }
 

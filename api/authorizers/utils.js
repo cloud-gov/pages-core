@@ -2,7 +2,7 @@ const siteErrors = require('../responses/siteErrors');
 const { Organization, Site } = require('../models');
 const { fetchModelById } = require('../utils/queryDatabase');
 
-const authorize = async ({ id: userId }, { id: siteId }) => {
+const authorize = async (userId, siteId) => {
   const site = await fetchModelById(
     siteId,
     Site.forUser({
@@ -39,8 +39,8 @@ const authorize = async ({ id: userId }, { id: siteId }) => {
   return site;
 };
 
-const isSiteOrgManager = async ({ id: userId }, { id: siteId }) => {
-  const site = await authorize({ id: userId }, { id: siteId });
+const isSiteOrgManager = async (userId, siteId) => {
+  const site = await authorize(userId, siteId);
   const organization = await fetchModelById(
     site.organizationId,
     Organization.forManagerRole({ id: userId }),
@@ -56,7 +56,7 @@ const isSiteOrgManager = async ({ id: userId }, { id: siteId }) => {
   return { site, organization };
 };
 
-const isOrgManager = async ({ id: userId }, { id: orgId }) => {
+const isOrgManager = async (userId, orgId) => {
   const organization = await fetchModelById(
     orgId,
     Organization.forManagerRole({ id: userId }),
@@ -72,7 +72,7 @@ const isOrgManager = async ({ id: userId }, { id: orgId }) => {
   return { organization };
 };
 
-const isOrgUser = async ({ id: userId }, { id: orgId }) => {
+const isOrgUser = async (userId, orgId) => {
   const organization = await fetchModelById(orgId, Organization.forUser({ id: userId }));
 
   if (!organization) {
