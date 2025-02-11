@@ -17,6 +17,8 @@ import DomainList from '@pages/sites/$siteId/custom-domains';
 import NewCustomDomain from '@pages/sites/$siteId/custom-domains/new';
 import EditCustomDomain from '@pages/sites/$siteId/custom-domains/$domainId/edit';
 import Reports from '@pages/sites/$siteId/reports';
+import FileStoragePage from '@pages/file-storage';
+import FileStorageLogs from '@pages/file-storage/Log';
 import Settings from '@pages/settings';
 import NotFound from '@pages/NotFound';
 import ErrorMessage from '@pages/ErrorMessage';
@@ -56,6 +58,8 @@ export default (
       <Route path="custom-domains" element={<DomainList />} />
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
+      <Route path="storage" element={<FileStoragePage />} />
+      <Route path="storage/logs" element={<FileStorageLogs />} />
       <Route path="builds/:buildId/logs" element={<BuildLogs />} />
       <Route path="scans" loader={() => redirect('../reports')} />
       {process.env.FEATURE_BUILD_TASKS === 'active' && (

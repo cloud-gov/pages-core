@@ -1,3 +1,4 @@
+import IconAttachment from '../../public/images/icons/icon-attachment.svg';
 import IconBook from '../../public/images/icons/icon-book.svg';
 import IconBranch from '../../public/images/icons/icon-branch.svg';
 import IconCheckCircle from '../../public/images/icons/icon-check-circle-solid.svg';
@@ -22,6 +23,7 @@ import IconX from '../../public/images/icons/icon-x.svg';
 import IconTrash from '../../public/images/icons/icon-trash.svg';
 
 export {
+  IconAttachment,
   IconBook,
   IconBranch,
   IconCheckCircle,
