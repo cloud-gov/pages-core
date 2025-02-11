@@ -432,12 +432,15 @@ describe('utils', () => {
       expect(result).to.be.eq(expected);
     });
 
-    it('should remove accents and punctuation from a string', () => {
-      const input = 'Cazá, Cazá';
-      const expected = 'caza-caza';
+    it('should remove slashes from a string', () => {
+      const input = 'hello\\world';
+      const input2 = 'hello/world';
+      const expected = 'helloworld';
 
       const result = utils.slugify(input);
+      const result2 = utils.slugify(input2);
       expect(result).to.be.eq(expected);
+      expect(result2).to.be.eq(expected);
     });
 
     it('throws if not a string or number', () => {

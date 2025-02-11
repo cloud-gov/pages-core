@@ -482,6 +482,40 @@ describe('FileStorage services', () => {
       expect(files.length).to.be.eq(allFileCount);
     });
 
+    it('should list files in a directory and not the parent directory', async () => {
+      const { client, fss } = await createFileStorageServiceClient();
+      const dir = 'a/b/c/';
+      const subdir = `${dir}/d/`;
+      await factory.fileStorageFile.create({
+        fileStorageServiceId: fss.id,
+        type: 'directory',
+        key: dir,
+      });
+      const expectedList = await factory.fileStorageFile.createBulk(fss.id, dir, {
+        files: 10,
+        directories: 2,
+      });
+      const expectedCount = expectedList.files.length + expectedList.directories.length;
+      const unexpectedList = await factory.fileStorageFile.createBulk(fss.id, subdir, {
+        files: 2,
+        directories: 1,
+      });
+      const unexpectedCount =
+        unexpectedList.files.length + unexpectedList.directories.length;
+      const allFileCount = expectedCount + unexpectedCount + 1;
+      const results = await client.listDirectoryFiles(dir, { limit: 100 });
+
+      const files = await FileStorageFile.findAll({
+        where: { fileStorageServiceId: fss.id },
+      });
+
+      expect(results.currentPage).to.be.eq(1);
+      expect(results.totalPages).to.be.eq(1);
+      expect(results.data.length).to.be.eq(expectedCount);
+      expect(results.totalItems).to.be.eq(expectedCount);
+      expect(files.length).to.be.eq(allFileCount);
+    });
+
     it('should list files for directory on multiple pages', async () => {
       const { client, fss } = await createFileStorageServiceClient();
       const dir = 'a/b/c/';

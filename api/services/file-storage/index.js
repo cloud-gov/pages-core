@@ -234,6 +234,7 @@ class SiteFileStorageSerivce {
           [Op.and]: [
             { key: { [Op.like]: `${dir}%` } },
             { key: { [Op.notLike]: `${dir}%/_%` } },
+            { key: { [Op.ne]: dir } },
           ],
         },
         order,
