@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "required": ["id", "metadata", "createdAt", "updatedAt"],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "description": {
+      "oneOf": [{ "type": ["null"] }, { "type": ["string"] }]
+    },
+    "metadata": {
+      "type": "json"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

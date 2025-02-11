@@ -1,35 +1,7 @@
 const GitHub = require('../services/GitHub');
 const siteErrors = require('../responses/siteErrors');
-const { Organization, Site } = require('../models');
-const { fetchModelById } = require('../utils/queryDatabase');
-
-const authorize = async ({ id: userId }, { id: siteId }) => {
-  const site = await fetchModelById(
-    siteId,
-    Site.forUser({
-      id: userId,
-    }),
-  );
-
-  if (!site) {
-    throw 403;
-  }
-
-  if (!site.isActive) {
-    // if site is not active
-    throw 403;
-  }
-
-  if (site.organizationId) {
-    // if site exists in an org
-    const org = await site.getOrganization();
-    if (!org.isActive) {
-      throw 403;
-    }
-  }
-
-  return site;
-};
+const { Organization } = require('../models');
+const { authorize } = require('./utils');
 
 const authorizeRepositoryAdmin = (user, site) =>
   GitHub.checkPermissions(user, site.owner, site.repository)
@@ -101,16 +73,16 @@ const create = async (user, siteParams) => {
   }
 };
 
-const createBuild = (user, site) => authorize(user, site);
+const createBuild = (user, site) => authorize(user.id, site.id);
 
-const showActions = (user, site) => authorize(user, site);
+const showActions = (user, site) => authorize(user.id, site.id);
 
-const findOne = (user, site) => authorize(user, site);
+const findOne = (user, site) => authorize(user.id, site.id);
 
-const update = (user, site) => authorize(user, site);
+const update = (user, site) => authorize(user.id, site.id);
 
 const destroy = (user, site) =>
-  authorize(user, site).then(() => authorizeRepositoryAdmin(user, site));
+  authorize(user.id, site.id).then(() => authorizeRepositoryAdmin(user, site));
 
 module.exports = {
   create,
