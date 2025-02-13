@@ -33,7 +33,7 @@ const verify = async (req, accessToken, refreshToken, profile, callback) => {
   try {
     const { user, role } = await verifyUAAUser(accessToken, refreshToken, profile);
 
-    if (user && role) {
+    if (user && ['pages.admin', 'pages.support'].includes(role)) {
       return callback(null, {
         ...user.dataValues,
         role,
