@@ -35,19 +35,20 @@ describe('Admin authentication request', () => {
       const uaaId = 'user_id_1';
       const code = 'code';
       const profile = {
-        email: 'hello@example.com',
+        email: 'justauser@example.com',
         user_id: uaaId,
       };
       const user = await userFactory();
       await createUAAIdentity({
         uaaId,
         userId: user.id,
+        email: profile.email,
       });
       const userProfile = uaaUser({
         id: uaaId,
         groups: [
           {
-            display: 'not.admin',
+            display: 'pages.user',
           },
         ],
         ...profile,
