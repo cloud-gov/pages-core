@@ -337,7 +337,7 @@ Environment-specific feature flags are supported for both the api and frontend. 
 
 ### Current available features
 
-N/A
+- `FEATURE_FILE_STORAGE_SERVICE`: The file storage service feature flag to gate the API's accessibility in production.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:

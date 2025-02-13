@@ -5,8 +5,6 @@ instances: 2
 env: staging
 env_postfix: -staging
 log_level: verbose
-feature_auth_uaa: "true"
-feature_bull_site_build_queue: "true"
 uaa_host: https://uaa.fr-stage.cloud.gov
 uaa_login_host: https://login.fr-stage.cloud.gov
 new_relic_app_name: web-pages-staging
@@ -15,3 +13,4 @@ cf_cdn_space_name: sites-staging
 node_env: production
 queues_build_tasks_concurrency: 4
 queues_site_builds_concurrency: 4
+feature_file_storage_service: "true"

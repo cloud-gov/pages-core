@@ -1,4 +1,5 @@
 const express = require('express');
+const Features = require('../features');
 
 const mainRouter = express.Router();
 
@@ -12,7 +13,11 @@ apiRouter.use(require('./build-log'));
 apiRouter.use(require('./build-task'));
 apiRouter.use(require('./build'));
 apiRouter.use(require('./domain'));
-apiRouter.use(require('./file-storage-service'));
+
+if (Features.enabled(Features.Flags.FEATURE_FILE_STORAGE_SERVICE)) {
+  apiRouter.use(require('./file-storage-service'));
+}
+
 apiRouter.use(require('./organization'));
 apiRouter.use(require('./organization-role'));
 apiRouter.use(require('./published-branch'));
