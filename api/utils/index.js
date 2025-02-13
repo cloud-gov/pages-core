@@ -216,7 +216,6 @@ async function paginate(model, serialize, params, query = {}) {
     order: [['createdAt', 'DESC']],
     ...query,
   };
-
   const { rows, count } = await model.findAndCountAll(pQuery);
 
   const totalPages = Math.trunc(count / limit) + (count % limit === 0 ? 0 : 1);
@@ -303,6 +302,60 @@ function appMatch(type) {
   return type.metadata.appName.replace(/pages-(.*)-task-.*/, '$1');
 }
 
+function splitFileExt(str, separator = '.') {
+  const lastIndex = str.lastIndexOf(separator);
+  if (lastIndex === -1) {
+    return [str];
+  }
+  const before = str.slice(0, lastIndex);
+  const after = str.slice(lastIndex + 1);
+  return [before, after];
+}
+
+function slugify(text, len = 200) {
+  const argType = typeof text;
+
+  if (!['string', 'number'].includes(argType)) {
+    throw new Error('Text must be a string or number.');
+  }
+
+  const str = text.toString();
+
+  const [base, extension] = splitFileExt(str);
+
+  if (str.length > len) {
+    throw new Error(`Text must be less than or equal to ${len} characters.`);
+  }
+
+  const slugifiedBase = base
+    .normalize('NFD') // Normalize to decompose combined characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .toLowerCase() // Convert to lowercase
+    .trim() // Trim whitespace from both ends
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/[^\w-]+/g, '') // Remove all non-word chars
+    .replace(/--+/g, '-') // Replace multiple hyphens with a single hyphen
+    .replace(/^-+/, '') // Trim hyphens from the start
+    // eslint-disable-next-line sonarjs/slow-regex
+    .replace(/-+$/, ''); // Trim hyphens from the end
+
+  return extension ? `${slugifiedBase}.${extension}` : slugifiedBase;
+}
+
+function normalizeDirectoryPath(dir) {
+  let normalized = path.normalize(dir);
+
+  if (normalized.startsWith('/') && normalized.endsWith('/')) {
+    normalized = normalized.slice(1);
+  }
+
+  if (!normalized.endsWith('/')) {
+    normalized += '/';
+  }
+
+  return normalized;
+}
+
 module.exports = {
   appMatch,
   buildEnum,
@@ -315,11 +368,13 @@ module.exports = {
   loadDevelopmentManifest,
   loadProductionManifest,
   mapValues,
+  normalizeDirectoryPath,
   omitBy,
   omit,
   paginate,
   pick,
   shouldIncludeTracking,
+  slugify,
   toInt,
   toSubdomainPart,
   truncateString,

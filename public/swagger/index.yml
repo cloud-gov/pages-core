@@ -279,6 +279,191 @@ paths:
           description: Not found
           schema:
             $ref: 'Error.json'
+  /file-storage/{file_storage_id}:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+    get:
+      summary: Returns a list of files in a file storage service path
+      responses:
+        200:
+          description: A list of files
+          schema:
+            $ref: 'FileStorageList.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/file/{file_id}:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+      - name: file_id
+        in: path
+        description: The id of the file storage file
+        type: integer
+        required: true
+    get:
+      summary: Returns a file storage file
+      responses:
+        200:
+          description: A list of files
+          schema:
+            $ref: 'FileStorageFile.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+    delete:
+      summary: Deletes a file storage file
+      responses:
+        200:
+          description: An empty object
+          schema:
+            type: object
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/user-actions:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+    get:
+      summary: Returns a list of user actions in a file storage service path
+      responses:
+        200:
+          description: Lists the user actions for a file storage service
+          schema:
+            $ref: 'FileStorageUserActionList.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/user-actions/{file_id}:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+      - name: file_id
+        in: path
+        description: The id of the file storage file
+        type: integer
+        required: true
+    get:
+      summary: Returns a list of user actions in a file storage file
+      responses:
+        200:
+          description: Lists the user actions for a file storage file
+          schema:
+            $ref: 'FileStorageUserActionList.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/directory:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+    post:
+      summary: Creates a directory given a name and directory path
+      responses:
+        200:
+          description: Acknowledgement that the directory was created
+          schema:
+            $ref: 'FileStorageFile.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /file-storage/{file_storage_id}/upload:
+    parameters:
+      - name: file_storage_id
+        in: path
+        description: The id of the file storage service
+        type: integer
+        required: true
+    post:
+      summary: Uploads a file given a name, directory path, and file
+      responses:
+        200:
+          description: Acknowledgement that the file was uploaded
+          schema:
+            $ref: 'FileStorageFile.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
   /organization:
     get:
       summary: Fetch all of the current user's organizations
@@ -763,6 +948,31 @@ paths:
           description: The create site domain
           schema:
             $ref: 'Domain.json'
+        400:
+          description: Bad request
+          schema:
+            $ref: 'Error.json'
+        403:
+          description: Not authorized
+          schema:
+            $ref: 'Error.json'
+        404:
+          description: Not found
+          schema:
+            $ref: 'Error.json'
+  /site/{site_id}/file-storage-service:
+    post:
+      summary: Create a site file storage service if the current user has permissions
+      parameters:
+        - name: site_id
+          in: path
+          description: the id of the site
+          type: integer
+      responses:
+        200:
+          description: The create site file storage service
+          schema:
+            $ref: 'FileStorageService.json'
         400:
           description: Bad request
           schema:
