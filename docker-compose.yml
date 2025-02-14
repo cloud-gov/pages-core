@@ -30,6 +30,7 @@ services:
       DOMAIN: localhost:1337
       FEATURE_BUILD_TASKS: 'active'
       FEATURE_LOCAL_BUILD_REPORTS: 'active'
+      FEATURE_FILE_STORAGE_SERVICE: 'true'
       NODE_ENV: development
       PORT: 1337
       PRODUCT: pages

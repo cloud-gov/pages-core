@@ -52,6 +52,7 @@ applications:
       NEW_RELIC_ERROR_COLLECTOR_ENABLED: false
       QUEUES_BUILD_TASKS_CONCURRENCY: ((queues_build_tasks_concurrency))
       QUEUES_SITE_BUILDS_CONCURRENCY: ((queues_site_builds_concurrency))
+      FEATURE_FILE_STORAGE_SERVICE: ((feature_file_storage_service))
   - name: pages-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client
