@@ -1,3 +1,13 @@
+## 0.16.0 (2025-02-14)
+
+### Added
+
+- Add API endpoints for file storage #2082
+
+### Maintenance
+
+- Add feature flag for file storage #4718
+
 ## 0.15.2 (2025-02-13)
 
 ### Fixed
