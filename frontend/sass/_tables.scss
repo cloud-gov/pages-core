@@ -476,8 +476,9 @@
 
 /* --- Sortable table --- */
 
-$selectedColumnBackground: #05bdfd22;
-$selectedColumnText: #192532;
+$selectedColumnBackground: #62a5d522;
+$selectedColumnText: #071018;
+$sortableBorderColor: #5c759980;
 
 // Shared table styles
 @mixin table-header-unsorted-styles {
@@ -553,7 +554,6 @@ $selectedColumnText: #192532;
   th[data-sortable],
   th[data-is-sortable] {
     @include table-header-unsorted-styles;
-
     &:not([aria-sort]),
     &[aria-sort="none"] {
       .usa-table__sort-button {
@@ -585,6 +585,9 @@ $selectedColumnText: #192532;
       background-color: $selectedColumnBackground;
       color: $selectedColumnText;
     }
+    th {
+      border-color: $sortableBorderColor;
+    }
   }
 
   td[data-sort-active],
@@ -595,6 +598,7 @@ $selectedColumnText: #192532;
 
   td {
     white-space: nowrap;
+    border-color: $sortableBorderColor;
   }
   
   td.file-name-cell{

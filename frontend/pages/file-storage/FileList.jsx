@@ -40,7 +40,7 @@ const FileListRow = ({
         data-label="Name"
         data-sort-active={currentSortKey === SORT_KEY_NAME ? true : undefined}
       >
-        <div className="file-name-wrap">
+        <div className="file-name-wrap  font-mono-xs text-ls-neg-1">
           <span className="file-icon">
             {item.type === 'folder' ? (
               <IconFolder className="usa-icon" />
@@ -127,7 +127,7 @@ const FileList = ({
 
   return (
     <table
-      className="usa-table usa-table--borderless usa-table--sortable width-full"
+      className="usa-table usa-table--borderless usa-table--sortable width-full margin-y-0"
       data-sortable
     >
       <caption className="usa-sr-only">{TABLE_CAPTION}</caption>
@@ -182,7 +182,7 @@ const FileList = ({
               />
             </button>
           </th>
-          <th scope="col" className="width-actions">
+          <th scope="col" className="width-actions height-6">
             <span className="usa-sr-only">Actions</span>
           </th>
         </tr>

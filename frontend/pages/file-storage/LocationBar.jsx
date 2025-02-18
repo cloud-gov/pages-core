@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { IconGlobe } from '@shared/icons';
 
 const LocationBar = ({ path, siteId, domain, onNavigate }) => {
   const baseUrl = `/sites/${siteId}/storage`;
@@ -23,29 +24,44 @@ const LocationBar = ({ path, siteId, domain, onNavigate }) => {
   };
 
   return (
-    <nav className="usa-breadcrumb" aria-label="Breadcrumb">
-      <ol className="usa-breadcrumb__list">
+    <nav
+      className="usa-breadcrumb border-top-1px border-bottom-1px border-base-light padding-y-1 margin-top-3 text-ls-neg-1"
+      aria-label="Breadcrumb"
+    >
+      <ol className="usa-breadcrumb__list font-mono">
+        <li className="display-inline text-middle margin-right-1">
+          <button
+            className="usa-button--unstyled"
+            onClick={() => handleNavigation('')}
+            title="Public storage home"
+            style={{ cursor: 'pointer' }}
+          >
+            <IconGlobe className="usa-icon width-3 height-3" />
+          </button>
+        </li>
         {showDomain && (
-          <li className="usa-breadcrumb__list-item">
+          <li className="usa-breadcrumb__list-item font-mono-xs">
             {!cleanedPath ? (
-              <span>{domain}~assets</span>
+              <span>{domain}~assets/</span>
             ) : (
               <Link
                 to={baseUrl}
                 className="usa-breadcrumb__link text-underline"
                 onClick={() => handleNavigation('')}
+                title="/~assets/ root"
               >
-                {domain}~assets
+                {domain}~assets/
               </Link>
             )}
           </li>
         )}
         {segments.length > 1 && (
-          <li className="usa-breadcrumb__list-item">
+          <li className="usa-breadcrumb__list-item font-mono-xs">
             <Link
               to={grandparentHref}
               className="usa-breadcrumb__link text-underline"
               onClick={() => handleNavigation(grandparentPath)}
+              title={grandparentHref}
             >
               ../
             </Link>
@@ -57,17 +73,21 @@ const LocationBar = ({ path, siteId, domain, onNavigate }) => {
             .join('/');
           const href = `${baseUrl}?path=${newPath}`;
           return (
-            <li key={`${label}-${idx}`} className="usa-breadcrumb__list-item">
+            <li
+              key={`${label}-${idx}`}
+              className="usa-breadcrumb__list-item font-mono-xs"
+            >
               {idx < displayedBreadcrumbs.length - 1 ? (
                 <Link
                   to={href}
                   className="usa-breadcrumb__link text-underline"
                   onClick={() => handleNavigation(newPath)}
+                  title={label}
                 >
                   {label}/
                 </Link>
               ) : (
-                <span>{label}/</span>
+                <span title={label}>{label}/</span>
               )}
             </li>
           );
