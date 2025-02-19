@@ -1,7 +1,7 @@
 const nock = require('nock');
 const factory = require('./factory');
 
-const url = 'https://api.example.com';
+const url = process.env.CLOUD_FOUNDRY_API_HOST;
 const reqheaders = {
   reqheaders: {
     authorization: /Bearer .+/,

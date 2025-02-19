@@ -465,7 +465,7 @@ resources:
     check_every: 1m
     source:
       repository: ((pages-repository-path))
-      access_token: ((gh-access-token))
+      access_token: ((pages-operations-ci-github-token))
       base_branch: main
       disable_forks: true
       ignore_drafts: false
@@ -528,7 +528,7 @@ resources:
     source:
       owner: cloud-gov
       repository: pages-core
-      access_token: ((gh-access-token))
+      access_token: ((pages-operations-ci-github-token))
   #@ end
 
   - name: redis

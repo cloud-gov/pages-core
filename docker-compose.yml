@@ -1,18 +1,30 @@
-version: '3'
-
 volumes:
   db-data:
   yarn:
   nm-app:
   nm-admin:
   pw-deps:
+  minio-data:
+
 
 services:
+  mc:
+    image: minio/mc
+    depends_on:
+      - minio
+    restart: "no"
+    environment: &minioenv
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+    entrypoint: /app/scripts/local/minio-bootstrap.sh
+    volumes:
+      - .:/app
   app:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: ["yarn", "watch"]
+    command: [ "yarn", "watch" ]
     volumes:
       - yarn:/usr/local/share/.cache/yarn
       - .:/app
@@ -25,20 +37,23 @@ services:
     depends_on:
       - db
       - redis
+      - minio
     environment:
+      <<: *minioenv
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
       FEATURE_BUILD_TASKS: 'active'
-      FEATURE_LOCAL_BUILD_REPORTS: 'active'
       FEATURE_FILE_STORAGE_SERVICE: 'true'
+      FEATURE_LOCAL_BUILD_REPORTS: 'active'
+      FEATURE_LOCAL_S3_ENDPOINT: 'true'
       NODE_ENV: development
       PORT: 1337
       PRODUCT: pages
       UAA_HOST: http://localhost:9001
       UAA_HOST_DOCKER_URL: http://uaa:8080
       USER_AUDITOR: federalist
-      CLOUD_FOUNDRY_API_HOST: https://api.example.com
-      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.example.com/oauth/token
+      CLOUD_FOUNDRY_API_HOST: ${CLOUD_FOUNDRY_API_HOST}
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: ${CLOUD_FOUNDRY_API_HOST}/oauth/token
       CF_API_USERNAME: deploy_user
       CF_API_PASSWORD: deploy_pass
       PROXY_DOMAIN: localhost:1337
@@ -47,7 +62,7 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: ["scripts/wait-for-it.sh", "redis:6379", "--", "yarn", "start-bull-board:local"]
+    command: [ "scripts/wait-for-it.sh", "redis:6379", "--", "yarn", "start-bull-board:local" ]
     volumes:
       - yarn:/usr/local/share/.cache/yarn
       - .:/app
@@ -83,7 +98,7 @@ services:
       - "35729:35729"
     depends_on:
       - app
-    command: ["yarn", "dev"]
+    command: [ "yarn", "dev" ]
     environment:
       API_URL: http://localhost:1337
   db:
@@ -114,3 +129,27 @@ services:
       HOST: 0.0.0.0
       PORT: 8989
     command: node app/scripts/echo.js
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+    command: 'server --console-address=":9001" /data'
+    environment:
+      <<: *minioenv
+    volumes:
+      - minio-data:/data
+      - .:/app
+  mock-cf-api:
+    build:
+      dockerfile: Dockerfile-app
+      context: .
+    command: [ "yarn", "mock-cf-api" ]
+    volumes:
+      - yarn:/usr/local/share/.cache/yarn
+      - .:/app
+    ports:
+      - "3456:3456"
+    environment:
+      <<: *minioenv
