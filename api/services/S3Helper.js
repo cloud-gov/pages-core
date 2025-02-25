@@ -10,15 +10,21 @@ const {
 
 const S3_DEFAULT_MAX_KEYS = 1000;
 
+const isLocal = process.env.FEATURE_LOCAL_S3_ENDPOINT;
+const endpoint = isLocal ? process.env.MINIO_ENDPOINT_URL : null;
+
 class S3Client {
   constructor(credentials) {
     this.bucket = credentials.bucket;
     this.client = new S3({
+      endpoint,
       region: credentials.region,
       credentials: {
         accessKeyId: credentials.accessKeyId,
         secretAccessKey: credentials.secretAccessKey,
       },
+      // Required to upload files to local dev with minio
+      forcePathStyle: !!endpoint,
     });
   }
 
@@ -102,6 +108,10 @@ class S3Client {
     let wereS3ResultsTruncated = false;
     // Concatenate S3 pages until there are enough for OUR page size
     for await (const page of paginator) {
+      if (!page.Contents) {
+        break;
+      }
+
       objects.push(...page.Contents);
       if (objects.length >= totalMaxObjects) {
         break;

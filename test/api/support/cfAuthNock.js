@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const nock = require('nock');
 
+const url = process.env.CLOUD_FOUNDRY_API_HOST;
+
 const mockTokenRequest = (token) => {
   const accessToken =
     token ||
@@ -11,7 +13,7 @@ const mockTokenRequest = (token) => {
       '123abc',
     );
 
-  const n = nock('https://login.example.com', {
+  const n = nock(url, {
     reqheaders: {
       authorization: `Basic ${Buffer.from('cf:').toString('Base64')}`,
     },

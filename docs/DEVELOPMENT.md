@@ -71,8 +71,8 @@ Any time the node dependencies are changed (like from a recently completed new f
 
 In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker compose configuration file when executing the docker compose commands which build containers or start the development environment, e.g.:
 
-1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml build`
-1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml up`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env build`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env up`
 
 #### Check to see if everything is working correctly
 
@@ -98,6 +98,38 @@ The `db` container is exposed on port `5433` of your host computer to make it ea
 The admin client is running on port `3000` of hour host computer.
 
 Some aspects of the system aren't expected to be fully functional in a development environment. For example: the "View site" and "Uploaded files" links associated with sites in the seed data do not reach working URLs.
+
+#### Connecting to local minio server
+
+We use [MinIO](https://github.com/minio/minio) in our local deployment to handle some of the S3 calls the application makes.
+
+##### Connect to the local instance
+
+All of the S3 compatibable calls are made through the endpoint url of `http://localhost:9100` from outside of the docker compose network or `http://minio:9000` from a container within the docker compose network. The following AWS CLI command from you terminal will look like:
+
+```bash
+export AWS_ACCESS_KEY_ID=objectstoreaccesskey
+export AWS_SECRET_ACCESS_KEY=objectstoreyoursecretkey
+
+aws s3 ls s3://$BUCKET_NAME --endpoint-url http://localhost:9100
+```
+
+Access the MinIO web UI navigate to `http://localhost:9101`
+
+#### Mock CF API for local development
+
+A mock CF API server is located at [/services/local/mock-cf-api/](../services/local/mock-cf-api/) and returns simulated CF responses. These endpoints can be used to get MinIO credentials that will allow us to make S3 calls to the local MinIO instance.
+
+Endpoints:
+
+Fetch service instanaces:
+- __/v3/service_instances__
+
+Fetch service instanace credentials binding name:
+- __/v3/service_credential_bindings?service_instance_names=name__
+
+Fetch service instanace credentials by binding guid
+- __/v3/service_credential_bindings/:guid/details__
 
 #### Front end application
 
@@ -211,7 +243,7 @@ Some credentials in this pipeline are "compound" credentials that use the pipeli
 |**`((support-email))`**| Our support email address | :x:|
 |**`((git-base-url))`**|The base url to the git server's HTTP endpoint|:x:|
 |**`((pages-repository-path))`**|The url path to the repository|:x:|
-|**`((gh-access-token))`**| The Github access token|:x:|
+|**`((pages-operations-ci-github-token))`**| The Github access token|:x:|
 
 ##### Setting up the pipeline for Core
 The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the default branch will automatically set the pipeline. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. First, a compiled pipeline file needs to be created with [`ytt`](https://carvel.dev/ytt/):

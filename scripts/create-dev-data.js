@@ -15,6 +15,7 @@ const {
   BuildLog,
   Domain,
   Event,
+  FileStorageService,
   Organization,
   Role,
   SiteBuildTask,
@@ -336,7 +337,15 @@ async function createData() {
    *                 Sites
    */
   console.log('Creating sites...');
-  const [site1, nodeSite, goSite, goSite2, nodeSite2, orglessSite] = await Promise.all([
+  const siteServicesStrings = process.env.SITES_SERVICE_NAMES;
+
+  if (!siteServicesStrings) {
+    throw 'The SITES_SERVICE_NAMES env var is not defined';
+  }
+
+  const serviceList = siteServicesStrings.split(',');
+
+  const [site1, nodeSite, goSite, goSite2, nodeSite2] = await Promise.all([
     siteFactory({
       demoBranch: 'demo-branch',
       demoDomain: 'https://demo.example.gov',
@@ -344,6 +353,7 @@ async function createData() {
       owner: user1.username,
       repository: 'example-site',
       users: [user1, userOrgless],
+      s3ServiceName: serviceList.find((s) => s.includes('r-example-site')),
       defaultConfig: {
         hello: 'world',
       },
@@ -355,6 +365,7 @@ async function createData() {
       repository: 'example-node-site',
       users: [user1, managerWithGithub],
       demoBranch: 'demo1',
+      s3ServiceName: serviceList.find((s) => s.includes('r-example-node-site')),
       previewConfig: {
         hello: 'preview',
       },
@@ -365,6 +376,7 @@ async function createData() {
       owner: user1.username,
       repository: 'example-go-site',
       users: [user1, user2, managerNoGithub],
+      s3ServiceName: serviceList.find((s) => s.includes('r-example-go-site')),
     }).then((site) => addSiteToOrg(site, agency2)),
 
     siteFactory({
@@ -372,6 +384,7 @@ async function createData() {
       owner: user3.username,
       repository: 'another-example-hugo-site',
       users: [user3, managerWithGithub],
+      s3ServiceName: serviceList.find((s) => s.includes('r-another-example-hugo-site')),
       demoBranch: 'demo3',
     }).then((site) => addSiteToOrg(site, agency3)),
 
@@ -380,22 +393,50 @@ async function createData() {
       owner: user4.username,
       repository: 'another-example-node-site',
       users: [user4, managerWithGithub],
+      s3ServiceName: serviceList.find((s) => s.includes('r-another-example-node-site')),
       demoBranch: 'demo4',
     }).then((site) => addSiteToOrg(site, agency4)),
-
-    siteFactory({
-      engine: 'node.js',
-      owner: userOrgless.username,
-      repository: 'an-orgless-node-site',
-      users: [userOrgless, managerWithGithub],
-      demoBranch: 'demo5',
-    }),
   ]);
 
   await site1.createUserEnvironmentVariable({
     name: 'MY_ENV_VAR',
     ...encrypt('supersecretstuff', 'ABC123ABC123ABC123ABC123ABC123'),
   });
+
+  /** *****************************************
+   *           File Storage Services
+   */
+  console.log('Creating file storage services...');
+  await Promise.all([
+    FileStorageService.create({
+      siteId: nodeSite.id,
+      organizationId: agency1.id,
+      name: 'site-storage',
+      serviceId: '56789',
+      serviceName: nodeSite.s3ServiceName,
+    }),
+    FileStorageService.create({
+      siteId: goSite.id,
+      organizationId: agency2.id,
+      name: 'site-storage',
+      serviceId: '98765',
+      serviceName: goSite.s3ServiceName,
+    }),
+    FileStorageService.create({
+      siteId: goSite2.id,
+      organizationId: agency3.id,
+      name: 'site-storage',
+      serviceId: '54321',
+      serviceName: goSite2.s3ServiceName,
+    }),
+    FileStorageService.create({
+      siteId: nodeSite2.id,
+      organizationId: agency4.id,
+      name: 'site-storage',
+      serviceId: '12345',
+      serviceName: nodeSite2.s3ServiceName,
+    }),
+  ]);
 
   /** *****************************************
    *                 Builds
@@ -923,15 +964,6 @@ async function createData() {
       origin: 'quz-baz-bar.app.cloud.gov',
       path: `/site/${nodeSite2.owner}/${nodeSite2.repository}`,
       serviceName: 'vanity.qux.example.gov-ext',
-      state: 'provisioned',
-    }),
-    Domain.create({
-      siteBranchConfigId: orglessSite.SiteBranchConfigs[0].id,
-      names: 'orgless.example.gov',
-      siteId: orglessSite.id,
-      origin: 'orgless.app.cloud.gov',
-      path: `/site/${orglessSite.owner}/${orglessSite.repository}`,
-      serviceName: 'orgless.example.gov-ext',
       state: 'provisioned',
     }),
   ]);
