@@ -13,7 +13,7 @@ build_buckets() {
   local bucket_exists="Your previous request to create the named bucket succeeded and you already own it"
 
   # Load the .env file
-  local env_file="/app/services/local/local-docker.env"
+  local env_file="/app/services/local/docker.env"
 
   if [ -f "$env_file" ]; then
     while IFS='=' read -r key value; do

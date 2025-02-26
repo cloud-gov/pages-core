@@ -63,16 +63,16 @@ If local UAA authentication is not needed, Docker can be set up and started with
 1. Run `docker compose build`.
 1. Run `docker compose run --rm app yarn` to install dependencies.
 1. Run `docker compose run --rm admin-client yarn` to install dependencies.
-1. Run `docker compose run --rm app yarn migrate:up` to initialize the local database.
-1. Run `docker compose run --rm app yarn create-dev-data` to create some fake development data for your local database.
+1. Run `docker compose --env-file ./services/local/docker.env run --rm app yarn migrate:up` to initialize the local database.
+1. Run `docker compose --env-file ./services/local/docker.env run --rm app yarn create-dev-data` to create some fake development data for your local database.
 1. Run `docker compose up` to start the development environment.
 
 Any time the node dependencies are changed (like from a recently completed new feature), `docker compose run --rm app yarn` will need to be re-run to install updated dependencies after pulling the new code from GitHub.
 
 In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker compose configuration file when executing the docker compose commands which build containers or start the development environment, e.g.:
 
-1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env build`
-1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env up`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env build`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env up`
 
 #### Check to see if everything is working correctly
 
@@ -85,7 +85,7 @@ In our Docker Compose environment, `app` is the name of the container where the 
 
 For example:
 
-- Use `docker compose run --rm app yarn test` to run local testing on the app.
+- Use `docker compose --env-file ./services/local/docker.env build run --rm app yarn test` to run local testing on the app.
 - Use `docker compose run --rm app yarn lint` to check that your local changes meet our linting standards.
 - Use `docker compose run --rm app yarn format` to format your local changes based on our standards.
 
@@ -315,11 +315,11 @@ docker compose run --rm app yarn test
 You can also just run back or front end tests via:
 
 ```sh
-docker compose run --rm app yarn test:server  # for all back end tests
-docker compose run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
-docker compose run --rm app yarn test:client  # for all front end tests
-docker compose run --rm app yarn test:client:watch  # to watch and re-run front end tests
-docker compose run --rm app yarn test:client:file ./test/frontend/<path/to/test.js> # to run a single front end test file
+docker compose --env-file ./services/local/docker.env build run --rm app yarn test:server  # for all back end tests
+docker compose --env-file ./services/local/docker.env build run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
+docker compose --env-file ./services/local/docker.env build run --rm app yarn test:rtl  # for all front end tests
+docker compose --env-file ./services/local/docker.env build run --rm app yarn test:rtl:watch  # to watch and re-run front end tests
+docker compose --env-file ./services/local/docker.env build run --rm app yarn test:rtl:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
 To view coverage reports as HTML:
