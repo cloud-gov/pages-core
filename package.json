@@ -108,7 +108,7 @@
     "export:sites": "node ./scripts/exportSitesAsCsv.js",
     "serve-coverage": "serve -n -l 8080 ./coverage",
     "update-local-config": "node ./scripts/update-local-config.js",
-    "create-dev-data": "NODE_ENV=development DOTENV_CONFIG_PATH=./services/local/local-docker.env node -r dotenv/config ./scripts/create-dev-data.js",
+    "create-dev-data": "NODE_ENV=development DOTENV_CONFIG_PATH=./services/local/docker.env node -r dotenv/config ./scripts/create-dev-data.js",
     "update-proxy-db": "node ./scripts/proxy-edge.js",
     "archive-build-logs": "node ./scripts/archive-build-logs.js",
     "migrate-build-logs": "node ./scripts/migrate-build-logs.js",
@@ -123,7 +123,7 @@
     "create-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/create-test-users.js",
     "remove-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/remove-test-users.js",
     "run-scans-for-build": "node ./scripts/run-scans-for-build.js",
-    "mock-cf-api": "DOTENV_CONFIG_PATH=./services/local/local-docker.env node -r dotenv/config --watch-path=./services/local/mock-cf-api ./services/local/mock-cf-api/index.js"
+    "mock-cf-api": "DOTENV_CONFIG_PATH=./services/local/docker.env node -r dotenv/config --watch-path=./services/local/mock-cf-api ./services/local/mock-cf-api/index.js"
   },
   "main": "index.js",
   "repository": {

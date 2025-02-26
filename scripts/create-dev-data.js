@@ -23,6 +23,8 @@ const {
   UserAction,
 } = require('../api/models');
 const { site: siteFactory } = require('../test/api/support/factory');
+const { cleanFileStorage, runFileStorageSeed } = require('./local/populate-file-storage');
+const fileStorageStructure = require('../services/local/file-storage/data-structure');
 
 const localSiteBuildTasks = [];
 const localSiteBuildTasksFile = path.join(
@@ -154,12 +156,24 @@ async function addSiteToOrg(site, org) {
   return site;
 }
 
+// Get Site Bucket Names
+const siteServicesStrings = process.env.SITES_SERVICE_NAMES;
+
+if (!siteServicesStrings) {
+  throw 'The SITES_SERVICE_NAMES env var is not defined';
+}
+
+const serviceList = siteServicesStrings.split(',');
+
 /** *****************************************
  *        Where the magic happens!!
  */
 async function createData() {
   console.log('Cleaning database...');
   await cleanDatabase();
+
+  console.log('Cleaning file storage buckets...');
+  await Promise.all(serviceList.map((bucket) => cleanFileStorage(bucket)));
 
   /** *****************************************
    *              Action Types
@@ -337,13 +351,6 @@ async function createData() {
    *                 Sites
    */
   console.log('Creating sites...');
-  const siteServicesStrings = process.env.SITES_SERVICE_NAMES;
-
-  if (!siteServicesStrings) {
-    throw 'The SITES_SERVICE_NAMES env var is not defined';
-  }
-
-  const serviceList = siteServicesStrings.split(',');
 
   const [site1, nodeSite, goSite, goSite2, nodeSite2] = await Promise.all([
     siteFactory({
@@ -407,7 +414,7 @@ async function createData() {
    *           File Storage Services
    */
   console.log('Creating file storage services...');
-  await Promise.all([
+  const [fs1, fs2, fs3, fs4] = await Promise.all([
     FileStorageService.create({
       siteId: nodeSite.id,
       organizationId: agency1.id,
@@ -436,6 +443,16 @@ async function createData() {
       serviceId: '12345',
       serviceName: nodeSite2.s3ServiceName,
     }),
+  ]);
+
+  // Seed file storage
+  // *Note: file storage service name is the same as the bucket name locally
+
+  await Promise.all([
+    runFileStorageSeed(fs1.id, user1.id, fs1.serviceName, fileStorageStructure),
+    runFileStorageSeed(fs2.id, user1.id, fs2.serviceName, fileStorageStructure),
+    runFileStorageSeed(fs3.id, user3.id, fs3.serviceName, fileStorageStructure),
+    runFileStorageSeed(fs4.id, user4.id, fs4.serviceName, fileStorageStructure),
   ]);
 
   /** *****************************************

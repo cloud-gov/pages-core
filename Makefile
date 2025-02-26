@@ -34,44 +34,44 @@ lint-client: ## Lint admin client code
 lint: lint-server lint-client ## Lint project
 
 lint-fix: ## lint and fix
-	docker compose run --rm app yarn format:lint
+	docker compose --env-file ./services/local/docker.env run --rm app yarn format:lint
 
 format:
-	docker compose run --rm app yarn format
+	docker compose --env-file ./services/local/docker.env run --rm app yarn format
 
 format-check:
-	docker compose run --rm app yarn format:check
+	docker compose --env-file ./services/local/docker.env run --rm app yarn format:check
 
 migrate: ## Run database migrations
-	docker compose run --rm app yarn migrate:up
+	docker compose --env-file ./services/local/docker.env run  --rm app yarn migrate:up
 
 rebuild: ## Rebuild docker images and database volumes
 	docker volume rm pages-core_db-data
-	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env build
+	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env build
 
 seed: ## (Re)Create seed data
-	docker compose run --rm app yarn create-dev-data
+	docker compose --env-file ./services/local/docker.env run --rm app yarn create-dev-data
 
 set-pipeline: ## Set Concourse `web` pipeline
 	fly -t pages-staging sp -p web -c ci/pipeline.yml
 
 start: ## Start
-	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env up
+	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env up
 
 start-workers: ## Start with workers
-	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env up
+	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env up
 
 test-client: ## Run client tests
-	docker compose run --rm app yarn test:client
+	docker compose --env-file ./services/local/docker.env  run --rm app yarn test:rtl
 
 test-server: ## Run server tests
-	docker compose run --rm app yarn test:server
+	docker compose --env-file ./services/local/docker.env  run --rm app yarn test:server
 
 test-all: ## Run all tests
-	docker compose run --rm app yarn test
+	docker compose --env-file ./services/local/docker.env run --rm app yarn test
 
 everything: # When you switch to a new branch and need to rebuild everything
-	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/local-docker.env down
+	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env down
 	make rebuild
 	make install
 	make migrate
