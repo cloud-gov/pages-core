@@ -383,6 +383,46 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('DELETE', endpoint, 404, body);
       });
 
+      it('returns 400 when deleting a directory with file', async () => {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const dirPath = '~assets/';
+        const dirName = 'test';
+
+        const directory = await factory.fileStorageFile.create({
+          fileStorageServiceId: fss.id,
+          key: `${dirPath}${dirName}`,
+          type: 'directory',
+          name: dirName,
+        });
+
+        // Create nested file
+        await factory.fileStorageFile.create({
+          fileStorageServiceId: fss.id,
+          key: `${dirPath}${dirName}/file.txt`,
+          type: 'file',
+          name: 'file.txt',
+        });
+
+        const cookie = await authenticatedSession(user);
+
+        const s3stub = sinon.stub(S3Helper.S3Client.prototype, 'deleteObject').resolves();
+
+        const { body } = await request(app)
+          .delete(`/v0/file-storage/${fss.id}/file/${directory.id}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(400);
+
+        expect(s3stub.notCalled).to.be.eq(true);
+        validateAgainstJSONSchema('DELETE', endpoint, 400, body);
+      });
+
       it('returns 200 with a file', async () => {
         const { site, org, user } = await stubSiteS3();
         const fss = await factory.fileStorageService.create({
@@ -744,6 +784,37 @@ describe('File Storgage API', () => {
       });
     });
 
+    describe('when a user duplicates a directory in the same parent', () => {
+      it('returns a 400', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+        const payload = { parent: 'cool', name: 'runnings' };
+        await request(app)
+          .post(`/v0/file-storage/${fss.id}/directory`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send(payload);
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/directory`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send(payload)
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      });
+    });
+
     describe('when a user creates a valid directory', () => {
       it('returns a 200', async () => {
         const { site, org, user } = await stubSiteS3({
@@ -766,6 +837,39 @@ describe('File Storgage API', () => {
           .expect(200);
 
         validateAgainstJSONSchema('POST', endpoint, 200, body);
+      });
+    });
+
+    describe('when a user creates a duplicate directory', () => {
+      it('returns a 400', async () => {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const cookie = await authenticatedSession(user);
+        const payload = { parent: 'cool', name: 'runnings' };
+
+        await request(app)
+          .post(`/v0/file-storage/${fss.id}/directory`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send(payload);
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/directory`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send(payload)
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
       });
     });
   });

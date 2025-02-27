@@ -103,6 +103,8 @@ class SiteFileStorageSerivce {
     const directoryName = slugify(name);
     const directoryPath = this.#buildKeyPath(`${parent}/${directoryName}`);
 
+    await this.#hasDuplicateKey(directoryPath, 'directory');
+
     await this.s3Client.putObject('', directoryPath);
 
     const fsf = await FileStorageFile.create({
@@ -160,9 +162,9 @@ class SiteFileStorageSerivce {
       });
 
       if (children > 1) {
-        return {
-          message: siteErrors.DIRECTORY_MUST_BE_EMPTIED,
-        };
+        const error = new Error(siteErrors.DIRECTORY_MUST_BE_EMPTIED);
+        error.status = 400;
+        throw error;
       }
     }
 
@@ -247,6 +249,8 @@ class SiteFileStorageSerivce {
     const directoryPath = this.#buildKeyPath(parent);
     const key = path.join(directoryPath, filename);
 
+    await this.#hasDuplicateKey(key, 'file');
+
     await this.s3Client.putObject(fileBuffer, key);
 
     const fsf = await FileStorageFile.create({
@@ -277,6 +281,33 @@ class SiteFileStorageSerivce {
     }
 
     return normalized;
+  }
+
+  async #hasDuplicateKey(key, type) {
+    let errorMessage;
+
+    switch (type) {
+      case 'directory':
+        errorMessage = siteErrors.DIRECTORY_EXISTS_ALREADY;
+        break;
+      case 'file':
+        errorMessage = siteErrors.FILE_EXISTS_ALREADY;
+        break;
+      default:
+        errorMessage = 'An error occured';
+        break;
+    }
+
+    const fsf = await FileStorageFile.findOne({
+      where: { fileStorageServiceId: this.id, key },
+    });
+
+    if (fsf) {
+      const error = new Error(errorMessage);
+      error.status = 400;
+
+      throw error;
+    }
   }
 
   #isInitialized() {
