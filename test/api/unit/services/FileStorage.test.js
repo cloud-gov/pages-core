@@ -240,6 +240,21 @@ describe('FileStorage services', () => {
       expect(error.message).to.be.eq(errorMessage);
     });
 
+    it('errors with duplicate directory key and file service id', async () => {
+      const { client } = await createFileStorageServiceClient();
+      const basepath = '/a/b/c';
+      const name = 'another-directory/';
+
+      sinon.stub(S3Helper.S3Client.prototype, 'putObject').resolves();
+
+      await client.createDirectory(basepath, name);
+      const error = await client.createDirectory(basepath, name).catch((e) => e);
+
+      expect(error).to.be.throw;
+      expect(error.message).to.be.eq(siteErrors.DIRECTORY_EXISTS_ALREADY);
+      expect(error.status).to.be.eq(400);
+    });
+
     it('should not create a file or user action on s3 error', async () => {
       const { client, user } = await createFileStorageServiceClient();
       const basepath = '/a/b/c';
@@ -312,9 +327,11 @@ describe('FileStorage services', () => {
         directories: 2,
       });
 
-      const results = await client.deleteFile(file.id);
+      const error = await client.deleteFile(file.id).catch((e) => e);
 
-      expect(results.message).to.be.eq(siteErrors.DIRECTORY_MUST_BE_EMPTIED);
+      expect(error).to.be.throw;
+      expect(error.message).to.be.eq(siteErrors.DIRECTORY_MUST_BE_EMPTIED);
+      expect(error.status).to.be.eq(400);
     });
 
     it('should delete directory if empty', async () => {
@@ -686,7 +703,7 @@ describe('FileStorage services', () => {
   });
 
   describe('uploadFile', () => {
-    it('should create a directory with a name and path', async () => {
+    it('should upload a file with a name and path', async () => {
       const { client, user } = await createFileStorageServiceClient();
       const parent = '/a/b/c';
       const name = 'test.txt';
@@ -711,7 +728,7 @@ describe('FileStorage services', () => {
       expect(fsua.description).to.be.eq(FileStorageUserAction.ACTION_TYPES.UPLOAD_FILE);
     });
 
-    it('should create a directory appended to the ~assets root', async () => {
+    it('should upload a file appended to the ~assets root', async () => {
       const { client, user } = await createFileStorageServiceClient();
       const parent = '/a/b/c';
       const name = 'test.txt';
@@ -734,6 +751,27 @@ describe('FileStorage services', () => {
       expect(s3stub.calledOnceWith(fileBuffer, `${expectedKey}`)).to.be.eq(true);
       expect(fsua.method).to.be.eq(FileStorageUserAction.METHODS.POST);
       expect(fsua.description).to.be.eq(FileStorageUserAction.ACTION_TYPES.UPLOAD_FILE);
+    });
+
+    it('errors with duplicate file key and file storage service', async () => {
+      const { client } = await createFileStorageServiceClient();
+      const parent = '/a/b/c';
+      const name = 'test.txt';
+      const fileBuffer = Buffer.from('file content');
+      const type = 'plain/txt';
+      const metadata = { size: 123 };
+
+      sinon.stub(S3Helper.S3Client.prototype, 'putObject').resolves();
+
+      await client.uploadFile(name, fileBuffer, type, parent, metadata);
+
+      const error = await client
+        .uploadFile(name, fileBuffer, type, parent, metadata)
+        .catch((e) => e);
+
+      expect(error).to.be.throw;
+      expect(error.message).to.be.eq(siteErrors.FILE_EXISTS_ALREADY);
+      expect(error.status).to.be.eq(400);
     });
   });
 });

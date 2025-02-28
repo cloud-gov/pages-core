@@ -17,4 +17,8 @@ module.exports = {
   SITE_DOES_NOT_EXIST: 'The specified site does not exist',
   DIRECTORY_MUST_BE_EMPTIED:
     'This directory cannot be deleted. Please delete file contents first.',
+  DIRECTORY_EXISTS_ALREADY:
+    'A directory with the same name already exists. Please rename your new directory.',
+  FILE_EXISTS_ALREADY:
+    'A file with the same name already exists. Please rename your new file.',
 };
