@@ -15,6 +15,7 @@ do:
       APP_HOSTNAME: https://((((deploy-env))-pages-domain))
       PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
       FEATURE_BUILD_TASKS: "active"
+      FEATURE_FILE_STORAGE_SERVICE: true
 
   - task: deploy-api
     file: src/ci/partials/deploy.yml

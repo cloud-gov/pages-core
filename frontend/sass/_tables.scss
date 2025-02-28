@@ -1,3 +1,4 @@
+@use 'variables' as *;
 
 #js-app .usa-table--borderless {
   thead,
@@ -471,4 +472,243 @@
 .site-reports-table p {
   font-size: 1em;
   line-height: 1.4;
+}
+
+/* --- Sortable table --- */
+
+$selectedColumnBackground: #ecf3f9;
+$selectedColumnText: #071018;
+$sortableBorderColor: #b2bccd;
+$highlightedRowBackground: #f2f3f5;
+$highlightedAndSelectedCellBackground: #dde7ef;
+
+// Shared table styles
+@mixin table-header-unsorted-styles {
+  position: relative;
+  &::after {
+    border-bottom-color: transparent;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    bottom: 0;
+    content: "";
+    height: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+  }
+}
+
+@mixin table-button-default-styles {
+  width: 2rem;
+  height: 2rem;
+  color:  $color-gray-dark;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0;
+  position: absolute;
+  right: 0.25rem;
+  text-align: center;
+  text-decoration: none;
+  top: 50%;
+  transform: translate(0, -50%);
+  .usa-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    vertical-align: middle;
+    & > g {
+      fill: transparent;
+    }
+  }
+}
+
+// The SVG in the sortable column button contains three icon shapes.
+// This CSS controls which of the shapes is 'filled' when active.
+
+@mixin table-button-unsorted-styles {
+  @include table-button-default-styles;
+  .usa-icon > g.unsorted {
+    fill: $color-gray-dark;
+  }
+  &:hover .usa-icon > g.unsorted {
+    fill: $color-blue;
+  }
+}
+
+@mixin table-button-sorted-ascending-styles {
+  @include table-button-default-styles;
+  .usa-icon > .ascending {
+    fill: $color-blue-dark;
+  }
+}
+
+@mixin table-button-sorted-descending-styles {
+  @include table-button-default-styles;
+  .usa-icon > .descending {
+    fill: $color-blue-dark;
+  }
+}
+
+
+// specificity because our old tables have a lot of overrides
+#js-app .usa-table--sortable {
+
+  /* stylelint-disable selector-class-pattern */
+  th[data-sortable],
+  th[data-is-sortable] {
+    @include table-header-unsorted-styles;
+    &:not([aria-sort]),
+    &[aria-sort="none"] {
+      .usa-table__sort-button {
+        @include table-button-unsorted-styles;
+      }
+    }
+
+    &[aria-sort="descending"],
+    &[aria-sort="ascending"] {
+      background-color: $selectedColumnBackground;
+    }
+
+    &[aria-sort="descending"] {
+      .usa-table__sort-button {
+        @include table-button-sorted-descending-styles;
+      }
+    }
+
+    &[aria-sort="ascending"] {
+      .usa-table__sort-button {
+        @include table-button-sorted-ascending-styles;
+      }
+    }
+  }
+  /* stylelint-enable selector-class-pattern */
+
+  thead {
+    th[aria-sort] {
+      background-color: $selectedColumnBackground;
+      color: $selectedColumnText;
+    }
+    th {
+      border-color: $sortableBorderColor;
+    }
+  }
+
+  td[data-sort-active],
+  th[data-sort-active] {
+    background-color: $selectedColumnBackground;
+    color: $selectedColumnText;
+  }  
+
+  td {
+    white-space: nowrap;
+    border-color: $sortableBorderColor;
+  }
+  
+  tr.highlight td {
+    background-color: $highlightedRowBackground;
+    &[data-sort-active] {
+      background-color: $highlightedAndSelectedCellBackground;
+    }
+  }
+  td.file-name-cell{
+    max-width: 0;
+  }
+  .width-last-mod {
+    width: 18ch;
+  } 
+  .width-actions {
+    width: 24ch;
+  }
+  .file-icon {
+    width: 1em;
+    height: 1.2em;
+    margin-right: .5rem;
+    svg {
+      display: inline-block;
+      fill: currentColor;
+      height: 1em;
+      position: relative;
+      width: 1em;
+      flex-shrink: 0;
+    }
+  }
+  .file-name-wrap {
+    display: flex;
+    height: 2rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .file-name {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    -webkit-font-smoothing: auto;
+    color: $color-blue-dark;
+    height: 1.2em;
+    line-height: 1.2em;
+  }
+  .delete-button {
+    padding: 0.4em 0.6em;
+    font-size: 1.1em;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-right: 0;
+    // mimics error colors from USWDS -- no outline button for this
+    box-shadow: inset 0 0 0 2px #d83933;
+    color: #d83933;
+    &:hover {
+      box-shadow: inset 0 0 0 2px #b50909;
+      color: #b50909
+    }
+    &:active {
+      box-shadow: inset 0 0 0 2px #8b0a03;
+      color: #8b0a03
+    }
+  }
+}
+
+/* File details */
+
+.file-details {}
+.file-details__header {
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 1rem;
+  align-items: center;
+  .usa-icon {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  h3 {
+    margin: 0;
+  }
+}
+.file-details__close {
+  margin-left: auto;
+  color: $color-blue-dark;
+}
+.file-details__table {
+  margin: 0;
+  width: 100%;
+  th, td {
+    border-color: $sortableBorderColor;
+  }
+  .text-bold,
+  th {
+    font-weight: 600;
+  }
+  th {
+    color: #5d5d5d;
+    min-height: 3rem;
+    min-width: 20ch;
+  }
+}
+
+.border-base {
+  border-color: $sortableBorderColor;
+}
+
+a {
+  cursor: pointer;
 }

@@ -2,7 +2,7 @@ import { waitFor, renderHook } from '@testing-library/react';
 import nock from 'nock';
 import { spy } from 'sinon';
 import { createTestQueryClient } from '@support/queryClient';
-import { getSiteBuilds, getSiteBuildsError, postSiteBuild } from '@support/nocks';
+import { getSiteBuilds, getSiteBuildsError, postSiteBuild } from '@support/nocks/builds';
 import { useBuilds, useRebuild } from './useBuilds';
 
 const createWrapper = createTestQueryClient();
