@@ -1,10 +1,4 @@
-$color-blue: #1c5982;
-$color-blue-dark: #112e51;
-$color-blue-bright: rgb(5, 104, 253);
-
-
-$link-color: $color-blue;
-$link-color-active: $color-blue-dark;
+@use 'variables' as *;
 
 .repo-link {
   svg {
