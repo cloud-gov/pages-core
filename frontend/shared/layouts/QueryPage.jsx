@@ -12,6 +12,7 @@ export default function QueryPage({
   errorMessage,
   isPending,
   isPlaceholderData,
+  showErrorIfEmpty = true,
 }) {
   if (error) {
     const message = errorMessage || error.message;
@@ -22,7 +23,7 @@ export default function QueryPage({
     return <LoadingIndicator />;
   }
 
-  if (!isPlaceholderData && data?.length === 0) {
+  if (showErrorIfEmpty && !isPlaceholderData && data?.length === 0) {
     const header = dataHeader || 'No data available.';
     const message = dataMessage || 'There is no data currently available for this page.';
     return <AlertBanner status="info" header={header} message={message} />;
@@ -44,4 +45,5 @@ QueryPage.propTypes = {
   errorMessage: PropTypes.string,
   isPending: PropTypes.bool.isRequired,
   isPlaceholderData: PropTypes.bool.isRequired,
+  showErrorIfEmpty: PropTypes.bool,
 };

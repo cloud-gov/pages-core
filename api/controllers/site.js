@@ -10,6 +10,7 @@ const {
   Site,
   Event,
   Domain,
+  FileStorageService,
   SiteBranchConfig,
   SiteBuildTask,
   BuildTaskType,
@@ -24,7 +25,7 @@ module.exports = wrapHandlers({
     const { user } = req;
 
     const sites = await Site.forUser(user).findAll({
-      include: [Domain, SiteBranchConfig, SiteBuildTask],
+      include: [Domain, FileStorageService, SiteBranchConfig, SiteBuildTask],
     });
 
     if (!sites) {

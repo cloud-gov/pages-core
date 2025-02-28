@@ -1,5 +1,5 @@
 import nock from 'nock';
-import { builds } from '../../test/frontend/support/data/builds';
+import { builds } from '../../../test/frontend/support/data/builds';
 
 const BASE_URL = 'http://localhost:80';
 
