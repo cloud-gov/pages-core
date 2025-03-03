@@ -1,3 +1,17 @@
+## 0.16.0 (2025-03-03)
+
+### Added
+
+- add components, view, and route for file storage ui
+- Check for duplicate file storage files
+- Add API endpoints for file storage #2082
+
+### Maintenance
+
+- Add file storage seeding to create-dev-data #4733
+- Create services to support file storage local dev
+- Add feature flag for file storage #4718
+
 ## 0.15.2 (2025-02-13)
 
 ### Fixed
