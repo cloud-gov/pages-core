@@ -19,6 +19,7 @@ const allowedAttributes = [
   'isActive',
   'organizationId',
   'Domains',
+  'FileStorageService',
   'Organization',
   'SiteBranchConfigs',
   'SiteBuildTasks',
@@ -122,6 +123,11 @@ const serializeObject = (site, isSystemAdmin) => {
   if (json.Organization) {
     json.organizationId = site.Organization.id;
     delete json.Organization;
+  }
+
+  if (json.FileStorageService) {
+    json.fileStorageServiceId = site.FileStorageService?.id;
+    delete json.FileStorageService;
   }
 
   if (site.Domains) {

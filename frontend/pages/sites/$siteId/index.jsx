@@ -32,9 +32,14 @@ export const SITE_NAVIGATION_CONFIG = [
     icon: 'IconGear',
   },
   {
-    display: 'Uploaded files',
+    display: 'Published builds',
     route: 'published',
     icon: 'IconCloudUpload',
+  },
+  {
+    display: 'Public storage',
+    route: 'storage',
+    icon: 'IconAttachment',
   },
 ];
 

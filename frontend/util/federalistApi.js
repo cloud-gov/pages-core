@@ -365,4 +365,72 @@ export default {
   fetchReportData(id, subPage) {
     return request(`tasks/${id}/report/${subPage || ''}`);
   },
+
+  // default sort from backend is updatedAt, descending. 'name' is also a possible key
+  fetchPublicFiles(
+    fileStorageId,
+    path = '/',
+    sortKey = 'updatedAt',
+    sortOrder = 'desc',
+    page = 1,
+  ) {
+    const params = new URLSearchParams({
+      path,
+      sortKey,
+      sortOrder,
+      page,
+    });
+    return request(
+      `file-storage/${fileStorageId}?${params.toString()}`,
+      {
+        method: 'GET',
+      },
+      {
+        handleHttpError: false,
+      },
+    );
+  },
+
+  createPublicDirectory(fileStorageId, parent = '/', name) {
+    return request(`file-storage/${fileStorageId}/directory`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ parent: parent, name: name }),
+    });
+  },
+
+  uploadPublicFile(fileStorageId, parent = '/', fileName) {
+    return request(`file-storage/${fileStorageId}/upload`, {
+      method: 'POST',
+      body: JSON.stringify({ parent: parent, name: fileName }),
+      // Do not set content type header
+    });
+  },
+
+  deletePublicItem(fileStorageId, itemId) {
+    return request(
+      `file-storage/${fileStorageId}/file/${itemId}`,
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      },
+      {
+        handleHttpError: false,
+      },
+    );
+  },
+
+  fetchPublicFileHistory(fileStorageId, fileId) {
+    return request(`file-storage/${fileStorageId}/user-actions/${fileId}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  },
+
+  fetchAllPublicFilesHistory(fileStorageId) {
+    return request(`file-storage/${fileStorageId}/user-actions/`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  },
 };
