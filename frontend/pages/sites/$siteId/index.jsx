@@ -36,12 +36,16 @@ export const SITE_NAVIGATION_CONFIG = [
     route: 'published',
     icon: 'IconCloudUpload',
   },
-  {
-    display: 'Public storage',
-    route: 'storage',
-    icon: 'IconAttachment',
-  },
 ];
+
+{
+  process.env.FEATURE_FILE_STORAGE_SERVICE === 'true' &&
+    SITE_NAVIGATION_CONFIG.push({
+      display: 'Public storage',
+      route: 'storage',
+      icon: 'IconAttachment',
+    });
+}
 
 export const SITE_TITLE_CONFIG = [
   ...SITE_NAVIGATION_CONFIG,
@@ -130,7 +134,6 @@ export function SiteContainer() {
         role="main"
       >
         <AlertBanner message={alert.message} status={alert.status} />
-
         <PagesHeader
           repository={site.repository}
           owner={site.owner}
@@ -139,7 +142,6 @@ export function SiteContainer() {
           branch={params.branch || site.defaultBranch}
           fileName={params.fileName}
         />
-
         <Outlet />
       </div>
     </div>
