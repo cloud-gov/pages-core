@@ -57,6 +57,10 @@ function fetchWrapper(url, configs = {}) {
     },
     method: configs.method || defaultMethod,
   };
+  const isFormData = configs.body instanceof FormData;
+  if (isFormData) {
+    delete baseConfigs.headers['content-type'];
+  }
 
   let requestConfigs;
 
@@ -65,7 +69,7 @@ function fetchWrapper(url, configs = {}) {
       baseConfigs,
       {},
       {
-        body: JSON.stringify(configs.data),
+        body: isFormData ? configs.body : JSON.stringify(configs.data),
       },
     );
   } else {
@@ -74,7 +78,10 @@ function fetchWrapper(url, configs = {}) {
 
   const requestUrl = configs.params ? mergeParams(url, configs.params) : url;
 
-  return fetch(requestUrl, requestConfigs).then(checkStatus).then(parseJSON);
+  return fetch(requestUrl, requestConfigs)
+    .then(checkStatus)
+    .then(parseJSON)
+    .catch((error) => { throw error });
 }
 
 export default fetchWrapper;

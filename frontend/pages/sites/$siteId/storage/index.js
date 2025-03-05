@@ -6,6 +6,7 @@ import useFileStorage from '@hooks/useFileStorage';
 import AlertBanner from '@shared/alertBanner';
 import LocationBar from './LocationBar';
 import FileDetails from './FileDetails';
+import NewFileOrFolder from './NewFileOrFolder';
 import FileList from './FileList';
 import Pagination from '@shared/Pagination';
 import QueryPage from '@shared/layouts/QueryPage';
@@ -36,15 +37,16 @@ function FileStoragePage() {
     totalPages,
     totalItems,
     isLoading,
-    // we don't use these yet but we may soon, WIP
-    // ----
-    // isFetching,
-    // isPending,
-    // isPlaceholderData,
-    error,
+    defaultError, // for HTTP errors, handled in alertActions by handleHttpError
     deleteItem,
     deleteError,
     deleteSuccess,
+    uploadFile,
+    uploadError,
+    // uploadSuccess,
+    createFolder,
+    createFolderError,
+    // createFolderSuccess,
   } = useFileStorage(fileStorageServiceId, path, sortKey, sortOrder, initalPage);
 
   const [highlightItem, setHighlightItem] = useState(null);
@@ -117,7 +119,7 @@ function FileStoragePage() {
     const isFolder = item.type === 'directory';
     const confirmMessage = isFolder
       ? // eslint-disable-next-line sonarjs/slow-regex
-        `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
+      `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
          Please check that it does not contain any files.`
       : `Are you sure you want to delete the file "${item.name}"?`;
 
@@ -147,10 +149,26 @@ function FileStoragePage() {
     });
   };
 
+  const [uploadFileError, setUploadFileError] = useState(null);
+  const handleUpload = (files) => {
+    files.forEach((file) => {
+      uploadFile(path, file).catch((error) => {
+        setUploadFileError(error.message);
+      });
+    });
+  }
+
+  const [createNewFolderError, setCreateNewFolderError] = useState(null);
+  const handleCreateFolder = (folderName) => {
+    createFolder(path, folderName).catch((error) => {
+      setCreateNewFolderError(error.message)
+    });
+  };
+
   return (
     <QueryPage
       data={fetchedPublicFiles}
-      error={error}
+      error={defaultError}
       showErrorIfEmpty={false}
       isPending={false}
       isPlaceholderData={false}
@@ -170,12 +188,27 @@ function FileStoragePage() {
             message="Successfully deleted file"
           />
         )}
+        {uploadFileError && (
+          <AlertBanner
+            status="info"
+            header={'Could not upload file'}
+            message={uploadFileError || uploadError?.message}
+          />
+        )}
+        {createNewFolderError && (
+          <AlertBanner
+            status="info"
+            header={'Could not upload file'}
+            message={createNewFolderError || createFolderError?.message}
+          />
+        )}
         <LocationBar
           path={path}
           siteId={id}
           storageRoot={storageRoot}
           onNavigate={handleNavigate}
         />
+        <NewFileOrFolder onUpload={handleUpload} onCreateFolder={handleCreateFolder} />
         {foundFileDetails && foundFileDetails.id && (
           <FileDetails
             name={foundFileDetails?.name || ''}

@@ -21,13 +21,22 @@ function request(endpoint, params = {}, { handleHttpError = true } = {}) {
     headers,
   };
 
-  return fetch(url, finalParams).catch((error) => {
-    if (handleHttpError) {
-      alertActions.httpError(error.message);
-    } else {
+  return fetch(url, finalParams)
+    .then((data) => {
+      if (!data) {
+        throw new Error("No response received from server.");
+      }
+      if (data.error || data.message) {
+        throw new Error(data.message || "Unknown API error");
+      }
+      return data;
+    })
+    .catch((error) => {
+      if (handleHttpError) {
+        alertActions.httpError(error.message);
+      }
       throw error;
-    }
-  });
+    });
 }
 
 export default {
@@ -394,16 +403,27 @@ export default {
   createPublicDirectory(fileStorageId, parent = '/', name) {
     return request(`file-storage/${fileStorageId}/directory`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ parent: parent, name: name }),
+      data: { parent, name },
+    }, {
+      handleHttpError: false,
     });
   },
 
-  uploadPublicFile(fileStorageId, parent = '/', fileName) {
+  uploadPublicFile(fileStorageId, parent = '/', file) {
+    if (!(file instanceof File)) {
+      return Promise.reject(new Error('Invalid file object.'));
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('parent', parent);
+    formData.append('name', file.name);
+
     return request(`file-storage/${fileStorageId}/upload`, {
       method: 'POST',
-      body: JSON.stringify({ parent: parent, name: fileName }),
-      // Do not set content type header
+      body: formData,
+    }, {
+      handleHttpError: false,
     });
   },
 
