@@ -58,7 +58,7 @@ export default (
       <Route path="custom-domains" element={<DomainList />} />
       <Route path="custom-domains/new" element={<NewCustomDomain />} />
       <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
-      {process.env.FEATURE_FILE_STORAGE_SERVICE && (
+      {process.env.FEATURE_FILE_STORAGE_SERVICE === 'true' && (
         <>
           <Route path="storage" element={<FileStorage />} />
           <Route path="storage/logs" element={<FileStorageLog />} />
