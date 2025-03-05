@@ -156,6 +156,14 @@ const FileUpload = ({ onUpload, onCancel = null, triggerOnMount = false }) => {
       <div className="usa-button-group margin-0 padding-1 bg-primary-lighter">
         <button
           type="button"
+          disabled={files.length < 1}
+          className="usa-button"
+          onClick={() => onUpload(files)}
+        >
+          Upload
+        </button>
+        <button
+          type="button"
           className="usa-button usa-button--outline"
           onClick={() => {
             setFiles([]);
@@ -163,14 +171,6 @@ const FileUpload = ({ onUpload, onCancel = null, triggerOnMount = false }) => {
           }}
         >
           Cancel upload
-        </button>
-        <button
-          type="button"
-          disabled={files.length < 1}
-          className="usa-button"
-          onClick={() => onUpload(files)}
-        >
-          Upload
         </button>
       </div>
     </div>
