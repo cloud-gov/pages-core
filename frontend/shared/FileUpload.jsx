@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import prettyBytes from 'pretty-bytes';
+import { IconX } from './icons';
 
 const MEGABYTE_LIMIT = 250;
 const MAX_FILE_SIZE = MEGABYTE_LIMIT * 1024 * 1024; // 250MB
@@ -32,12 +33,15 @@ const FileUpload = ({ onUpload, onCancel = null, triggerOnMount = false }) => {
     handleFileSelection(event.dataTransfer.files);
   };
 
-  // opens the file dialog immediately
+  const removeFile = (fileName) => {
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+  };
+
   useEffect(() => {
     if (triggerOnMount && fileInputRef.current) {
       fileInputRef.current.click();
     }
-  }, [triggerOnMount, fileInputRef]);
+  }, [triggerOnMount]);
 
   return (
     <div
@@ -114,15 +118,33 @@ const FileUpload = ({ onUpload, onCancel = null, triggerOnMount = false }) => {
           onChange={(e) => handleFileSelection(e.target.files)}
         />
       </div>
+
       {files.length > 0 && (
         <>
           {files.map((file) => (
             <div
-              className="usa-file-input__preview padding-y-1 font-mono-sm"
+              className="
+                usa-file-input__preview padding-y-1 font-mono-sm bg-primary-lightest
+              "
               aria-hidden
               key={file.name}
             >
-              {file.name}
+              <button
+                type="button"
+                className="usa-button usa-button--unstyled file-input__remove"
+                onClick={() => removeFile(file.name)}
+                title={`Remove ${file.name}`}
+              >
+                <svg
+                  className="usa-icon width-3 height-3 margin-1"
+                  aria-hidden="true"
+                  focusable="false"
+                  role="img"
+                >
+                  <use xlinkHref="/img/sprite.svg#close" />
+                </svg>{' '}
+              </button>
+              <span>{file.name}</span>
               <span className="font-body-sm margin-left-auto margin-right-1">
                 {prettyBytes(file.size)}
               </span>
@@ -130,7 +152,8 @@ const FileUpload = ({ onUpload, onCancel = null, triggerOnMount = false }) => {
           ))}
         </>
       )}
-      <div className="usa-button-group margin-0 padding-1 bg-primary-lightest">
+
+      <div className="usa-button-group margin-0 padding-1 bg-primary-lighter">
         <button
           type="button"
           className="usa-button usa-button--outline"
