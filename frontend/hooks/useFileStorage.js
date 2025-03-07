@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import federalist from '@util/federalistApi';
 import { REFETCH_INTERVAL } from './utils';
 
@@ -10,55 +10,139 @@ const INITIAL_DATA = {
   totalItems: 0,
 };
 
+const TIMEOUT_DURATION = 5000;
+
 export default function useFileStorage(
   fileStorageId,
-  path = '',
-  sortKey = null,
-  sortOrder = null,
+  path = '/',
+  sortKey = 'updatedAt',
+  sortOrder = 'desc',
   page = 1,
 ) {
   const previousData = useRef();
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isFetching, isPending, isPlaceholderData, error } = useQuery({
-    queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
-    queryFn: () =>
-      federalist.fetchPublicFiles(fileStorageId, path, sortKey, sortOrder, page),
-    refetchInterval: REFETCH_INTERVAL,
-    refetchIntervalInBackground: false,
-    enabled: !!fileStorageId,
-    keepPreviousData: true,
-    staleTime: 2000,
-    placeholderData: previousData.current || INITIAL_DATA,
-    onError: (err) => {
-      // using an empty string so that we don't end up with "undefined" at the end
-      throw new Error('Failed to fetch public files ' + (err?.message || ''));
-    },
-  });
+  const [uploadError, setUploadError] = useState(null);
+  const [uploadSuccess, setUploadSuccess] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(null);
+  const [createFolderError, setCreateFolderError] = useState(null);
+  const [createFolderSuccess, setCreateFolderSuccess] = useState(null);
+  const uploadTimeout = useRef(null);
+  const deleteTimeout = useRef(null);
+  const createFolderTimeout = useRef(null);
 
+  const handleSuccess = (setSuccess, setError, timeoutRef, message) => {
+    setError(null);
+    setSuccess(() => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setSuccess(null), TIMEOUT_DURATION);
+      return message;
+    });
+    queryClient.invalidateQueries({
+      queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
+    });
+  };
+
+  const handleError = (setError, setSuccess, timeoutRef, errorMessage) => {
+    setSuccess(null);
+    setError(() => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setError(null), TIMEOUT_DURATION);
+      return errorMessage;
+    });
+  };
+
+  const { data, isLoading, isFetching, isPending, isPlaceholderData, isError, error } =
+    useQuery({
+      queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
+      queryFn: () =>
+        federalist.fetchPublicFiles(fileStorageId, path, sortKey, sortOrder, page),
+      refetchInterval: REFETCH_INTERVAL,
+      refetchIntervalInBackground: false,
+      enabled: !!fileStorageId,
+      keepPreviousData: true,
+      staleTime: 2000,
+      placeholderData: previousData.current || INITIAL_DATA,
+      onError: (err) => {
+        // using an empty string so that we don't end up with "undefined" at the end
+        throw new Error('Failed to fetch public files ' + (err?.message || ''));
+      },
+    });
   useEffect(() => {
     if (data !== undefined) {
       previousData.current = data;
     }
   }, [data]);
 
+  useEffect(() => {
+    return () => {
+      if (uploadTimeout.current) clearTimeout(uploadTimeout.current);
+      if (deleteTimeout.current) clearTimeout(deleteTimeout.current);
+      if (createFolderTimeout.current) clearTimeout(createFolderTimeout.current);
+    };
+  }, []);
+
   const deleteMutation = useMutation({
     mutationFn: (item) => federalist.deletePublicItem(fileStorageId, item.id),
-    onSuccess: () => {
-      // Invalidate the query to refetch the file list after deletion.
-      return queryClient.invalidateQueries({
-        queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
-      });
-    },
-    onError: (err) => {
-      // using an empty string so that we don't end up with "undefined" at the end
-      throw new Error('Failed to delete file ' + (err?.message || ''));
+    onSuccess: () =>
+      handleSuccess(
+        setDeleteSuccess,
+        setDeleteError,
+        deleteTimeout,
+        'File deleted successfully.',
+      ),
+    onError: (err) =>
+      handleError(
+        setDeleteError,
+        setDeleteSuccess,
+        deleteTimeout,
+        err?.message || 'Failed to delete file.',
+      ),
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: ({ parent = '/', file }) =>
+      federalist.uploadPublicFile(fileStorageId, parent, file),
+    onSuccess: () =>
+      handleSuccess(
+        setUploadSuccess,
+        setUploadError,
+        uploadTimeout,
+        'File uploaded successfully.',
+      ),
+    onError: (err, { file }) => {
+      const errorMessage = err?.message || 'Upload failed.';
+      const formattedMessage = errorMessage.includes('already exists')
+        ? `A file named "${file.name}" already exists in this folder.`
+        : errorMessage;
+      handleError(setUploadError, setUploadSuccess, uploadTimeout, formattedMessage);
     },
   });
 
-  async function deleteItem(item) {
-    return deleteMutation.mutate(item);
-  }
+  const createFolderMutation = useMutation({
+    mutationFn: ({ parent = '/', name }) =>
+      federalist.createPublicDirectory(fileStorageId, parent, name),
+    onSuccess: () =>
+      handleSuccess(
+        setCreateFolderSuccess,
+        setCreateFolderError,
+        createFolderTimeout,
+        'Folder created successfully.',
+      ),
+    onError: (err, { name }) => {
+      const errorMessage = err?.message || 'Could not create folder.';
+      const formattedMessage = errorMessage.includes('already exists')
+        ? `A folder named "${name}" already exists in this folder.`
+        : errorMessage;
+      handleError(
+        setCreateFolderError,
+        setCreateFolderSuccess,
+        createFolderTimeout,
+        formattedMessage,
+      );
+    },
+  });
 
   return {
     ...data,
@@ -67,9 +151,16 @@ export default function useFileStorage(
     isFetching,
     isPending,
     isPlaceholderData,
-    error,
-    deleteItem,
-    deleteError: deleteMutation.error,
-    deleteSuccess: deleteMutation.isSuccess,
+    isError,
+    defaultError: error,
+    deleteItem: (item) => deleteMutation.mutateAsync(item),
+    deleteError,
+    deleteSuccess,
+    uploadFile: (parent, file) => uploadMutation.mutateAsync({ parent, file }),
+    uploadError,
+    uploadSuccess,
+    createFolder: (parent, name) => createFolderMutation.mutateAsync({ parent, name }),
+    createFolderError,
+    createFolderSuccess,
   };
 }

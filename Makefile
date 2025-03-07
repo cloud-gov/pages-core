@@ -70,6 +70,9 @@ test-server: ## Run server tests
 test-all: ## Run all tests
 	docker compose --env-file ./services/local/docker.env run --rm app yarn test
 
+test-watch:
+	docker compose --env-file ./services/local/docker.env run --rm app yarn test:rtl --watch --runInBand --silent=false
+
 everything: # When you switch to a new branch and need to rebuild everything
 	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env down
 	make rebuild

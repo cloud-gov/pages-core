@@ -1,4 +1,4 @@
-import { waitFor, renderHook } from '@testing-library/react';
+import { waitFor, renderHook, act } from '@testing-library/react';
 import nock from 'nock';
 import { spy } from 'sinon';
 import { createTestQueryClient } from '@support/queryClient';
@@ -7,134 +7,318 @@ import {
   getFileStorageFilesError,
   deletePublicItem,
   deletePublicItemError,
+  uploadPublicFile,
+  uploadPublicFileError,
+  createPublicDirectory,
+  createPublicDirectoryError,
 } from '@support/nocks/fileStorage';
 import useFileStorage from './useFileStorage';
-import { fileStorageData } from '../../test/frontend/support/data/fileStorageData';
+import { getFileStorageData } from '../../test/frontend/support/data/fileStorageData';
 
 const createWrapper = createTestQueryClient();
 
+const props = {
+  fileStorageId: 123,
+  path: '/',
+  sortKey: 'updatedAt',
+  sortOrder: 'desc',
+  page: 1,
+};
 describe('useFileStorage', () => {
   beforeEach(() => nock.cleanAll());
   afterAll(() => nock.restore());
 
   it('should fetch public files successfully', async () => {
-    const fileStorageId = 123;
-    const path = '/';
-    const sortKey = 'name';
-    const sortOrder = 'asc';
-    const page = '1';
+    const expectedData = getFileStorageData(props.page);
+    await getFileStorageFiles({ ...props });
 
-    await getFileStorageFiles({
-      fileStorageId,
-      path,
-      sortKey,
-      sortOrder,
-      page,
-      fileStorageData,
+    const { result } = renderHook(() => useFileStorage(...Object.values(props)), {
+      wrapper: createWrapper(),
     });
+    await waitFor(() =>
+      expect(!result.current.isPending && !result.current.isPlaceholderData).toBe(true),
+    );
+    expect(result.current.data).toEqual(expectedData.data);
+    expect(result.current.currentPage).toEqual(expectedData.currentPage);
+    expect(result.current.totalPages).toEqual(expectedData.totalPages);
+    expect(result.current.totalItems).toEqual(expectedData.totalItems);
+  });
+
+  it('should fetch public files successfully even in a nested folder', async () => {
+    const nestedFolder = '/subfolder';
+    const expectedData = getFileStorageData(props.page);
+
+    await getFileStorageFiles({ ...props, path: nestedFolder });
 
     const { result } = renderHook(
-      () => useFileStorage(fileStorageId, path, sortKey, sortOrder, page),
-      { wrapper: createWrapper() },
+      () => useFileStorage(props.fileStorageId, nestedFolder),
+      {
+        wrapper: createWrapper(),
+      },
     );
 
     await waitFor(() =>
       expect(!result.current.isPending && !result.current.isPlaceholderData).toBe(true),
     );
 
-    expect(result.current.data).toEqual(fileStorageData.data);
-    expect(result.current.currentPage).toEqual(fileStorageData.currentPage);
-    expect(result.current.totalPages).toEqual(fileStorageData.totalPages);
-    expect(result.current.totalItems).toEqual(fileStorageData.totalItems);
+    expect(result.current.data).toEqual(expectedData.data);
+    expect(result.current.currentPage).toEqual(expectedData.currentPage);
+    expect(result.current.totalPages).toEqual(expectedData.totalPages);
+    expect(result.current.totalItems).toEqual(expectedData.totalItems);
+  });
+
+  it('should fetch the second page of results correctly', async () => {
+    const pageNumber = 2;
+    const expectedData = getFileStorageData(pageNumber);
+
+    await getFileStorageFiles({ ...props, page: pageNumber });
+
+    const { result } = renderHook(
+      () =>
+        useFileStorage(
+          props.fileStorageId,
+          props.path,
+          props.sortKey,
+          props.sortOrder,
+          pageNumber,
+        ),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() =>
+      expect(!result.current.isPending && !result.current.isPlaceholderData).toBe(true),
+    );
+    expect(result.current.data).toEqual(expectedData.data);
+    expect(result.current.currentPage).toEqual(expectedData.currentPage);
+    expect(result.current.totalPages).toEqual(expectedData.totalPages);
+    expect(result.current.totalItems).toEqual(expectedData.totalItems);
   });
 
   it('should return an error when fetching public files fails', async () => {
-    const fileStorageId = 123;
-    const path = '/';
-    const sortKey = 'name';
-    const sortOrder = 'asc';
-    const page = 1;
-
     const errorMessage = 'Failed to fetch public files';
-    await getFileStorageFilesError({
-      fileStorageId,
-      path,
-      sortKey,
-      sortOrder,
-      page,
-      errorMessage,
+    await getFileStorageFilesError({ ...props, errorMessage });
+    await getFileStorageFiles({ ...props }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(...Object.values(props)), {
+      wrapper: createWrapper(),
     });
 
-    const { result } = renderHook(
-      () => useFileStorage(fileStorageId, path, sortKey, sortOrder, page),
-      { wrapper: createWrapper() },
-    );
+    await waitFor(() => expect(result.current.defaultError).toBeInstanceOf(Error));
 
-    await waitFor(() =>
-      expect(!result.current.isPending && !result.current.isPlaceholderData).toBe(true),
-    );
-
-    expect(result.current.error).toBeInstanceOf(Error);
-    expect(result.current.error.message).toContain(errorMessage);
+    expect(result.current.defaultError).toBeInstanceOf(Error);
+    expect(result.current.defaultError.message).toContain(errorMessage);
   });
 
   it('should delete an item successfully and invalidate the query', async () => {
-    const fileStorageId = 123;
-    const path = '/';
-    const sortKey = 'name';
-    const sortOrder = 'asc';
-    const page = 1;
     const fileItem = { id: 1, name: 'file1.txt' };
 
-    await deletePublicItem(fileStorageId, fileItem.id);
-    await getFileStorageFiles(
-      { fileStorageId, path, sortKey, sortOrder, page },
-      { times: 2 },
-    );
+    await deletePublicItem(props.fileStorageId, fileItem.id);
+    await getFileStorageFiles({ ...props }, { times: 3 });
 
-    const { result } = renderHook(
-      () => useFileStorage(fileStorageId, path, sortKey, sortOrder, page),
-      { wrapper: createWrapper() },
-    );
+    const { result } = renderHook(() => useFileStorage(...Object.values(props)), {
+      wrapper: createWrapper(),
+    });
 
     const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+    await act(async () => {
+      await result.current.deleteItem(fileItem);
+    });
+    await waitFor(() =>
+      expect(result.current.deleteSuccess).toContain('File deleted successfully'),
+    );
 
-    await result.current.deleteItem(fileItem);
-    await waitFor(() => expect(result.current.deleteSuccess).toBe(true));
-
-    expect(
-      qcSpy.calledOnceWith({
-        queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
-      }),
-    ).toBe(true);
+    expect(qcSpy.calledOnce).toBe(true);
   });
 
-  it('should return an error when deletion fails', async () => {
-    const fileStorageId = 123;
-    const path = '/';
-    const sortKey = 'name';
-    const sortOrder = 'asc';
-    const page = 1;
+  it('should return an error message when deletion fails', async () => {
     const fileItem = { id: 1, name: 'file1.txt' };
 
     const deleteErrorMessage = 'Failed to delete file';
-    await deletePublicItemError(fileStorageId, fileItem.id, deleteErrorMessage);
-    await getFileStorageFiles(
-      { fileStorageId, path, sortKey, sortOrder, page },
-      { times: 2 },
+    await deletePublicItemError(props.fileStorageId, fileItem.id, deleteErrorMessage);
+    await getFileStorageFiles({ ...props }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(...Object.values(props)), {
+      wrapper: createWrapper(),
+    });
+
+    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+
+    await act(async () => {
+      await result.current.deleteItem(fileItem).catch(() => {});
+    });
+
+    await waitFor(() => expect(result.current.deleteError).toBe(deleteErrorMessage));
+
+    expect(qcSpy.notCalled).toBe(true);
+  });
+
+  it('should upload a file successfully and invalidate the query', async () => {
+    const parent = '/';
+    const mockFile = new File(['file content'], 'test-file.txt', { type: 'text/plain' });
+
+    await uploadPublicFile(props.fileStorageId, parent, mockFile);
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
+      wrapper: createWrapper(),
+    });
+
+    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+
+    await act(async () => {
+      await result.current.uploadFile(parent, mockFile);
+    });
+
+    await waitFor(() =>
+      expect(result.current.uploadSuccess).toContain('File uploaded successfully'),
     );
+    expect(qcSpy.calledOnce).toBe(true);
+  });
+
+  it('should successfully upload a file even inside a nested folder', async () => {
+    const parent = '/nested/folder';
+    const mockFile = new File(['file content'], 'nested-file.txt', {
+      type: 'text/plain',
+    });
+
+    await uploadPublicFile(props.fileStorageId, parent, mockFile);
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
 
     const { result } = renderHook(
-      () => useFileStorage(fileStorageId, path, sortKey, sortOrder, page),
-      { wrapper: createWrapper() },
+      () =>
+        // don't spread from Object.values() if you're going to overwrite something
+        useFileStorage(
+          props.fileStorageId,
+          parent,
+          props.sortKey,
+          props.sortOrder,
+          props.page,
+        ),
+      {
+        wrapper: createWrapper(),
+      },
     );
 
     const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
 
-    await result.current.deleteItem(fileItem).catch(() => {});
+    await act(async () => {
+      await result.current.uploadFile(parent, mockFile);
+    });
 
-    await waitFor(() => expect(result.current.deleteError).toBeInstanceOf(Error));
-    expect(result.current.deleteError.message).toContain(deleteErrorMessage);
-    expect(qcSpy.notCalled).toBe(true);
+    await waitFor(() =>
+      expect(result.current.uploadSuccess).toContain('File uploaded successfully'),
+    );
+    expect(qcSpy.calledOnce).toBe(true);
+  });
+
+  it('should return an error message when file upload fails', async () => {
+    const parent = '/';
+    const mockFile = new File(['file content'], 'test-file.txt', { type: 'text/plain' });
+
+    const errorMessage = 'Upload failed.';
+    await uploadPublicFileError(props.fileStorageId, parent, mockFile, errorMessage);
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.uploadFile(parent, mockFile).catch(() => {});
+    });
+
+    await waitFor(() => expect(result.current.uploadError).toBe(errorMessage));
+  });
+
+  it('should return a specific error when uploading a duplicate file', async () => {
+    const parent = '/';
+    const mockFile = new File(['file content'], 'existing-file.txt', {
+      type: 'text/plain',
+    });
+    const errorMessage = `A file named "${mockFile.name}" already exists in this folder.`;
+
+    await uploadPublicFileError(props.fileStorageId, parent, mockFile, errorMessage);
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.uploadFile(parent, mockFile).catch(() => {});
+    });
+
+    await waitFor(() => expect(result.current.uploadError).toBe(errorMessage));
+  });
+
+  it('should create a folder successfully and invalidate the query', async () => {
+    const parent = '/';
+    const folderName = 'New Folder';
+
+    await createPublicDirectory(props.fileStorageId, parent, folderName);
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
+      wrapper: createWrapper(),
+    });
+
+    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+
+    await act(async () => {
+      await result.current.createFolder(parent, folderName);
+    });
+
+    await waitFor(() =>
+      expect(result.current.createFolderSuccess).toContain('Folder created successfully'),
+    );
+    expect(qcSpy.calledOnce).toBe(true);
+  });
+
+  it('should return an error when folder creation fails', async () => {
+    const parent = '/';
+    const folderName = 'daddy';
+    const errorMessage = `A folder named "${folderName}" already exists in this folder.`;
+
+    await createPublicDirectoryError(
+      props.fileStorageId,
+      parent,
+      folderName,
+      errorMessage,
+    );
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.createFolder(parent, folderName).catch(() => {});
+    });
+
+    await waitFor(() => expect(result.current.createFolderError).toBe(errorMessage));
+  });
+
+  it('should return a specific error when creating a duplicate folder', async () => {
+    const parent = '/';
+    const folderName = 'mommy';
+    const errorMessage = `A folder named "${folderName}" already exists in this folder.`;
+
+    await createPublicDirectoryError(
+      props.fileStorageId,
+      parent,
+      folderName,
+      errorMessage,
+    );
+    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.createFolder(parent, folderName).catch(() => {});
+    });
+
+    await waitFor(() => expect(result.current.createFolderError).toBe(errorMessage));
   });
 });

@@ -60,12 +60,19 @@ function fetchWrapper(url, configs = {}) {
 
   let requestConfigs;
 
+  let requestBody = JSON.stringify(configs.data);
+
+  if (baseConfigs.headers['content-type'] === 'multipart/form-data') {
+    requestBody = configs.body;
+    // browser must set this for FormData
+    delete baseConfigs.headers['content-type'];
+  }
   if (configs.method && !/get|delete/i.test(configs.method)) {
     requestConfigs = Object.assign(
       baseConfigs,
       {},
       {
-        body: JSON.stringify(configs.data),
+        body: requestBody,
       },
     );
   } else {
@@ -73,7 +80,6 @@ function fetchWrapper(url, configs = {}) {
   }
 
   const requestUrl = configs.params ? mergeParams(url, configs.params) : url;
-
   return fetch(requestUrl, requestConfigs).then(checkStatus).then(parseJSON);
 }
 

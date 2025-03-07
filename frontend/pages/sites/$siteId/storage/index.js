@@ -6,6 +6,7 @@ import useFileStorage from '@hooks/useFileStorage';
 import AlertBanner from '@shared/alertBanner';
 import LocationBar from './LocationBar';
 import FileDetails from './FileDetails';
+import NewFileOrFolder from './NewFileOrFolder';
 import FileList from './FileList';
 import Pagination from '@shared/Pagination';
 import QueryPage from '@shared/layouts/QueryPage';
@@ -36,15 +37,16 @@ function FileStoragePage() {
     totalPages,
     totalItems,
     isLoading,
-    // we don't use these yet but we may soon, WIP
-    // ----
-    // isFetching,
-    // isPending,
-    // isPlaceholderData,
-    error,
+    defaultError,
     deleteItem,
     deleteError,
     deleteSuccess,
+    uploadFile,
+    uploadError,
+    uploadSuccess,
+    createFolder,
+    createFolderError,
+    createFolderSuccess,
   } = useFileStorage(fileStorageServiceId, path, sortKey, sortOrder, initalPage);
 
   const [highlightItem, setHighlightItem] = useState(null);
@@ -58,7 +60,6 @@ function FileStoragePage() {
   function scrollToTop() {
     return scrollTo.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
   const handleNavigate = (newPath) => {
     const decodedPath = decodeURIComponent(newPath);
     // Remove trailing slash if it exists
@@ -113,19 +114,6 @@ function FileStoragePage() {
     }, 100);
   };
 
-  const handleDelete = async (item) => {
-    const isFolder = item.type === 'directory';
-    const confirmMessage = isFolder
-      ? // eslint-disable-next-line sonarjs/slow-regex
-        `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
-         Please check that it does not contain any files.`
-      : `Are you sure you want to delete the file "${item.name}"?`;
-
-    if (!window.confirm(confirmMessage)) return;
-
-    await deleteItem(item);
-  };
-
   const handleSort = (sortKey) => {
     const currentSortKey = searchParams.get('sortKey') || DEFAULT_SORT_KEY;
     const currentSortOrder = searchParams.get('sortOrder') || DEFAULT_SORT_ORDER;
@@ -147,35 +135,83 @@ function FileStoragePage() {
     });
   };
 
+  const handleDelete = async (item) => {
+    const isFolder = item.type === 'directory';
+    const confirmMessage = isFolder
+      ? // eslint-disable-next-line sonarjs/slow-regex
+        `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
+         Please check that it does not contain any files.`
+      : `Are you sure you want to delete the file "${item.name}"?`;
+
+    if (!window.confirm(confirmMessage)) return;
+
+    await deleteItem(item);
+  };
+
+  const handleUpload = async (files) => {
+    await Promise.all(files.map((file) => uploadFile(path, file)));
+  };
+
+  const handleCreateFolder = async (folderName) => {
+    await createFolder(path, folderName);
+  };
   return (
     <QueryPage
       data={fetchedPublicFiles}
-      error={error}
-      showErrorIfEmpty={false}
+      showErrorIfEmpty={true}
+      error={defaultError}
       isPending={false}
       isPlaceholderData={false}
     >
+      {/* TODO: make these into an array of alerts */}
+      {uploadError && (
+        <AlertBanner status="error" header="Upload Error" message={uploadError} />
+      )}
+
+      {uploadSuccess && (
+        <AlertBanner
+          status="success"
+          header="Upload Successful"
+          message={uploadSuccess}
+        />
+      )}
+
+      {deleteError && (
+        <AlertBanner status="error" header="Delete Error" message={deleteError} />
+      )}
+
+      {deleteSuccess && (
+        <AlertBanner
+          status="success"
+          header="Delete Successful"
+          message={deleteSuccess}
+        />
+      )}
+
+      {createFolderError && (
+        <AlertBanner
+          status="error"
+          header="Folder Creation Error"
+          message={createFolderError}
+        />
+      )}
+
+      {createFolderSuccess && (
+        <AlertBanner
+          status="success"
+          header="Folder Created"
+          message={createFolderSuccess}
+        />
+      )}
+
       <div className="grid-col-12" ref={scrollTo}>
-        {deleteError && (
-          <AlertBanner
-            status="error"
-            header={'Failed to delete ' + deleteError.itemName}
-            message={deleteError.message}
-          />
-        )}
-        {deleteSuccess && (
-          <AlertBanner
-            status="success"
-            header={'Deleted File'}
-            message="Successfully deleted file"
-          />
-        )}
         <LocationBar
           path={path}
           siteId={id}
           storageRoot={storageRoot}
           onNavigate={handleNavigate}
         />
+        <NewFileOrFolder onUpload={handleUpload} onCreateFolder={handleCreateFolder} />
         {foundFileDetails && foundFileDetails.id && (
           <FileDetails
             name={foundFileDetails?.name || ''}
