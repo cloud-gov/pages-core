@@ -1,4 +1,10 @@
-function associate({ FileStorageFile, FileStorageService, FileStorageUserAction }) {
+function associate({
+  FileStorageFile,
+  FileStorageService,
+  FileStorageUserAction,
+  UAAIdentity,
+  User,
+}) {
   FileStorageFile.belongsTo(FileStorageService, {
     foreignKey: 'fileStorageServiceId',
   });
@@ -15,6 +21,23 @@ function associate({ FileStorageFile, FileStorageService, FileStorageUserAction 
       },
     ],
   }));
+
+  FileStorageFile.addScope('withLastAction', {
+    include: {
+      model: FileStorageUserAction,
+      limit: 1,
+      required: true,
+      order: [['createdAt', 'DESC']],
+      include: {
+        model: User,
+        required: true,
+        include: {
+          model: UAAIdentity,
+          required: true,
+        },
+      },
+    },
+  });
 }
 
 function define(sequelize, DataTypes) {

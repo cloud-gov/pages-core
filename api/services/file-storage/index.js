@@ -184,7 +184,7 @@ class SiteFileStorageSerivce {
   }
 
   async getFile(id) {
-    const record = await FileStorageFile.findOne({
+    const record = await FileStorageFile.scope(['withLastAction']).findOne({
       where: { id, fileStorageServiceId: this.id },
     });
 
@@ -222,7 +222,7 @@ class SiteFileStorageSerivce {
     const key = this.#buildKeyPath(directory);
 
     const results = await paginate(
-      FileStorageFile,
+      FileStorageFile.scope(['withLastAction']),
       serializeFileStorageFiles,
       {
         limit,
