@@ -13,6 +13,5 @@ module.exports = {
     '@util(.*)$': '<rootDir>/frontend/util$1',
     '@support(.*)$': '<rootDir>/frontend/support$1',
   },
-  testEnvironment: 'jsdom',
-  setupFiles: ['<rootDir>/rtl-test/setupJest.js'],
+  testEnvironment: 'jest-fixed-jsdom',
 };
