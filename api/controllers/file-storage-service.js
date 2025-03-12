@@ -49,7 +49,7 @@ module.exports = wrapHandlers({
     const client = await siteStorageService.createClient();
     const fss = await client.createDirectory(parent, name);
 
-    const data = serializeFileStorageFile(fss);
+    const data = serializeFileStorageFile(fss, { includeLastModified: false });
     return res.send(data);
   },
 
@@ -162,7 +162,7 @@ module.exports = wrapHandlers({
       originalname,
     });
 
-    const data = serializeFileStorageFile(fss);
+    const data = serializeFileStorageFile(fss, { includeLastModified: false });
     return res.send(data);
   },
 });

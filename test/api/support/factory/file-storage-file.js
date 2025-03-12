@@ -1,6 +1,8 @@
 const path = require('node:path');
 const fileStorageService = require('./file-storage-service');
-const { FileStorageFile } = require('../../../../api/models');
+const userWithIdentity = require('./user-with-uaa-identity');
+const { FileStorageFile, FileStorageUserAction } = require('../../../../api/models');
+const { getRandItem } = require('./utils');
 
 const counters = {};
 
@@ -17,6 +19,7 @@ async function build(params = {}) {
     fileStorageServiceId = null,
     description = null,
     metadata = null,
+    createFileUserAction = true,
   } = params;
 
   if (!name) {
@@ -36,7 +39,7 @@ async function build(params = {}) {
     fileStorageServiceId = fss.id;
   }
 
-  return FileStorageFile.create({
+  const file = await FileStorageFile.create({
     name,
     key,
     type,
@@ -44,17 +47,33 @@ async function build(params = {}) {
     description,
     metadata,
   });
+
+  const { user } = await userWithIdentity.create();
+
+  if (createFileUserAction) {
+    await FileStorageUserAction.create({
+      userId: user.id,
+      fileStorageServiceId,
+      fileStorageFileId: file.id,
+      method: getRandItem(FileStorageUserAction.METHODS),
+      description: getRandItem(FileStorageUserAction.ACTION_TYPES),
+    });
+  }
+
+  return file;
 }
 
 function create(params) {
   return build(params);
 }
 
-function truncate() {
-  return FileStorageFile.truncate({
+async function truncate() {
+  await FileStorageFile.truncate({
     force: true,
     cascade: true,
   });
+
+  await userWithIdentity.truncate();
 }
 
 async function createBulk(
@@ -64,7 +83,6 @@ async function createBulk(
 ) {
   let totalFiles = [];
   let totalDiectories = [];
-
   if (files > 0) {
     const fileList = new Array(files).fill(0);
 

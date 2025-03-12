@@ -9,13 +9,35 @@ const allowedFileStorageFileFields = [
   'key',
   'type',
   'metadata',
+  'lastModifiedAt',
+  'lastModifiedBy',
+  'lastModifiedByUserId',
   ...dateFields,
 ];
 
-const serializeFileStorageFile = (serializable) => {
+const serializeFileStorageFile = (serializable, { includeLastModified = true } = {}) => {
   if (!serializable) return {};
 
-  return pick(allowedFileStorageFileFields, serializable.dataValues);
+  let lastModified = {};
+
+  if (includeLastModified) {
+    const { FileStorageUserActions } = serializable;
+
+    const {
+      createdAt: lastModifiedAt,
+      User: {
+        id: lastModifiedByUserId,
+        UAAIdentity: { email: lastModifiedBy },
+      },
+    } = FileStorageUserActions[0];
+
+    lastModified = { lastModifiedAt, lastModifiedByUserId, lastModifiedBy };
+  }
+
+  return pick(allowedFileStorageFileFields, {
+    ...serializable.dataValues,
+    ...lastModified,
+  });
 };
 
 const serializeFileStorageFiles = (list) => {
@@ -43,15 +65,33 @@ const allowedFileStorageUserActionFields = [
   'userId',
   'createdAt',
   'email',
+  'fileKey',
+  'fileName',
+  'fileMetadata',
+  'fileType',
 ];
 
 const serializeFileStorageUserAction = (serializable) => {
-  const { User, ...rest } = serializable.dataValues;
+  const { User, FileStorageFile, ...rest } = serializable.dataValues;
 
   const { UAAIdentity } = User.dataValues;
   const { email } = UAAIdentity.dataValues;
 
-  return pick(allowedFileStorageUserActionFields, { ...rest, email });
+  const {
+    key: fileKey,
+    name: fileName,
+    metadata: fileMetadata,
+    type: fileType,
+  } = FileStorageFile;
+
+  return pick(allowedFileStorageUserActionFields, {
+    ...rest,
+    email,
+    fileKey,
+    fileName,
+    fileMetadata,
+    fileType,
+  });
 };
 
 const serializeFileStorageUserActions = (list) => {

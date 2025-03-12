@@ -34,11 +34,17 @@ function associate({
   });
 
   FileStorageUserAction.addScope('withUserIdentity', {
-    include: {
-      model: User,
-      required: true,
-      include: { model: UAAIdentity, required: true },
-    },
+    include: [
+      {
+        model: User,
+        required: true,
+        include: { model: UAAIdentity, required: true },
+      },
+      {
+        model: FileStorageFile,
+        required: true,
+      },
+    ],
   });
 }
 

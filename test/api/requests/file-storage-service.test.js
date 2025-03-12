@@ -15,11 +15,13 @@ describe('File Storgage API', () => {
   beforeEach(async () => {
     sinon.stub(EventCreator, 'error').resolves();
     await factory.organization.truncate();
+    await factory.fileStorageFile.truncate();
   });
 
   afterEach(async () => {
     sinon.restore();
     await factory.organization.truncate();
+    await factory.fileStorageFile.truncate();
   });
 
   describe('GET /v0/file-storage/:file_storage_id', () => {
@@ -532,7 +534,7 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('GET', endpoint, 200, body);
       });
 
-      it('returns a list of items in the directory path', async () => {
+      it('returns a list of user actions', async () => {
         const { site, org, user } = await stubSiteS3({ roleName: 'manager' });
         const fss = await factory.fileStorageService.create({
           siteId: site.id,
@@ -678,7 +680,7 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('GET', endpoint, 200, body);
       });
 
-      it('returns a list of items in the directory path', async () => {
+      it('returns a list of user actions for a file', async () => {
         const { site, org, user } = await stubSiteS3({ roleName: 'manager' });
         const fss = await factory.fileStorageService.create({
           siteId: site.id,
