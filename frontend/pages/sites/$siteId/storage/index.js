@@ -5,7 +5,7 @@ import useFileStorage from '@hooks/useFileStorage';
 
 import AlertBanner from '@shared/alertBanner';
 import LocationBar from './LocationBar';
-import FileDetails from './FileDetails';
+// import FileDetails from './FileDetails';
 import NewFileOrFolder from './NewFileOrFolder';
 import FileList from './FileList';
 import Pagination from '@shared/Pagination';
@@ -53,9 +53,10 @@ function FileStoragePage() {
   const [savedScrollPos, setSavedScrollPos] = useState(0);
   const queryFileDetails = searchParams.get('details');
   const storageRoot = `${site.siteOrigin}/~assets`;
-  const foundFileDetails = fetchedPublicFiles?.find(
-    (file) => file.name === queryFileDetails,
-  );
+  let foundFileDetails;
+  // const foundFileDetails = fetchedPublicFiles?.find(
+  //   (file) => file.name === queryFileDetails,
+  // );
   const scrollTo = useRef(null);
   function scrollToTop() {
     return scrollTo.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -102,17 +103,17 @@ function FileStoragePage() {
     window.scrollTo({ top: 0 });
   };
 
-  const handleCloseDetails = () => {
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
-      newParams.delete('details');
-      return newParams;
-    });
-    // scroll back to where you were in this really long list
-    setTimeout(() => {
-      window.scrollTo({ top: savedScrollPos, behavior: 'smooth' });
-    }, 100);
-  };
+  // const handleCloseDetails = () => {
+  //   setSearchParams((prev) => {
+  //     const newParams = new URLSearchParams(prev);
+  //     newParams.delete('details');
+  //     return newParams;
+  //   });
+  //   // scroll back to where you were in this really long list
+  //   setTimeout(() => {
+  //     window.scrollTo({ top: savedScrollPos, behavior: 'smooth' });
+  //   }, 100);
+  // };
 
   const handleSort = (sortKey) => {
     const currentSortKey = searchParams.get('sortKey') || DEFAULT_SORT_KEY;
@@ -139,7 +140,7 @@ function FileStoragePage() {
     const isFolder = item.type === 'directory';
     const confirmMessage = isFolder
       ? // eslint-disable-next-line sonarjs/slow-regex
-        `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
+      `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
          Please check that it does not contain any files.`
       : `Are you sure you want to delete the file "${item.name}"?`;
 
@@ -212,7 +213,7 @@ function FileStoragePage() {
           onNavigate={handleNavigate}
         />
         <NewFileOrFolder onUpload={handleUpload} onCreateFolder={handleCreateFolder} />
-        {foundFileDetails && foundFileDetails.id && (
+        {/* {foundFileDetails && foundFileDetails.id && (
           <FileDetails
             name={foundFileDetails?.name || ''}
             id={foundFileDetails?.id}
@@ -224,7 +225,7 @@ function FileStoragePage() {
             onDelete={handleDelete}
             onClose={handleCloseDetails}
           />
-        )}
+        )} */}
         {(!queryFileDetails || !foundFileDetails) && (
           <>
             {queryFileDetails && !foundFileDetails && (

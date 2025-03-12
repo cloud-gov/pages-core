@@ -400,6 +400,18 @@ export default {
     );
   },
 
+  fetchPublicFile(fileStorageId, fileId) {
+    return request(
+      `file-storage/${fileStorageId}/file/${fileId}`,
+      {
+        method: 'GET',
+      },
+      // {
+      //   handleHttpError: false,
+      // },
+    )
+  },
+
   createPublicDirectory(fileStorageId, parent = '/', name) {
     return request(
       `file-storage/${fileStorageId}/directory`,
