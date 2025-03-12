@@ -100,7 +100,7 @@ body {
       margin: 1.5rem 0;
   }
 }
-.usa-button {
+.usa-button:not(.usa-button--unstyled) {
   -webkit-font-smoothing: antialiased;
   svg {
     display: inline-block;

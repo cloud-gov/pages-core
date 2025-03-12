@@ -712,3 +712,12 @@ $highlightedAndSelectedCellBackground: #dde7ef;
 a {
   cursor: pointer;
 }
+
+/* File Upload list/table */
+.usa-file-input {}
+.usa-file-input__preview {
+  pointer-events: initial;
+}
+.file-input__remove:hover + span {
+  text-decoration: line-through;
+}
