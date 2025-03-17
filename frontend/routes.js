@@ -17,6 +17,7 @@ import DomainList from '@pages/sites/$siteId/custom-domains';
 import NewCustomDomain from '@pages/sites/$siteId/custom-domains/new';
 import EditCustomDomain from '@pages/sites/$siteId/custom-domains/$domainId/edit';
 import Reports from '@pages/sites/$siteId/reports';
+import FileDetails from '@pages/sites/$siteId/storage/$fileId/FileDetails';
 import FileStorage from '@pages/sites/$siteId/storage';
 import FileStorageLog from '@pages/sites/$siteId/storage/logs';
 import Settings from '@pages/settings';
@@ -61,6 +62,7 @@ export default (
       {process.env.FEATURE_FILE_STORAGE_SERVICE === 'true' && (
         <>
           <Route path="storage" element={<FileStorage />} />
+          <Route path="storage/file/:fileId" element={<FileDetails />} />
           <Route path="storage/logs" element={<FileStorageLog />} />
         </>
       )}
