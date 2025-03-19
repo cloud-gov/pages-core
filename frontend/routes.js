@@ -23,6 +23,7 @@ import Settings from '@pages/settings';
 import NotFound from '@pages/NotFound';
 import ErrorMessage from '@pages/ErrorMessage';
 
+import siteNav from '@pages/sites/$siteId/siteNav';
 import siteActions from './actions/siteActions';
 import userActions from './actions/userActions';
 import organizationActions from './actions/organizationActions';
@@ -51,23 +52,23 @@ export default (
     <Route path="sites/new" element={<AddSite />} />
     <Route path="sites/:id" element={<SiteContainer />}>
       <Route path="" loader={() => redirect('builds')} />
-      <Route path="settings" element={<SiteSettings />} />
-      <Route path="published" element={<PublishedBranchesTable />} />
-      <Route path="published/:name" element={<PublishedFilesTable />} />
-      <Route path="builds" element={<SiteBuildList />} />
-      <Route path="custom-domains" element={<DomainList />} />
-      <Route path="custom-domains/new" element={<NewCustomDomain />} />
-      <Route path="custom-domains/:domainId/edit" element={<EditCustomDomain />} />
+      <Route path={siteNav.SiteSettings.path} element={<SiteSettings />} />
+      <Route path={siteNav.PublishedBranches.path} element={<PublishedBranchesTable />} />
+      <Route path={siteNav.PublishedFiles.path} element={<PublishedFilesTable />} />
+      <Route path={siteNav.SiteBuildList.path} element={<SiteBuildList />} />
+      <Route path={siteNav.DomainList.path} element={<DomainList />} />
+      <Route path={siteNav.NewCustomDomain.path} element={<NewCustomDomain />} />
+      <Route path={siteNav.EditCustomDomain.path} element={<EditCustomDomain />} />
       {process.env.FEATURE_FILE_STORAGE_SERVICE === 'true' && (
         <>
-          <Route path="storage" element={<FileStorage />} />
-          <Route path="storage/logs" element={<FileStorageLog />} />
+          <Route path={siteNav.FileStorage.path} element={<FileStorage />} />
+          <Route path={siteNav.FileStorageLog.path} element={<FileStorageLog />} />
         </>
       )}
-      <Route path="builds/:buildId/logs" element={<BuildLogs />} />
+      <Route path={siteNav.BuildLogs.path} element={<BuildLogs />} />
       <Route path="scans" loader={() => redirect('../reports')} />
       {process.env.FEATURE_BUILD_TASKS === 'active' && (
-        <Route path="reports" element={<Reports />} />
+        <Route path={siteNav.Reports.path} element={<Reports />} />
       )}
     </Route>
     <Route path="settings" element={<Settings />} />
