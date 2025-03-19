@@ -1,3 +1,13 @@
+## 0.17.0 (2025-03-19)
+
+### Added
+
+- add confirmation dialog for destructive actions #4743
+
+### Maintenance
+
+- Update file url to use baseUrl and file key
+
 ## 0.16.0 (2025-03-17)
 
 ### Added
