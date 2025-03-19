@@ -50,6 +50,7 @@ describe('FileUpload Component', () => {
 
     expect(screen.getByRole('button', { name: 'Upload' })).toBeEnabled();
   });
+
   test('displays correct singular or plural file count', async () => {
     renderFileUpload();
     const fileInput = screen.getByLabelText('Upload files');
@@ -100,6 +101,7 @@ describe('FileUpload Component', () => {
 
     jest.restoreAllMocks();
   });
+
   test('clears error message when a valid file is selected', async () => {
     renderFileUpload();
     const fileInput = screen.getByLabelText('Upload files');
@@ -126,9 +128,10 @@ describe('FileUpload Component', () => {
     const fileInput = screen.getByLabelText('Upload files');
 
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
+
     await screen.findByText('test-file.txt');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Upload' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Upload' }));
 
     expect(mockOnUpload).toHaveBeenCalledWith([mockFile]);
   });
@@ -201,6 +204,7 @@ describe('FileUpload Component', () => {
     await userEvent.keyboard(' ');
     expect(fileInput.click).toHaveBeenCalledTimes(1);
   });
+
   test('opens file picker automatically when triggerOnMount is true', async () => {
     renderFileUpload({ triggerOnMount: true });
 
@@ -218,6 +222,7 @@ describe('FileUpload Component', () => {
 
     expect(fileInput.click).not.toHaveBeenCalled();
   });
+
   test('clicking "Change files" opens the file picker', async () => {
     renderFileUpload();
     const fileInput = screen.getByLabelText('Upload files');
@@ -231,6 +236,7 @@ describe('FileUpload Component', () => {
 
     expect(fileInput.click).toHaveBeenCalled();
   });
+
   test('clears selected files when "Cancel upload" is clicked', async () => {
     renderFileUpload();
     const fileInput = screen.getByLabelText('Upload files');
@@ -243,6 +249,7 @@ describe('FileUpload Component', () => {
 
     expect(screen.queryByText('test-file.txt')).not.toBeInTheDocument();
   });
+
   test('does not crash if onCancel is not provided', async () => {
     renderFileUpload();
 

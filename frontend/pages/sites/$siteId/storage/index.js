@@ -266,7 +266,7 @@ function FileStoragePage() {
             )}
             <FileList
               path={path}
-              storageRoot={storageRoot}
+              baseUrl={site.siteOrigin}
               data={fetchedPublicFiles || []}
               onDelete={handleDelete}
               onNavigate={handleNavigate}

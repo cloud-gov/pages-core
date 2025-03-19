@@ -1,14 +1,20 @@
 import React from 'react';
-import { render, screen, within, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, within, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MemoryRouter } from 'react-router-dom';
 import FileList from './FileList.jsx';
 
 const mockFiles = [
-  { id: 20, name: 'Documents', type: 'directory', updatedAt: '2024-02-10T12:30:00Z' },
+  {
+    id: 20,
+    name: 'Documents',
+    key: '~assets/Documents',
+    type: 'directory',
+    updatedAt: '2024-02-10T12:30:00Z',
+  },
   {
     id: 21,
     name: 'report.pdf',
+    key: '~assets/report.pdf',
     type: 'application/pdf',
     updatedAt: '2025-01-09T15:45:00Z',
     updatedBy: 'user@federal.gov',
@@ -17,6 +23,7 @@ const mockFiles = [
   {
     id: 22,
     name: 'presentation.ppt',
+    key: '~assets/presentation.ppt',
     type: 'application/vnd.ms-powerpoint',
     updatedAt: '2024-02-08T09:15:00Z',
     updatedBy: 'user@federal.gov',
@@ -26,7 +33,7 @@ const mockFiles = [
 
 const mockProps = {
   path: '/',
-  storageRoot: 'https://custom.domain.gov/~assets',
+  baseUrl: 'https://custom.domain.gov',
   data: mockFiles,
   onDelete: jest.fn(),
   onNavigate: jest.fn(),
@@ -42,62 +49,38 @@ describe('FileList', () => {
   });
 
   it('renders correctly with file and folder names', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     expect(screen.getByRole('link', { name: 'Documents' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'report.pdf' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'presentation.ppt' })).toBeInTheDocument();
   });
 
   it('does not trigger onViewDetails when clicking a folder', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     fireEvent.click(screen.getByRole('link', { name: 'Documents' }));
     expect(mockProps.onViewDetails).not.toHaveBeenCalled();
   });
 
   it('calls onNavigate when a folder is clicked', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     fireEvent.click(screen.getByRole('link', { name: 'Documents' }));
     expect(mockProps.onNavigate).toHaveBeenCalledWith('/Documents/');
   });
 
   it('does not trigger onNavigate when clicking a file', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     fireEvent.click(screen.getByRole('link', { name: 'report.pdf' }));
     expect(mockProps.onNavigate).not.toHaveBeenCalled();
   });
 
   it('calls onViewDetails when a file name is clicked', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     fireEvent.click(screen.getByRole('link', { name: 'report.pdf' }));
     expect(mockProps.onViewDetails).toHaveBeenCalledWith('report.pdf');
   });
 
   it('calls onSort and reverses sort when a sortable header is clicked', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
 
     fireEvent.click(screen.getByLabelText('Sort by name'));
     expect(mockProps.onSort).toHaveBeenCalledWith('name');
@@ -108,11 +91,7 @@ describe('FileList', () => {
   });
 
   it('calls onSort with updatedAt for last modified header', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
 
     const sortButton = screen.getByLabelText('Sort by last modified');
     fireEvent.click(sortButton);
@@ -121,44 +100,28 @@ describe('FileList', () => {
   });
 
   it('shows the ascending icon if currentSortOrder is asc', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     const sortButton = screen.getByLabelText('Sort by name');
     const ascendingIcon = within(sortButton).getByLabelText('ascending sort icon');
     expect(ascendingIcon).toBeInTheDocument();
   });
 
   it('shows the descending icon if currentSortOrder is desc', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} currentSortOrder="desc" />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} currentSortOrder="desc" />);
     const sortButton = screen.getByLabelText('Sort by name');
     const descendingIcon = within(sortButton).getByLabelText('descending sort icon');
     expect(descendingIcon).toBeInTheDocument();
   });
 
   it('shows the unsorted icon on headers that are not currently sorted', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     const sortButton = screen.getByLabelText('Sort by last modified');
     const unsortedIcon = within(sortButton).getByLabelText('unsorted icon');
     expect(unsortedIcon).toBeInTheDocument();
   });
 
   it('calls onSort with name for file name header', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
 
     const sortButton = screen.getByLabelText('Sort by name');
     fireEvent.click(sortButton);
@@ -167,11 +130,7 @@ describe('FileList', () => {
   });
 
   it('calls onDelete when a folder delete button is clicked', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     fireEvent.click(screen.getAllByRole('button', { name: 'Delete' })[0]);
     expect(mockProps.onDelete).toHaveBeenCalledWith({
       ...mockFiles[0],
@@ -180,21 +139,13 @@ describe('FileList', () => {
   });
 
   it('calls onDelete when a file delete button is clicked', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
     fireEvent.click(screen.getAllByRole('button', { name: 'Delete' })[1]);
     expect(mockProps.onDelete).toHaveBeenCalledWith({ ...mockFiles[1] });
   });
 
   it('renders no rows when no files are present', () => {
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} data={[]} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} data={[]} />);
     expect(screen.getAllByRole('row').length).toBe(1);
   });
 
@@ -207,11 +158,7 @@ describe('FileList', () => {
 
     jest.useFakeTimers();
 
-    render(
-      <MemoryRouter>
-        <FileList {...mockProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...mockProps} />);
 
     const copyButton = screen.getAllByText('Copy link')[0];
 
@@ -222,7 +169,7 @@ describe('FileList', () => {
     );
 
     await screen.findByText('Copied!');
-    jest.advanceTimersByTime(5000);
+    act(() => jest.advanceTimersByTime(5000));
     await waitFor(() => expect(screen.queryByText('Copied!')).not.toBeInTheDocument());
     expect(screen.getAllByText('Copy link')).toHaveLength(2);
 
@@ -231,24 +178,18 @@ describe('FileList', () => {
 
   it('renders children if provided', () => {
     render(
-      <MemoryRouter>
-        <FileList {...mockProps}>
-          <tr data-testid="child-row">
-            <td>Child Row</td>
-          </tr>
-        </FileList>
-      </MemoryRouter>,
+      <FileList {...mockProps}>
+        <tr data-testid="child-row">
+          <td>Child Row</td>
+        </tr>
+      </FileList>,
     );
     expect(screen.getByTestId('child-row')).toBeInTheDocument();
   });
 
   it('applies the highlight class when highlightItem matches the row name', () => {
     const highlightProps = { ...mockProps, highlightItem: 'report.pdf' };
-    render(
-      <MemoryRouter>
-        <FileList {...highlightProps} />
-      </MemoryRouter>,
-    );
+    render(<FileList {...highlightProps} />);
 
     const cell = screen.getByText('report.pdf');
     // eslint-disable-next-line testing-library/no-node-access
