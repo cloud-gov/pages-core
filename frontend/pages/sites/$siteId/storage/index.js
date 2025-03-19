@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import useFileStorage from '@hooks/useFileStorage';
@@ -10,7 +10,7 @@ import NewFileOrFolder from './NewFileOrFolder';
 import FileList from './FileList';
 import Pagination from '@shared/Pagination';
 import QueryPage from '@shared/layouts/QueryPage';
-
+import Dialog from '@shared/Dialog';
 import { currentSite } from '@selectors/site';
 
 function FileStoragePage() {
@@ -80,6 +80,19 @@ function FileStoragePage() {
     scrollToTop();
   };
 
+  const INITIAL_DIALOG_PROPS = {
+    open: false,
+    primaryHandler: () => {},
+  };
+  const resetModal = useCallback(() => {
+    setDialogProps(INITIAL_DIALOG_PROPS);
+  }, []);
+
+  const [dialogProps, setDialogProps] = useState({
+    closeHandler: resetModal,
+    primaryHandler: () => {},
+  });
+
   const handlePageChange = (newPage) => {
     if (newPage === currentPage) return;
     setSearchParams((prev) => {
@@ -135,18 +148,32 @@ function FileStoragePage() {
     });
   };
 
-  const handleDelete = async (item) => {
-    const isFolder = item.type === 'directory';
-    const confirmMessage = isFolder
-      ? // eslint-disable-next-line sonarjs/slow-regex
-        `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
+  const handleDelete = useCallback(
+    async (item) => {
+      const isFolder = item.type === 'directory';
+      const confirmMessage = isFolder
+        ? // eslint-disable-next-line sonarjs/slow-regex
+          `Are you sure you want to delete the folder  "${item.name.replace(/\/+$/, '')}"?
          Please check that it does not contain any files.`
-      : `Are you sure you want to delete the file "${item.name}"?`;
-
-    if (!window.confirm(confirmMessage)) return;
-
-    await deleteItem(item);
-  };
+        : `Are you sure you want to delete the file "${item.name}"?`;
+      const deleteHandler = async () => {
+        await deleteItem(item);
+        resetModal();
+      };
+      setDialogProps({
+        ...dialogProps,
+        open: true,
+        header: 'Are you sure?',
+        message: confirmMessage,
+        primaryButton: 'Yes, I want to delete',
+        primaryHandler: deleteHandler,
+        secondaryButton: 'Cancel',
+        secondaryHandler: resetModal,
+        closeHandler: resetModal,
+      });
+    },
+    [deleteItem, resetModal],
+  );
 
   const handleUpload = async (files) => {
     await Promise.all(files.map((file) => uploadFile(path, file)));
@@ -155,6 +182,7 @@ function FileStoragePage() {
   const handleCreateFolder = async (folderName) => {
     await createFolder(path, folderName);
   };
+
   return (
     <QueryPage
       data={fetchedPublicFiles}
@@ -203,7 +231,7 @@ function FileStoragePage() {
           message={createFolderSuccess}
         />
       )}
-
+      <Dialog {...dialogProps} />
       <div className="grid-col-12" ref={scrollTo}>
         <LocationBar
           path={path}
