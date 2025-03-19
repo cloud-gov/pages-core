@@ -14,7 +14,7 @@ const SORT_KEY_LAST_MODIFIED = 'updatedAt';
 
 const FileListRow = ({
   item,
-  storageRoot,
+  baseUrl,
   path,
   currentSortKey,
   onNavigate,
@@ -22,7 +22,7 @@ const FileListRow = ({
   onViewDetails,
   highlight = false,
 }) => {
-  const copyUrl = `${storageRoot}${path}${item.name}`;
+  const copyUrl = `${baseUrl}/${item.key}`;
   // handle copying the file's URL
   const [copySuccess, setCopySuccess] = useState(false);
   const handleCopy = async (url) => {
@@ -116,7 +116,7 @@ const FileListRow = ({
 
 const FileList = ({
   path,
-  storageRoot,
+  baseUrl,
   data,
   onDelete,
   onNavigate,
@@ -128,7 +128,7 @@ const FileList = ({
   children,
 }) => {
   const TABLE_CAPTION = `
-    Listing all contents for the current folder, sorted by ${currentSortKey} in 
+    Listing all contents for the current folder, sorted by ${currentSortKey} in
     ${ariaFormatSort(currentSortOrder)} order
   `; // TODO: Create and update an aria live region to announce all changes
 
@@ -200,10 +200,10 @@ const FileList = ({
         {children}
         {data.map((item) => (
           <FileListRow
-            key={item.name}
+            key={item.key}
             item={item}
             path={path}
-            storageRoot={storageRoot}
+            baseUrl={baseUrl}
             currentSortKey={currentSortKey}
             onNavigate={onNavigate}
             onDelete={onDelete}
@@ -243,7 +243,7 @@ const SortIcon = ({ sort = '' }) => (
 
 FileList.propTypes = {
   path: PropTypes.string.isRequired,
-  storageRoot: PropTypes.string.isRequired,
+  baseUrl: PropTypes.string.isRequired,
   data: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -263,9 +263,10 @@ FileList.propTypes = {
 
 FileListRow.propTypes = {
   path: PropTypes.string.isRequired,
-  storageRoot: PropTypes.string.isRequired,
+  baseUrl: PropTypes.string.isRequired,
   item: PropTypes.shape({
     name: PropTypes.string.isRequired,
+    key: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     updatedAt: PropTypes.string.isRequired,
   }).isRequired,

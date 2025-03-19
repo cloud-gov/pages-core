@@ -85,7 +85,7 @@ In our Docker Compose environment, `app` is the name of the container where the 
 
 For example:
 
-- Use `docker compose --env-file ./services/local/docker.env build run --rm app yarn test` to run local testing on the app.
+- Use `docker compose --env-file ./services/local/docker.env run --rm app yarn test` to run local testing on the app.
 - Use `docker compose run --rm app yarn lint` to check that your local changes meet our linting standards.
 - Use `docker compose run --rm app yarn format` to format your local changes based on our standards.
 
