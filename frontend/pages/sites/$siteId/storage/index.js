@@ -42,8 +42,6 @@ function FileStoragePage() {
     deleteError,
     deleteSuccess,
     uploadFile,
-    uploadError,
-    uploadSuccess,
     createFolder,
     createFolderError,
     createFolderSuccess,
@@ -175,10 +173,6 @@ function FileStoragePage() {
     [deleteItem, resetModal],
   );
 
-  const handleUpload = async (files) => {
-    await Promise.all(files.map((file) => uploadFile(path, file)));
-  };
-
   const handleCreateFolder = async (folderName) => {
     await createFolder(path, folderName);
   };
@@ -191,19 +185,6 @@ function FileStoragePage() {
       isPending={false}
       isPlaceholderData={false}
     >
-      {/* TODO: make these into an array of alerts */}
-      {uploadError && (
-        <AlertBanner status="error" header="Upload Error" message={uploadError} />
-      )}
-
-      {uploadSuccess && (
-        <AlertBanner
-          status="success"
-          header="Upload Successful"
-          message={uploadSuccess}
-        />
-      )}
-
       {deleteError && (
         <AlertBanner status="error" header="Delete Error" message={deleteError} />
       )}
@@ -239,7 +220,10 @@ function FileStoragePage() {
           storageRoot={storageRoot}
           onNavigate={handleNavigate}
         />
-        <NewFileOrFolder onUpload={handleUpload} onCreateFolder={handleCreateFolder} />
+        <NewFileOrFolder
+          onUpload={(file) => uploadFile(path, file)}
+          onCreateFolder={handleCreateFolder}
+        />
         {foundFileDetails && foundFileDetails.id && (
           <FileDetails
             name={foundFileDetails?.name || ''}

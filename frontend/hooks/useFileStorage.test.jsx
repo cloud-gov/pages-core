@@ -1,19 +1,18 @@
 import { waitFor, renderHook, act } from '@testing-library/react';
 import nock from 'nock';
-import { spy } from 'sinon';
+import sinon from 'sinon';
 import { createTestQueryClient } from '@support/queryClient';
 import {
   getFileStorageFiles,
   getFileStorageFilesError,
   deletePublicItem,
   deletePublicItemError,
-  uploadPublicFile,
-  uploadPublicFileError,
   createPublicDirectory,
   createPublicDirectoryError,
 } from '@support/nocks/fileStorage';
 import useFileStorage from './useFileStorage';
 import { getFileStorageData } from '../../test/frontend/support/data/fileStorageData';
+import federalist from '@util/federalistApi';
 
 const createWrapper = createTestQueryClient();
 
@@ -26,6 +25,7 @@ const props = {
 };
 describe('useFileStorage', () => {
   beforeEach(() => nock.cleanAll());
+  afterEach(() => sinon.restore());
   afterAll(() => nock.restore());
 
   it('should fetch public files successfully', async () => {
@@ -119,7 +119,7 @@ describe('useFileStorage', () => {
       wrapper: createWrapper(),
     });
 
-    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+    const qcSpy = sinon.spy(result.current.queryClient, 'invalidateQueries');
     await act(async () => {
       await result.current.deleteItem(fileItem);
     });
@@ -141,7 +141,7 @@ describe('useFileStorage', () => {
       wrapper: createWrapper(),
     });
 
-    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+    const qcSpy = sinon.spy(result.current.queryClient, 'invalidateQueries');
 
     await act(async () => {
       await result.current.deleteItem(fileItem).catch(() => {});
@@ -155,100 +155,42 @@ describe('useFileStorage', () => {
   it('should upload a file successfully and invalidate the query', async () => {
     const parent = '/';
     const mockFile = new File(['file content'], 'test-file.txt', { type: 'text/plain' });
+    const stub = sinon.stub(federalist, 'uploadPublicFile');
 
-    await uploadPublicFile(props.fileStorageId, parent, mockFile);
     await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
+
+    stub.resolves();
 
     const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
       wrapper: createWrapper(),
     });
 
-    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+    const qcSpy = sinon.spy(result.current.queryClient, 'invalidateQueries');
 
-    await act(async () => {
-      await result.current.uploadFile(parent, mockFile);
-    });
+    await waitFor(async () => result.current.uploadFile(parent, mockFile));
 
-    await waitFor(() =>
-      expect(result.current.uploadSuccess).toContain('File uploaded successfully'),
-    );
     expect(qcSpy.calledOnce).toBe(true);
   });
 
-  it('should successfully upload a file even inside a nested folder', async () => {
-    const parent = '/nested/folder';
-    const mockFile = new File(['file content'], 'nested-file.txt', {
-      type: 'text/plain',
-    });
-
-    await uploadPublicFile(props.fileStorageId, parent, mockFile);
-    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
-
-    const { result } = renderHook(
-      () =>
-        // don't spread from Object.values() if you're going to overwrite something
-        useFileStorage(
-          props.fileStorageId,
-          parent,
-          props.sortKey,
-          props.sortOrder,
-          props.page,
-        ),
-      {
-        wrapper: createWrapper(),
-      },
-    );
-
-    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
-
-    await act(async () => {
-      await result.current.uploadFile(parent, mockFile);
-    });
-
-    await waitFor(() =>
-      expect(result.current.uploadSuccess).toContain('File uploaded successfully'),
-    );
-    expect(qcSpy.calledOnce).toBe(true);
-  });
-
-  it('should return an error message when file upload fails', async () => {
+  it('should throw error when upload file fails', async () => {
     const parent = '/';
     const mockFile = new File(['file content'], 'test-file.txt', { type: 'text/plain' });
+    const stub = sinon.stub(federalist, 'uploadPublicFile');
+    stub.rejects();
 
-    const errorMessage = 'Upload failed.';
-    await uploadPublicFileError(props.fileStorageId, parent, mockFile, errorMessage);
     await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
 
     const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
       wrapper: createWrapper(),
     });
 
-    await act(async () => {
-      await result.current.uploadFile(parent, mockFile).catch(() => {});
-    });
+    const qcSpy = sinon.spy(result.current.queryClient, 'invalidateQueries');
 
-    await waitFor(() => expect(result.current.uploadError).toBe(errorMessage));
-  });
+    await waitFor(async () =>
+      result.current.uploadFile(parent, mockFile).catch((e) => e),
+    );
 
-  it('should return a specific error when uploading a duplicate file', async () => {
-    const parent = '/';
-    const mockFile = new File(['file content'], 'existing-file.txt', {
-      type: 'text/plain',
-    });
-    const errorMessage = `A file named "${mockFile.name}" already exists in this folder.`;
-
-    await uploadPublicFileError(props.fileStorageId, parent, mockFile, errorMessage);
-    await getFileStorageFiles({ ...props, path: parent }, { times: 3 });
-
-    const { result } = renderHook(() => useFileStorage(props.fileStorageId), {
-      wrapper: createWrapper(),
-    });
-
-    await act(async () => {
-      await result.current.uploadFile(parent, mockFile).catch(() => {});
-    });
-
-    await waitFor(() => expect(result.current.uploadError).toBe(errorMessage));
+    expect(qcSpy.calledOnce).toBe(false);
   });
 
   it('should create a folder successfully and invalidate the query', async () => {
@@ -262,7 +204,7 @@ describe('useFileStorage', () => {
       wrapper: createWrapper(),
     });
 
-    const qcSpy = spy(result.current.queryClient, 'invalidateQueries');
+    const qcSpy = sinon.spy(result.current.queryClient, 'invalidateQueries');
 
     await act(async () => {
       await result.current.createFolder(parent, folderName);

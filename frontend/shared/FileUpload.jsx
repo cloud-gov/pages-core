@@ -1,13 +1,26 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import prettyBytes from 'pretty-bytes';
+import { useMultiFileUpload } from '@hooks/useMultiFileUpload';
 
 const MEGABYTE_LIMIT = 250;
 const MAX_FILE_SIZE = MEGABYTE_LIMIT * 1024 * 1024; // 250MB
 
+const getFileStatusColor = (status) => {
+  if (status === 'error') return 'bg-secondary-lighter';
+
+  if (status === 'success') return 'bg-mint';
+
+  if (['queued', 'uploading'].includes(status)) return 'bg-base-lighter';
+
+  return 'bg-primary-lightest';
+};
+
 const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) => {
-  const [files, setFiles] = useState([]);
   const [fileUploadErrorMessage, setFileUploadErrorMessage] = useState('');
+  const { addFiles, clearFiles, files, removeFile, startUploads } = useMultiFileUpload({
+    onUpload,
+  });
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -23,29 +36,13 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
       return true;
     });
 
-    setFiles(validFiles);
-  };
-
-  const handleFileUpload = async () => {
-    if (!files.length) return;
-
-    try {
-      await onUpload(files);
-      setFiles([]);
-      setFileUploadErrorMessage('');
-    } catch (error) {
-      setFileUploadErrorMessage(error.message || 'Upload failed.');
-    }
+    addFiles(validFiles);
   };
 
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
     handleFileSelection(event.dataTransfer.files);
-  };
-
-  const removeFile = (fileName) => {
-    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
   };
 
   useEffect(() => {
@@ -123,7 +120,7 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
               type="button"
               className="usa-file-input__choose usa-button--unstyled"
               onClick={(e) => {
-                e.stopPropagation();
+                e.preventDefault();
                 fileInputRef.current?.click();
               }}
             >
@@ -147,34 +144,48 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
 
       {files.length > 0 && (
         <>
-          {files.map((file) => (
-            <div
-              className="
-                usa-file-input__preview padding-y-1 font-mono-sm bg-primary-lightest
-              "
-              key={file.name}
-            >
-              <button
-                type="button"
-                className="usa-button usa-button--unstyled file-input__remove"
-                onClick={() => removeFile(file.name)}
-                title={`Remove ${file.name}`}
+          {files.map((file) => {
+            const bgColor = getFileStatusColor(file.status);
+
+            return (
+              <div
+                key={file.id}
+                className={
+                  'grid-gap-sm ' +
+                  'usa-file-input__preview padding-y-1 font-mono-sm ' +
+                  bgColor
+                }
               >
-                <svg
-                  className="usa-icon width-3 height-3 margin-1"
-                  aria-hidden="true"
-                  focusable="false"
-                  role="img"
+                <button
+                  disabled={file.status === 'uploading'}
+                  type="button"
+                  className="usa-button usa-button--unstyled file-input__remove"
+                  onClick={() => removeFile(file.id)}
+                  title={`Remove ${file.data.name}`}
                 >
-                  <use xlinkHref="/img/sprite.svg#close" />
-                </svg>{' '}
-              </button>
-              <span>{file.name}</span>
-              <span className="font-body-sm margin-left-auto margin-right-1">
-                {prettyBytes(file.size)}
-              </span>
-            </div>
-          ))}
+                  <svg
+                    className="usa-icon width-3 height-3 margin-1"
+                    aria-hidden="true"
+                    focusable="false"
+                    role="img"
+                  >
+                    {file.status !== 'uploading' ? (
+                      <use xlinkHref="/img/sprite.svg#close" />
+                    ) : (
+                      <use xlinkHref="/img/sprite.svg#arrow_upward" />
+                    )}
+                  </svg>{' '}
+                </button>
+                <span>{file.data.name}</span>
+                {file.message && (
+                  <span className="margin-x-1 text-bold">{file.message}</span>
+                )}
+                <span className="font-body-sm margin-left-auto margin-right-1">
+                  {prettyBytes(file.data.size)}
+                </span>
+              </div>
+            );
+          })}
         </>
       )}
 
@@ -183,7 +194,7 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
           type="button"
           disabled={files.length < 1}
           className="usa-button"
-          onClick={handleFileUpload}
+          onClick={() => startUploads()}
         >
           Upload
         </button>
@@ -191,7 +202,7 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
           type="button"
           className="usa-button usa-button--outline"
           onClick={() => {
-            setFiles([]);
+            clearFiles();
             onCancel();
           }}
         >

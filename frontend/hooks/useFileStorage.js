@@ -22,13 +22,10 @@ export default function useFileStorage(
   const previousData = useRef();
   const queryClient = useQueryClient();
 
-  const [uploadError, setUploadError] = useState(null);
-  const [uploadSuccess, setUploadSuccess] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(null);
   const [createFolderError, setCreateFolderError] = useState(null);
   const [createFolderSuccess, setCreateFolderSuccess] = useState(null);
-  const uploadTimeout = useRef(null);
   const deleteTimeout = useRef(null);
   const createFolderTimeout = useRef(null);
 
@@ -77,7 +74,6 @@ export default function useFileStorage(
 
   useEffect(() => {
     return () => {
-      if (uploadTimeout.current) clearTimeout(uploadTimeout.current);
       if (deleteTimeout.current) clearTimeout(deleteTimeout.current);
       if (createFolderTimeout.current) clearTimeout(createFolderTimeout.current);
     };
@@ -104,20 +100,15 @@ export default function useFileStorage(
   const uploadMutation = useMutation({
     mutationFn: ({ parent = '/', file }) =>
       federalist.uploadPublicFile(fileStorageId, parent, file),
-    onSuccess: () =>
-      handleSuccess(
-        setUploadSuccess,
-        setUploadError,
-        uploadTimeout,
-        'File uploaded successfully.',
-      ),
-    onError: (err, { file }) => {
-      const errorMessage = err?.message || 'Upload failed.';
-      const formattedMessage = errorMessage.includes('already exists')
-        ? `A file named "${file.name}" already exists in this folder.`
-        : errorMessage;
-      handleError(setUploadError, setUploadSuccess, uploadTimeout, formattedMessage);
+    onSuccess: (file) => {
+      queryClient.invalidateQueries({
+        queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
+      });
+
+      return file;
     },
+    onError: (error) => error,
+    retry: false,
   });
 
   const createFolderMutation = useMutation({
@@ -157,8 +148,6 @@ export default function useFileStorage(
     deleteError,
     deleteSuccess,
     uploadFile: (parent, file) => uploadMutation.mutateAsync({ parent, file }),
-    uploadError,
-    uploadSuccess,
     createFolder: (parent, name) => createFolderMutation.mutateAsync({ parent, name }),
     createFolderError,
     createFolderSuccess,

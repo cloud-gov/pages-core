@@ -63,7 +63,7 @@ describe('FileUpload Component', () => {
     });
     fireEvent.change(fileInput, { target: { files: [mockFile, secondFile] } });
 
-    await screen.findByText('2 files selected');
+    await screen.findByText('3 files selected');
   });
 
   test('removes a selected file when clicking "x"', async () => {
@@ -133,7 +133,7 @@ describe('FileUpload Component', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Upload' }));
 
-    expect(mockOnUpload).toHaveBeenCalledWith([mockFile]);
+    expect(mockOnUpload).toHaveBeenCalledWith(mockFile);
   });
 
   test('triggers onCancel and clears selected files', async () => {
