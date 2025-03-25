@@ -21,22 +21,13 @@ function request(endpoint, params = {}, { handleHttpError = true } = {}) {
     headers,
   };
 
-  return fetch(url, finalParams)
-    .then((data) => {
-      if (!data) {
-        throw new Error('No response received from server.');
-      }
-      if (data.error || data.message) {
-        throw new Error(data.message || 'Unknown API error');
-      }
-      return data;
-    })
-    .catch((error) => {
-      if (handleHttpError) {
-        alertActions.httpError(error.message);
-      }
+  return fetch(url, finalParams).catch((error) => {
+    if (handleHttpError) {
+      alertActions.httpError(error.message);
+    } else {
       throw error;
-    });
+    }
+  });
 }
 
 export default {
