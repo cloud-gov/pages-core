@@ -1,3 +1,9 @@
+## 0.18.0 (2025-03-26)
+
+### Added
+
+- Create a file upload hook to queue uploads
+
 ## 0.17.0 (2025-03-25)
 
 ### Added
