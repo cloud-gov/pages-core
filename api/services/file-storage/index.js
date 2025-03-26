@@ -251,7 +251,7 @@ class SiteFileStorageSerivce {
 
     await this.#hasDuplicateKey(key, 'file');
 
-    await this.s3Client.putObject(fileBuffer, key);
+    await this.s3Client.putObject(fileBuffer, key, { ContentType: type });
 
     const fsf = await FileStorageFile.create({
       name,
