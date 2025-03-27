@@ -6,34 +6,18 @@ import prettyBytes from 'pretty-bytes';
 
 const FileDetails = ({
   name,
-  id,
   fullPath,
-  updatedBy,
-  updatedAt,
+  lastModifiedBy,
+  lastModifiedAt,
   size,
   mimeType,
   onDelete,
-  onClose,
 }) => {
-  const thisItem = {
-    id: id,
-    type: 'file',
-  };
-  if (id < 1) return null;
   return (
     <div className="file-details">
       <div className="file-details__header bg-base-lightest">
         <IconAttachment className="usa-icon margin-right-1" />
         <h3>File details</h3>
-        <button
-          title="close file details"
-          className="usa-button usa-button--unstyled file-details__close"
-          onClick={onClose}
-        >
-          <svg className="usa-icon" aria-hidden="true" role="img">
-            <use href="/img/sprite.svg#close"></use>
-          </svg>
-        </button>
       </div>
       <table className="usa-table usa-table--borderless file-details__table">
         <thead className="usa-sr-only">
@@ -61,12 +45,12 @@ const FileDetails = ({
             </td>
           </tr>
           <tr>
-            <th scope="row">Uploaded by</th>
-            <td className="text-bold">{updatedBy}</td>
+            <th scope="row">Last modified by</th>
+            <td className="text-bold">{lastModifiedBy}</td>
           </tr>
           <tr>
-            <th scope="row">Uploaded at</th>
-            <td>{updatedAt && dateAndTimeSimple(updatedAt)}</td>
+            <th scope="row">Last modified at</th>
+            <td>{dateAndTimeSimple(lastModifiedAt)}</td>
           </tr>
           <tr>
             <th scope="row">File size</th>
@@ -86,10 +70,7 @@ const FileDetails = ({
                 type="button"
                 title="Remove from public storage"
                 className="usa-button usa-button--outline delete-button"
-                onClick={() => {
-                  onDelete(thisItem);
-                  onClose();
-                }}
+                onClick={() => onDelete()}
               >
                 Delete
               </button>
@@ -105,12 +86,11 @@ FileDetails.propTypes = {
   name: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,
   fullPath: PropTypes.string.isRequired,
-  updatedBy: PropTypes.string.isRequired,
-  updatedAt: PropTypes.string.isRequired,
+  lastModifiedBy: PropTypes.string.isRequired,
+  lastModifiedAt: PropTypes.string.isRequired,
   size: PropTypes.number.isRequired,
   mimeType: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default FileDetails;

@@ -366,6 +366,16 @@ export default {
     return request(`tasks/${id}/report/${subPage || ''}`);
   },
 
+  fetchPublicFile(fileStorageServiceId, fileStorageFileId) {
+    return request(
+      `file-storage/${fileStorageServiceId}/file/${fileStorageFileId}`,
+      { method: 'GET' },
+      {
+        handleHttpError: false,
+      },
+    );
+  },
+
   // default sort from backend is updatedAt, descending. 'name' is also a possible key
   fetchPublicFiles(
     fileStorageId,

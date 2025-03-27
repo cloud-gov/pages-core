@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { dateAndTimeSimple, timeFrom } from '@util/datetime';
 import { IconAttachment, IconFolder, IconLink } from '@shared/icons';
 
@@ -13,13 +14,13 @@ const SORT_KEY_NAME = 'name';
 const SORT_KEY_LAST_MODIFIED = 'updatedAt';
 
 const FileListRow = ({
+  siteId,
   item,
   baseUrl,
   path,
   currentSortKey,
   onNavigate,
   onDelete,
-  onViewDetails,
   highlight = false,
 }) => {
   const copyUrl = `${baseUrl}/${item.key}`;
@@ -65,18 +66,14 @@ const FileListRow = ({
               {item.name}
             </a>
           ) : (
-            // eslint-disable-next-line jsx-a11y/anchor-is-valid
-            <a
-              href="#"
+            <Link
+              to={`/sites/${siteId}/storage/files/${item.id}`}
+              prefetch="intent"
               title="View file details"
               className="usa-link file-name"
-              onClick={(e) => {
-                e.preventDefault();
-                onViewDetails(item.name);
-              }}
             >
               {item.name}
-            </a>
+            </Link>
           )}
         </div>
       </td>
@@ -121,11 +118,11 @@ const FileList = ({
   onDelete,
   onNavigate,
   onSort,
-  onViewDetails,
   currentSortKey,
   currentSortOrder,
   highlightItem,
   children,
+  siteId,
 }) => {
   const TABLE_CAPTION = `
     Listing all contents for the current folder, sorted by ${currentSortKey} in
@@ -207,8 +204,8 @@ const FileList = ({
             currentSortKey={currentSortKey}
             onNavigate={onNavigate}
             onDelete={onDelete}
-            onViewDetails={onViewDetails}
             highlight={highlightItem === item.name}
+            siteId={siteId}
           />
         ))}
       </tbody>
@@ -242,6 +239,7 @@ const SortIcon = ({ sort = '' }) => (
 );
 
 FileList.propTypes = {
+  siteId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   path: PropTypes.string.isRequired,
   baseUrl: PropTypes.string.isRequired,
   data: PropTypes.arrayOf(
@@ -253,7 +251,6 @@ FileList.propTypes = {
   ).isRequired,
   onDelete: PropTypes.func.isRequired,
   onNavigate: PropTypes.func.isRequired,
-  onViewDetails: PropTypes.func.isRequired,
   onSort: PropTypes.func.isRequired,
   currentSortKey: PropTypes.string.isRequired,
   currentSortOrder: PropTypes.oneOf(['asc', 'desc']).isRequired,
@@ -262,9 +259,11 @@ FileList.propTypes = {
 };
 
 FileListRow.propTypes = {
+  siteId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   path: PropTypes.string.isRequired,
   baseUrl: PropTypes.string.isRequired,
   item: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string.isRequired,
     key: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
@@ -272,7 +271,6 @@ FileListRow.propTypes = {
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
   onNavigate: PropTypes.func.isRequired,
-  onViewDetails: PropTypes.func.isRequired,
   currentSortKey: PropTypes.string.isRequired,
   highlight: PropTypes.bool,
 };

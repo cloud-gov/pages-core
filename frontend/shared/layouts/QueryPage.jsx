@@ -38,7 +38,7 @@ export default function QueryPage({
 
 QueryPage.propTypes = {
   children: PropTypes.node.isRequired,
-  data: PropTypes.array,
+  data: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   dataHeader: PropTypes.string,
   dataMessage: PropTypes.string,
   error: PropTypes.shape({ message: PropTypes.string }),
