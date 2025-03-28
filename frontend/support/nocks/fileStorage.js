@@ -24,6 +24,15 @@ export async function getFileStorageFiles(
     .reply(200, getFileStorageData(page));
 }
 
+export async function getFileStorageFile(
+  { fileStorageServiceId, fileId, times = 1, statusCode = 200 },
+  data = {},
+) {
+  const expectedUrl = `/v0/file-storage/${fileStorageServiceId}/file/${fileId}`;
+
+  nock(BASE_URL).get(expectedUrl).times(times).reply(statusCode, data);
+}
+
 export async function getFileStorageFilesError({
   fileStorageId,
   path,
@@ -37,10 +46,10 @@ export async function getFileStorageFilesError({
     .reply(400, { error: true, message: 'Failed to fetch public files' });
 }
 
-export async function deletePublicItem(fileStorageId, fileId) {
+export async function deletePublicItem(fileStorageId, fileId, data = { success: true }) {
   nock(BASE_URL)
     .delete(`/v0/file-storage/${fileStorageId}/file/${fileId}`)
-    .reply(200, { success: true });
+    .reply(200, data);
 }
 
 export async function deletePublicItemError(fileStorageId, fileId) {

@@ -11,6 +11,7 @@ const allowedAttributes = [
   'defaultBranch',
   'domain',
   'engine',
+  'liveDomain',
   'owner',
   'publishedAt',
   'repository',
@@ -58,6 +59,30 @@ const viewLinks = {
   viewLink: 'site',
 };
 
+function getLiveDomain(branchConfigs, domains) {
+  if (!branchConfigs || !domains) {
+    return '';
+  }
+
+  const config = branchConfigs.find((c) => c.context === 'site');
+
+  if (!config) {
+    return '';
+  }
+
+  const domain = domains
+    .filter((d) => d.state === 'provisioned')
+    .find((d) => d.siteBranchConfigId === config.id);
+
+  if (!domain || !domain?.names) {
+    return '';
+  }
+
+  const domainName = domain.names.split(',')[0];
+
+  return `https://${domainName}`;
+}
+
 // Eventually replace `serialize`
 function serializeNew(site, isSystemAdmin = false) {
   const object = site.get({
@@ -95,6 +120,9 @@ function serializeNew(site, isSystemAdmin = false) {
 
 const serializeObject = (site, isSystemAdmin) => {
   const json = serializeNew(site, isSystemAdmin);
+
+  const liveDomain = getLiveDomain(json.SiteBranchConfigs, json.Domains);
+  json.liveDomain = liveDomain;
 
   if (json.Domains) {
     json.domains = site.Domains.map((d) =>

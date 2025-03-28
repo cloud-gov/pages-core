@@ -19,6 +19,7 @@ import EditCustomDomain from '@pages/sites/$siteId/custom-domains/$domainId/edit
 import Reports from '@pages/sites/$siteId/reports';
 import FileStorage from '@pages/sites/$siteId/storage';
 import FileStorageLog from '@pages/sites/$siteId/storage/logs';
+import FileStorageFile from '@pages/sites/$siteId/storage/files/$fileId';
 import Settings from '@pages/settings';
 import NotFound from '@pages/NotFound';
 import ErrorMessage from '@pages/ErrorMessage';
@@ -61,6 +62,7 @@ export default (
       {process.env.FEATURE_FILE_STORAGE_SERVICE === 'true' && (
         <>
           <Route path="storage" element={<FileStorage />} />
+          <Route path="storage/files/:fileId" element={<FileStorageFile />} />
           <Route path="storage/logs" element={<FileStorageLog />} />
         </>
       )}
