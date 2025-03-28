@@ -23,14 +23,14 @@ const SideNav = ({ config, siteId }) => (
         // eslint-disable-next-line import/namespace
         const IconComponent = icons[conf.icon];
         return (
-          <li className="margin-y-2" key={conf.route}>
+          <li className="margin-y-2" key={conf.path}>
             <Link
               className="display-flex flex-align-center"
-              to={`/sites/${siteId}/${conf.route}`}
+              to={`/sites/${siteId}/${conf.path}`}
             >
               <IconComponent />{' '}
               <span className="flex-fill margin-left-1 text-no-underline">
-                {conf.display}
+                {conf.title}
               </span>
             </Link>
           </li>
@@ -43,8 +43,8 @@ const SideNav = ({ config, siteId }) => (
 SideNav.propTypes = {
   config: PropTypes.arrayOf(
     PropTypes.shape({
-      display: PropTypes.string.isRequired,
-      route: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      path: PropTypes.string.isRequired,
       icon: PropTypes.string.isRequired,
     }),
   ).isRequired,

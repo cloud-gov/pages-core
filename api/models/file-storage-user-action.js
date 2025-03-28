@@ -1,4 +1,6 @@
 const ACTION_TYPES = [
+  // make sure to keep in sync with file storage history messages in parseAction()
+  // from /frontend/pages/sites/$siteId/storage/logs
   'CREATE_SITE_FILE_STORAGE_SERVICE',
   'CREATE_ORGANIZATION_FILE_STORAGE_SERVICE',
   'CREATE_DIRECTORY',

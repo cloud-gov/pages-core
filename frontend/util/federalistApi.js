@@ -445,9 +445,15 @@ export default {
     });
   },
 
-  fetchAllPublicFilesHistory(fileStorageId) {
-    return request(`file-storage/${fileStorageId}/user-actions/`, {
-      method: 'GET',
-    });
+  fetchAllPublicFilesHistory(fileStorageId, page = 1) {
+    return request(
+      `file-storage/${fileStorageId}/user-actions/?page=${page}`,
+      {
+        method: 'GET',
+      },
+      {
+        handleHttpError: false,
+      },
+    );
   },
 };
