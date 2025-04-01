@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AlertBanner from '@shared/alertBanner';
 import LoadingIndicator from '@shared/LoadingIndicator';
@@ -14,6 +15,12 @@ export default function QueryPage({
   isPlaceholderData,
   showErrorIfEmpty = true,
 }) {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   if (error) {
     const message = errorMessage || error.message;
     return <AlertBanner status="error" header={'Error'} message={message} />;

@@ -1,7 +1,14 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import QueryPage from './QueryPage';
+
+const QueryPageComponent = (props) => (
+  <MemoryRouter>
+    <QueryPage {...props} />
+  </MemoryRouter>
+);
 
 describe('<QueryPage />', () => {
   const children = 'Hello';
@@ -17,18 +24,18 @@ describe('<QueryPage />', () => {
   };
 
   test('it renders', () => {
-    render(<QueryPage {...initProps} />);
+    render(<QueryPageComponent {...initProps} />);
     expect(screen.getByText(children)).toBeInTheDocument();
   });
 
   test('it does not render children with placeholder data', () => {
-    render(<QueryPage {...initProps} isPlaceholderData={true} />);
+    render(<QueryPageComponent {...initProps} isPlaceholderData={true} />);
     expect(screen.queryByText(children)).not.toBeInTheDocument();
   });
 
   test('it renders with default empty data alert', () => {
     const props = { ...initProps, data: [] };
-    render(<QueryPage {...props} />);
+    render(<QueryPageComponent {...props} />);
     screen.debug;
     expect(screen.getByText('No data available.')).toBeInTheDocument();
     expect(
@@ -41,7 +48,7 @@ describe('<QueryPage />', () => {
     const dataHeader = 'This is a header';
     const dataMessage = 'This is a message';
     const props = { ...initProps, data: [], dataHeader, dataMessage };
-    render(<QueryPage {...props} />);
+    render(<QueryPageComponent {...props} />);
     expect(screen.getByText(dataHeader)).toBeInTheDocument();
     expect(screen.getByText(dataMessage)).toBeInTheDocument();
     expect(screen.queryByText(children)).not.toBeInTheDocument();
@@ -51,7 +58,7 @@ describe('<QueryPage />', () => {
     const defaultErrorMessage = 'This is an error';
     const error = new Error(defaultErrorMessage);
     const props = { ...initProps, error };
-    render(<QueryPage {...props} />);
+    render(<QueryPageComponent {...props} />);
     expect(screen.getByText(defaultErrorMessage)).toBeInTheDocument();
     expect(screen.queryByText(children)).not.toBeInTheDocument();
   });
@@ -60,14 +67,14 @@ describe('<QueryPage />', () => {
     const error = new Error('This is an error');
     const errorMessage = 'My custom error message';
     const props = { ...initProps, error, errorMessage };
-    render(<QueryPage {...props} />);
+    render(<QueryPageComponent {...props} />);
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
     expect(screen.queryByText(children)).not.toBeInTheDocument();
   });
 
   test('it renders loading indicator when peding', () => {
     const props = { ...initProps, isPending: true };
-    render(<QueryPage {...props} />);
+    render(<QueryPageComponent {...props} />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(screen.queryByText(children)).not.toBeInTheDocument();
   });

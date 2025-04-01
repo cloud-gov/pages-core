@@ -68,7 +68,7 @@ const FileListRow = ({
           ) : (
             <Link
               to={`/sites/${siteId}/storage/files/${item.id}`}
-              prefetch="intent"
+              prefetch="render"
               title="View file details"
               className="usa-link file-name"
             >

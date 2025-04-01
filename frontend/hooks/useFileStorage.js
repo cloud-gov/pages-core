@@ -53,18 +53,27 @@ export default function useFileStorage(
   const { data, isLoading, isFetching, isPending, isPlaceholderData, isError, error } =
     useQuery({
       queryKey: ['fileStorage', fileStorageId, path, sortKey, sortOrder, page],
-      queryFn: () =>
-        federalist.fetchPublicFiles(fileStorageId, path, sortKey, sortOrder, page),
+      queryFn: async () => {
+        const res = await federalist.fetchPublicFiles(
+          fileStorageId,
+          path,
+          sortKey,
+          sortOrder,
+          page,
+        );
+
+        res.data.map((record) =>
+          queryClient.setQueryData(['fileStorageFile', fileStorageId, record.id], record),
+        );
+
+        return res;
+      },
       refetchInterval: REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
       enabled: !!fileStorageId,
       keepPreviousData: true,
       staleTime: 2000,
       placeholderData: previousData.current || INITIAL_DATA,
-      onError: (err) => {
-        // using an empty string so that we don't end up with "undefined" at the end
-        throw new Error('Failed to fetch public files ' + (err?.message || ''));
-      },
     });
   useEffect(() => {
     if (data !== undefined) {
