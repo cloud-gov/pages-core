@@ -16,3 +16,33 @@ export function getFileStorageData(page = 1) {
     data: generateMockFiles(page),
   };
 }
+export function getFileStorageLogsData(page = 1) {
+  return {
+    data: [
+      {
+        id: 1,
+        fileKey: 'test.txt',
+        description: 'UPLOAD_FILE',
+        createdAt: '2024-02-14T12:00:00Z',
+        email: 'user@example.com',
+      },
+      {
+        id: 2,
+        fileKey: 'folder',
+        description: 'CREATE_DIRECTORY',
+        createdAt: '2024-02-14T13:00:00Z',
+        email: 'user@example.com',
+      },
+      {
+        id: 3,
+        fileKey: 'old.txt',
+        description: 'DELETE_FILE',
+        createdAt: '2024-02-14T14:00:00Z',
+        email: 'user@example.com',
+      },
+    ],
+    currentPage: page,
+    totalPages: 2,
+    totalItems: 10,
+  };
+}
