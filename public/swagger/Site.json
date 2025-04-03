@@ -42,6 +42,9 @@
       "type": "string",
       "enum": ["jekyll", "hugo", "static", "node.js"]
     },
+    "liveDomain": {
+      "type": "string"
+    },
     "owner": {
       "type": "string"
     },

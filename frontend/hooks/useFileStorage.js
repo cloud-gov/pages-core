@@ -60,10 +60,6 @@ export default function useFileStorage(
       enabled: !!fileStorageId,
       staleTime: 2000,
       placeholderData: previousData.current || INITIAL_DATA,
-      onError: (err) => {
-        // using an empty string so that we don't end up with "undefined" at the end
-        throw new Error('Failed to fetch public files ' + (err?.message || ''));
-      },
     });
   useEffect(() => {
     if (data !== undefined) {

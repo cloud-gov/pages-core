@@ -17,8 +17,8 @@ describe('FileDetails', () => {
     id: 20,
     name: 'test-document.pdf',
     fullPath: 'https://example.com/files/test-document.pdf',
-    updatedBy: 'user@example.com',
-    updatedAt: '2025-02-19T12:00:00Z',
+    lastModifiedBy: 'user@example.com',
+    lastModifiedAt: '2025-02-19T12:00:00Z',
     size: 1048576, // 1MB
     mimeType: 'application/pdf',
     onDelete: mockOnDelete,
@@ -47,7 +47,7 @@ describe('FileDetails', () => {
     );
 
     // Uploaded by
-    expect(screen.getByText(fileProps.updatedBy)).toBeInTheDocument();
+    expect(screen.getByText(fileProps.lastModifiedBy)).toBeInTheDocument();
 
     // Uploaded on (formatted date check)
     expect(screen.getByText(/Feb 19, 2025/i)).toBeInTheDocument();
