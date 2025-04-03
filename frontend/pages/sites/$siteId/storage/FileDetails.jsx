@@ -8,8 +8,8 @@ const FileDetails = ({
   name,
   id,
   fullPath,
-  updatedBy,
-  updatedAt,
+  lastModifiedBy,
+  lastModifiedAt,
   size,
   mimeType,
   onDelete,
@@ -61,12 +61,12 @@ const FileDetails = ({
             </td>
           </tr>
           <tr>
-            <th scope="row">Uploaded by</th>
-            <td className="text-bold">{updatedBy}</td>
+            <th scope="row">Last modified by</th>
+            <td className="text-bold">{lastModifiedBy}</td>
           </tr>
           <tr>
-            <th scope="row">Uploaded at</th>
-            <td>{updatedAt && dateAndTimeSimple(updatedAt)}</td>
+            <th scope="row">Last modified at</th>
+            <td>{lastModifiedAt && dateAndTimeSimple(lastModifiedAt)}</td>
           </tr>
           <tr>
             <th scope="row">File size</th>
@@ -105,8 +105,8 @@ FileDetails.propTypes = {
   name: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,
   fullPath: PropTypes.string.isRequired,
-  updatedBy: PropTypes.string.isRequired,
-  updatedAt: PropTypes.string.isRequired,
+  lastModifiedBy: PropTypes.string.isRequired,
+  lastModifiedAt: PropTypes.string.isRequired,
   size: PropTypes.number.isRequired,
   mimeType: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,

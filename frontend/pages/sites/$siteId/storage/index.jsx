@@ -50,7 +50,7 @@ function FileStoragePage() {
   const [highlightItem, setHighlightItem] = useState(null);
   const [savedScrollPos, setSavedScrollPos] = useState(0);
   const queryFileDetails = searchParams.get('details');
-  const storageRoot = `${site.siteOrigin}/~assets`;
+  const storageRoot = `${site.liveDomain}/~assets`;
   const foundFileDetails = fetchedPublicFiles?.find(
     (file) => file.name === queryFileDetails,
   );
@@ -229,8 +229,8 @@ function FileStoragePage() {
             name={foundFileDetails?.name || ''}
             id={foundFileDetails?.id}
             fullPath={`${storageRoot}${path}${foundFileDetails?.name}`}
-            updatedBy={foundFileDetails?.updatedBy || ''}
-            updatedAt={foundFileDetails?.updatedAt || ''}
+            lastModifiedBy={foundFileDetails?.lastModifiedBy || ''}
+            lastModifiedAt={foundFileDetails?.lastModifiedAt || ''}
             size={foundFileDetails?.metadata.size || 0}
             mimeType={foundFileDetails?.type || ''}
             onDelete={handleDelete}
@@ -239,7 +239,7 @@ function FileStoragePage() {
         )}
         {(!queryFileDetails || !foundFileDetails) && (
           <>
-            {queryFileDetails && !foundFileDetails && (
+            {queryFileDetails && !foundFileDetails && fetchedPublicFiles.length > 0 && (
               <AlertBanner
                 status="error margin-bottom-2"
                 header="File not found"
@@ -250,7 +250,7 @@ function FileStoragePage() {
             )}
             <FileList
               path={path}
-              baseUrl={site.siteOrigin}
+              baseUrl={site.liveDomain}
               data={fetchedPublicFiles || []}
               onDelete={handleDelete}
               onNavigate={handleNavigate}

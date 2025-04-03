@@ -2,20 +2,24 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { IconGlobe } from '@shared/icons';
 
-const LocationBar = ({ path, storageRoot, onNavigate }) => {
+const LocationBar = ({ path, storageRoot, onNavigate, trailingSlash = true }) => {
   // Only trim leading slashes, keep trailing
   const cleanedPath = path.replace(/^\/+/, '');
   const segments = cleanedPath ? cleanedPath.split('/').filter(Boolean) : [];
   // Show storageRoot only if it's the current or parent folder
   const showDomain = segments.length <= 1;
-  const grandparentPath = segments.slice(0, segments.length - 1).join('/') + '/';
+  const grandparentPath = segments.slice(0, -2).join('/') + '/';
 
   const displayedBreadcrumbs = useMemo(() => {
+    const trailer = trailingSlash ? '/' : '';
     if (segments.length > 1) {
       // Ensure it only includes the last two segments
-      return segments.slice(-2).map((seg) => `${seg}/`);
+      return segments.slice(-2).map((seg, idx) => {
+        if (idx === 1) return `${seg}${trailer}`;
+        return `${seg}/`;
+      });
     }
-    return segments.length === 1 ? [`${segments[0]}/`] : [];
+    return segments.length === 1 ? [`${segments[0]}${trailer}`] : [];
   }, [segments]);
 
   return (
@@ -110,7 +114,8 @@ LocationBar.propTypes = {
   path: PropTypes.string.isRequired,
   siteId: PropTypes.string.isRequired,
   storageRoot: PropTypes.string.isRequired,
-  onNavigate: PropTypes.func,
+  onNavigate: PropTypes.func.isRequired,
+  trailingSlash: PropTypes.bool,
 };
 
 export default LocationBar;
