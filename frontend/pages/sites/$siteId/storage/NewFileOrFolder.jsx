@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import FileUpload from '@shared/FileUpload';
-import { IconFolder } from '@shared/icons';
-
+import { IconFolder, IconAttachment } from '@shared/icons';
+import AlertBanner from '@shared/alertBanner';
+import { Link } from 'react-router-dom';
 const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
   const [folderName, setFolderName] = useState('');
   const [creatingFolder, setCreatingFolder] = useState(false);
@@ -30,16 +31,36 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
 
     setCreatingFolder(false);
   };
-
+  const docsLink = 'https://cloud.gov/pages/documentation'; // TODO: update link
+  const message = (
+    <>
+      Before uploading, carefully review your file to ensure it does not contain any
+      Personally Identifiable Information (PII) or sensitive data. We{' '}
+      <Link to="./storage/logs"> log every file upload and deletion </Link> for security
+      tracking. For more about Public File Storage, review the{' '}
+      <a target="_blank" rel="noreferrer" className="usa-link" href={docsLink}>
+        documentation
+      </a>
+      .
+    </>
+  );
   return (
     <div className="new-file-or-folder">
       {errorMessage && <div className="usa-error-message">{errorMessage}</div>}
       {showFileDropZone && (
-        <FileUpload
-          onUpload={onUpload}
-          onCancel={() => setShowFileDropZone(false)}
-          triggerOnMount
-        />
+        <>
+          <AlertBanner
+            className="margin-top-1"
+            status="warning"
+            message={message}
+            alertRole={false}
+          />
+          <FileUpload
+            onUpload={onUpload}
+            onCancel={() => setShowFileDropZone(false)}
+            triggerOnMount
+          />
+        </>
       )}
       {showFolderNameField && (
         <div className="new-folder grid-row flex-align-center margin-y-1">
@@ -71,24 +92,30 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
       )}
       <div className="margin-y-1">
         {!showFolderNameField && !showFileDropZone && (
-          <button
-            type="button"
-            className="usa-button usa-button--outline"
-            onClick={() => setShowFileDropZone(true)}
-          >
-            <IconFolder className="usa-icon" />
-            Upload files
-          </button>
-        )}
-        {!showFileDropZone && !showFolderNameField && (
-          <button
-            type="button"
-            className="usa-button usa-button--outline"
-            onClick={() => setShowFolderNameField(true)}
-          >
-            <IconFolder className="usa-icon" />
-            New folder
-          </button>
+          <>
+            <button
+              type="button"
+              className="usa-button"
+              onClick={() => setShowFileDropZone(true)}
+            >
+              <IconAttachment className="usa-icon" />
+              Upload files
+            </button>
+            <button
+              type="button"
+              className="usa-button usa-button--outline"
+              onClick={() => setShowFolderNameField(true)}
+            >
+              <IconFolder className="usa-icon" />
+              New folder
+            </button>
+            <Link
+              className="usa-button usa-button--unstyled text-top padding-105"
+              to="./logs"
+            >
+              View file history logs
+            </Link>
+          </>
         )}
       </div>
     </div>

@@ -17,6 +17,22 @@ function FileStoragePage() {
   const { id } = useParams();
   const site = useSelector((state) => currentSite(state.sites, id));
   const fileStorageServiceId = site.fileStorageServiceId;
+  if (!fileStorageServiceId) {
+    const errorMessage = (
+      <span>
+        This site does not have Public File Storage enabled. Please contact{' '}
+        <a
+          title="Email support to launch a custom domain."
+          href="mailto:pages-support@cloud.gov"
+        >
+          pages-support@cloud.gov
+        </a>{' '}
+        to request access.
+      </span>
+    );
+    return <AlertBanner status="info" header="" message={errorMessage} />;
+  }
+
   const [searchParams, setSearchParams] = useSearchParams();
   let path = decodeURIComponent(searchParams.get('path') || '/').replace(/^\/+/, '/');
   // Ensure path always ends in "/" because we use it for asset url links

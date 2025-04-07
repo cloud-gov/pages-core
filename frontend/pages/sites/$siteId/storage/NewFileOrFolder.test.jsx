@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import NewFileOrFolder from './NewFileOrFolder';
 import prettyBytes from 'pretty-bytes';
@@ -9,13 +10,19 @@ jest.mock('pretty-bytes', () => jest.fn());
 const mockOnUpload = jest.fn();
 const mockOnCreateFolder = jest.fn();
 
+jest.mock('@shared/alertBanner', () => {
+  return jest.fn(() => null);
+});
+
 const renderComponent = (props = {}) => {
   return render(
-    <NewFileOrFolder
-      onUpload={mockOnUpload}
-      onCreateFolder={mockOnCreateFolder}
-      {...props}
-    />,
+    <MemoryRouter>
+      <NewFileOrFolder
+        onUpload={mockOnUpload}
+        onCreateFolder={mockOnCreateFolder}
+        {...props}
+      />
+    </MemoryRouter>,
   );
 };
 

@@ -1,72 +1,33 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useParams, useLocation, useSearchParams, Outlet } from 'react-router-dom';
+import {
+  matchPath,
+  useParams,
+  useLocation,
+  useSearchParams,
+  Outlet,
+} from 'react-router-dom';
 
 import { currentSite } from '@selectors/site';
 import { getOrgById } from '@selectors/organization';
 import AlertBanner from '@shared/alertBanner';
 import LoadingIndicator from '@shared/LoadingIndicator';
+import siteRoutes from './siteRoutes';
 
 import SideNav from './SideNav';
 import PagesHeader from './PagesHeader';
 
-export const SITE_NAVIGATION_CONFIG = [
-  {
-    display: 'Custom Domains',
-    route: 'custom-domains',
-    icon: 'IconLink',
-  },
-  {
-    display: 'Build history',
-    route: 'builds',
-    icon: 'IconBook',
-  },
-  {
-    display: 'Report history',
-    route: 'reports',
-    icon: 'IconReport',
-  },
-  {
-    display: 'Site settings',
-    route: 'settings',
-    icon: 'IconGear',
-  },
-  {
-    display: 'Published builds',
-    route: 'published',
-    icon: 'IconCloudUpload',
-  },
-];
+export const SITE_NAVIGATION_CONFIG = siteRoutes.filter((route) => route.showInSidebar);
 
-{
-  process.env.FEATURE_FILE_STORAGE_SERVICE === 'true' &&
-    SITE_NAVIGATION_CONFIG.push({
-      display: 'Public storage',
-      route: 'storage',
-      icon: 'IconAttachment',
-    });
-}
-
-export const SITE_TITLE_CONFIG = [
-  ...SITE_NAVIGATION_CONFIG,
-  {
-    display: 'Reports for build #',
-    route: 'reports',
-  },
-  {
-    display: 'Logs for build #',
-    route: 'logs',
-  },
-];
-
-function getPageTitle(pathname, buildId = null) {
-  const route = pathname.split('/').pop();
-  const routeConf = SITE_TITLE_CONFIG.find((conf) => conf.route === route);
-  if (routeConf) {
+function getPageTitle(location, buildId = null) {
+  const matchingRoute = siteRoutes.find((route) =>
+    matchPath('sites/:id/' + route.path, location.pathname),
+  );
+  if (matchingRoute) {
     if (buildId) {
-      return routeConf.display + buildId;
+      return matchingRoute.title + buildId;
     }
-    return routeConf.display;
+    return matchingRoute.title;
   }
   return '';
 }
@@ -120,7 +81,7 @@ export function SiteContainer() {
     return <AlertBanner status="error" header="" message={errorMessage} />;
   }
 
-  const pageTitle = getPageTitle(location.pathname, buildId);
+  const pageTitle = getPageTitle(location, buildId);
   const navConig = SITE_NAVIGATION_CONFIG.filter(
     (navItem) => !(navItem.route === 'reports' && site.SiteBuildTasks.length === 0),
   );
