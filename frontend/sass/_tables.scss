@@ -721,3 +721,10 @@ a {
 .file-input__remove:hover + span {
   text-decoration: line-through;
 }
+
+.file-storage-logs {
+  .file-name-cell {
+    max-width: 0;
+    word-wrap: break-word;
+  }
+}

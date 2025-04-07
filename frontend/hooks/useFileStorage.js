@@ -58,7 +58,6 @@ export default function useFileStorage(
       refetchInterval: REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
       enabled: !!fileStorageId,
-      keepPreviousData: true,
       staleTime: 2000,
       placeholderData: previousData.current || INITIAL_DATA,
       onError: (err) => {

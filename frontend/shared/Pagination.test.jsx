@@ -24,9 +24,7 @@ describe('Pagination Component', () => {
 
   test('renders pagination label correctly', () => {
     renderPagination();
-    expect(
-      screen.getByText(/Showing 10 of 111 total files in this folder/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Showing 10 of 111 total/i)).toBeInTheDocument();
   });
 
   test('displays Previous button disabled on first page', () => {

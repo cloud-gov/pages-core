@@ -1,5 +1,8 @@
 import nock from 'nock';
-import { getFileStorageData } from '../../../test/frontend/support/data/fileStorageData';
+import {
+  getFileStorageData,
+  getFileStorageLogsData,
+} from '../../../test/frontend/support/data/fileStorageData';
 
 const BASE_URL = 'http://localhost:80';
 
@@ -82,4 +85,22 @@ export async function createPublicDirectoryError(
   nock(BASE_URL)
     .post(`/v0/file-storage/${fileStorageId}/directory`, { parent, name })
     .reply(400, { error: true, message });
+}
+
+export async function getFileStorageLogs(
+  { fileStorageServiceId, page = 1 },
+  { times = 1 } = {},
+) {
+  nock(BASE_URL)
+    .get(`/v0/file-storage/${fileStorageServiceId}/user-actions/`)
+    .query({ page })
+    .times(times)
+    .reply(200, getFileStorageLogsData(page));
+}
+
+export async function getFileStorageLogsError({ fileStorageServiceId, page = 1 }) {
+  nock(BASE_URL)
+    .get(`/v0/file-storage/${fileStorageServiceId}/user-actions/`)
+    .query({ page })
+    .reply(400, { error: true, message: 'Failed to fetch storage logs' });
 }

@@ -58,7 +58,7 @@ const Pagination = ({
       pagination__label text-center margin-top-1 margin-bottom-3 margin-x-auto text-base
       "
       >
-        Showing {itemsOnCurrentPage} of {totalItems} total files in this folder
+        Showing {itemsOnCurrentPage} of {totalItems} total
       </p>
       {totalPages > 1 && (
         <nav className="usa-pagination bg-base-lightest" aria-label="Pagination">
