@@ -203,6 +203,15 @@ function mockExchangeToken(code, accessToken) {
       expires_in: 10,
     });
 }
+function mockExchangeTokenFailure() {
+  const url = new URL(uaaConfig.tokenURL);
+
+  return nock(url.origin)
+    .post(url.pathname)
+    .reply(403, {
+      error: new Error('Invalid token'),
+    });
+}
 
 function mockFailedExchange(code) {
   const url = new URL(uaaConfig.tokenURL);
@@ -282,6 +291,7 @@ function mockServerErrorStatus(status, path, message, accessToken, method = 'get
 module.exports = {
   mockAddUserToGroup,
   mockUAAAuth,
+  mockExchangeTokenFailure,
   mockFailedExchange,
   mockFetchClientToken,
   mockFetchGroupId,

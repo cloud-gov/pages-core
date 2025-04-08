@@ -62,6 +62,16 @@ describe('Admin authentication request', () => {
         .expect(401);
     });
 
+    it('returns forbidden with invalid code', () => {
+      const invalidCode = 'invlaid';
+
+      cfUAANock.mockExchangeTokenFailure();
+
+      return request(app)
+        .get(`/admin/auth/uaa/callback?code=${invalidCode}&state=abc123`)
+        .expect(403);
+    });
+
     describe('when successful', () => {
       const uaaId = 'admin_id_1';
       const code = 'code';
