@@ -57,18 +57,13 @@ export default [
     icon: 'IconGear',
     showInSidebar: true,
   },
-
-  ...(process.env.FEATURE_FILE_STORAGE_SERVICE === 'true'
-    ? [
-        {
-          Component: FileStorage,
-          title: 'Public file storage',
-          path: 'storage',
-          icon: 'IconCloudUpload',
-          showInSidebar: true,
-        },
-      ]
-    : []),
+  {
+    Component: FileStorage,
+    title: 'Public file storage',
+    path: 'storage',
+    icon: 'IconCloudUpload',
+    showInSidebar: true,
+  },
   ...(process.env.FEATURE_FILE_STORAGE_SERVICE === 'true'
     ? [
         {

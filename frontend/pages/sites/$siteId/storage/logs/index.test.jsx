@@ -91,7 +91,7 @@ describe('storage/logs/index', () => {
     setup();
 
     expect(
-      screen.getByText(/This site does not have Public File Storage enabled/i),
+      screen.getByText(/excited to announce an upcoming new public file storage/i),
     ).toBeInTheDocument();
     expect(useFileStorageLogs).not.toHaveBeenCalled();
   });

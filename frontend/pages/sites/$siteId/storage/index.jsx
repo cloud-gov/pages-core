@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import useFileStorage from '@hooks/useFileStorage';
 
 import AlertBanner from '@shared/alertBanner';
+import Announcement from './Announcement';
 import LocationBar from './LocationBar';
 import FileDetails from './FileDetails';
 import NewFileOrFolder from './NewFileOrFolder';
@@ -17,20 +18,9 @@ function FileStoragePage() {
   const { id } = useParams();
   const site = useSelector((state) => currentSite(state.sites, id));
   const fileStorageServiceId = site.fileStorageServiceId;
+
   if (!fileStorageServiceId) {
-    const errorMessage = (
-      <span>
-        This site does not have Public File Storage enabled. Please contact{' '}
-        <a
-          title="Email support to launch a custom domain."
-          href="mailto:pages-support@cloud.gov"
-        >
-          pages-support@cloud.gov
-        </a>{' '}
-        to request access.
-      </span>
-    );
-    return <AlertBanner status="info" header="" message={errorMessage} />;
+    return <Announcement />;
   }
 
   const [searchParams, setSearchParams] = useSearchParams();

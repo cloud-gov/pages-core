@@ -364,7 +364,7 @@ async function createData() {
       defaultConfig: {
         hello: 'world',
       },
-    }),
+    }).then((site) => addSiteToOrg(site, agency1)),
 
     siteFactory({
       engine: 'node.js',

@@ -41,7 +41,7 @@ describe('siteRoutes', () => {
     it('should not include storage routes when FEATURE_FILE_STORAGE_SERVICE is false', () => {
       process.env.FEATURE_FILE_STORAGE_SERVICE = 'false';
       const routes = jest.requireActual('./siteRoutes').default;
-      expect(routes.some((route) => route.path === 'storage')).toBe(false);
+      expect(routes.some((route) => route.path === 'storage')).toBe(true);
       expect(routes.some((route) => route.path === 'storage/logs')).toBe(false);
     });
   });
