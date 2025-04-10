@@ -1,4 +1,4 @@
-const { Strategy } = require('passport-oauth2');
+const { Strategy, TokenError } = require('passport-oauth2');
 const { Sequelize } = require('sequelize');
 const UAAClient = require('../utils/uaaClient');
 const { Event, UAAIdentity, User } = require('../models');
@@ -23,6 +23,14 @@ function createUAAStrategy(options, verify) {
         return callback(e);
       }
     });
+  };
+
+  strategy.parseErrorResponse = function (body) {
+    var json = JSON.parse(body);
+    if (json.error) {
+      return new TokenError(json.error_description, json.error, json.error_uri, 403);
+    }
+    return null;
   };
 
   const params = new URLSearchParams();
