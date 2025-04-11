@@ -1,3 +1,17 @@
+## 0.18.0 (2025-04-11)
+
+### Added
+
+- Add public file storage waitlist alert
+- add file storage actions log
+- Create a file upload hook to queue uploads
+
+### Fixed
+
+- Return status 403 for invalid uaa oauth code
+- File view details alert to not flash on load
+- page titles, routes, and sidenav consistency
+
 ## 0.17.0 (2025-03-25)
 
 ### Added
