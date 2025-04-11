@@ -5,7 +5,7 @@ import useFileStorageLogs from '@hooks/useFileStorageLogs';
 import PropTypes from 'prop-types';
 import QueryPage from '@shared/layouts/QueryPage';
 import Pagination from '@shared/Pagination';
-import AlertBanner from '@shared/alertBanner';
+import Announcement from '../Announcement';
 
 import { dateAndTimeSimple, timeFrom } from '@util/datetime';
 import { currentSite } from '@selectors/site';
@@ -18,19 +18,7 @@ function FileStorageLogs() {
   const initalPage = parseInt(searchParams.get('page')) || 1;
 
   if (!fileStorageServiceId) {
-    const errorMessage = (
-      <span>
-        This site does not have Public File Storage enabled. Please contact{' '}
-        <a
-          title="Email support to launch a custom domain."
-          href="mailto:pages-support@cloud.gov"
-        >
-          pages-support@cloud.gov
-        </a>{' '}
-        to request access.
-      </span>
-    );
-    return <AlertBanner status="info" header="" message={errorMessage} />;
+    return <Announcement />;
   }
 
   const { data, isPending, error, currentPage, totalPages, totalItems } =
