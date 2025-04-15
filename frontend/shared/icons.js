@@ -1,4 +1,6 @@
 import IconAttachment from '../../public/images/icons/icon-attachment.svg';
+import IconAddAttachment from '../../public/images/icons/icon-add-attachment.svg';
+import IconAddFolder from '../../public/images/icons/icon-add-folder.svg';
 import IconBook from '../../public/images/icons/icon-book.svg';
 import IconBranch from '../../public/images/icons/icon-branch.svg';
 import IconCheckCircle from '../../public/images/icons/icon-check-circle-solid.svg';
@@ -26,6 +28,8 @@ import IconTrash from '../../public/images/icons/icon-trash.svg';
 
 export {
   IconAttachment,
+  IconAddAttachment,
+  IconAddFolder,
   IconBook,
   IconBranch,
   IconCheckCircle,

@@ -599,7 +599,6 @@ $highlightedAndSelectedCellBackground: #dde7ef;
   }  
 
   td {
-    white-space: nowrap;
     border-color: $sortableBorderColor;
   }
   
@@ -609,40 +608,107 @@ $highlightedAndSelectedCellBackground: #dde7ef;
       background-color: $highlightedAndSelectedCellBackground;
     }
   }
-  td.file-name-cell{
-    max-width: 0;
+  // mobile stuff
+  tr {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
   }
-  .width-last-mod {
-    width: 18ch;
-  } 
-  .width-actions {
-    width: 24ch;
+  td {
+    width: 100%;
+    border-width: 0;
+  }
+  td.file-name-cell{
+    width: 100%;
+    border-top-width: 1px;
+  }
+  @media (max-width: 63.999em) {
+    thead tr {
+      display: inline-table;
+      &:before {
+        content: "Sorted by:";
+        display: block;
+        font-weight: normal;
+        padding: 0.5em 1em;
+      }
+      th {
+        border-width: 0;
+      }
+    }
+
+    th[data-label],
+    td[data-label] {
+      border-bottom: 1px solid $sortableBorderColor;
+      &:before {
+        content: attr(data-label) ":";
+        display: block;
+        font-weight: bold;
+        padding: 0.75rem 1rem 0.25rem;
+        margin: -0.5rem -1rem -.25rem;
+      }
+    }
+    td:last-child {
+      padding-bottom: 1rem;
+    }
+    .file-name-wrap {
+      margin: .25em 0 .5em;
+    }
+    .file-name {
+      word-break: break-all;
+    }
+  }
+  @media (min-width: 64em) {
+    // desktop stuff
+    tr {
+      display: table-row;
+    }
+    td, th {
+      border-width: 1px;
+      width: initial;
+      white-space: nowrap;
+    }
+    td.file-name-cell{
+      max-width: 0;
+      border-top-width: 1px;
+    }
+    .width-last-mod {
+      min-width: 17ch;
+    } 
+    .width-actions {
+      width: 24ch;
+      text-align: right;
+    }
+    .file-name-wrap {
+      display: flex;
+      height: 2rem;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+    .file-name {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block;
+      overflow: hidden;
+    }
   }
   .file-icon {
-    width: 1em;
+    width: 1.2em;
     height: 1.2em;
     margin-right: .5rem;
     svg {
       display: inline-block;
       fill: currentColor;
-      height: 1em;
+      height: 1.2em;
       position: relative;
-      width: 1em;
+      width: 1.2em;
       flex-shrink: 0;
+      vertical-align: text-top;
     }
   }
   .file-name-wrap {
-    display: flex;
-    height: 2rem;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
   }
   .file-name {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: block;
-    overflow: hidden;
     -webkit-font-smoothing: auto;
     color: $color-blue-dark;
     height: 1.2em;
@@ -666,6 +732,8 @@ $highlightedAndSelectedCellBackground: #dde7ef;
       color: #8b0a03
     }
   }
+
+
 }
 
 /* File details */

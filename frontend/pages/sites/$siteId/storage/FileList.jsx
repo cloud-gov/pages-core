@@ -89,7 +89,7 @@ const FileListRow = ({
           {item.updatedAt ? timeFrom(item.updatedAt) : 'N/A'}
         </span>
       </td>
-      <td data-label="Actions" className="text-right">
+      <td data-label="Actions" className="width-actions">
         {item.type !== 'directory' && (
           <button
             type="button"
@@ -191,7 +191,10 @@ const FileList = ({
               />
             </button>
           </th>
-          <th scope="col" className="width-actions height-6">
+          <th
+            scope="col"
+            className="width-actions height-6 display-none desktop:display-block"
+          >
             <span className="usa-sr-only">Actions</span>
           </th>
         </tr>

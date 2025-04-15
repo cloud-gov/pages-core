@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import FileUpload from '@shared/FileUpload';
-import { IconFolder, IconAttachment } from '@shared/icons';
+import { IconAddFolder, IconAddAttachment } from '@shared/icons';
 import AlertBanner from '@shared/alertBanner';
 import { Link } from 'react-router-dom';
 const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
@@ -98,7 +98,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
               className="usa-button"
               onClick={() => setShowFileDropZone(true)}
             >
-              <IconAttachment className="usa-icon" />
+              <IconAddAttachment className="usa-icon" />
               Upload files
             </button>
             <button
@@ -106,7 +106,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
               className="usa-button usa-button--outline"
               onClick={() => setShowFolderNameField(true)}
             >
-              <IconFolder className="usa-icon" />
+              <IconAddFolder className="usa-icon" />
               New folder
             </button>
             <Link
