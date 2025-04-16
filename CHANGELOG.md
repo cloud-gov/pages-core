@@ -1,3 +1,10 @@
+## 0.18.1 (2025-04-16)
+
+### Fixed
+
+- show loading state rather than empty state  while file storage  query is pending
+- file storage icons and mobile table styles polish
+
 ## 0.18.0 (2025-04-11)
 
 ### Added
