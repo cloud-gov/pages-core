@@ -13,6 +13,7 @@ import Pagination from '@shared/Pagination';
 import QueryPage from '@shared/layouts/QueryPage';
 import Dialog from '@shared/Dialog';
 import { currentSite } from '@selectors/site';
+import LoadingIndicator from '@shared/LoadingIndicator';
 
 function FileStoragePage() {
   const { id } = useParams();
@@ -42,7 +43,7 @@ function FileStoragePage() {
     currentPage,
     totalPages,
     totalItems,
-    isLoading,
+    isFetching,
     defaultError,
     deleteItem,
     deleteError,
@@ -269,21 +270,24 @@ function FileStoragePage() {
               currentSortOrder={sortOrder}
               highlightItem={highlightItem}
             >
-              {!isLoading && fetchedPublicFiles?.length === 0 && (
+              {!isFetching && fetchedPublicFiles?.length === 0 && (
                 <tr>
                   <td colSpan="99" className="text-italic">
                     No files or folders found.
                   </td>
                 </tr>
               )}
+              {isFetching && fetchedPublicFiles?.length === 0 && <LoadingIndicator />}
             </FileList>
-            <Pagination
-              currentPage={currentPage || 0}
-              totalPages={totalPages || 0}
-              totalItems={totalItems || 0}
-              itemsOnCurrentPage={fetchedPublicFiles?.length || 0}
-              onPageChange={handlePageChange}
-            />
+            {fetchedPublicFiles?.length > 0 && (
+              <Pagination
+                currentPage={currentPage || 0}
+                totalPages={totalPages || 0}
+                totalItems={totalItems || 0}
+                itemsOnCurrentPage={fetchedPublicFiles?.length || 0}
+                onPageChange={handlePageChange}
+              />
+            )}
           </>
         )}
       </div>

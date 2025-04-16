@@ -155,3 +155,16 @@ a > svg {
     top: 1rem;
   }
 }
+.new-file-or-folder {
+  .usa-button {
+    padding: 0.5em 0.75em;
+    font-size: 1.1em;
+    line-height: 1.1em;
+    vertical-align: middle;
+    border-radius: 4px;
+    svg {
+      height: 1.1em;
+      width: auto;
+    }
+  }
+}
