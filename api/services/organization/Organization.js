@@ -108,6 +108,48 @@ module.exports = {
   },
 
   /**
+   * Used to create a new user when not running on behalf of a user
+   * @param {string} targetUserEmail - the email address of the user to invite
+   * if they are a current user
+   *
+   * @returns {Promise<[UserType, UAAClient.UAAUserAttributes]>}
+   */
+  async botFindOrCreateUAAUser(targetUserEmail) {
+    const uaaClient = new UAAClient();
+    const clientToken = await uaaClient.fetchClientToken({
+      scope: 'scim.read,scim.invite,scim.write',
+    });
+
+    return this.findOrCreateUAAUser(clientToken, targetUserEmail);
+  },
+
+  /**
+   *
+   * @param {string} email
+   * @param {string} orgName
+   */
+
+  async setupSiteEditorOrganization(email, orgName) {
+    let org;
+    const [user, uaaUserAttributes] = await this.botFindOrCreateUAAUser(email);
+
+    org = await Organization.findOne({ where: { name: orgName } });
+
+    if (!org) {
+      org = await Organization.create({
+        agency: 'gsa',
+        name: orgName,
+        isSandbox: false,
+        isSelfAuthorized: false,
+      });
+    }
+
+    await org.addRoleUser(user, 'manager');
+
+    return { org, user, uaaUserAttributes };
+  },
+
+  /**
    *
    * @param {UserType} currentUser
    * @param {string} targetUserEmail

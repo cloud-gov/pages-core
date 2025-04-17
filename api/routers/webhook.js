@@ -32,7 +32,31 @@ function verifySignature(req, res, next) {
   next();
 }
 
+function verifySiteRequest(req, res, next) {
+  const { body: payload } = req;
+
+  // ToDo Add additional headers to check if request is legit
+
+  try {
+    const hasKeys = Object.keys(payload).includes([
+      'userEmail',
+      'apiKey',
+      'siteId',
+      'siteName',
+      'org',
+    ]);
+
+    if (!hasKeys) throw new Error('Invalid request payload');
+  } catch (err) {
+    res.badRequest();
+    next(err);
+  }
+
+  next();
+}
+
 router.post('/webhook/github', verifySignature, WebhookController.github);
 router.post('/webhook/organization', verifySignature, WebhookController.organization);
+router.post('/webhook/site', verifySiteRequest, WebhookController.site);
 
 module.exports = router;

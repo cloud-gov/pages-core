@@ -1,6 +1,11 @@
 const moment = require('moment');
 const PromisePool = require('@supercharge/promise-pool');
-const { BuildTasksQueue, MailQueue, SiteBuildsQueue } = require('../queues');
+const {
+  BuildTasksQueue,
+  CreateEditorSiteQueue,
+  MailQueue,
+  SiteBuildsQueue,
+} = require('../queues');
 const Templates = require('../services/mailer/templates');
 const { truncateString } = require('../utils');
 const {
@@ -11,6 +16,7 @@ class QueueJobs {
   constructor(connection) {
     this.siteBuildsQueue = new SiteBuildsQueue(connection);
     this.buildTasksQueue = new BuildTasksQueue(connection);
+    this.createEditorSiteQueue = new CreateEditorSiteQueue(connection);
     this.mailQueue = new MailQueue(connection);
   }
 
@@ -145,6 +151,35 @@ class QueueJobs {
     await this.buildTasksQueue.waitUntilReady();
 
     return this.buildTasksQueue.add(name, { buildTaskId }, { priority });
+  }
+
+  /**
+   * Adds a create editor site task job to the Create Editor Site Queue
+   * The editor sites's manager email, org name, site name, site id, and bot api key
+   * are used to create the site job added to the queue
+   * @async
+   * @method startCreateEditorSiteTask
+   * @param {Object} editorSite - An instance of the model Build Taks
+   * * @param {number} editorSite.userEmail - The editor site's manager email for the org
+   * * @param {Object} editorSite.orgName - The name of the org
+   * * @param {Object} editorSite.siteName - The name of the site
+   * * @param {Object} editorSite.siteName - The id of the site
+   * * @param {Object} editorSite.apiKey - The bot api key
+   * @return {Promise<{Object}>} The bullmq's queue add job response
+   */
+  async startCreateEditorSiteTask(editorSite) {
+    const { userEmail, orgName, siteName, siteId, apiKey } = editorSite;
+    const jobName = `Creating editor site for org ${orgName}`;
+
+    await this.createEditorSiteQueue.waitUntilReady();
+
+    return this.createEditorSiteQueue.add(jobName, {
+      userEmail,
+      orgName,
+      siteName,
+      siteId,
+      apiKey,
+    });
   }
 
   /**
