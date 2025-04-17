@@ -18,15 +18,44 @@ describe('siteRoutes', () => {
   });
 
   describe('feature flags', () => {
-    it('should include Reports', () => {
-      const routes = jest.requireActual('./siteRoutes').default;
-      expect(routes.some((route) => route.path === 'reports')).toBe(true);
-    });
+    it('should include storage route logs', () => {
+      // Enable FEATURE_FILE_STORAGE_SERVICE
+      process.env.FEATURE_FILE_STORAGE_SERVICE = 'true';
 
-    it('should include storage routes', () => {
       const routes = jest.requireActual('./siteRoutes').default;
       expect(routes.some((route) => route.path === 'storage')).toBe(true);
       expect(routes.some((route) => route.path === 'storage/logs')).toBe(true);
+    });
+
+    it('should not include storage route logs', () => {
+      // Disable FEATURE_FILE_STORAGE_SERVICE
+      process.env.FEATURE_FILE_STORAGE_SERVICE = 'false';
+
+      const routes = jest.requireActual('./siteRoutes').default;
+      expect(routes.some((route) => route.path === 'storage')).toBe(true);
+      expect(routes.some((route) => route.path === 'storage/logs')).toBe(false);
+    });
+  });
+
+  describe('site routes', () => {
+    it('should include the following', () => {
+      const routes = jest.requireActual('./siteRoutes').default;
+      const paths = [
+        'custom-domains',
+        'custom-domains/new',
+        'custom-domains/:domainId/edit',
+        'builds',
+        'builds/:buildId/logs',
+        'reports',
+        'settings',
+        'storage',
+        'published',
+        'published/:name',
+      ];
+
+      paths.map((p) => {
+        expect(routes.some((route) => route.path === p)).toBe(true);
+      });
     });
   });
 

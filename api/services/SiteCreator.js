@@ -1,7 +1,7 @@
 const GitHub = require('./GitHub');
 const TemplateResolver = require('./TemplateResolver');
-const { Build, Site, User } = require('../models');
-const { generateS3ServiceName, generateSubdomain } = require('../utils');
+const { Build, Organization, Site, User } = require('../models');
+const utils = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
 
@@ -12,7 +12,7 @@ const defaultEngine = 'jekyll';
 function paramsForNewSite(params) {
   const owner = params.owner ? params.owner.toLowerCase() : null;
   const repository = params.repository ? params.repository.toLowerCase() : null;
-  const subdomain = generateSubdomain(owner, repository);
+  const subdomain = utils.generateSubdomain(owner, repository);
   const organizationId = params.organizationId
     ? parseInt(params.organizationId, 10)
     : null;
@@ -44,12 +44,18 @@ function ownerIsFederalistUser(owner) {
   });
 }
 
-function checkSiteExists({ owner, repository }) {
+function checkSiteExists({ owner, repository, organizationId }) {
   return Site.findOne({
     where: {
       owner,
       repository,
     },
+    include: [
+      {
+        model: Organization,
+        where: { id: organizationId },
+      },
+    ],
   }).then((existingSite) => {
     if (existingSite) {
       const error = new Error(
@@ -135,7 +141,7 @@ function buildInfrastructure(params, s3ServiceName) {
 }
 
 function validateSite(params) {
-  const s3ServiceName = generateS3ServiceName(params.owner, params.repository);
+  const s3ServiceName = utils.generateS3ServiceName(params.owner, params.repository);
 
   if (!s3ServiceName) {
     // Will always not create a valid site object
@@ -183,11 +189,12 @@ async function saveAndBuildSite({ site, user }) {
 }
 
 async function createSiteFromExistingRepo({ siteParams, user }) {
-  const { owner, repository } = siteParams;
+  const { owner, repository, organizationId } = siteParams;
 
   await checkSiteExists({
     owner,
     repository,
+    organizationId,
   });
   const repo = await checkGithubRepository({
     user,

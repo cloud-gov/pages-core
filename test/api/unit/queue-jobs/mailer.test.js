@@ -70,7 +70,7 @@ describe('mailer', () => {
         const job = await queue.sendAlert(reason, errors);
 
         expect(job.name).to.eq('alert');
-        expect(job.data.to).to.deep.eq(['federalist-alerts@gsa.gov']);
+        expect(job.data.to).to.deep.eq(['ops@example.gov']);
         expect(job.data.html).to.eq(
           Templates.alert({
             errors,

@@ -21,6 +21,8 @@ services:
       PROXY_DOMAIN: localhost:1337
       CI: true
       FEATURE_FILE_STORAGE_SERVICE: true
+      PAGES_EDITOR_HOST: https://editor.example.gov
+      OPS_EMAIL: ops@example.gov
   db:
     image: postgres:ci
     environment:

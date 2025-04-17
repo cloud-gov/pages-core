@@ -33,6 +33,10 @@ $ cf run-task pages-<env> --command "yarn migrate-site-repo 1 user@agency.gov ag
 $ cf logs --recent pages-<env>
 ```
 
+## Operations user
+
+The platform uses a shared operations user to connect to Pages organizations and GitHub oauth token. This allows us to create organizations to support Pages Editor sites and pull the corresponding site template source code from GitHub. The account credentials are available in credhub under the `pages-operations-<env>` if you need to access Pages as the operations user.
+
 ## Dev and Staging
 
 ### Manually running migrations in dev or staging environments

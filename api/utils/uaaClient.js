@@ -89,6 +89,22 @@ class UAAClient {
   }
 
   /**
+   * @param {string} targetUserEmail - the email address of the user to add
+   * @returns {UAAUserAttributes} - User or invite attributes
+   *
+   * Used by our backend to add a user to UAA's pages.user group
+   * when the invite cannot be on behalf of a user.
+   * This would be used in a webhook or scheduled jobs
+   */
+  async botInviteUser(targetUserEmail) {
+    const clientToken = await this.fetchClientToken({
+      scope: 'scim.read,scim.invite,scim.write',
+    });
+
+    return this.inviteUserToUserGroup(targetUserEmail, clientToken);
+  }
+
+  /**
    *
    * Utility
    *

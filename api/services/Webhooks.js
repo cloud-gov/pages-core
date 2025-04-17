@@ -6,7 +6,7 @@ const EventCreator = require('./EventCreator');
 const findSiteForWebhookRequest = (payload) => {
   const [owner, repository] = payload.repository.full_name.split('/');
 
-  return Site.findOne({
+  return Site.findAll({
     where: {
       owner: owner.toLowerCase(),
       repository: repository.toLowerCase(),
@@ -101,12 +101,17 @@ const createBuildForWebhookRequest = async (payload, site) => {
 
 const pushWebhookRequest = async (payload) => {
   if (payload.commits && payload.commits.length > 0) {
-    const site = await findSiteForWebhookRequest(payload);
-    if (shouldBuildForSite(site)) {
-      const build = await createBuildForWebhookRequest(payload, site);
-      await build.reload({ include: Site });
-      await GithubBuildHelper.reportBuildStatus(build);
-    }
+    const sites = await findSiteForWebhookRequest(payload);
+
+    await Promise.all(
+      sites.map(async (site) => {
+        if (shouldBuildForSite(site)) {
+          const build = await createBuildForWebhookRequest(payload, site);
+          await build.reload({ include: Site });
+          await GithubBuildHelper.reportBuildStatus(build);
+        }
+      }),
+    );
   }
 };
 

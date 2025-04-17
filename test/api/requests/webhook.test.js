@@ -227,4 +227,12 @@ describe('Webhook API', () => {
       sinon.assert.calledWith(organizationWebhookRequestStub, payload);
     });
   });
+
+  describe('POST /webhook/site', () => {
+    it('should respond with a 400 if payload is invalid', async () => {
+      const payload = { bad: 'payload' };
+
+      await request(app).post('/webhook/site').send(payload).expect(400);
+    });
+  });
 });
