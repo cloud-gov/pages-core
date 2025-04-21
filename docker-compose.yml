@@ -42,7 +42,6 @@ services:
       <<: *minioenv
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
-      FEATURE_BUILD_TASKS: 'active'
       FEATURE_FILE_STORAGE_SERVICE: 'true'
       FEATURE_LOCAL_BUILD_REPORTS: 'active'
       FEATURE_LOCAL_S3_ENDPOINT: 'true'

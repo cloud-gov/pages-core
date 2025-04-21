@@ -39,17 +39,13 @@ export default [
     title: 'Logs for build #',
     path: 'builds/:buildId/logs',
   },
-  ...(process.env.FEATURE_BUILD_TASKS === 'true'
-    ? [
-        {
-          Component: Reports,
-          title: 'Report history',
-          path: 'reports',
-          icon: 'IconReport',
-          showInSidebar: true,
-        },
-      ]
-    : []),
+  {
+    Component: Reports,
+    title: 'Report history',
+    path: 'reports',
+    icon: 'IconReport',
+    showInSidebar: true,
+  },
   {
     Component: SiteSettings,
     title: 'Site settings',
