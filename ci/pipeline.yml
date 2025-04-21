@@ -14,7 +14,6 @@ do:
     params:
       APP_HOSTNAME: https://((((deploy-env))-pages-domain))
       PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
-      FEATURE_BUILD_TASKS: "active"
       #@ if/end env != 'production':
       FEATURE_FILE_STORAGE_SERVICE: true
       #@ if/end env == 'production':

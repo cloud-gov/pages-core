@@ -15,7 +15,7 @@ export const useBuildTasks = (id) => {
         setResults({
           isLoading: false,
           buildTasks: data,
-          hasBuildTasks: process.env.FEATURE_BUILD_TASKS === 'active' && data.length > 0,
+          hasBuildTasks: data.length > 0,
         }),
       );
     }
