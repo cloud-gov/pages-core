@@ -14,6 +14,7 @@ const { authenticatedSession, unauthenticatedSession } = require('../support/ses
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
 const csrfToken = require('../support/csrfToken');
 const { createSiteUserOrg } = require('../support/site-user');
+const utils = require('../../../api/utils');
 
 const { Organization, Role, Site } = require('../../../api/models');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
@@ -27,6 +28,10 @@ describe('Site API', () => {
   beforeEach(() => {
     sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
     sinon.stub(EventCreator, 'error').resolves();
+    sinon.stub(utils, 'generateS3ServiceName').callsFake((owner, repo) => {
+      if (!owner || !repo) return undefined;
+      return `o-${owner}-r-${repo}`;
+    });
 
     return factory.organization.truncate();
   });
@@ -558,35 +563,27 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should respond with a 400 if the site already exists', (done) => {
-      const userPromise = factory.user();
+    it('should respond with a 400 if the site already exists in org', async () => {
+      const { site, user, org } = await createSiteUserOrg();
+      const cookie = await authenticatedSession(user);
 
-      Promise.props({
-        user: factory.user(),
-        site: factory.site(),
-        cookie: authenticatedSession(userPromise),
-      })
-        .then(({ site, cookie }) =>
-          request(app)
-            .post('/v0/site')
-            .set('x-csrf-token', csrfToken.getToken())
-            .send({
-              owner: site.owner,
-              repository: site.repository,
-              defaultBranch: 'main',
-              engine: 'jekyll',
-            })
-            .set('Cookie', cookie)
-            .expect(400),
-        )
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 400, response.body);
-          expect(response.body.message).to.equal(
-            `This site has already been added to ${config.app.appName}.`,
-          );
-          done();
+      const response = await request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: site.owner,
+          repository: site.repository,
+          defaultBranch: 'main',
+          engine: 'jekyll',
+          organizationId: org.id,
         })
-        .catch(done);
+        .set('Cookie', cookie)
+        .expect(400);
+
+      validateAgainstJSONSchema('POST', '/site', 400, response.body);
+      expect(response.body.message).to.equal(
+        `This site has already been added to ${config.app.appName}.`,
+      );
     });
 
     it(`should respond with a 400 if the user

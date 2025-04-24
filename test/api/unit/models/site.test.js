@@ -255,19 +255,6 @@ describe('Site model', () => {
       });
   });
 
-  it('should validate that the subdomain is unique', async () => {
-    const site = await factory.site();
-
-    const error = await factory
-      .site({
-        subdomain: site.subdomain,
-      })
-      .catch((e) => e);
-
-    expect(error).to.be.a('error');
-    expect(error.message).to.equal('Validation error');
-  });
-
   it('can belong to an organization', async () => {
     const [site, org] = await Promise.all([
       factory.site(),

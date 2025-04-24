@@ -3,6 +3,10 @@ const {
   ArchiveBuildLogsQueueName,
 } = require('./ArchiveBuildLogsQueue');
 const { BuildTasksQueue, BuildTasksQueueName } = require('./BuildTasksQueue');
+const {
+  CreateEditorSiteQueue,
+  CreateEditorSiteQueueName,
+} = require('./CreateEditorSiteQueue');
 const { DomainQueue, DomainQueueName } = require('./DomainQueue');
 const {
   FailStuckBuildsQueue,
@@ -23,6 +27,8 @@ module.exports = {
   ArchiveBuildLogsQueueName,
   BuildTasksQueue,
   BuildTasksQueueName,
+  CreateEditorSiteQueue,
+  CreateEditorSiteQueueName,
   DomainQueue,
   DomainQueueName,
   FailStuckBuildsQueue,

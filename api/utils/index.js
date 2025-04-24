@@ -46,10 +46,6 @@ function generateS3ServiceName(owner, repository) {
 
   const serviceName = `o-${format(owner)}-r-${format(repository)}`;
 
-  if (serviceName.length < 47) {
-    return serviceName;
-  }
-
   function makeId() {
     let result = '';
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';

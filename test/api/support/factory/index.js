@@ -18,6 +18,7 @@ const siteBuildTask = require('./site-build-task');
 const { createUAAIdentity } = require('./uaa-identity');
 const user = require('./user');
 const userEnvironmentVariable = require('./user-environment-variable');
+const userWithUAAIdentity = require('./user-with-uaa-identity');
 
 module.exports = {
   buildLog,
@@ -42,4 +43,5 @@ module.exports = {
   uaaIdentity: createUAAIdentity,
   user,
   userEnvironmentVariable,
+  userWithUAAIdentity,
 };

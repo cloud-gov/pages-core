@@ -11,10 +11,15 @@ const SiteCreator = require('../../../../api/services/SiteCreator');
 const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, SiteBranchConfig } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
+const utils = require('../../../../api/utils');
 
 describe('SiteCreator', () => {
   beforeEach(() => {
     sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
+    sinon.stub(utils, 'generateS3ServiceName').callsFake((owner, repo) => {
+      if (!owner || !repo) return undefined;
+      return `o-${owner}-r-${repo}`;
+    });
   });
 
   afterEach(() => {
@@ -276,29 +281,28 @@ describe('SiteCreator', () => {
           });
       });
 
-      it('should reject if the site already exists in Federalist', (done) => {
-        Promise.props({
-          site: factory.site(),
-          user: factory.user(),
-        })
-          .then((values) => {
-            const siteParams = {
-              owner: values.site.owner,
-              repository: values.site.repository,
-            };
-            return SiteCreator.createSite({
-              user: values.user,
-              siteParams,
-            });
-          })
-          .catch((err) => {
-            expect(err.status).to.equal(400);
-            expect(err.message).to.equal(
-              `This site has already been added to ${apiConfig.app.appName}.`,
-            );
-            done();
-          })
-          .catch(done);
+      it('should reject if the site already exists in an organization', async () => {
+        const org = await factory.organization.create();
+        const [site, user] = await Promise.all([
+          factory.site({ organizationId: org.id }),
+          factory.user(),
+        ]);
+
+        const siteParams = {
+          owner: site.owner,
+          repository: site.repository,
+          organizationId: org.id,
+        };
+
+        const error = await SiteCreator.createSite({
+          user: user,
+          siteParams,
+        }).catch((e) => e);
+
+        expect(error.status).to.equal(400);
+        expect(error.message).to.equal(
+          `This site has already been added to ${apiConfig.app.appName}.`,
+        );
       });
 
       it('should reject if the GitHub repository does not exist', (done) => {

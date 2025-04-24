@@ -1,6 +1,9 @@
 const { Organization, OrganizationRole, Role, User } = require('../../models');
 const { CustomError } = require('../../utils/validators');
+const { slugify } = require('../../utils');
 const UAAClient = require('../../utils/uaaClient');
+
+const { OPS_EMAIL } = process.env;
 
 /**
  * Not typing the Sequelize stuff...
@@ -105,6 +108,33 @@ module.exports = {
     });
 
     return [user, uaaUserAttributes];
+  },
+
+  /**
+   *
+   * @param {string} email
+   * @param {string} orgName
+   */
+
+  async setupSiteEditorOrganization(editorSiteName, editorOrgName) {
+    let org;
+    const orgName = `editor-${slugify(editorOrgName)}-${slugify(editorSiteName)}`;
+    const user = await User.byUAAEmail(OPS_EMAIL).findOne();
+
+    org = await Organization.findOne({ where: { name: orgName } });
+
+    if (!org) {
+      org = await Organization.create({
+        agency: editorSiteName,
+        name: orgName,
+        isSandbox: false,
+        isSelfAuthorized: false,
+      });
+    }
+
+    await org.addRoleUser(user, 'manager');
+
+    return { org, user, uaaUserAttributes: user.UAAIdentity };
   },
 
   /**

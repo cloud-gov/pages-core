@@ -57,7 +57,7 @@ describe('utils', () => {
       const repository = 'Hello World';
       const expected = 'o-hello-r-hello-world';
 
-      expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      expect(utils.generateS3ServiceName(owner, repository)).to.contain(expected);
       done();
     });
 
@@ -66,7 +66,7 @@ describe('utils', () => {
       const repository = 'Hello World';
       const expected = 'o-12345-r-hello-world';
 
-      expect(utils.generateS3ServiceName(owner, repository)).to.equal(expected);
+      expect(utils.generateS3ServiceName(owner, repository)).to.contain(expected);
       done();
     });
 
