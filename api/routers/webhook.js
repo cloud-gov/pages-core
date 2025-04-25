@@ -32,32 +32,47 @@ function verifySignature(req, res, next) {
   next();
 }
 
-function verifySiteRequest(req, res, next) {
-  const { body: payload } = req;
-  const expectedKeys = ['userEmail', 'apiKey', 'siteId', 'siteName', 'org'].sort();
+function verifySiteRequest(expectedKeys) {
+  return (req, res, next) => {
+    const { body: payload } = req;
+    const sortedExpectedKeys = expectedKeys.sort();
 
-  // ToDo Add additional headers to check if request is legit
+    // ToDo Add additional headers to check if request is legit
 
-  try {
-    const payloadKeys = Object.keys(payload).sort();
+    try {
+      const payloadKeys = Object.keys(payload).sort();
 
-    if (payloadKeys.length !== expectedKeys.length) {
-      throw new Error('Invalid request payload');
+      if (payloadKeys.length !== sortedExpectedKeys.length) {
+        throw new Error('Invalid request payload');
+      }
+
+      const hasKeys = payloadKeys.every(
+        (value, index) => value === sortedExpectedKeys[index],
+      );
+
+      if (!hasKeys) throw new Error('Invalid request payload');
+    } catch (err) {
+      res.badRequest();
+      next(err);
     }
 
-    const hasKeys = payloadKeys.every((value, index) => value === expectedKeys[index]);
-
-    if (!hasKeys) throw new Error('Invalid request payload');
-  } catch (err) {
-    res.badRequest();
-    next(err);
-  }
-
-  next();
+    next();
+  };
 }
+
+const verifyNewEditorSite = verifySiteRequest([
+  'userEmail',
+  'apiKey',
+  'siteId',
+  'siteName',
+  'org',
+]);
+
+const verifyEditorSiteBuild = verifySiteRequest(['siteId']);
 
 router.post('/webhook/github', verifySignature, WebhookController.github);
 router.post('/webhook/organization', verifySignature, WebhookController.organization);
-router.post('/webhook/site', verifySiteRequest, WebhookController.site);
+router.post('/webhook/site', verifyNewEditorSite, WebhookController.site);
+router.post('/webhook/site/build', verifyEditorSiteBuild, WebhookController.siteBuild);
 
 module.exports = router;

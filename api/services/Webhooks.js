@@ -3,6 +3,8 @@ const { Build, User, Site, Event, Organization } = require('../models');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const EventCreator = require('./EventCreator');
 
+const { OPS_EMAIL } = process.env;
+
 const findSiteForWebhookRequest = (payload) => {
   const [owner, repository] = payload.repository.full_name.split('/');
 
@@ -13,6 +15,32 @@ const findSiteForWebhookRequest = (payload) => {
     },
     include: [Organization],
   });
+};
+
+const createBuildForEditor = async (siteId) => {
+  const branch = 'main';
+  const { id: userId, username } = await User.byUAAEmail(OPS_EMAIL).findOne();
+
+  const queuedBuild = await Build.findOne({
+    where: {
+      branch,
+      state: ['created', 'queued'],
+      site: siteId,
+    },
+  });
+
+  if (queuedBuild) {
+    return;
+  }
+
+  const build = await Build.create({
+    branch,
+    site: siteId,
+    user: userId,
+    username,
+  });
+
+  return build.enqueue();
 };
 
 const shouldBuildForSite = (site) =>
@@ -116,6 +144,7 @@ const pushWebhookRequest = async (payload) => {
 };
 
 module.exports = {
+  createBuildForEditor,
   organizationWebhookRequest,
   pushWebhookRequest,
 };

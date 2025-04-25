@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const crypto = require('crypto');
 const sinon = require('sinon');
 const request = require('supertest');
@@ -7,6 +8,9 @@ const factory = require('../support/factory');
 const { createSiteUserOrg } = require('../support/site-user');
 const EventCreator = require('../../../api/services/EventCreator');
 const Webhooks = require('../../../api/services/Webhooks');
+const Encryptor = require('../../../api/services/Encryptor');
+const { encryption } = require('../../../config');
+const QueueJobs = require('../../../api/queue-jobs');
 
 describe('Webhook API', () => {
   const signWebhookPayload = (payload) => {
@@ -229,10 +233,56 @@ describe('Webhook API', () => {
   });
 
   describe('POST /webhook/site', () => {
+    it('should respon with a 200 with valid payload', async () => {
+      const userEmail = 'user@agency.gov';
+      const apiKey = 'an-api-key';
+      const siteId = '123';
+      const siteName = 'site';
+      const org = 'org';
+      const payload = Encryptor.encryptObjectValues(
+        { userEmail, apiKey, siteId, siteName, org },
+        encryption.key,
+      );
+
+      const stub = sinon
+        .stub(QueueJobs.prototype, 'startCreateEditorSiteTask')
+        .resolves();
+
+      await request(app).post('/webhook/site').send(payload).expect(200);
+
+      expect(
+        stub.calledOnceWith({
+          userEmail,
+          apiKey,
+          siteId,
+          siteName,
+          orgName: org,
+        }),
+      ).to.be.equal(true);
+    });
+
     it('should respond with a 400 if payload is invalid', async () => {
       const payload = { bad: 'payload' };
 
       await request(app).post('/webhook/site').send(payload).expect(400);
+    });
+  });
+
+  describe('POST /webhook/site/build', () => {
+    it('should respon with a 200 with valid payload', async () => {
+      const siteId = '123';
+      const payload = Encryptor.encryptObjectValues({ siteId }, encryption.key);
+
+      const stub = sinon.stub(Webhooks, 'createBuildForEditor').resolves();
+
+      await request(app).post('/webhook/site/build').send(payload).expect(200);
+      expect(stub.calledOnceWith(siteId)).to.be.equal(true);
+    });
+
+    it('should respond with a 400 if payload is invalid', async () => {
+      const payload = { bad: 'payload' };
+
+      await request(app).post('/webhook/site/build').send(payload).expect(400);
     });
   });
 });
