@@ -57,6 +57,65 @@ describe('Webhooks Service', () => {
     sinon.restore();
   });
 
+  describe('createBuildForEditor', () => {
+    // Generate Ops User
+    before(() => factory.userWithUAAIdentity.create({ email: process.env.OPS_EMAIL }));
+    after(() => User.truncate());
+
+    it('should start a site build', async () => {
+      const site = await factory.site();
+      const stub = sinon.stub(Build.prototype, 'enqueue').resolves();
+      const numBuildsBefore = await Build.count({
+        where: {
+          site: site.id,
+        },
+      });
+      expect(numBuildsBefore).to.eq(0);
+
+      await Webhooks.createBuildForEditor(site.id);
+
+      expect(stub.calledOnce).to.be.equal(true);
+
+      const numBuildsAfter = await Build.count({
+        where: {
+          site: site.id,
+        },
+      });
+      expect(numBuildsAfter).to.eq(1);
+
+      const build = await Build.findOne({ where: { site: site.id } });
+      expect(build.branch).to.equal('main');
+    });
+
+    it('should not start a new build if one is created or queued', async () => {
+      const site = await factory.site();
+      const stub = sinon.stub(Build.prototype, 'enqueue').resolves();
+      await Build.create({
+        branch: 'main',
+        site: site.id,
+        username: 'test',
+        state: 'queued',
+      });
+      const numBuildsBefore = await Build.count({
+        where: {
+          site: site.id,
+        },
+      });
+      expect(numBuildsBefore).to.eq(1);
+
+      await Webhooks.createBuildForEditor(site.id);
+
+      expect(stub.notCalled).to.be.equal(true);
+
+      const numBuildsAfter = await Build.count({
+        where: {
+          site: site.id,
+        },
+      });
+      expect(numBuildsAfter).to.eq(1);
+    });
+  });
+
   describe('pushWebhookRequest', () => {
     beforeEach(() => {
       nock.cleanAll();

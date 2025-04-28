@@ -44,4 +44,13 @@ module.exports = wrapHandlers({
 
     return res.ok();
   },
+
+  async siteBuild(req, res) {
+    const { body } = req;
+    const siteId = decrypt(body.siteId, encryption.key);
+
+    await Webhooks.createBuildForEditor(siteId);
+
+    return res.ok();
+  },
 });
