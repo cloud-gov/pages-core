@@ -76,11 +76,12 @@ describe('createEditorSite', () => {
       const siteName = 'agency-test-site';
       const apiKey = '1234abcd';
       const orgName = 'agency-org';
+      const s3 = { bucket: 'bucket', region: 'region' };
 
       sinon.stub(SiteCreator, 'createSite').callsFake(async ({ siteParams }) => {
         const site = await factory.site({ organizationId: siteParams.organizationId });
         pagesSiteId = site.id;
-        return site;
+        return { site, s3 };
       });
 
       const webhookPost = sinon.spy();
@@ -100,6 +101,7 @@ describe('createEditorSite', () => {
       expect(webhookArgs[0]).to.equal(`/${siteId}`);
       expect(webhookArgs[1]).to.have.property('siteId');
       expect(webhookArgs[1]).to.have.property('orgId');
+      expect(webhookArgs[1]).to.have.property('bucket');
       expect(webhookPost.calledOnce).to.equal(true);
 
       const siteEnvVars = await UserEnvironmentVariable.findAll({
@@ -117,13 +119,14 @@ describe('createEditorSite', () => {
       const siteName = 'agency-test-with-org';
       const orgName = 'agency-org';
       const apiKey = '1234abcd';
+      const s3 = { bucket: 'bucket', region: 'region' };
 
       await factory.organization.create({ name: `editor-${orgName}-${siteName}` });
 
       sinon.stub(SiteCreator, 'createSite').callsFake(async ({ siteParams }) => {
         const site = await factory.site({ organizationId: siteParams.organizationId });
         pagesSiteId = site.id;
-        return site;
+        return { site, s3 };
       });
 
       const webhookPost = sinon.spy();
@@ -143,6 +146,7 @@ describe('createEditorSite', () => {
       expect(webhookArgs[0]).to.equal(`/${siteId}`);
       expect(webhookArgs[1]).to.have.property('siteId');
       expect(webhookArgs[1]).to.have.property('orgId');
+      expect(webhookArgs[1]).to.have.property('bucket');
       expect(webhookPost.calledOnce).to.equal(true);
 
       const siteEnvVars = await UserEnvironmentVariable.findAll({
