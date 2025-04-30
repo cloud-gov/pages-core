@@ -1,3 +1,11 @@
+## 0.19.0 (2025-04-30)
+
+### Added
+
+- Add bucket name to Pages Editor webhook response
+- Add webhook to create editor site builds
+- Add webhook to create an editor site
+
 ## 0.18.1 (2025-04-21)
 
 ### Fixed
