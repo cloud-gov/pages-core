@@ -122,7 +122,9 @@ function buildSite(params, s3) {
 
   const site = Site.build(siteParams);
 
-  return site.validate().then(() => site);
+  return site
+    .validate()
+    .then(() => ({ site, s3: { bucket: s3.bucket, region: s3.region } }));
 }
 
 function buildInfrastructure(params, s3ServiceName) {
@@ -205,14 +207,17 @@ async function createSiteFromExistingRepo({ siteParams, user }) {
     user,
     owner,
   });
-  const site = await validateSite({
+  const { site, s3 } = await validateSite({
     ...siteParams,
     defaultBranch: repo.default_branch,
   });
-  return saveAndBuildSite({
+
+  const savedSite = await saveAndBuildSite({
     site,
     user,
   });
+
+  return { site: savedSite, s3 };
 }
 
 async function createSiteFromTemplate({ siteParams, user, template }) {
@@ -223,12 +228,14 @@ async function createSiteFromTemplate({ siteParams, user, template }) {
   };
   const { owner, repository } = params;
 
-  const site = await validateSite(params);
+  const { site, s3 } = await validateSite(params);
   await GitHub.createRepoFromTemplate(user, owner, repository, template);
-  return saveAndBuildSite({
+  const savedSite = await saveAndBuildSite({
     site,
     user,
   });
+
+  return { site: savedSite, s3 };
 }
 
 function createSite({ user, siteParams }) {

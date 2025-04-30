@@ -49,7 +49,7 @@ async function createEditorSite(job) {
     );
 
     logger.log('Creating site');
-    const site = await SiteCreator.createSite({
+    const { site, s3 } = await SiteCreator.createSite({
       user,
       siteParams: {
         owner: 'cloud-gov',
@@ -85,6 +85,7 @@ async function createEditorSite(job) {
       {
         siteId: site.id,
         orgId: org.id,
+        bucket: s3.bucket,
       },
       encryption.key,
     );

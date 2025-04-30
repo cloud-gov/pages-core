@@ -95,7 +95,7 @@ module.exports = wrapHandlers({
     };
 
     await authorizer.create(user, siteParams);
-    const site = await SiteCreator.createSite({
+    const { site } = await SiteCreator.createSite({
       user,
       siteParams,
     });

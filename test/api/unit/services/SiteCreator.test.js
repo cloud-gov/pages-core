@@ -472,7 +472,7 @@ describe('SiteCreator', () => {
               siteParams,
             });
           })
-          .then((site) => {
+          .then(({ site }) => {
             expect(site).to.not.be.undefined;
             expect(site.owner).to.equal(siteParams.owner);
             expect(site.repository).to.equal(siteParams.repository);
@@ -504,7 +504,7 @@ describe('SiteCreator', () => {
               user,
             });
           })
-          .then((site) => {
+          .then(({ site }) => {
             expect(site.engine).to.equal('node.js');
             done();
           })
@@ -533,7 +533,7 @@ describe('SiteCreator', () => {
               user,
             });
           })
-          .then((site) =>
+          .then(({ site }) =>
             Site.findByPk(site.id, {
               include: [Build],
             }),
