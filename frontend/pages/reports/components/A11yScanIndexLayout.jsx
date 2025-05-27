@@ -243,7 +243,7 @@ const ScanResultsChildPages = ({ pages = [], baseurl }) => (
                   {utils.relPath(page.absoluteURL, baseurl)}
                 </span>
                 <span className="font-body-2xs narrow-body text-bold text-error-dark">
-                  Couldn&apos;t process report results. Please contact support.
+                  Couldn't&apos;t process report results. Please contact support.
                   <br />
                 </span>
               </>

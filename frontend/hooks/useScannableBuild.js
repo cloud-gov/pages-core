@@ -25,7 +25,7 @@ export const useScannableBuild = (build) => {
         isScanActionDisabled: false,
       }));
       return alertActions.alertError(
-        `An error occured when attempting to start report: ${error.message}`,
+        `An error occurred when attempting to start report: ${error.message}`,
       );
     }
   }

@@ -86,7 +86,7 @@ export default {
           dispatchSiteBasicAuthSavedAction(site);
         }
       })
-      .then(() => alertActions.alertSuccess('Successfully added basic authentcation.'))
+      .then(() => alertActions.alertSuccess('Successfully added basic authentication.'))
       .catch(alertError);
   },
 };

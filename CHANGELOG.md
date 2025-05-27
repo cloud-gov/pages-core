@@ -89,7 +89,7 @@
 - test @shared/ButtonLink.jsx #4672
 -  test @shared/UsaIcon.jsx #4668
 - Test frontend/pages/sites/SiteListItem.jsx and refactor/remove frontend/pages/sites/PublishedState.jsx
-- Reenable sonarjs linting rules #4652
+- Re-enable sonarjs linting rules #4652
 - Test shared/GithubBuildBranchLink #4670
 - Test shared/GithubBuildShaLink #4669
 - remove SiteUser and associated concepts (#4339)
@@ -179,7 +179,7 @@
 ### Fixed
 
 - Site builds polling to use doc visibilityState #4591
-- use serialized site reponse to fix build preview link
+- use serialized site response to fix build preview link
 - restore the ability to rebuild failed latest branches
 
 ## 0.11.0 (2024-09-04)
@@ -404,10 +404,10 @@
 
 ### Maintenance
 
-- Update CommitSummary commponent data fetch to useState
+- Update CommitSummary component data fetch to useState
 - correct staging e2e pipeline
 - Upgrade local and CI to Postgres v15
-- update depedencies
+- update dependencies
 - Fix syntax error and remove outdated setup step from developer documentation
 
 ## 0.4.1 (2023-11-30)

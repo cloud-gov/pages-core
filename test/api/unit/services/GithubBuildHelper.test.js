@@ -836,7 +836,7 @@ describe('GithubBuildHelper', () => {
       );
     });
 
-    it('all site users withouth write access', async () => {
+    it('all site users without write access', async () => {
       const orgUser = await factory.user();
       await org.addRoleUser(orgUser);
       const repoNocks = [];

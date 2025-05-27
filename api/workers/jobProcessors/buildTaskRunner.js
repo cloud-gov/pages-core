@@ -83,7 +83,7 @@ async function buildTaskRunner(job, { sleepNumber = 15000, totalAttempts = 240 }
     logger.log(`Unknown task runner ${buildTaskId}: ${taskTypeRunner}`);
     throw new Error(`Unknown task runner ${buildTaskId}: ${taskTypeRunner}`);
   } catch (err) {
-    logger.log(`An error occured: ${err?.message}`);
+    logger.log(`An error occurred: ${err?.message}`);
     const errorTask = await BuildTask.findByPk(buildTaskId);
     await errorTask.update({ status: BuildTask.Statuses.Error, message: err?.message });
     throw err;

@@ -74,7 +74,7 @@ describe('<SiteBuilds/>', () => {
     fetchBuildMock.resetHistory();
   });
 
-  it('should not error if state is unkown/unexpected', () => {
+  it('should not error if state is unknown/unexpected', () => {
     state.builds.data[0].state = 'unexpected';
     const wrapper = mountRouter(
       <SiteBuilds />,

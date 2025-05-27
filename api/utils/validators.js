@@ -98,7 +98,7 @@ function parseSiteConfigs(siteConfigs) {
 
 function isEmptyOrBranch(value) {
   if (value?.length >= 300) {
-    throw new Error('Invalid branch name — branch names are limitted to 299 characters.');
+    throw new Error('Invalid branch name — branch names are limited to 299 characters.');
   }
 
   if (value && value.length && !branchRegex.test(value)) {

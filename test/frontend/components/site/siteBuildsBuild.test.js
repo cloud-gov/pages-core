@@ -129,7 +129,7 @@ describe('<SiteBuildsBuild/>', () => {
     expect(wrapper.find('.view-site-link')).to.have.length(0);
   });
 
-  it('should not error if state is unkown/unexpected', () => {
+  it('should not error if state is unknown/unexpected', () => {
     let modifiedProps = {
       ...defaultProps,
       build: {

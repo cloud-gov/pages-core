@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Exit if we are not targetting the correct space
+# Exit if we are not targeting the correct space
 if ! cf target | grep "org: \s*gsa-18f-federalist"; then
   echo "This command must be run while targeting the gsa-18f-federalist org"
   exit 1

@@ -92,7 +92,7 @@ commonPaths.forEach((path) => {
           .catch(done);
       });
 
-      it('should paremeterize the application name', (done) => {
+      it('should parameterize the application name', (done) => {
         config.app.appEnv = 'production';
         config.app.appName = 'Test App Name';
 

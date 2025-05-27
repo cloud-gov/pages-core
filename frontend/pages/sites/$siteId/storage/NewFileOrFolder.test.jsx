@@ -97,7 +97,7 @@ describe('NewFileOrFolder Component', () => {
     expect(screen.getByRole('button', { name: 'Create folder' })).toBeDisabled();
   });
 
-  test('shows an error when backend erros that folder already exists', async () => {
+  test('shows an error when backend errors that folder already exists', async () => {
     const backendError = new Error('A folder with this name already exists.');
     mockOnCreateFolder.mockRejectedValueOnce(backendError);
 

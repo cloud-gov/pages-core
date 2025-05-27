@@ -7,7 +7,7 @@ export default function RouterError() {
         <h1 className="font-sans-2xl">Error</h1>
         <p>
           Apologies! An error occurred in the application that we didn&apos;t know to
-          handle. Refreshing the page might fix the problem but you can also notifiy us.
+          handle. Refreshing the page might fix the problem but you can also notify us.
         </p>
       </div>
     </main>

@@ -344,7 +344,7 @@ describe('Build model', () => {
       'Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.';
     const branchNameLengthError =
       // eslint-disable-next-line max-len
-      'Validation error: Invalid branch name — branch names are limitted to 299 characters.';
+      'Validation error: Invalid branch name — branch names are limited to 299 characters.';
 
     it('should require a site object before saving', () => {
       const buildPromise = Build.create({

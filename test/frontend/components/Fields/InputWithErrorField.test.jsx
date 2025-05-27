@@ -21,7 +21,7 @@ describe('<InputWithErrorField />', () => {
 
     const wrapper = shallow(<InputWithErrorField {...props} />);
     expect(wrapper).not.to.be.undefined;
-    expect(wrapper.find('input[id="anId"][type="url"]')).to.have.length(1);
+    expect(wrapper.find('input[id="and"][type="url"]')).to.have.length(1);
     expect(wrapper.find('#helpspan')).to.have.length(1);
   });
 

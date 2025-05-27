@@ -861,7 +861,7 @@ describe('SiteBuildQueue', () => {
   });
 
   describe('.setupTaskEnv', () => {
-    it(`shoudld find the build and
+    it(`should find the build and
         associated tables to setup the cf task dev`, async () => {
       const factoryBuild = await factory.build();
       const stub = sinon.stub(SiteBuildQueue, 'setupBucket');
@@ -879,7 +879,7 @@ describe('SiteBuildQueue', () => {
       sinon.assert.calledOnceWithExactly(stub, build, 1);
     });
 
-    it(`shoudld find the build with
+    it(`should find the build with
         multiple site builds to setup the cf task dev`, async () => {
       const site = await factory.site();
       const fb1 = await factory.build({

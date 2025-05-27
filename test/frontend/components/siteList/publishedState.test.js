@@ -18,7 +18,7 @@ describe('<PublishedState />', () => {
     expect(wrapper.find('p').text()).to.equal(PUBLISHED_BASE);
   });
 
-  it('displays a fallback if build times cant be determined properly', () => {
+  it('displays a fallback if build times can't be determined properly', () => {
     wrapper = shallow(
       <PublishedState
         site={{

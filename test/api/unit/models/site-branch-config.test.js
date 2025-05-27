@@ -43,7 +43,7 @@ describe('Site Branch Config model', () => {
     expect(error).to.be.an('Error');
     expect(error.name).to.eq('SequelizeValidationError');
     expect(error.errors.map((e) => e.message)).to.include(
-      'Invalid branch name — branch names are limitted to 299 characters.',
+      'Invalid branch name — branch names are limited to 299 characters.',
     );
   });
 

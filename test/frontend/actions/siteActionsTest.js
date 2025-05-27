@@ -168,7 +168,7 @@ describe('siteActions', () => {
       });
     });
 
-    it('behaves as a no-op when a site isnt added, but there is no error', () => {
+    it('behaves as a no-op when a site isn't added, but there is no error', () => {
       // addSite returns nothing when the POST request fails,
       // so resolve to nothing
       addSite.withArgs(siteToAdd).resolves();

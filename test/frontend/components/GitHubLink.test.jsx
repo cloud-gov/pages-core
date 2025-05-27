@@ -85,7 +85,7 @@ describe('<GitHubLink/>', () => {
     expect(anchor.prop('href')).to.equal(commitUrl);
   });
 
-  it('uses overrided title attribute if provided', () => {
+  it('uses overrode title attribute if provided', () => {
     const props = {
       text: 'boop',
       owner: 'owner',

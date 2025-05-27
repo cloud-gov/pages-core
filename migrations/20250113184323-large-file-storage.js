@@ -205,7 +205,7 @@ const FILE_STORAGE_USER_ACTION_SCHEMA = {
     type: 'string',
     notNull: true,
   },
-  desciption: {
+  description: {
     type: 'string',
     allowNull: true,
   },

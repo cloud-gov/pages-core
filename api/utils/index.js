@@ -216,7 +216,7 @@ async function paginate(model, serialize, params, query = {}) {
 
   const totalPages = Math.trunc(count / limit) + (count % limit === 0 ? 0 : 1);
 
-  // The serialize funtion may or may not be a promise
+  // The serialize function may or may not be a promise
   const data = await Promise.resolve(serialize(rows));
 
   return {

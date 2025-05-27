@@ -6,8 +6,8 @@
 
   function handleSubmit() {
     const selected = options.reduce(
-      (accumlated, current) => ({
-        ...accumlated,
+      (accumulated, current) => ({
+        ...accumulated,
         [current.name]: current.selected,
       }),
       {},

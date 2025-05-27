@@ -248,7 +248,7 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('GET', endpoint, 404, body);
       });
 
-      it('returns a 404 when file exists in differnt file service', async () => {
+      it('returns a 404 when file exists in different file service', async () => {
         const { site, org, user } = await stubSiteS3();
         const fss = await factory.fileStorageService.create({
           siteId: site.id,
@@ -360,7 +360,7 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('DELETE', endpoint, 404, body);
       });
 
-      it('returns a 404 when file exists in differnt file service', async () => {
+      it('returns a 404 when file exists in different file service', async () => {
         const { site, org, user } = await stubSiteS3();
         const fss = await factory.fileStorageService.create({
           siteId: site.id,

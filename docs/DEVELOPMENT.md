@@ -211,7 +211,7 @@ Our continuous integration pipeline is run on Concourse CI. To use Concourse, on
 2. Update local credential files (see ci/vars/example.yml)
 
 #### CI deployments
-This repository contains one deployment pipeline file which is used to deploy the application across three separate environments. This is acheived using the `boot` task from [`pages-pipeline-task`](https://github.com/cloud-gov/pages-pipeline-tasks/?tab=readme-ov-file#boot).
+This repository contains one deployment pipeline file which is used to deploy the application across three separate environments. This is achieved using the `boot` task from [`pages-pipeline-task`](https://github.com/cloud-gov/pages-pipeline-tasks/?tab=readme-ov-file#boot).
 
 Each pipeline deploys the Pages app/api, the admin app, and the queues app for a given environment. Notable differences between the per-environment pipelines:
 - `dev`: This pipeline runs when a PR is created against the `main` branch. It will deploy the API without waiting for lint/tests to pass. It sends back information about various tasks as Github status checks. It runs integration testing post-deployment.
@@ -229,7 +229,7 @@ Three instances of the pipeline are set for the `pages dev`, `pages staging` and
 ##### Pipeline credentials
 Concourse CI integrates directly with [Credhub](https://docs.cloudfoundry.org/credhub/) to provide access to credentials/secrets at job runtime. When a job is started, Concourse will resolve the parameters within the pipeline with the latest credentials using the double parentheses notation (ie. `((<credential-name>))`). See more about the [credentials lookup rules](https://concourse-ci.org/credhub-credential-manager.html#credential-lookup-rules).
 
-Some credentials in this pipeline are "compound" credentials that use the pipeline's instance variable in conjuction with its parameterized variables to pull the correct Credhub credentials based on the pipeline instance. The following parameters are used in the proxy pipeline:
+Some credentials in this pipeline are "compound" credentials that use the pipeline's instance variable in conjunction with its parameterized variables to pull the correct Credhub credentials based on the pipeline instance. The following parameters are used in the proxy pipeline:
 
 |Parameter|Description|Is Compound|
 --- | --- | --- |
@@ -395,7 +395,7 @@ if (Features.enabled(Features.Flags.FEATURE_AWESOME_SAUCE)) {
 ```
 
 ### Frontend feature flags
-Frontend feature flags are evaluated at *compile* time NOT at runtime, resulting in unused codepaths being exluded from the built code. Environment variables with the `FEATURE_` prefix are available globally within the codebase at compile time. This magic is performed by `webpack.DefinePlugin` and minification.
+Frontend feature flags are evaluated at *compile* time NOT at runtime, resulting in unused codepaths being excluded from the built code. Environment variables with the `FEATURE_` prefix are available globally within the codebase at compile time. This magic is performed by `webpack.DefinePlugin` and minification.
 
 
 Example:
@@ -498,7 +498,7 @@ The frontend UI should be structured to improve consistency and developer experi
 #### Browser rendered pages (React)
 - Page template components are in the [`./frontend/pages`](../frontend/pages) directory.
 - Each page is named `index.jsx` and located in the file structure at a path matching the intended route. For example, to find the component which renders `pages.cloud.gov/sites/new`, look in `frontend/pages/sites/new`. Dynamic routes are matched using `$id`, e.g the component which renders `pages.cloud.gov/sites/2/build/3/logs` is in the folder `frontend/pages/sites/$siteId/builds/$buildId/logs`.
-- This pattern is inteded to support a future move to file-based routing, potentially [Tanstack Router](https://tanstack.com/router/latest)
+- This pattern is intended to support a future move to file-based routing, potentially [Tanstack Router](https://tanstack.com/router/latest)
 - Only page template components should be used to render the routes in the [`./frontend/routes.js`](../frontend/routes.js) file.
 
 #### Components (React)
@@ -511,7 +511,7 @@ The frontend UI should be structured to improve consistency and developer experi
   - A button component that will call a function on click.
 - Page-specific components aren't shared throughout the UI but have similar functions as enumerated below.
 
-- We've mostly abandoned the distinction between pure and dynamic components. In general, it's preferred for non-page template components to be pure (the render is fuly controlled via props) but some components will receive additional inputs via `useSelector` (reading from the global redux state), a localized `useState` hook, or a custom hook. For completeness, for pure components:
+- We've mostly abandoned the distinction between pure and dynamic components. In general, it's preferred for non-page template components to be pure (the render is fully controlled via props) but some components will receive additional inputs via `useSelector` (reading from the global redux state), a localized `useState` hook, or a custom hook. For completeness, for pure components:
   - All of the component properties are passed directly to the component.
   - Property types should be booleans, numbers, strings, arrays, objects, or functions.
   - No HTTP requests should be called from within a pure component.
@@ -550,7 +550,7 @@ When a queue is processing the maximum number of jobs, all new jobs will be plac
 
 ### Queue Jobs
 
-Queue jobs are actions that add a job to a queue and are kept in the [./api/queue-jobs](../api/queue-jobs) directory. The `QueueJobs` class provides methods to add jobs to a variety of queues. These methods should normally take two arguments. The first argument should be the message/data the worker will recieve to process the job. The second argument should be the job priority number.
+Queue jobs are actions that add a job to a queue and are kept in the [./api/queue-jobs](../api/queue-jobs) directory. The `QueueJobs` class provides methods to add jobs to a variety of queues. These methods should normally take two arguments. The first argument should be the message/data the worker will receive to process the job. The second argument should be the job priority number.
 
 Site build jobs use the CF Task functionality to remotely execute the command on the independently deployed pages-build-container app. To successfully build a site, the site build job passes the build params when executing a new site build. The command and params are sent via the CF API using the [startSiteBuildTask](../api/utils/cfApiClient.js) method where the method also encrypts the params sent to the CF Tasks via the [Encryptor](../api/services/Encryptor.js). When the site build is executed on the pages-build-container app, it decrypts the site params and starts the build process. The pages-core and pages-build-container apps share the user-provided service `pages-<env>-encryption` to encrypt and decrypt the params with a shared key.
 

@@ -231,7 +231,7 @@ describe('BuildLogs Service', () => {
       expect(byteLength).to.equal(contentLength);
     });
 
-    it('returns null if range cannott be satisified', async () => {
+    it('returns null if range cannot be satisified', async () => {
       const key = 'owner/repo/1';
 
       const build = {

@@ -446,7 +446,7 @@ describe('Site Branch Config API', () => {
         validateAgainstJSONSchema('POST', '/site/{site_id}/branch-config', 400, body);
         expect(body.message).to.eq(
           // eslint-disable-next-line max-len
-          'An error occurred creating the site branch config: Validation error: Invalid branch name — branch names are limitted to 299 characters.',
+          'An error occurred creating the site branch config: Validation error: Invalid branch name — branch names are limited to 299 characters.',
         );
       });
     });

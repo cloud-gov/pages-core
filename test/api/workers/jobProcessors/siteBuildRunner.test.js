@@ -194,7 +194,7 @@ describe('siteBuildRunner', () => {
       sinon.assert.calledOnceWithExactly(stubCancelTask, guid);
     });
 
-    it('should have a successfull build', async () => {
+    it('should have a successful build', async () => {
       const guid = 'task-guid';
       const taskState = 'SUCCEEDED';
 
@@ -285,7 +285,7 @@ describe('siteBuildRunner', () => {
       sinon.assert.calledWith(stubTaskStatus, guid);
     });
 
-    it('should have a successfull build with a retry on creating CF Task', async () => {
+    it('should have a successful build with a retry on creating CF Task', async () => {
       const guid = 'task-guid';
       const startTaskResponse = {
         guid,

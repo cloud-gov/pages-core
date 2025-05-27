@@ -512,7 +512,7 @@ describe('SiteCreator', () => {
       });
 
       it(`should trigger a build that pushes
-          the source repo to the destiantion repo`, (done) => {
+          the source repo to the destination repo`, (done) => {
         const templateResolverStub = sinon.stub(TemplateResolver, 'getTemplate');
         const fakeTemplate = {
           repo: 'federalist-template',

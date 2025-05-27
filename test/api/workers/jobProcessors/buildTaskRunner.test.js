@@ -196,7 +196,7 @@ describe('buildTaskRunner', () => {
       sinon.assert.calledOnceWithExactly(stubCancelTask, guid);
     });
 
-    it('should have a successfull CF task type', async () => {
+    it('should have a successful CF task type', async () => {
       const guid = 'task-guid';
       const taskState = 'SUCCEEDED';
 
@@ -226,7 +226,7 @@ describe('buildTaskRunner', () => {
       sinon.assert.calledWith(stubStatus, guid);
     });
 
-    it('should have a successfull CF task with a custom domains', async () => {
+    it('should have a successful CF task with a custom domains', async () => {
       const guid = 'task-guid';
       const taskState = 'SUCCEEDED';
       const jobData = {
@@ -278,7 +278,7 @@ describe('buildTaskRunner', () => {
       sinon.assert.calledWith(stubStatus, guid);
     });
 
-    it('should have a successfull CF task with a custom rules', async () => {
+    it('should have a successful CF task with a custom rules', async () => {
       const guid = 'task-guid';
       const taskState = 'SUCCEEDED';
       const jobData = {
@@ -334,7 +334,7 @@ describe('buildTaskRunner', () => {
       sinon.assert.calledWith(stubStatus, guid);
     });
 
-    it(`should have a successfull
+    it(`should have a successful
         CF task type with multiple startBuildTask calls`, async () => {
       const guid = 'task-guid';
       const taskState = 'SUCCEEDED';

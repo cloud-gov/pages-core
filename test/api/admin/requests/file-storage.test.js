@@ -49,7 +49,7 @@ describe('Admin File-Storage API', () => {
       expect(response.body.message).to.equal('Unauthorized');
     });
 
-    it('returns a 200 with successfull site file storage service creation', async () => {
+    it('returns a 200 with successful site file storage service creation', async () => {
       const user = await factory.user();
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
       const { site } = await stubSiteS3();

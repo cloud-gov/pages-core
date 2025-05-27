@@ -64,7 +64,7 @@ module.exports = wrapHandlers({
    *
    * It might also be worth nesting builds within a site,
    * since they are only ever used in that context.
-   * Then we don't have to explicity pass the site id as a param to this controller
+   * Then we don't have to explicitly pass the site id as a param to this controller
    *
    * e.g. `sites/1/builds/1`
    */
