@@ -1,3 +1,15 @@
+## 0.19.0 (2025-06-02)
+
+### Added
+
+- Add bucket name to Pages Editor webhook response
+- Add webhook to create editor site builds
+- Add webhook to create an editor site
+
+### Maintenance
+
+- Update CONTRIBUTING.md
+
 ## 0.18.1 (2025-04-21)
 
 ### Fixed
