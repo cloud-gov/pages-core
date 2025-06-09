@@ -61,6 +61,7 @@ function FileStoragePage() {
   const foundFileDetails = fetchedPublicFiles?.find(
     (file) => file.name === queryFileDetails,
   );
+
   const scrollTo = useRef(null);
   function scrollToTop() {
     return scrollTo.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -238,7 +239,7 @@ function FileStoragePage() {
           <FileDetails
             name={foundFileDetails?.name || ''}
             id={foundFileDetails?.id}
-            fullPath={`${storageRoot}${path}${foundFileDetails?.name}`}
+            fullPath={`${site.liveDomain}${path}${foundFileDetails?.key}`}
             lastModifiedBy={foundFileDetails?.lastModifiedBy || ''}
             lastModifiedAt={foundFileDetails?.lastModifiedAt || ''}
             size={foundFileDetails?.metadata.size || 0}
