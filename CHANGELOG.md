@@ -1,3 +1,21 @@
+## 0.19.0 (2025-06-09)
+
+### Added
+
+- Add bucket name to Pages Editor webhook response
+- Add webhook to create editor site builds
+- Add webhook to create an editor site
+
+### Fixed
+
+- Update FileDetails link to use site domain with file s3 key
+
+### Maintenance
+
+- Update multer to v2.0.1
+- Update dependencies 2025-05-30
+- Update CONTRIBUTING.md
+
 ## 0.18.1 (2025-04-21)
 
 ### Fixed
