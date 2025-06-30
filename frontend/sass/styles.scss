@@ -51,13 +51,11 @@
   $theme-table-header-background-color: 'primary-lightest',
 );
 
-
 @import "build-logs";
 @import "icons";
 @import "loader";
 @import "tables";
 @import "log-tools";
-
 
 body {
   display: flex;
