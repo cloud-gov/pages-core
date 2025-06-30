@@ -1,3 +1,9 @@
+## 0.19.1 (2025-06-30)
+
+### Maintenance
+
+- Update csurf and app build dependencies
+
 ## 0.19.0 (2025-06-09)
 
 ### Added
