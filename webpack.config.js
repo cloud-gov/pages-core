@@ -20,12 +20,13 @@ const stats = isDev ? 'minimal' : 'none';
 
 const uswdsDist = './node_modules/@uswds/uswds/dist';
 
-const uswdsIncludePaths = [
-  './node_modules/@uswds/uswds',
-  './node_modules/@uswds/uswds/src/stylesheets',
-  './node_modules/@uswds/uswds/packages',
-  './frontend/sass',
-  './public',
+const uswdsLoadPaths = [
+  path.resolve(__dirname, 'node_modules'),
+  path.resolve(__dirname, 'node_modules/@uswds/uswds'),
+  path.resolve(__dirname, 'node_modules/@uswds/uswds/src/stylesheets'),
+  path.resolve(__dirname, 'node_modules/@uswds/uswds/packages'),
+  path.resolve(__dirname, 'frontend/sass'),
+  path.resolve(__dirname, 'public'),
 ];
 
 const RESOURCE_GENERATOR = {
@@ -159,7 +160,7 @@ module.exports = {
             options: {
               sassOptions: {
                 quietDeps: true,
-                includePaths: uswdsIncludePaths,
+                loadPaths: uswdsLoadPaths,
               },
             },
           },
