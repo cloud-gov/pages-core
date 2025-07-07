@@ -1,3 +1,10 @@
+## 0.19.1 (2025-07-07)
+
+### Maintenance
+
+- Set security considerations action to read only
+- Update csurf and app build dependencies
+
 ## 0.19.0 (2025-06-09)
 
 ### Added
