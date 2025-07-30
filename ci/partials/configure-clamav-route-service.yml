@@ -1,0 +1,9 @@
+platform: linux
+inputs: [name: src]
+params:
+  APP_ENV:
+  CF_API:
+  CF_ORG:
+  CF_SPACE:
+run:
+  path: src/ci/tasks/configure-clamav-route-service.sh

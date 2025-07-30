@@ -277,6 +277,61 @@ jobs:
           CLAMAV_REST_HOSTNAME: pages-clamav-rest-((deploy-env))
         on_failure: #@ slack_hook("failure", "Deploy ClamAV REST Server")
 
+  #@ if/end env != 'production':
+  - name: deploy-route-service
+    plan:
+      - in_parallel:
+        - get: src
+          params:
+            #@ if/end env != 'dev':
+            depth: 1
+            #@ if/end env == 'dev':
+            integration_tool: checkout
+          passed: [set-pipeline]
+          trigger: true
+        - get: general-task
+        - get: pipeline-tasks
+      - task: deploy
+        file: src/ci/partials/deploy.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          CF_APP_NAME: route-service-((deploy-env))
+          CF_MANIFEST: src/.cloudgov/manifest.yml
+          CF_VARS_FILE: src/.cloudgov/vars/pages-((deploy-env)).yml
+          CF_PATH: src
+        on_failure:
+          try:
+            task: cancel-api-deployment
+            file: pipeline-tasks/tasks/cancel-deployment.yml
+            image: general-task
+            params:
+              _: #@ template.replace(data.values.env_cf)
+              CF_APP_NAME: route-service-((deploy-env))
+    on_failure: #@ slack_hook("failure", "Deploy Route Service")
+
+  #@ if/end env != 'production':
+  - name: configure-calmav-route-service
+    plan:
+      - in_parallel:
+        - get: src
+          params:
+            #@ if/end env != 'dev':
+            depth: 1
+            #@ if/end env == 'dev':
+            integration_tool: checkout
+          passed: [deploy-route-service]
+          trigger: true
+        - get: general-task
+        - get: pipeline-tasks
+      - task: configure
+        file: src/ci/partials/configure-clamav-route-service.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+    on_failure: #@ slack_hook("failure", "Configure ClamAV Route Service")
+
   - name: nightly-tasks-pages
     plan:
       - get: src
@@ -524,7 +579,7 @@ resources:
     icon: github
     source:
       uri: ((git-base-url))/cloud-gov/clamav-rest-image
-      branch: develop
+      branch: main
       commit_verification_keys: ((cloud-gov-pgp-keys))
 
   - name: clamav-rest-candidate-image

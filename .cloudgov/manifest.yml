@@ -84,3 +84,13 @@ applications:
       NODE_MODULES_CACHE: false
       UAA_LOGIN_HOST: ((uaa_login_host))
       PRODUCT: pages
+  - name: route-service((env_postfix))
+    buildpack: nodejs_buildpack
+    command: yarn start-route-service
+    disk_quota: 1G
+    instances: ((route-service-instances))
+    memory: 1G
+    routes:
+      - route: route-service.((domain))
+    env:
+      SCAN_BASEURL: pages-clamav-rest((env_postfix)).apps.internal

@@ -27,6 +27,10 @@ export default [
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      'svelte/require-each-key': [0],
+      'svelte/no-reactive-reassign': [0],
+      'svelte/no-immutable-reactive-statements': [0],
+      'svelte/no-dom-manipulating': [0],
     },
   },
 ];
