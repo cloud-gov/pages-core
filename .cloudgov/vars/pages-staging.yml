@@ -11,5 +11,6 @@ node_env: production
 proxy_domain: sites.pages-staging.cloud.gov
 queues_build_tasks_concurrency: 4
 queues_site_builds_concurrency: 4
+route-service-instances: 2
 uaa_host: https://uaa.fr-stage.cloud.gov
 uaa_login_host: https://login.fr-stage.cloud.gov

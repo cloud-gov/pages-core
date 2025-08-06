@@ -11,5 +11,6 @@ node_env: production
 proxy_domain: sites.pages.cloud.gov
 queues_build_tasks_concurrency: 10
 queues_site_builds_concurrency: 10
+route-service-instances: 6
 uaa_host: https://uaa.fr.cloud.gov
 uaa_login_host: https://login.fr.cloud.gov
