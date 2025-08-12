@@ -252,7 +252,7 @@ jobs:
         #@ if/end env == 'dev':
         -  #@ pr_hook("success", "deploy-queues-ui-pages")
 
-  #@ if/end env == 'dev':
+  #@ if/end env != 'production':
   - name: deploy-clamav-rest
     plan:
       - in_parallel:
@@ -275,7 +275,16 @@ jobs:
           CF_DOCKER_USERNAME: ((ecr_aws_key))
           CLAMAV_REST_DOMAIN: apps.internal
           CLAMAV_REST_HOSTNAME: pages-clamav-rest-((deploy-env))
-        on_failure: #@ slack_hook("failure", "Deploy ClamAV REST Server")
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "Deploy ClamAV REST")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "deploy-clamav-rest")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "Deploy ClamAV REST")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "deploy-clamav-rest")
 
   #@ if/end env != 'production':
   - name: deploy-route-service
@@ -308,7 +317,16 @@ jobs:
             params:
               _: #@ template.replace(data.values.env_cf)
               CF_APP_NAME: route-service-((deploy-env))
-    on_failure: #@ slack_hook("failure", "Deploy Route Service")
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "Deploy Route Service App")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "deploy-route-service-app")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "Deploy Route Service App")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "deploy-route-service-app")
 
   #@ if/end env != 'production':
   - name: configure-calmav-route-service
@@ -330,7 +348,16 @@ jobs:
         params:
           _: #@ template.replace(data.values.env_cf)
           APP_ENV: ((deploy-env))
-    on_failure: #@ slack_hook("failure", "Configure ClamAV Route Service")
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "Configure ClamAV Route Service")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "configure-clamav-route-service")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "Configure ClamAV Route Service")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "configure-clamav-route-service")
 
   - name: nightly-tasks-pages
     plan:
@@ -574,6 +601,7 @@ resources:
       tag_filter: 0.*.*
       fetch_tags: true
 
+  #@ if/end env != 'production':
   - name: clamav-rest-source
     type: git
     icon: github
@@ -582,6 +610,7 @@ resources:
       branch: main
       commit_verification_keys: ((cloud-gov-pgp-keys))
 
+  #@ if/end env != 'production':
   - name: clamav-rest-candidate-image
     type: registry-image
     source:
