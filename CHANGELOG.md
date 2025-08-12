@@ -1,3 +1,19 @@
+## 0.20.0 (2025-08-12)
+
+### Added
+
+- Add route-service app
+- Add ClamAV REST scan route service
+
+### Fixed
+
+- **ci**: Properly configure route service resources for non-prod envs
+
+### Maintenance
+
+- Set security considerations action to read only
+- Update csurf and app build dependencies
+
 ## 0.19.0 (2025-06-09)
 
 ### Added
