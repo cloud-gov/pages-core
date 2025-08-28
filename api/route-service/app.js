@@ -1,4 +1,5 @@
 /* eslint no-console: 0 */
+const crypto = require('node:crypto');
 const http = require('node:http');
 const https = require('node:https');
 const url = require('node:url');
@@ -11,6 +12,7 @@ const CF_FORWARDED_URL = 'X-Cf-Forwarded-Url';
 const SCAN_BASEURL = process.env.SCAN_BASEURL;
 const SCAN_PATH = '/v2/scan';
 const SCAN_ENDPOINT = `http://${SCAN_BASEURL}:${DEFAULT_PORT}${SCAN_PATH}`;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 function getForwardedURL(req) {
   try {
@@ -34,6 +36,63 @@ function shouldScan(req) {
     forwardedURL?.pathname?.length < 100 &&
     regex.test(forwardedURL?.pathname)
   );
+}
+
+function sign(val, secret) {
+  const signature =
+    val + '.' + crypto.createHmac('sha256', secret).update(val).digest('base64');
+
+  if (signature.length > 500) {
+    throw new Error('Signature is too long');
+  }
+
+  // Use signature length to avoid backtracking
+  // eslint-disable-next-line
+  return signature.replace(/\=+$/, '');
+}
+
+function isSigned(input, secret) {
+  if ('string' != typeof input || null == secret) return false;
+
+  const cleanedInput = decodeURIComponent(input.slice(4));
+  const tentativeValue = cleanedInput.slice(0, cleanedInput.lastIndexOf('.'));
+  const expectedInput = sign(tentativeValue, secret);
+  const expectedBuffer = Buffer.from(expectedInput);
+  const inputBuffer = Buffer.from(cleanedInput);
+
+  return expectedBuffer.length === inputBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, inputBuffer)
+    ? true
+    : false;
+}
+
+function cookieCheck(cookies) {
+  const cookieObj = {};
+
+  if (!cookies) return false;
+
+  cookies.split(';').forEach((cookie) => {
+    const [name, value] = cookie.trim().split('=');
+    cookieObj[name] = value;
+  });
+
+  const pagesCookie = cookieObj['pages.sid'];
+
+  if (!pagesCookie) {
+    return false;
+  }
+
+  return isSigned(pagesCookie, SESSION_SECRET);
+}
+
+function isAuthenticated(req) {
+  const cookies = req?.headers?.cookie;
+
+  try {
+    return cookieCheck(cookies);
+  } catch {
+    return false;
+  }
 }
 
 function skipSslValidation() {
@@ -156,6 +215,7 @@ function scanThenProxy(req, res) {
       let errorMessage;
 
       if (error?.status === 406) {
+        console.error(`Malicious File Detected: Posting to ${forwardedURL}`);
         errorMessage = `Error: File has been flagged as malicious`;
       } else {
         errorMessage = `Error: ${error.message}`;
@@ -208,6 +268,13 @@ function main() {
   }
 
   const server = http.createServer(async (req, res) => {
+    const authenticated = isAuthenticated(req);
+
+    if (!authenticated) {
+      res.writeHead(401);
+      return res.end('Unauthenticated');
+    }
+
     if (shouldScan(req)) {
       return scanThenProxy(req, res);
     } else {
