@@ -92,5 +92,8 @@ applications:
     memory: 1G
     routes:
       - route: route-service.((domain))
+    services:
+      - pages-((env))-env
     env:
+      APP_ENV: ((env))
       SCAN_BASEURL: pages-clamav-rest((env_postfix)).apps.internal
