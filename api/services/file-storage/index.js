@@ -209,6 +209,7 @@ class SiteFileStorageSerivce {
       {
         where,
         order,
+        paranoid: false,
       },
     );
 

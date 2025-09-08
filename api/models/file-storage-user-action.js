@@ -45,6 +45,7 @@ function associate({
       {
         model: FileStorageFile,
         required: true,
+        paranoid: false,
       },
     ],
   });
