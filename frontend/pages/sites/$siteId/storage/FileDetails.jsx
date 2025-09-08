@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { IconAttachment } from '@shared/icons';
 import { dateAndTimeSimple } from '@util/datetime';
 import prettyBytes from 'pretty-bytes';
+import CopyFileLink from './CopyFileLink';
 
 const FileDetails = ({
   name,
@@ -79,8 +80,13 @@ const FileDetails = ({
           <tr>
             <th scope="row">Actions</th>
             <td>
-              <a href={fullPath} download className="usa-button">
-                Download
+              <a
+                href={fullPath}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="usa-button"
+              >
+                View File
               </a>
               <button
                 type="button"
@@ -94,6 +100,7 @@ const FileDetails = ({
               >
                 Delete
               </button>
+              <CopyFileLink url={fullPath} />
             </td>
           </tr>
         </tbody>
