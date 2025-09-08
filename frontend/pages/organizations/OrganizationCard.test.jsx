@@ -11,14 +11,14 @@ import OrganizationCard from './OrganizationCard';
 jest.mock('react-router-dom', () => {
   const original = jest.requireActual('react-router-dom');
   return {
-    ...original, Link: ({ to, children }) => {
+    ...original,
+    Link: ({ to, children }) => {
       return `Link[to="${to}"] ${children}`;
-    }
+    },
   };
 });
 
 describe('OrganizationCard', () => {
-
   function testOrganizationCard(organizationName) {
     expect(screen.getByText(organizationName)).toBeInTheDocument();
     expect(screen.getByRole('listitem')).toHaveClass('usa-card');
@@ -59,19 +59,22 @@ describe('OrganizationCard', () => {
         name: 'Organization Name',
         isActive: isActive,
         isSandbox: isSandbox,
-        daysUntilSandboxCleaningdays: 3
-      }), role: {
-        id: randomUUID(), name: roleName
-      }
+        daysUntilSandboxCleaningdays: 3,
+      }),
+      role: {
+        id: randomUUID(),
+        name: roleName,
+      },
     };
-    render(<OrganizationCard {...(testProps)} />);
+    render(<OrganizationCard {...testProps} />);
     return testProps;
   }
 
   it('renders correctly active production organization for a non-manager role', () => {
-
     const testData = {
-      isActive: true, isSandbox: false, roleName: '!manager'
+      isActive: true,
+      isSandbox: false,
+      roleName: '!manager',
     };
     const testProps = initTest(testData);
 
@@ -82,9 +85,10 @@ describe('OrganizationCard', () => {
   });
 
   it('renders correctly active production organization for a manager role', () => {
-
     const testData = {
-      isActive: true, isSandbox: false, roleName: 'manager'
+      isActive: true,
+      isSandbox: false,
+      roleName: 'manager',
     };
     const testProps = initTest(testData);
 
@@ -94,11 +98,11 @@ describe('OrganizationCard', () => {
     testOrganizationLink(true, testProps.organization.id);
   });
 
-
   it('renders correctly active sandbox organization for a non-manager role', () => {
-
     const testData = {
-      isActive: true, isSandbox: true, roleName: '!manager'
+      isActive: true,
+      isSandbox: true,
+      roleName: '!manager',
     };
     const testProps = initTest(testData);
 
@@ -109,9 +113,10 @@ describe('OrganizationCard', () => {
   });
 
   it('renders correctly active sandbox organization for a manager role', () => {
-
     const testData = {
-      isActive: true, isSandbox: true, roleName: 'manager'
+      isActive: true,
+      isSandbox: true,
+      roleName: 'manager',
     };
     const testProps = initTest(testData);
 
@@ -122,9 +127,10 @@ describe('OrganizationCard', () => {
   });
 
   it('renders correctly inactive production organization for a non-manager role', () => {
-
     const testData = {
-      isActive: false, isSandbox: false, roleName: '!manager'
+      isActive: false,
+      isSandbox: false,
+      roleName: '!manager',
     };
     const testProps = initTest(testData);
 
@@ -135,9 +141,10 @@ describe('OrganizationCard', () => {
   });
 
   it('renders correctly inactive production organization for a manager role', () => {
-
     const testData = {
-      isActive: false, isSandbox: false, roleName: 'manager'
+      isActive: false,
+      isSandbox: false,
+      roleName: 'manager',
     };
     const testProps = initTest(testData);
 
@@ -148,9 +155,10 @@ describe('OrganizationCard', () => {
   });
 
   it('renders correctly inactive sandbox organization for a non-manager role', () => {
-
     const testData = {
-      isActive: false, isSandbox: true, roleName: '!manager'
+      isActive: false,
+      isSandbox: true,
+      roleName: '!manager',
     };
     const testProps = initTest(testData);
 
@@ -161,9 +169,10 @@ describe('OrganizationCard', () => {
   });
 
   it('renders correctly inactive sandbox organization for a manager role', () => {
-
     const testData = {
-      isActive: false, isSandbox: true, roleName: 'manager'
+      isActive: false,
+      isSandbox: true,
+      roleName: 'manager',
     };
     const testProps = initTest(testData);
 
@@ -172,6 +181,4 @@ describe('OrganizationCard', () => {
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });
-
 });
-
