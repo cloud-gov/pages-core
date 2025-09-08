@@ -315,11 +315,11 @@ docker compose run --rm app yarn test
 You can also just run back or front end tests via:
 
 ```sh
-docker compose --env-file ./services/local/docker.env build run --rm app yarn test:server  # for all back end tests
-docker compose --env-file ./services/local/docker.env build run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
-docker compose --env-file ./services/local/docker.env build run --rm app yarn test:rtl  # for all front end tests
-docker compose --env-file ./services/local/docker.env build run --rm app yarn test:rtl:watch  # to watch and re-run front end tests
-docker compose --env-file ./services/local/docker.env build run --rm app yarn test:rtl:file ./test/frontend/<path/to/test.js> # to run a single front end test file
+docker compose --env-file ./services/local/docker.env run --rm app yarn test:server  # for all back end tests
+docker compose --env-file ./services/local/docker.env run --rm app yarn test:server:file ./test/api/<path/to/test.js> # to run a single back end test file
+docker compose --env-file ./services/local/docker.env run --rm app yarn test:rtl  # for all front end tests
+docker compose --env-file ./services/local/docker.env run --rm app yarn test:rtl:watch  # to watch and re-run front end tests
+docker compose --env-file ./services/local/docker.env run --rm app yarn test:rtl:file ./test/frontend/<path/to/test.js> # to run a single front end test file
 ```
 
 To view coverage reports as HTML:

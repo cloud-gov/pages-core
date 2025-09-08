@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { dateAndTimeSimple, timeFrom } from '@util/datetime';
-import { IconAttachment, IconFolder, IconLink } from '@shared/icons';
+import { IconAttachment, IconFolder } from '@shared/icons';
+import CopyFileLink from './CopyFileLink';
 
 // constants and functions used by both components
 
@@ -22,18 +23,7 @@ const FileListRow = ({
   onViewDetails,
   highlight = false,
 }) => {
-  const copyUrl = `${baseUrl}/${item.key}`;
-  // handle copying the file's URL
-  const [copySuccess, setCopySuccess] = useState(false);
-  const handleCopy = async (url) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 4000);
-    } catch (err) {
-      throw new Error('Failed to Copy', err);
-    }
-  };
+  const url = `${baseUrl}/${item.key}`;
 
   return (
     <tr key={item.name} id={item.name} className={highlight ? 'highlight' : ''}>
@@ -90,17 +80,7 @@ const FileListRow = ({
         </span>
       </td>
       <td data-label="Actions" className="width-actions">
-        {item.type !== 'directory' && (
-          <button
-            type="button"
-            title="Copy full url to clipboard"
-            className="usa-button usa-button--unstyled margin-right-2 text-bold"
-            onClick={() => handleCopy(`${copyUrl}`)}
-          >
-            {copySuccess ? 'Copied!' : 'Copy link'}
-            <IconLink className="usa-icon" />
-          </button>
-        )}
+        {item.type !== 'directory' && <CopyFileLink url={url} />}
         <button
           type="button"
           title="Remove from public storage"
