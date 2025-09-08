@@ -239,7 +239,7 @@ function FileStoragePage() {
           <FileDetails
             name={foundFileDetails?.name || ''}
             id={foundFileDetails?.id}
-            fullPath={`${site.liveDomain}${path}${foundFileDetails?.key}`}
+            fullPath={`${site.liveDomain}/${foundFileDetails?.key}`}
             lastModifiedBy={foundFileDetails?.lastModifiedBy || ''}
             lastModifiedAt={foundFileDetails?.lastModifiedAt || ''}
             size={foundFileDetails?.metadata.size || 0}

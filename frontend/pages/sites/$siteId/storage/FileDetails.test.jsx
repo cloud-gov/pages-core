@@ -93,9 +93,20 @@ describe('FileDetails', () => {
       </MemoryRouter>,
     );
 
-    const downloadLink = screen.getByRole('link', { name: /download/i });
+    const downloadLink = screen.getByRole('link', { name: /View File/i });
     expect(downloadLink).toHaveAttribute('href', fileProps.fullPath);
-    expect(downloadLink).toHaveAttribute('download');
+    expect(downloadLink).toHaveAttribute('target');
+  });
+
+  it('renders a working Copy Url button', () => {
+    render(
+      <MemoryRouter>
+        <FileDetails {...fileProps} />
+      </MemoryRouter>,
+    );
+
+    const copy = screen.getByRole('button', { name: /copy/i });
+    expect(copy).toBeInTheDocument();
   });
 
   it('renders nothing if given an invalid id', () => {
