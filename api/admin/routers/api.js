@@ -80,6 +80,11 @@ apiRouter.post(
   '/sites/:id/file-storage',
   AdminControllers.FileStorage.createSiteFileStorage,
 );
+apiRouter.get('/sites/:id/file-storage', AdminControllers.FileStorage.getSiteFileStorage);
+apiRouter.get(
+  '/site-file-storage/:id/user-actions',
+  AdminControllers.FileStorage.getSiteFileStorageUserActions,
+);
 apiRouter.get('/sites/:id/webhooks', AdminControllers.Site.listWebhooks);
 apiRouter.post('/sites/:id/webhooks', AdminControllers.Site.createWebhook);
 apiRouter.delete('/sites/:id', authorize(['pages.admin']), AdminControllers.Site.destroy);

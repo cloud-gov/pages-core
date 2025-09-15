@@ -46,6 +46,46 @@ async function adminCreateSiteFileStorage(
   return fss;
 }
 
+async function adminGetSiteFileStorageBySiteId(siteId) {
+  const fss = await FileStorageService.findOne({ where: { siteId } });
+
+  return fss;
+}
+
+async function adminGetSiteFileStorageById(id) {
+  const fss = await FileStorageService.findOne({ where: { id } });
+
+  return fss;
+}
+
+async function adminGetSiteFileStorageUserActions({
+  siteFileStorageId,
+  limit = 50,
+  page = 1,
+} = {}) {
+  const order = [['createdAt', 'DESC']];
+
+  const where = {
+    fileStorageServiceId: siteFileStorageId,
+  };
+
+  const results = await paginate(
+    FileStorageUserAction.scope(['withUserIdentity']),
+    serializeFileStorageUserActions,
+    {
+      limit,
+      page,
+    },
+    {
+      where,
+      order,
+      paranoid: false,
+    },
+  );
+
+  return results;
+}
+
 class SiteFileStorageSerivce {
   constructor(fileStorageService, userId) {
     const { id, organizationId, serviceName, serviceId } = fileStorageService.dataValues;
@@ -320,5 +360,8 @@ class SiteFileStorageSerivce {
 
 module.exports = {
   adminCreateSiteFileStorage,
+  adminGetSiteFileStorageBySiteId,
+  adminGetSiteFileStorageById,
+  adminGetSiteFileStorageUserActions,
   SiteFileStorageSerivce,
 };
