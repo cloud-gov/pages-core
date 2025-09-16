@@ -1,3 +1,23 @@
+## 0.20.0 (2025-09-16)
+
+### Added
+
+- add site file storage service admin api end points
+- Add route service cookie check for clamav file endpoints
+- Add route-service app
+- Add ClamAV REST scan route service
+
+### Fixed
+
+- **ci**: Properly configure route service resources for non-prod envs
+
+### Maintenance
+
+- new test for OrganizationCard component
+- Clean up File Details UI with fixed links and button types
+- Set security considerations action to read only
+- Update csurf and app build dependencies
+
 ## 0.19.0 (2025-06-09)
 
 ### Added
