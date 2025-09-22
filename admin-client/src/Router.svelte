@@ -72,6 +72,7 @@
   page('/reports/active-users', queryString, render(Pages.User.ActiveUsersReport));
   page('/reports', queryString, render(Pages.Reports));
   page('/tasks', queryString, render(Pages.Tasks));
+  page('/site-file-storage/:id/user-actions', queryString, render(Pages.FileStorageActions));
   page('*', render(Pages.NotFound));
   page();
 </script>

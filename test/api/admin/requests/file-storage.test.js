@@ -127,22 +127,19 @@ describe('Admin File-Storage API', () => {
       validateFileStorageServiceAgainstJSONSchema(retrievedSfs);
     });
 
-    it('returns a 404 when site file storage service does not exist', async () => {
+    it('returns id:undefined when site file storage service does not exist', async () => {
       const user = await factory.user();
       const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
 
-      await request(app)
+      const { body: retrievedSfs } = await request(app)
         .get(`/sites/9999/file-storage`)
         .set('Cookie', cookie)
         .set('Origin', config.app.adminHostname)
         .set('x-csrf-token', csrfToken.getToken())
         .type('json')
-        .expect(404)
-        .expect((res) => {
-          expect(res.body.message).to.be.eq(
-            'The specified site file storage does not exist.',
-          );
-        });
+        .expect(200);
+
+      expect(retrievedSfs.siteId).to.be.eq(undefined);
     });
 
     async function validateFileStorageServiceAgainstJSONSchema(fileStorageServiceBody) {

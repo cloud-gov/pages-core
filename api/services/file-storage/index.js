@@ -70,7 +70,7 @@ async function adminGetSiteFileStorageUserActions({
   };
 
   const results = await paginate(
-    FileStorageUserAction.scope(['withUserIdentity']),
+    FileStorageUserAction.scope(['siteFileStorageUserActions']),
     serializeFileStorageUserActions,
     {
       limit,
