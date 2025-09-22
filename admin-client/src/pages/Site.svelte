@@ -13,6 +13,8 @@
     addSiteBuildTask,
     updateSiteBuildTask,
     removeBuildTask,
+    fetchSiteFileStorage,
+    createSiteFileStorage,
   } from '../lib/api';
   import {
     Accordion,
@@ -33,6 +35,7 @@
   import { selectSiteDomains, stateColor } from '../lib/utils';
   import SiteFormBuildTaskType from '../components/SiteFormBuildTaskType.svelte';
   import SiteFormUpdateBuildTaskType from '../components/SiteFormUpdateBuildTaskType.svelte';
+  import SiteFormSiteFileStorage from '../components/SiteFormSiteFileStorage.svelte';
 
   const { id } = $router.params;
   $: sitePromise = fetchSite(id);
@@ -42,6 +45,7 @@
   $: buildTaskTypesPromise = fetchBuildTaskTypes();
   $: orgsPromise = fetchOrganizations({ limit: 100 });
   $: uevsPromise = fetchUserEnvironmentVariables({ site: id });
+  $: siteFileStoragePromise = fetchSiteFileStorage(id);
 
   const initEditedBuildTask = {
     isEditing: false,
@@ -83,6 +87,19 @@
 
   async function handleWebhookFailure(error) {
     notification.setError(`Site webhook create error: ${error.message}`);
+  }
+
+  async function handleSiteFileStorageSubmit(siteId) {
+    return createSiteFileStorage(siteId);
+  }
+
+  async function handleSiteFileStorageSuccess() {
+    notification.setSuccess('Public File Storage created successfully');
+    siteFileStoragePromise = await fetchSiteFileStorage(id);
+  }
+
+  async function handleSiteFileStorageFailure(error) {
+    notification.setError(`Public File Storage create error: ${error.message}`);
   }
 
   async function handleSiteBuildTaskSubmit(
@@ -226,6 +243,17 @@
           </a>
         </div>
       </AccordionContent>
+      <Await on={siteFileStoragePromise} let:response={siteFileStorage}>
+        <AccordionContent title="Public File Storage">
+          <SiteFormSiteFileStorage
+            {site}
+            {siteFileStorage}
+            onSubmit={handleSiteFileStorageSubmit}
+            onSuccess={handleSiteFileStorageSuccess}
+            onFailure={handleSiteFileStorageFailure}
+          />
+        </AccordionContent>
+      </Await>
       <Await on={siteWebhookPromise} let:response={hooks}>
         <AccordionContent title="Webhooks">
           <SiteFormWebhook

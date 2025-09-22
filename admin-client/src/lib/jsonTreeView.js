@@ -491,8 +491,10 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
       event.element.removeEventListener(event.name, event.fn);
     }
 
-    while (child === children.pop()) {
-      removeChild(child);
+    if (child) {
+      while (child === children.pop()) {
+        removeChild(child);
+      }
     }
   }
 
@@ -619,20 +621,22 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
   }
 
   function removeChild(child) {
-    if (child.dom.parentNode) {
-      dom.children.removeChild(child.dom);
-    }
+    if (child) {
+      if (child.dom.parentNode) {
+        dom.children.removeChild(child.dom);
+      }
 
-    child.destroy();
-    child.emit(
-      'delete',
-      child,
-      [child.name],
-      child.value,
-      child.parent.isRoot ? child.parent.oldType : child.parent.type,
-      true,
-    );
-    child.removeAllListeners();
+      child.destroy();
+      child.emit(
+        'delete',
+        child,
+        [child.name],
+        child.value,
+        child.parent.isRoot ? child.parent.oldType : child.parent.type,
+        true,
+      );
+      child.removeAllListeners();
+    }
   }
 
   function editField(field) {

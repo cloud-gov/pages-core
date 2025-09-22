@@ -276,6 +276,18 @@ async function fetchSiteWebhooks(id) {
   return get(`/sites/${id}/webhooks`).catch(() => null);
 }
 
+async function createSiteFileStorage(id) {
+  return post(`/sites/${id}/file-storage`);
+}
+
+async function fetchSiteFileStorage(id) {
+  return get(`/sites/${id}/file-storage`);
+}
+
+async function fetchSiteFileStorageUserActions(query = {}, id) {
+  return get(`/site-file-storage/${id}/user-actions`, query).catch(() => []);
+}
+
 async function fetchRawSites() {
   return get('/sites/raw').catch(() => []);
 }
@@ -396,4 +408,7 @@ export {
   updateSite,
   fetchTasks,
   fetchBuildTaskTypes,
+  fetchSiteFileStorage,
+  createSiteFileStorage,
+  fetchSiteFileStorageUserActions,
 };

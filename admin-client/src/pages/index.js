@@ -1,5 +1,6 @@
 export { default as Build } from './Build.svelte';
 export { default as Builds } from './Builds.svelte';
+export { default as FileStorageActions } from './FileStorageActions.svelte';
 export { default as Events } from './Events.svelte';
 export { default as Home } from './Home.svelte';
 export { default as Login } from './Login.svelte';

@@ -9,6 +9,7 @@
 
   export let path;
   export let query;
+  export let resourceId;
   export let addAction = false;
   export let noSearch = false;
   export let fields = {};
@@ -29,7 +30,7 @@
   };
 
   $: params = { ...defaultParams, ...($router.query || {}) };
-  $: queryPromise = query(params);
+  $: queryPromise = query(params, resourceId);
   $: fieldKeys = Object.keys(fields);
   $: fieldArray = fieldKeys.map((key) => ({ ...fields[key], name: key }));
   $: hasFilters = fieldKeys.length > 0;
@@ -49,7 +50,7 @@
 </script>
 
 <Await on={queryPromise} let:response={payload}>
-  <header class="usa-header usa-header--basic usa-header--megamenu">
+  <header class="usa-header usa-header--megamenu">
     <div class="usa-nav-container">
       <div class="usa-navbar controls">
         <div class="usa-logo" id="basic-mega-logo">
@@ -189,9 +190,13 @@
     </div>
   </header>
   <GridContainer>
+    {#if payload.data && payload.data.length > 0}
     <PaginationBanner pagination={payload} extraParams={params} />
+    {/if}
     <slot data={payload.data}>Found {payload.data.length} items.</slot>
+    {#if payload.data && payload.data.length > 0}
     <PaginationBanner pagination={payload} extraParams={params} />
+    {/if}
   </GridContainer>
 </Await>
 

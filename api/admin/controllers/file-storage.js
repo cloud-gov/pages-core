@@ -37,14 +37,7 @@ module.exports = wrapHandlers({
 
     const fss = await adminGetSiteFileStorageBySiteId(siteId);
 
-    if (!fss) {
-      throw {
-        status: 404,
-        message: siteErrors.SITE_FILE_STORAGE_DOES_NOT_EXIST,
-      };
-    }
-
-    const data = serializeFileStorageService(fss);
+    const data = fss ? serializeFileStorageService(fss) : { id: null };
 
     return res.send(data);
   },

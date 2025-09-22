@@ -49,6 +49,21 @@ function associate({
       },
     ],
   });
+
+  FileStorageUserAction.addScope('siteFileStorageUserActions', {
+    include: [
+      {
+        model: User,
+        required: true,
+        include: { model: UAAIdentity, required: false },
+      },
+      {
+        model: FileStorageFile,
+        required: false,
+        paranoid: false,
+      },
+    ],
+  });
 }
 
 function define(sequelize, DataTypes) {
