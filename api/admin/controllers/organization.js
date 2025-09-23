@@ -109,14 +109,7 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: {
-        managerGithubUsername,
-        managerUAAEmail,
-        agency,
-        name,
-        isSandbox,
-        isSelfAuthorized,
-      },
+      body: { managerUAAEmail, agency, name, isSandbox, isSelfAuthorized },
       user,
     } = req;
 
@@ -132,7 +125,6 @@ module.exports = wrapHandlers({
         organizationParams,
         user,
         managerUAAEmail,
-        managerGithubUsername,
       );
 
     if (link) {
