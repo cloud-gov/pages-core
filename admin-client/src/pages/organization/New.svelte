@@ -9,14 +9,14 @@
   async function handleSubmit(event) {
     submitting = true;
     const {
-      agency, name, managerUAAEmail, managerGithubUsername, sandbox, selfAuthorized,
+      agency, name, managerUAAEmail,
+      sandbox, selfAuthorized,
     } = event.target.elements;
 
     const params = {
       agency: agency.value,
       name: name.value,
       managerUAAEmail: managerUAAEmail.value,
-      managerGithubUsername: managerGithubUsername.value,
       isSandbox: sandbox.value === 'sandbox',
       isSelfAuthorized: selfAuthorized.checked,
     };
@@ -56,12 +56,6 @@
       <label class="usa-label" for="managerUAAEmail">Organization Manager UAA Email<abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
       <span class="usa-hint">The user will be created and invited to UAA if necessary.</span>
       <input type="email" class="usa-input" name="managerUAAEmail" id="managerUAAEmail" required>
-    </fieldset>
-
-    <fieldset class="usa-fieldset">
-      <label class="usa-label" for="managerGithubUsername">Organization Manager Github Username</label>
-      <span class="usa-hint">Required to migrate an existing user.</span>
-      <input type="text" class="usa-input" name="managerGithubUsername" id="managerGithubUsername">
     </fieldset>
 
     <fieldset class="usa-fieldset">
