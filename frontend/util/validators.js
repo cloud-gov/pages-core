@@ -1,7 +1,10 @@
 import { load } from 'js-yaml';
 import { hasOrgs } from '../selectors/organization';
 
-const validAddRepoSiteForm = ({ repoOrganizationId, repoUrl }, { organizations }) => {
+const validAddRepoSiteForm = (
+  { repoOrganizationId, repoUrl, engine },
+  { organizations },
+) => {
   const errors = {};
 
   if (!repoUrl) {
@@ -10,6 +13,10 @@ const validAddRepoSiteForm = ({ repoOrganizationId, repoUrl }, { organizations }
 
   if (hasOrgs(organizations) && !repoOrganizationId) {
     errors.repoOrganizationId = 'Please select an organization';
+  }
+
+  if (!engine) {
+    errors.engine = 'Please select a site engine';
   }
 
   return errors;

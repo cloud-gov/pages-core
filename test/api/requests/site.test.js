@@ -387,7 +387,7 @@ describe('Site API', () => {
               owner: siteOwner,
               repository: siteRepository,
               defaultBranch: 'main',
-              engine: 'jekyll',
+              engine: 'hugo',
               organizationId: org.id,
             })
             .set('Cookie', cookie)
@@ -399,13 +399,15 @@ describe('Site API', () => {
             where: {
               owner: siteOwner,
               repository: siteRepository,
+              engine: 'hugo',
             },
             include: [Organization],
           });
         })
         .then((site) => {
           expect(site).to.not.be.undefined;
-          expect(site.Organization.id).to.equal(org.id);
+          expect(site.Organization?.id).to.equal(org.id);
+          expect(site.engine).to.equal('hugo');
         });
     });
 
