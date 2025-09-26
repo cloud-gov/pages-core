@@ -142,7 +142,7 @@ async function rebuildAssociatedSite(domain) {
     await Build.create({
       site: domain.siteId,
       branch,
-      username: 'Automated Platfrom Operation',
+      username: 'Automated Platform Operation',
     }).then((b) => b.enqueue());
   }
 }
