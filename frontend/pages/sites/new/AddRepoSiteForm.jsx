@@ -3,26 +3,11 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
 import GitHubRepoUrlField from '@shared/Fields/GitHubRepoUrlField';
-import AlertBanner from '@shared/alertBanner';
 import { validAddRepoSiteForm } from '@util/validators';
 import UserOrgSelect from '@shared/UserOrgSelect';
 import SelectSiteEngine from '@shared/SelectSiteEngine';
 
-import globals from '@globals';
 import { ORGANIZATIONS } from '@propTypes';
-
-const showNewSiteAlert = () => {
-  const message = (
-    <span>
-      Looks like this site is completely new to
-      {` ${globals.APP_NAME}!`}
-      <br />
-      Please fill out these additional fields to complete the process.
-    </span>
-  );
-
-  return <AlertBanner status="info" header="New Site" message={message} />;
-};
 
 export const AddRepoSiteForm = ({
   // even though initialValues is not directly used, it is used
@@ -61,27 +46,23 @@ export const AddRepoSiteForm = ({
         )}
       />
     </div>
-    {showAddNewSiteFields && (
-      <div className="add-repo-site-additional-fields">
-        {showNewSiteAlert()}
-        <div className="form-group margin-y-2">
-          <label className="usa-label text-bold" htmlFor="engine">
-            Site engine
-          </label>
-          <Field
+    <div className="form-group margin-y-3">
+      <label className="usa-label text-bold" htmlFor="engine">
+        Select the site&apos;s engine
+      </label>
+      <Field
+        name="engine"
+        component={(p) => (
+          <SelectSiteEngine
             name="engine"
-            component={(p) => (
-              <SelectSiteEngine
-                name="engine"
-                id="engine"
-                value={p.input.value}
-                onChange={p.input.onChange}
-              />
-            )}
+            id="engine"
+            value={p.input.value}
+            onChange={p.input.onChange}
+            {...p.meta}
           />
-        </div>
-      </div>
-    )}
+        )}
+      />
+    </div>
     <button
       type="submit"
       className="usa-button usa-button--primary inline-block"
