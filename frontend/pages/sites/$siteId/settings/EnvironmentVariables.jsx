@@ -24,7 +24,7 @@ const infoContent = (
     use and will be ignored. Warnings for any ignored environment variables will be
     present in the build logs. See the default variables in{' '}
     <a
-      href="https://cloud.gov/pages/documentation/env-vars-on-pages-builds"
+      href="https://docs.cloud.gov/pages/developers/env-vars-on-pages-builds"
       rel="noopener"
     >
       Environment Variables On

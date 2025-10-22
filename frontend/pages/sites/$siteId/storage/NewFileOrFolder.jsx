@@ -31,7 +31,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
 
     setCreatingFolder(false);
   };
-  const docsLink = 'https://cloud.gov/pages/documentation'; // TODO: update link
+  const docsLink = 'https://docs.cloud.gov/pages/using-pages/getting-started'; // TODO: update link
   const message = (
     <>
       Before uploading, carefully review your file to ensure it does not contain any

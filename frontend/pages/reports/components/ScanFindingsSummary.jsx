@@ -152,7 +152,7 @@ const ScanFindingsSummary = ({
               For more information about excluded results and suppression rules, review
               the{' '}
               <Link
-                to="https://cloud.gov/pages/documentation/automated-site-reports/#configuration"
+                to="https://docs.cloud.gov/pages/security-compliance/automated-site-reports/#configuration"
                 className="usa-link"
               >
                 Automated Site Reports documentation

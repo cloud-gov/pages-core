@@ -27,7 +27,7 @@ export default function About({ scanType, siteId, children }) {
         <p>
           For a full list of what Pages excludes from your results, review the{' '}
           <Link
-            to="https://cloud.gov/pages/documentation/automated-site-reports/#configuration"
+            to="https://docs.cloud.gov/pages/security-compliance/automated-site-reports/#configuration"
             className="usa-link"
           >
             Automated Site Reports documentation

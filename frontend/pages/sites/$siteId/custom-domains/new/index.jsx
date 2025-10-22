@@ -22,7 +22,7 @@ const infoContent = (
       target="_blank"
       rel="noopener noreferrer"
       title="Our documentation on setting up your DNS for your custom domain."
-      href="https://cloud.gov/pages/documentation/custom-domains/"
+      href="https://docs.cloud.gov/pages/using-pages/custom-domains/"
     >
       our documentation
     </a>{' '}

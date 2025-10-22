@@ -652,7 +652,7 @@ async function createData() {
     },
     runner: 'cf_task',
     startsWhen: 'build',
-    url: 'https://cloud.gov/pages/documentation/build-scans/',
+    url: 'https://docs.cloud.gov/pages/security-compliance/automated-site-reports',
   });
 
   // task "hook" for each site
@@ -737,7 +737,7 @@ async function createData() {
     },
     runner: 'cf_task',
     startsWhen: 'build',
-    url: 'https://cloud.gov/pages/documentation/build-scans/',
+    url: 'https://docs.cloud.gov/pages/security-compliance/automated-site-reports',
   });
 
   // task "hook" for each site
