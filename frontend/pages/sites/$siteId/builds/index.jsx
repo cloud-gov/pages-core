@@ -73,7 +73,10 @@ function SiteBuildList() {
                 {siteHasBuildTasks(site.SiteBuildTasks) && (
                   <th scope="col">
                     Reports (
-                    {scansDocsLink('https://cloud.gov/pages/documentation/build-scans/')})
+                    {scansDocsLink(
+                      'https://docs.cloud.gov/pages/security-compliance/automated-site-reports',
+                    )}
+                    )
                   </th>
                 )}
                 <th scope="col">Results</th>

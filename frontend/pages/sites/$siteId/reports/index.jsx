@@ -74,7 +74,7 @@ function Reports() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Pages documentation on reports"
-                href="https://cloud.gov/pages/documentation/build-scans/"
+                href="https://docs.cloud.gov/pages/security-compliance/automated-site-reports/"
               >
                 docs
               </a>

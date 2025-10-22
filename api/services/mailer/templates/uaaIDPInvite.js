@@ -12,7 +12,7 @@ function uaaIDPInvite({ link, orgName }) {
     </p>
     ${centeredButton(`${link}/login`, 'Log in with cloud.gov')}
     <p style="${css.p}">
-      We&rsquo;re here to help. If you need support, check out <a href="https://cloud.gov/pages/documentation/#getting-started" style="${css.a}" target="_blank">our Getting Started guide</a> or email us at
+      We&rsquo;re here to help. If you need support, check out <a href="https://docs.cloud.gov/pages/using-pages/getting-started" style="${css.a}" target="_blank">our Getting Started guide</a> or email us at
       <a href="mailto:pages-support@cloud.gov"
         style="${css.a}" target="_blank">pages-support@cloud.gov.</a>
     </p>

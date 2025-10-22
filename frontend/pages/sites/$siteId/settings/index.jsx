@@ -56,7 +56,7 @@ function SiteSettings() {
             target="_blank"
             rel="noopener noreferrer"
             title={`${globals.APP_NAME} documentation on settings`}
-            href="https://cloud.gov/pages/documentation/#managing-site-settings"
+            href="https://docs.cloud.gov/pages/using-pages/getting-started/#managing-site-settings"
           >
             these settings
           </a>{' '}
@@ -65,7 +65,7 @@ function SiteSettings() {
             target="_blank"
             rel="noopener noreferrer"
             title={`${globals.APP_NAME} documentation on previews`}
-            href="https://cloud.gov/pages/documentation/previews/"
+            href="https://docs.cloud.gov/pages/using-pages/previews/"
           >
             viewing site previews
           </a>

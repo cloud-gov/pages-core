@@ -35,7 +35,7 @@ function sandboxReminder({ organizationId, dateStr, sites, hostname, organizatio
       Don&rsquo;t want to lose your sites and builds? Let us know ASAP!
     </p>
     <p style="${css.p}">
-      If you&rsquo;d like to <a href="https://cloud.gov/pages/documentation/sandbox/#ready-to-launch" style="${css.a}" target="_blank">convert your free sandbox</a> to a paid production space, please email us at
+      If you&rsquo;d like to <a href="https://docs.cloud.gov/pages/using-pages/sandbox" style="${css.a}" target="_blank">convert your free sandbox</a> to a paid production space, please email us at
       <a href="mailto:pages-inquiries@cloud.gov" style="${css.a}" target="_blank">
       pages-inquiries@cloud.gov.</a>
     </p>
