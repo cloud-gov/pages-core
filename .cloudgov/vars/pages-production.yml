@@ -2,7 +2,7 @@ cf_cdn_space_name: sites
 domain: pages.cloud.gov
 env: production
 env_postfix: -production
-feature_file_storage_service: "false"
+feature_file_storage_service: "true"
 instances: 4
 log_level: info
 name: pages-production

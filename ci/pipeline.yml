@@ -252,7 +252,6 @@ jobs:
         #@ if/end env == 'dev':
         -  #@ pr_hook("success", "deploy-queues-ui-pages")
 
-  #@ if/end env != 'production':
   - name: deploy-clamav-rest
     plan:
       - in_parallel:
@@ -286,7 +285,6 @@ jobs:
         #@ if/end env == 'dev':
         -  #@ pr_hook("success", "deploy-clamav-rest")
 
-  #@ if/end env != 'production':
   - name: deploy-route-service
     plan:
       - in_parallel:
@@ -328,7 +326,6 @@ jobs:
         #@ if/end env == 'dev':
         -  #@ pr_hook("success", "deploy-route-service-app")
 
-  #@ if/end env != 'production':
   - name: configure-calmav-route-service
     plan:
       - in_parallel:
