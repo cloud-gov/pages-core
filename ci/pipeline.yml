@@ -598,7 +598,6 @@ resources:
       tag_filter: 0.*.*
       fetch_tags: true
 
-  #@ if/end env != 'production':
   - name: clamav-rest-source
     type: git
     icon: github
@@ -607,7 +606,6 @@ resources:
       branch: main
       commit_verification_keys: ((cloud-gov-pgp-keys))
 
-  #@ if/end env != 'production':
   - name: clamav-rest-candidate-image
     type: registry-image
     source:
