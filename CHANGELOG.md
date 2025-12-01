@@ -1,3 +1,9 @@
+## 0.20.1 (2025-12-01)
+
+### Fixed
+
+- CI clamav resources for prod deploy
+
 ## 0.20.0 (2025-12-01)
 
 ### Added
