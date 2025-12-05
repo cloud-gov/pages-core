@@ -53,4 +53,21 @@ module.exports = wrapHandlers({
 
     return res.ok();
   },
+
+  async siteDelete(req, res) {
+    const { body } = req;
+    const siteId = decrypt(body.siteId, encryption.key);
+
+    const { status, message } = await Webhooks.deleteEditorSite(siteId);
+
+    if (status === 'not found') {
+      return res.notFound();
+    }
+
+    if (status !== 'ok') {
+      return res.unprocessableEntity({ message });
+    }
+
+    return res.ok();
+  },
 });

@@ -285,4 +285,47 @@ describe('Webhook API', () => {
       await request(app).post('/webhook/site/build').send(payload).expect(400);
     });
   });
+
+  describe('DELETE /webhook/site', () => {
+    it('should respond with a 200 with valid payload', async () => {
+      const siteId = '123';
+      const payload = Encryptor.encryptObjectValues({ siteId }, encryption.key);
+
+      const stub = sinon.stub(Webhooks, 'deleteEditorSite').resolves({ status: 'ok' });
+
+      await request(app).delete('/webhook/site').send(payload).expect(200);
+
+      expect(stub.calledOnceWith(siteId)).to.be.equal(true);
+    });
+
+    it('should respond with a 400 if payload is invalid', async () => {
+      const payload = { bad: 'payload' };
+
+      await request(app).delete('/webhook/site').send(payload).expect(400);
+    });
+
+    it('should respond with a 422 if the site destroy fails', async () => {
+      const siteId = '123';
+      const payload = Encryptor.encryptObjectValues({ siteId }, encryption.key);
+
+      const stub = sinon.stub(Webhooks, 'deleteEditorSite').resolves({ status: 'bad' });
+
+      await request(app).delete('/webhook/site').send(payload).expect(422);
+
+      expect(stub.calledOnceWith(siteId)).to.be.equal(true);
+    });
+
+    it('should respond with a 404 if the site is not found', async () => {
+      const siteId = '123';
+      const payload = Encryptor.encryptObjectValues({ siteId }, encryption.key);
+
+      const stub = sinon
+        .stub(Webhooks, 'deleteEditorSite')
+        .resolves({ status: 'not found' });
+
+      await request(app).delete('/webhook/site').send(payload).expect(404);
+
+      expect(stub.calledOnceWith(siteId)).to.be.equal(true);
+    });
+  });
 });

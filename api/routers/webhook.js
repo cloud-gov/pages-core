@@ -68,11 +68,12 @@ const verifyNewEditorSite = verifySiteRequest([
   'org',
 ]);
 
-const verifyEditorSiteBuild = verifySiteRequest(['siteId']);
+const verifyEditorSiteId = verifySiteRequest(['siteId']);
 
 router.post('/webhook/github', verifySignature, WebhookController.github);
 router.post('/webhook/organization', verifySignature, WebhookController.organization);
 router.post('/webhook/site', verifyNewEditorSite, WebhookController.site);
-router.post('/webhook/site/build', verifyEditorSiteBuild, WebhookController.siteBuild);
+router.delete('/webhook/site', verifyEditorSiteId, WebhookController.siteDelete);
+router.post('/webhook/site/build', verifyEditorSiteId, WebhookController.siteBuild);
 
 module.exports = router;
