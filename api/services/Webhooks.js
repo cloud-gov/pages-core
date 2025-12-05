@@ -1,7 +1,10 @@
 const config = require('../../config');
 const { Build, User, Site, Event, Organization } = require('../models');
+const authorizer = require('../authorizers/site');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const EventCreator = require('./EventCreator');
+const SiteDestroyer = require('../services/SiteDestroyer');
+const { fetchModelById } = require('../utils/queryDatabase');
 
 const { OPS_EMAIL } = process.env;
 
@@ -41,6 +44,28 @@ const createBuildForEditor = async (siteId) => {
   });
 
   return build.enqueue();
+};
+
+const deleteEditorSite = async (siteId) => {
+  const user = await User.byUAAEmail(OPS_EMAIL).findOne();
+  const site = await fetchModelById(siteId, Site.forUser(user));
+
+  if (!site) {
+    return { status: 'not found' };
+  }
+
+  await authorizer.destroy(user, site);
+  const [status, message] = await SiteDestroyer.destroySite(site, user);
+
+  if (status !== 'ok') {
+    return { status, message };
+  }
+
+  EventCreator.audit(Event.labels.USER_ACTION, user, 'Site Destroyed', {
+    site,
+  });
+
+  return { status: 'ok' };
 };
 
 const shouldBuildForSite = (site) =>
@@ -145,6 +170,7 @@ const pushWebhookRequest = async (payload) => {
 
 module.exports = {
   createBuildForEditor,
+  deleteEditorSite,
   organizationWebhookRequest,
   pushWebhookRequest,
 };
