@@ -1,3 +1,9 @@
+## 0.21.0 (2025-12-05)
+
+### Added
+
+- Add site delete webhook for publisher site
+
 ## 0.20.1 (2025-12-01)
 
 ### Fixed
