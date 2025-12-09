@@ -1,3 +1,14 @@
+## 0.21.0 (2025-12-09)
+
+### Added
+
+- Add site delete webhook for publisher site
+
+### Fixed
+
+- Publisher endpoint host environment variable
+- Use the correct bound route service domain by env
+
 ## 0.20.1 (2025-12-01)
 
 ### Fixed
