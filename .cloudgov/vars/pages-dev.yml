@@ -9,6 +9,7 @@ name: pages-dev
 new_relic_app_name: web-pages-dev
 node_env: development
 proxy_domain: sites.pages-dev.cloud.gov
+publisher_host: https://pages-editor-dev.app.cloud.gov
 queues_build_tasks_concurrency: 2
 queues_site_builds_concurrency: 3
 route-service-instances: 2
