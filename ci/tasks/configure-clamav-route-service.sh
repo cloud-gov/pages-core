@@ -18,7 +18,7 @@ else
     PAGES_DOMAIN=pages-$APP_ENV.cloud.gov
 fi
 
-ROUTE_SERVICE_APP_DOMAIN=$ROUTE_SERVICE_APP.$PAGES_DOMAIN
+ROUTE_SERVICE_APP_DOMAIN=route-service.$PAGES_DOMAIN
 
 cf create-user-provided-service $USER_PROVIDED_SERVICE_NAME -r https://$ROUTE_SERVICE_APP_DOMAIN
 cf create-route $PAGES_DOMAIN --path /v0/file-storage
