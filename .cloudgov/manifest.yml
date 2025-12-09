@@ -47,7 +47,7 @@ applications:
       NODE_MODULES_CACHE: false
       NPM_CONFIG_PRODUCTION: true
       OPS_EMAIL: cloud-gov-pages-operations@cio.gov
-      PAGES_EDITOR_HOST: https://pages-editor((env_postfix)).app.cloud.gov
+      PAGES_PUBLISHER_HOST: ((publisher_host))
       PRODUCT: pages
       PROXY_DOMAIN: ((proxy_domain))
       QUEUES_BUILD_TASKS_CONCURRENCY: ((queues_build_tasks_concurrency))

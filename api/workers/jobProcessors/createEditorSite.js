@@ -8,7 +8,7 @@ const { UserEnvironmentVariable } = require('../../models');
 const { createJobLogger } = require('./utils');
 const { userEnvVar, encryption } = require('../../../config');
 
-const { PAGES_EDITOR_HOST } = process.env;
+const { PAGES_PUBLISHER_HOST } = process.env;
 
 /**
  * The Site Queue job processor
@@ -27,7 +27,7 @@ async function createEditorSite(job) {
   // Webhook client to send success or error request to
   // Pages Editor site endpoint
   const webhookClient = axios.create({
-    baseURL: `${PAGES_EDITOR_HOST}/api/webhook/site`,
+    baseURL: `${PAGES_PUBLISHER_HOST}/api/webhook/site`,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -69,7 +69,7 @@ async function createEditorSite(job) {
       hint: apiKeyEnc.hint,
     });
 
-    const editorHostEnc = encrypt(PAGES_EDITOR_HOST, userEnvVar.key);
+    const editorHostEnc = encrypt(PAGES_PUBLISHER_HOST, userEnvVar.key);
     await UserEnvironmentVariable.create({
       siteId: site.id,
       name: 'EDITOR_APP_URL',

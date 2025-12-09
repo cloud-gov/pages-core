@@ -9,6 +9,7 @@ name: pages-production
 new_relic_app_name: web-pages-production
 node_env: production
 proxy_domain: sites.pages.cloud.gov
+publisher_host: https://publisher.cloud.gov
 queues_build_tasks_concurrency: 10
 queues_site_builds_concurrency: 10
 route-service-instances: 6
