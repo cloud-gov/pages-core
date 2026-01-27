@@ -83,7 +83,7 @@ export default function Zap({
             title="link to Pages homepage"
           >
             <img
-              src="/images/logos/pages-logo-blue.svg"
+              src="/images/logos/pages-horizontal.svg"
               className="width-15"
               alt="Pages logo"
             />

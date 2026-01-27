@@ -75,17 +75,107 @@ body {
   height: inherit
 }
 
+// branding color updates
+body,
+.usa-table--borderless th,
+.usa-table,
+.usa-radio__label,
+.usa-card__container,
+.usa-footer__primary-link {
+  color: #2d2e2f;
+}
+
+a,
+.usa-footer__return-to-top a {
+  color: #047c9afa;
+  &:visited {
+    color: #136679;
+  }
+}
+
+.usa-banner__header, .usa-banner__content,
+.usa-banner__header-action {
+  color: white;
+}
+
+.usa-banner__header-action::after {
+  background-color: white;
+}
+
+// banner navigation
+@media (min-width: 64em) {
+  .usa-nav__secondary {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0;
+    align-items: stretch;
+    padding: 1rem 0;
+    & > .usa-nav__secondary-item {
+      line-height: 0.9;
+      padding: 0 1rem;
+      & > a {
+        color: white;
+        text-decoration: none;
+        &:hover,
+        &:focus,
+        &:target {
+          color: #f6f6f2; // blue-cool-10
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.usa-nav__primary > .usa-nav__secondary-item {
+  border-top: 1px solid #edeff0;
+  line-height: 1.1;
+}
+
+.usa-button {
+  background-color: #047d9a;
+  &:hover {
+    background-color: #0d5a6b;
+  }
+}
+
+.usa-menu-btn {
+  background-color: #047d9a;
+}
+
+.usa-button--outline {
+  color: #047d9a;
+  box-shadow: inset 0 0 0 2px #047d9a;
+  &:hover {
+    color: white;
+  }
+}
+
+.usa-radio__input:checked + [class*=__label]::before {
+  box-shadow: 0 0 0 2px #2d2e2f, inset 0 0 0 2px white
+}
+
+.usa-radio__input:checked + [class*=__label]::before {
+  background-color: #2d2e2f;
+}
+
 // menu restyle for desktop
 @media (min-width: 64em) {
+  .usa-header--basic .usa-nav-container {
+    align-items: center;
+  }
   .usa-nav__primary > .usa-nav__primary-item {
     & > a.usa-nav-link {
-      -webkit-font-smoothing: antialiased;
-      color: #fff;
       font-weight: 400;
+      letter-spacing: -.25px;
+      font-size: 22px;
+      color: #0d5a6b;
       &:hover,
       &:focus,
       &:target {
-        color: #dae9ee; // blue-cool-10
+        color: #047d9a; // blue-cool-10
         text-decoration: underline;
       }
     }
@@ -94,10 +184,14 @@ body {
       span { margin-right: 0 }
     }
   }
+  .usa-banner__inner .usa-nav__primary > .usa-nav__primary-item > a.usa-nav-link {
+    color: white;
+  }
   .usa-logo {
       margin: 1.5rem 0;
   }
 }
+
 .usa-button:not(.usa-button--unstyled) {
   -webkit-font-smoothing: antialiased;
   svg {

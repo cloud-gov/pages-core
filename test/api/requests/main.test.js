@@ -30,7 +30,7 @@ describe('Main Site', () => {
     it('should redirect to / with a flash error when not authenticated', async () => {
       const response = await request(app).get('/blahblahpage').expect(404);
 
-      expect(/Log in with (Github|cloud\.gov)/.test(response.text)).to.be.true;
+      expect(/Log in[\s\S]*with\s*(Github|cloud\.gov)/.test(response.text)).to.be.true;
     });
 
     it('should work when authenticated', async () => {

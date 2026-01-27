@@ -1,6 +1,6 @@
 {% block usa_banner %}
 <section
-  class="usa-banner"
+  class="usa-banner bg-primary-darker text-white"
   aria-label="Official website of the United States government"
 >
   <!-- <div class="usa-accordion">-->
@@ -28,6 +28,33 @@
         >
           <span class="usa-banner__button-text">Here’s how you know</span>
         </button> -->
+        <nav class="margin-left-auto">
+          <ul class="usa-nav__secondary usa-list--unstyled display-none">
+            <li class="usa-nav__secondary-item">
+              <a href="https://cloud.gov/apps/" class="usa-nav-link">
+                <span>Cloud.gov Apps</span>
+              </a>
+            </li>
+            <li class="usa-nav__secondary-item">
+              <a href="https://workshop.cloud.gov/" class="usa-nav-link">
+                <span>Workshop</span>
+              </a>
+            </li>
+            {% if isAuthenticated %}
+              <li class="usa-nav__secondary-item">
+                <a href="/logout" class="usa-nav-link">
+                  <span><strong>Log out</strong></span>
+                </a>
+              </li>
+            {% else %}
+              <li class="usa-nav__secondary-item">
+                <a href="/login" class="usa-nav-link">
+                  <span><strong>Log in<span class="usa-sr-only"> with cloud.gov</span></strong></span>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
       </div>
     </header>
     <!-- <div
