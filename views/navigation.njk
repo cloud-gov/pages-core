@@ -1,6 +1,6 @@
 {% block navigation %}
-<header class="usa-header usa-header--basic bg-primary-darker text-white">
-    <div class="usa-nav-container">
+<header class="usa-header usa-header--basic bg-white text-primary-dark">
+    <div class="usa-nav-container border-base-light border-bottom">
       <div class="usa-navbar">
         <div class="usa-logo">
           <em class="usa-logo__text">
@@ -16,11 +16,7 @@
           <img src="/img/usa-icons/close.svg" role="img" alt="Close" />
         </button>
         <ul class="usa-nav__primary usa-accordion">
-          <li class="usa-nav__primary-item">
-            <a href="{{ homepageUrl }}/documentation/" class="usa-nav-link">
-              <span>Documentation</span>
-            </a>
-          </li>
+          
           {% if isAuthenticated %}
             <li class="usa-nav__primary-item">
               <a href="/sites" class="usa-nav-link">
@@ -32,22 +28,39 @@
                 <span>Organizations</span>
               </a>
             </li>
-              <li class="usa-nav__primary-item">
+          {% endif %}
+          <li class="usa-nav__primary-item">
+            <a href="{{ homepageUrl }}/documentation/" class="usa-nav-link">
+              <span>Documentation</span>
+            </a>
+          </li>
+          {% if isAuthenticated %}
+            <li class="usa-nav__primary-item">
               <a href="/settings" class="usa-nav-link">
                 <span>Settings</span>
               </a>
             </li>
-            <li class="usa-nav__primary-item">
-              <a href="/logout" class="">
-                <span class="usa-button usa-button--inverse display-none desktop:display-block">Logout</span>
-                <span class="usa-button desktop:display-none">Logout</span>
+          {% endif %}
+            <li class="usa-nav__secondary-item desktop:display-none">
+              <a href="https://cloud.gov/apps/" class="usa-nav-link">
+                <span>Cloud.gov Apps</span>
+              </a>
+            </li>
+            <li class="usa-nav__secondary-item desktop:display-none">
+              <a href="https://workshop.cloud.gov/" class="usa-nav-link">
+                <span>Workshop</span>
+              </a>
+            </li>
+          {% if isAuthenticated %}
+            <li class="usa-nav__secondary-item desktop:display-none">
+              <a href="/logout" class="usa-nav-link">
+                <span><strong>Log out</strong></span>
               </a>
             </li>
           {% else %}
-            <li class="usa-nav__primary-item">
-              <a href="/login" class="">
-                <span class="usa-button usa-button--inverse display-none desktop:display-block">Log in with cloud.gov</span>
-                <span class="usa-button desktop:display-none">Log in with cloud.gov</span>
+            <li class="usa-nav__secondary-item desktop:display-none">
+              <a href="/login" class="usa-nav-link">
+                <span><strong>Log in</strong></span>
               </a>
             </li>
           {% endif %}
