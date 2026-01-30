@@ -395,7 +395,7 @@ function JSONTreeView(name_, value_, parent_, isRoot_) {
     }
     return i >= j
       ? n | (+b << i)
-      : ((n >> (i + 1)) << (i + 1)) | n % ((n >> i) << i) | (+b << i);
+      : ((n >> (i + 1)) << (i + 1)) | (n % ((n >> i) << i)) | (+b << i);
   }
 
   function refresh(silent) {
