@@ -52,7 +52,7 @@
     "react-highlight": "^0.15.0",
     "react-notification-system-redux": "^2.0.1",
     "react-redux": "8.1.2",
-    "react-router-dom": "^6.18.0",
+    "react-router-dom": "^6.30.3",
     "redis": "^3.0.0",
     "redux": "^4.2.1",
     "redux-devtools-extension": "^2.13.2",
@@ -203,6 +203,9 @@
   "resolutions": {
     "**/cheerio": "1.0.0-rc.12",
     "cookie": "^0.7.0",
-    "nanoid": "^3.3.8"
+    "nanoid": "^3.3.8",
+    "lodash": "^4.17.22",
+    "js-yaml": "^4.1.1",
+    "@smithy/config-resolver": "^4.4.0"
   }
 }
