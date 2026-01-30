@@ -10,7 +10,7 @@
     "start": "sirv public -p 3000 --host --single --dev"
   },
   "engines": {
-    "node": "^20.x.x"
+    "node": "^22.x.x"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
