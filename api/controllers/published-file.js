@@ -26,7 +26,7 @@ module.exports = {
       )
       .then((response) => {
         pagedFilesResponse = response;
-        return PublishedBranchSerializer.serialize(site, branch); // ???
+        return PublishedBranchSerializer.serialize(site, branch);
       })
       .then((branchJSON) => {
         pagedFilesResponse.files = pagedFilesResponse.files.map((file) =>

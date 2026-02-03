@@ -94,13 +94,14 @@ describe('<BranchViewLink/>', () => {
   });
 
   it('renders a preview link to the other branches', () => {
-    const branchName = 'some-other-branch';
+    const branchName = 'some-other-branch-with-special_characters-###';
+    const branchNameEncoded = 'some-other-branch-with-special_characters-%23%23%23';
     const updatedProps = { ...props, branchName };
     render(<BranchViewLink {...updatedProps} />);
     const anchor = screen.getByRole('link');
     expect(anchor).toHaveAttribute(
       'href',
-      `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchName}`,
+      `${proxyOrigin}/preview/${testSite.owner}/${testSite.repository}/${branchNameEncoded}`,
     );
     expect(anchor).toHaveTextContent(VIEW_BUILD);
   });
