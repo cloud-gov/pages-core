@@ -7,7 +7,7 @@ import BranchViewLink from './BranchViewLink';
 import { SITE } from '@propTypes';
 
 function BranchFilesLink({ branch }) {
-  const href = `/sites/${branch.site.id}/published/${branch.name}`;
+  const href = `/sites/${branch.site.id}/published/${encodeURIComponent(branch.name)}`;
   return <Link to={href}>View files</Link>;
 }
 

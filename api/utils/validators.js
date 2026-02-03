@@ -2,7 +2,6 @@ const yaml = require('js-yaml');
 const validator = require('validator');
 
 // eslint-disable-next-line sonarjs/slow-regex
-const branchRegex = /^[\w.]+(?:[/-]*[\w.])*$/;
 const githubUsernameRegex = /^[^-][a-zA-Z-]+$/;
 const shaRegex = /^[a-f0-9]{40}$/;
 const subdomainRegex = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
@@ -101,13 +100,53 @@ function isEmptyOrBranch(value) {
     throw new Error('Invalid branch name — branch names are limitted to 299 characters.');
   }
 
-  if (value && value.length && !branchRegex.test(value)) {
+  if (value && value.length && !isValidBranchName(value)) {
     throw new Error(
       // eslint-disable-next-line max-len
       'Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.',
     );
   }
 }
+
+const isValidBranchName = (branchName) => {
+  // Rule 1: Slash-separated components cannot begin with '.' or end with '.lock'
+  const components = branchName.split('/');
+  for (const component of components) {
+    if (component.startsWith('.')) return false;
+    if (component.endsWith('.lock')) return false;
+  }
+
+  // Rule 3: Cannot have two consecutive dots anywhere
+  if (branchName.includes('..')) return false;
+
+  // Rule 4: Cannot have ASCII control characters, space, tilde, caret, or colon
+  // Control chars: \x00-\x1F and \x7F
+  // Also check for space, ~, ^, :
+  if (/[\x00-\x1F\x7F ~^:]/.test(branchName)) return false;
+
+  // Rule 5: Cannot have ?, *, or [
+  if (/[?*\[]/.test(branchName)) return false;
+
+  // Rule 6: Cannot begin or end with a slash
+  if (branchName.startsWith('/') || branchName.endsWith('/')) return false;
+
+  // Rule 6: Cannot contain multiple consecutive slashes
+  if (branchName.includes('//')) return false;
+
+  // Rule 7: Cannot end with a dot
+  if (branchName.endsWith('.')) return false;
+
+  // Rule 8: Cannot contain the sequence '@{'
+  if (branchName.includes('@{')) return false;
+
+  // Rule 9: Cannot be the single character '@'
+  if (branchName === '@') return false;
+
+  // Rule 10: Cannot contain a backslash
+  if (branchName.includes('\\')) return false;
+
+  return true;
+};
 
 function isEmptyOrUrl(value) {
   const validUrlOptions = {
@@ -136,7 +175,6 @@ const isDelimitedFQDN = (str) => {
 };
 
 module.exports = {
-  branchRegex,
   CustomError,
   shaRegex,
   githubUsernameRegex,
@@ -149,4 +187,5 @@ module.exports = {
   ValidationError,
   isValidSubdomain,
   isDelimitedFQDN,
+  isValidBranchName,
 };

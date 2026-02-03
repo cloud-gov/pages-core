@@ -12,7 +12,7 @@ export default function BranchFileRow({ file }) {
       viewFileLink = `${file.publishedBranch.site.demoViewLink}${file.name}`;
       break;
     default:
-      viewFileLink = `${file.publishedBranch.site.previewLink}${branch}/${file.name}`;
+      viewFileLink = `${file.publishedBranch.site.previewLink}${encodeURIComponent(branch)}/${file.name}`;
   }
   return (
     <tr key={viewFileLink}>

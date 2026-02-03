@@ -13,7 +13,7 @@ const getViewLink = (branch, site) => {
   // Checks to see if there is a site branch config
   // If not it returns the preview url
   if (!branchConfig) {
-    return `${origin}/preview/${owner}/${repository}/${branch}`;
+    return `${origin}/preview/${owner}/${repository}/${encodeURIComponent(branch)}`;
   }
 
   const domain = domains.find((d) => d.siteBranchConfigId === branchConfig.id);

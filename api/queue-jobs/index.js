@@ -199,7 +199,7 @@ class QueueJobs {
   async startSiteBuild(build, priority) {
     const { branch, id: buildId, Site } = build;
     const { owner, repository } = Site;
-    const jobName = `${owner}/${repository}: ${truncateString(branch)}`;
+    const jobName = `${owner}/${repository}: ${truncateString(encodeURIComponent(branch))}`;
 
     await this.siteBuildsQueue.waitUntilReady();
 

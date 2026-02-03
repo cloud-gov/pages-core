@@ -1,7 +1,7 @@
 const config = require('../../config');
 
 function previewPath(build, site) {
-  return `/preview/${site.owner}/${site.repository}/${build.branch}`;
+  return `/preview/${site.owner}/${site.repository}/${encodeURIComponent(build.branch)}`;
 }
 
 function proxyUrl(path, site) {

@@ -104,7 +104,7 @@ export default {
   },
 
   fetchPublishedFiles(id, branch, startAtKey = null) {
-    let path = `site/${id}/published-branch/${branch}/published-file`;
+    let path = `site/${id}/published-branch/${encodeURIComponent(branch)}/published-file`;
     if (startAtKey) {
       path += `?startAtKey=${startAtKey}`;
     }

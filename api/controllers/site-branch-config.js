@@ -14,7 +14,7 @@ function generateS3Key(site, context, branch) {
     return null;
   }
 
-  return `preview/${site.owner}/${site.repository}/${branch}`;
+  return `preview/${site.owner}/${site.repository}/${encodeURIComponent(branch)}`;
 }
 
 function validate({ branch, config = {}, context } = {}) {

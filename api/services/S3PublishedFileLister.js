@@ -90,7 +90,7 @@ function listPagedPublishedFilesForBranch(site, branch, startAtKey) {
   } else if (site.demoBranch === branch) {
     filepath = `demo/${site.owner}/${site.repository}`;
   } else {
-    filepath = `preview/${site.owner}/${site.repository}/${branch}`;
+    filepath = `preview/${site.owner}/${site.repository}/${encodeURIComponent(branch)}`;
   }
 
   return apiClient

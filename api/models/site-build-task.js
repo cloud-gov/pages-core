@@ -1,3 +1,4 @@
+const { isEmptyOrBranch } = require('../utils/validators');
 const associate = ({ BuildTask, BuildTaskType, Site, SiteBuildTask }) => {
   SiteBuildTask.belongsTo(BuildTaskType, {
     foreignKey: 'buildTaskTypeId',
@@ -28,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       branch: {
         type: DataTypes.STRING,
+        validate: {
+          isEmptyOrBranch,
+        },
         allowNull: true,
       },
       metadata: {
