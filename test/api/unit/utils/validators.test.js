@@ -86,14 +86,17 @@ describe('validators', () => {
     // Git imposes the following rules on how references are named:
     //
     // 1. They can include slash / for hierarchical (directory) grouping,
-    // but no slash-separated component can begin with a dot . or end with the sequence .lock.
+    // but no slash-separated component can begin with a dot .
+    // or end with the sequence .lock.
     //
-    // 2. They must contain at least one /. This enforces the presence of a category like heads/, tags/ etc.
-    // but the actual names are not restricted. If the --allow-onelevel option is used, this rule is waived.
+    // 2. They must contain at least one /. This enforces the presence of a category
+    // like heads/, tags/ etc. but the actual names are not restricted.
+    // If the --allow-onelevel option is used, this rule is waived.
     //
     // 3. They cannot have two consecutive dots .. anywhere.
     //
-    // 4. They cannot have ASCII control characters (i.e. bytes whose values are lower than \040, or \177 DEL),
+    // 4. They cannot have ASCII control characters
+    // (i.e. bytes whose values are lower than \040, or \177 DEL),
     // space, tilde ~, caret ^, or colon : anywhere.
     //
     // 5. They cannot have question-mark ?, asterisk *, or open bracket [ anywhere.

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 export default function BranchFileRow({ file }) {
   let viewFileLink;
   const branch = file.publishedBranch.name;
+  const encBranch = encodeURIComponent(branch);
   switch (branch) {
     case file.publishedBranch.site.defaultBranch:
       viewFileLink = `${file.publishedBranch.site.viewLink}${file.name}`;
@@ -12,7 +13,7 @@ export default function BranchFileRow({ file }) {
       viewFileLink = `${file.publishedBranch.site.demoViewLink}${file.name}`;
       break;
     default:
-      viewFileLink = `${file.publishedBranch.site.previewLink}${encodeURIComponent(branch)}/${file.name}`;
+      viewFileLink = `${file.publishedBranch.site.previewLink}${encBranch}/${file.name}`;
   }
   return (
     <tr key={viewFileLink}>
