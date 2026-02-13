@@ -9,6 +9,7 @@ const EventCreator = require('../services/EventCreator');
 const { wrapHandlers } = require('../utils');
 const { Build, Domain, Event, Site, SiteBranchConfig } = require('../models');
 const { getSocket } = require('../socketIO');
+const siteErrors = require('../responses/siteErrors');
 
 const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
 
@@ -94,6 +95,13 @@ module.exports = wrapHandlers({
 
     if (!requestBuild) {
       return res.notFound();
+    }
+
+    if (requestBuild.state === 'invalid') {
+      return res.status(422).json({
+        message: siteErrors.INVALID_BRANCH_NAME,
+        errors: siteErrors.INVALID_BRANCH_NAME,
+      });
     }
 
     const queuedBuild = await Build.findOne({

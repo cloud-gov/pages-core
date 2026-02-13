@@ -1,3 +1,4 @@
+const { isEmptyOrBranch } = require('../utils/validators');
 const associate = ({ BuildTask, BuildTaskType, Site, SiteBuildTask }) => {
   SiteBuildTask.belongsTo(BuildTaskType, {
     foreignKey: 'buildTaskTypeId',
@@ -14,6 +15,10 @@ const associate = ({ BuildTask, BuildTaskType, Site, SiteBuildTask }) => {
 async function createBuildTask(build) {
   const { BuildTask } = this.sequelize.models;
 
+  if (build.state === 'invalid') {
+    throw new Error('Can not create build task for invalid build.');
+  }
+
   return BuildTask.create({
     buildTaskTypeId: this.buildTaskTypeId,
     buildId: build.id,
@@ -29,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       branch: {
         type: DataTypes.STRING,
         allowNull: true,
+        validate: {
+          isEmptyOrBranch,
+        },
       },
       metadata: {
         type: DataTypes.JSON,

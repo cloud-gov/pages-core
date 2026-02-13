@@ -115,8 +115,11 @@
     notification.setSuccess('Build task added successfully');
   }
 
-  async function handleSiteBuildTaskFailure() {
-    notification.setError('Build task update error');
+  async function handleSiteBuildTaskFailure(error) {
+    if (error?.erorrs) {
+      notification.setError(error.errors);
+    }
+    else{notification.setError('Build task update error');}
   }
 
   async function handleCloseEditSiteBuildTask() {

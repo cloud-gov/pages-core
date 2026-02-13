@@ -5,6 +5,7 @@ import ExpandableArea from '@shared/ExpandableArea';
 import LoadingIndicator from '@shared/LoadingIndicator';
 import notificationActions from '@actions/notificationActions';
 import { capitalize } from '@util';
+import alertActions from '@actions/alertActions';
 
 function formatConfig(config) {
   if (!config) return '';
@@ -48,6 +49,10 @@ function BranchConfig({ id, branch, config, context, handleUpdate, isExpanded })
               return notificationActions.success(
                 `Updated branch config for ${branchConfig.context}`,
               );
+            })
+            .catch((e) => {
+              setIsLoading(false);
+              return alertActions.httpError(e?.message);
             })
             .finally(() => setIsLoading(false));
         }}

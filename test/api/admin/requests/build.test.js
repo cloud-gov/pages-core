@@ -153,6 +153,27 @@ describe('Admin - Site API', () => {
           })
           .expect(200);
       });
+      it(`does not rebuild an invalid build`, async () => {
+        const [user, site] = await Promise.all([factory.user(), factory.site()]);
+        const build = await factory.build({ site, state: 'invalid' });
+
+        const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+        await request(app)
+          .post(`/builds`)
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({
+            buildId: build.id,
+            siteId: site.id,
+          })
+          .expect(422)
+          .expect((res) => {
+            expect(JSON.stringify(res.body)).to.equal(
+              '{"message":"Invalid branch name.","errors":"Invalid branch name."}',
+            );
+          });
+      });
     });
   });
 

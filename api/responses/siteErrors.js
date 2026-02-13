@@ -23,4 +23,5 @@ module.exports = {
   FILE_EXISTS_ALREADY:
     'A file with the same name already exists. Please rename your new file.',
   NEW_ERRORS: '',
+  INVALID_BRANCH_NAME: 'Invalid branch name.',
 };

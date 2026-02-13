@@ -927,6 +927,62 @@ describe('Site Branch Config API', () => {
           body,
         );
       });
+
+      describe('when the branch name is invalid', () => {
+        it('returns a 400', async () => {
+          const { user, site } = await createSiteUserOrg();
+          const branch = 'test bad branch name$';
+          const cookie = await authenticatedSession(user);
+          const context = 'preview';
+          const sbc = await factory.siteBranchConfig.create({
+            site,
+          });
+
+          const { body } = await request(app)
+            .put(`/v0/site/${site.id}/branch-config/${sbc.id}`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .send({
+              branch,
+              context,
+            })
+            .expect(400);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/branch-config', 400, body);
+          expect(body.message).to.eq(
+            // eslint-disable-next-line max-len
+            'An error occurred updating the site branch config: Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.',
+          );
+        });
+
+        it('returns a 400 when branch name is too long', async () => {
+          const { user, site } = await createSiteUserOrg();
+          const branch = Array(301).join('b');
+          const cookie = await authenticatedSession(user);
+          const context = 'preview';
+          const sbc = await factory.siteBranchConfig.create({
+            site,
+          });
+
+          const { body } = await request(app)
+            .put(`/v0/site/${site.id}/branch-config/${sbc.id}`)
+            .set('Cookie', cookie)
+            .set('x-csrf-token', csrfToken.getToken())
+            .type('json')
+            .send({
+              branch,
+              context,
+            })
+            .expect(400);
+
+          validateAgainstJSONSchema('POST', '/site/{site_id}/branch-config', 400, body);
+          expect(body.message).to.eq(
+            // eslint-disable-next-line max-len
+            'An error occurred updating the site branch config: Validation error: Invalid branch name — branch names are limitted to 299 characters.',
+          );
+        });
+      });
     });
   });
 });

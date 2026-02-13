@@ -1,4 +1,4 @@
-import fetch from './fetch';
+import fetchWrapper from './fetch';
 import alertActions from '../actions/alertActions';
 
 export const API = '/v0';
@@ -21,8 +21,8 @@ function request(endpoint, params = {}, { handleHttpError = true } = {}) {
     headers,
   };
 
-  return fetch(url, finalParams).catch((error) => {
-    if (handleHttpError) {
+  return fetchWrapper(url, finalParams).catch((error) => {
+    if (handleHttpError && !params?.data?.throwError) {
       alertActions.httpError(error.message);
     } else {
       throw error;
@@ -236,6 +236,7 @@ export default {
         branch,
         config,
         context,
+        throwError: true,
       },
     });
   },
@@ -251,6 +252,7 @@ export default {
         branch,
         config,
         context,
+        throwError: true,
       },
     });
   },

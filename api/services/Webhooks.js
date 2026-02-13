@@ -5,6 +5,7 @@ const GithubBuildHelper = require('./GithubBuildHelper');
 const EventCreator = require('./EventCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');
 const { fetchModelById } = require('../utils/queryDatabase');
+const { BuildService } = require('./build');
 
 const { OPS_EMAIL } = process.env;
 
@@ -149,7 +150,7 @@ const createBuildForWebhookRequest = async (payload, site) => {
     site: site.id,
     user: user ? user.id : null,
     username,
-  }).then((build) => build.enqueue());
+  }).then((build) => BuildService.enqueueOrLogBuild(build));
 };
 
 const pushWebhookRequest = async (payload) => {
