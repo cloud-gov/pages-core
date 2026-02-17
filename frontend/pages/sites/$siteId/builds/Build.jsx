@@ -17,6 +17,7 @@ import {
   IconRebuild,
   IconReport,
   IconView,
+  IconIgnore,
 } from '@shared/icons';
 import CreateScanLink from './CreateScanLink';
 
@@ -68,6 +69,14 @@ const Build = ({
           status: error === 'The build timed out' ? 'Timed out' : 'Failed',
           done: true,
           icon: IconExclamationCircle,
+        };
+        break;
+      case 'invalid':
+        messageStatusDoneIcon = {
+          messagePrefix: 'Invalid in ',
+          status: 'Invalid',
+          done: true,
+          icon: IconIgnore,
         };
         break;
       case 'processing':
@@ -165,7 +174,9 @@ const Build = ({
             </p>
 
             <p className="logs-link">
-              {build.startedAt && <BuildLogsLink buildId={build.id} siteId={siteId} />}
+              {(build.startedAt || build.state === 'invalid') && (
+                <BuildLogsLink buildId={build.id} siteId={siteId} />
+              )}
             </p>
           </div>
         </div>

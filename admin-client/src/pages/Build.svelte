@@ -68,24 +68,30 @@
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <div class="grid-row flex-column flex-align-end">
-          {#if !['error', 'success'].includes(build.state)}
+          {#if !['error', 'success', 'invalid'].includes(build.state)}
             <form on:submit|preventDefault={handleFailSubmit}>
               <input type="submit" value="Fail build" disabled={submitting}>
             </form>
           {/if}
-          <LabeledItem label="started at" value={formatDateTime(build.startedAt, true)} title={formatDateTime(build.startedAt)} />
-          <LabeledItem label="completed at" value={formatDateTime(build.completedAt, true)} title={formatDateTime(build.completedAt)} />
+          {#if !['invalid'].includes(build.state)}
+            <LabeledItem label="started at" value={formatDateTime(build.startedAt, true)} title={formatDateTime(build.startedAt)} />
+            <LabeledItem label="completed at" value={formatDateTime(build.completedAt, true)} title={formatDateTime(build.completedAt)} />
+          {/if}
           <LabeledItem label="source" value={build.source} />
           <div>
-            <ExternalLink href={build.url}>Live</ExternalLink>
+            {#if !['invalid'].includes(build.state)}
+                <ExternalLink href={build.url}>Live</ExternalLink>
+            {/if}
             <ExternalLink
               icon="github"
               href="https://github.com/{build.site.owner}/{build.site.repository}">
               Repository
             </ExternalLink>
           </div>
-          <button on:click={rebuild} class="usa-button margin-top-1">Rebuild</button>
-        </div>
+          {#if !['invalid'].includes(build.state)}
+            <button on:click={rebuild} class="usa-button margin-top-1">Rebuild</button>
+          {/if}
+          </div>
       </div>
     </div>
     {#if build.error}

@@ -662,6 +662,94 @@ describe('GithubBuildHelper', () => {
         expect(repoNock.isDone()).to.be.true;
       });
     });
+
+    context('with a build in the invalid state', () => {
+      let user;
+      let site;
+      let build;
+
+      beforeEach(async () => {
+        ({ site, user } = await createSiteUserOrg());
+        build = await factory.build({
+          state: 'invalid',
+          requestedCommitSha,
+          user,
+          site,
+        });
+      });
+      it("should report that the status is 'error' with requestedCommitSha", async () => {
+        const repoNock = githubAPINocks.repo({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          username: user.username,
+        });
+        const statusNock = githubAPINocks.status({
+          owner: site.owner,
+          repo: site.repository,
+          sha: requestedCommitSha,
+          state: 'error',
+        });
+
+        await build.reload({ include: Site });
+        await GithubBuildHelper.reportBuildStatus(build);
+        expect(statusNock.isDone()).to.be.true;
+        expect(repoNock.isDone()).to.be.true;
+      });
+
+      it("should report that the status is 'error' with clonedCommitSha", async () => {
+        await build.update({
+          clonedCommitSha,
+        });
+
+        const repoNock = githubAPINocks.repo({
+          accessToken: user.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          username: user.username,
+        });
+        const statusNock = githubAPINocks.status({
+          owner: site.owner,
+          repo: site.repository,
+          sha: clonedCommitSha,
+          state: 'error',
+          targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
+        });
+
+        await build.reload({ include: Site });
+        await GithubBuildHelper.reportBuildStatus(build);
+        expect(statusNock.isDone()).to.be.true;
+        expect(repoNock.isDone()).to.be.true;
+      });
+
+      it(`should use the GitHub
+          access token of the build's user not a site user`, async () => {
+        const nonSiteUser = await factory.user();
+        await build.update({
+          user: nonSiteUser.id,
+        });
+
+        const repoNock = githubAPINocks.repo({
+          accessToken: nonSiteUser.githubAccessToken,
+          owner: site.owner,
+          repo: site.repository,
+          username: user.username,
+        });
+        const statusNock = githubAPINocks.status({
+          owner: site.owner,
+          repo: site.repository,
+          sha: requestedCommitSha,
+          state: 'error',
+          targetURL: `${config.app.hostname}/sites/${build.site}/builds/${build.id}/logs`,
+        });
+
+        await build.reload({ include: Site });
+        await GithubBuildHelper.reportBuildStatus(build);
+
+        expect(statusNock.isDone()).to.be.true;
+        expect(repoNock.isDone()).to.be.true;
+      });
+    });
   });
 
   describe('fetchContent(build, site, users, path)', () => {

@@ -6,6 +6,7 @@ const { Build, Domain, Event, Site, SiteBranchConfig, User } = require('../../mo
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 const EventCreator = require('../../services/EventCreator');
+const siteErrors = require('../../responses/siteErrors');
 
 module.exports = wrapHandlers({
   async list(req, res) {
@@ -113,6 +114,13 @@ module.exports = wrapHandlers({
 
     if (!requestBuild) {
       return res.notFound();
+    }
+
+    if (requestBuild.state === 'invalid') {
+      return res.status(422).json({
+        message: siteErrors.INVALID_BRANCH_NAME,
+        errors: siteErrors.INVALID_BRANCH_NAME,
+      });
     }
 
     const queuedBuild = await Build.findOne({

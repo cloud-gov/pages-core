@@ -105,22 +105,19 @@ const reportBuildStatus = async (build) => {
       config.app.hostname,
       `/sites/${site.id}/builds/${build.id}/logs`,
     );
-    // eslint-disable-next-line max-len
     options.description =
       'The build is running. Click "Details" to see the Pages build status.';
   } else if (build.state === 'success') {
     options.state = 'success';
     options.target_url = build.url;
-    // eslint-disable-next-line max-len
     options.description =
       'The build is complete! Click "Details" to visit the Site Preview.';
-  } else if (build.state === 'error') {
+  } else if (build.state === 'error' || build.state === 'invalid') {
     options.state = 'error';
     options.target_url = url.resolve(
       config.app.hostname,
       `/sites/${site.id}/builds/${build.id}/logs`,
     );
-    // eslint-disable-next-line max-len
     options.description =
       'The build has encountered an error. Click "Details" to see the Pages build logs.';
   }

@@ -38,7 +38,7 @@ export const useBuildLogs = (id) => {
         }
       }
 
-      if (['success', 'error'].includes(state)) {
+      if (['success', 'error', 'invalid'].includes(state)) {
         if (outputCount > 0) {
           setResults(updatedResults);
         }

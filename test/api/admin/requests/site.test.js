@@ -246,4 +246,28 @@ describe('Admin - Site API', () => {
       });
     });
   });
+
+  describe('POST /admin/sites/:id/tasks', () => {
+    it('responds with an error if branch name is invalid', async () => {
+      const [user, site] = await Promise.all([factory.user(), factory.site()]);
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      await request(app)
+        .post(`/sites/${site.id}/tasks`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          buildTaskTypeId: 1,
+          branch: 'demo 2',
+          runDay: 1,
+        })
+        .expect(422)
+        .expect((res) => {
+          expect(JSON.stringify(res.body)).to.equal(
+            '{"message":"Invalid branch name.","errors":"Invalid branch name."}',
+          );
+        });
+    });
+  });
 });

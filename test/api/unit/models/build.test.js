@@ -1,16 +1,41 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const { DatabaseError, ValidationError } = require('sequelize');
-const QueueJobs = require('../../../../api/queue-jobs');
 const factory = require('../../support/factory');
 const { Build, Site } = require('../../../../api/models');
 const config = require('../../../../config');
 const { createSiteUserOrg } = require('../../support/site-user');
+const QueueJobs = require('../../../../api/queue-jobs');
 
 describe('Build model', () => {
   afterEach(() => {
     sinon.restore();
   });
+
+  function invalidBuildTester(build, branchName, error) {
+    expect(build.branch).to.equal(branchName);
+    expect(build.state).to.equal('invalid');
+    expect(build.error).to.equal(error);
+    expect(build.completedAt).to.equal(null);
+    expect(build.startedAt).equal(null);
+  }
+
+  async function createandTestBuildWithInvalidBranchName(
+    branchName,
+    error = 'Invalid branch name — ' +
+      'branches can only contain alphanumeric characters, underscores, and hyphens.',
+  ) {
+    const site = await factory.site();
+    await Build.create({
+      user: 1,
+      username: 'username',
+      site: site.id,
+      branch: branchName,
+    }).then((build) => {
+      invalidBuildTester(build, branchName, error);
+      return build;
+    });
+  }
 
   describe('before validate hook', () => {
     it('should add a build token', async () => {
@@ -120,6 +145,30 @@ describe('Build model', () => {
       // The build should include the site
       expect(queuedBuild.Site).to.be.an.instanceof(Site);
       expect(queuedBuild.Site.id).to.eq(site.id);
+    });
+
+    it('should not enque invalid build', async () => {
+      const branchName = 'invalid branch name';
+      const site = await factory.site();
+      const invalidBuild = await Build.create({
+        user: 1,
+        username: 'username',
+        site: site.id,
+        branch: branchName,
+      });
+
+      const spy = sinon.spy(QueueJobs.prototype, 'startSiteBuild');
+
+      await invalidBuild.enqueue();
+      await invalidBuild.reload();
+
+      invalidBuildTester(
+        invalidBuild,
+        branchName,
+        'Invalid branch name — ' +
+          'branches can only contain alphanumeric characters, underscores, and hyphens.',
+      );
+      expect(spy.called).to.be.false;
     });
   });
 
@@ -339,13 +388,6 @@ describe('Build model', () => {
   });
 
   describe('validations', () => {
-    const branchNameError =
-      // eslint-disable-next-line max-len
-      'Validation error: Invalid branch name — branches can only contain alphanumeric characters, underscores, and hyphens.';
-    const branchNameLengthError =
-      // eslint-disable-next-line max-len
-      'Validation error: Invalid branch name — branch names are limitted to 299 characters.';
-
     it('should require a site object before saving', () => {
       const buildPromise = Build.create({
         user: 1,
@@ -370,11 +412,20 @@ describe('Build model', () => {
       );
     });
 
-    it('should require a valid requestedCommitSha before saving', () => {
+    it('should require a valid requestedCommitSha before saving', async () => {
+      const organization = await factory.organization.create({
+        name: 'Org',
+      });
+      const site = await factory.site({
+        organizationId: organization.id,
+      });
+
       const buildPromise = Build.create({
         user: 1,
-        site: 1,
+        site: site.id,
         requestedCommitSha: 'not-a-real-sha.biz',
+        branch: 'some-branch',
+        username: 'some-user',
       });
 
       return expect(buildPromise).to.be.rejectedWith(
@@ -409,52 +460,23 @@ describe('Build model', () => {
       );
     });
 
-    it('requires a valid branch name before saving', () => {
-      const buildPromise = Build.create({
-        user: 1,
-        site: 1,
-        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-        branch: 'not*real',
-      });
-
-      return expect(buildPromise).to.be.rejectedWith(ValidationError, branchNameError);
+    it('sets status to invalid for invalid branch name', async () => {
+      await createandTestBuildWithInvalidBranchName('not*real');
     });
 
-    it('requires a valid branch name before saving no end slash', () => {
-      const buildPromise = Build.create({
-        user: 1,
-        site: 1,
-        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-        branch: 'not-real/',
-      });
-
-      return expect(buildPromise).to.be.rejectedWith(ValidationError, branchNameError);
+    it('requires a valid branch name before saving no end slash', async () => {
+      await createandTestBuildWithInvalidBranchName('notreal/');
     });
 
-    it('requires a valid branch name before saving no begin /', () => {
-      const buildPromise = Build.create({
-        user: 1,
-        site: 1,
-        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-        branch: '/not-real',
-      });
-
-      return expect(buildPromise).to.be.rejectedWith(ValidationError, branchNameError);
+    it('requires a valid branch name before saving no begin /', async () => {
+      await createandTestBuildWithInvalidBranchName('/notreal');
     });
 
     it(`requires a valid branch name before saving
-        and it cannot be >= 300 characters /`, () => {
-      const branch = Array(301).join('b');
-      const buildPromise = Build.create({
-        user: 1,
-        site: 1,
-        requestedCommitSha: 'a172b66c31e19d456a448041a5b3c2a70c32d8b7',
-        branch,
-      });
-
-      return expect(buildPromise).to.be.rejectedWith(
-        ValidationError,
-        branchNameLengthError,
+        and it cannot be >= 300 characters /`, async () => {
+      await createandTestBuildWithInvalidBranchName(
+        Array(301).join('b'),
+        'Invalid branch name — branch names are limitted to 299 characters.',
       );
     });
   });
@@ -582,6 +604,33 @@ describe('Build model', () => {
       expect(build).to.respondTo('getSiteOrgUsers');
       const users = await build.getSiteOrgUsers();
       expect(users[0].id).to.be.equal(user.id);
+    });
+  });
+
+  describe('update instance method', () => {
+    it('does not update status, error and dates if build is invalid', async () => {
+      const branchName = 'invalid branch name';
+      const site = await factory.site();
+      const invalidBuild = await Build.create({
+        user: 1,
+        username: 'username',
+        site: site.id,
+        branch: branchName,
+      });
+
+      invalidBuild.status = 'processing';
+      invalidBuild.error = null;
+      invalidBuild.completedAt = 289345387540348;
+      invalidBuild.startedAt = 289345387540348;
+
+      const updatedInvalidBuild = await invalidBuild.update();
+
+      invalidBuildTester(
+        updatedInvalidBuild,
+        branchName,
+        'Invalid branch name — ' +
+          'branches can only contain alphanumeric characters, underscores, and hyphens.',
+      );
     });
   });
 });

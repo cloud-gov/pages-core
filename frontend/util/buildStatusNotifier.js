@@ -59,6 +59,9 @@ class BuildStatusNotifier {
       case 'success':
         titleStatus = 'Successful Build';
         break;
+      case 'invalid':
+        titleStatus = 'Invalid Build: Please review logs.';
+        break;
       default:
         return null;
     }

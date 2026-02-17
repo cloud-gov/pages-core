@@ -44,13 +44,13 @@ describe('Build API', () => {
   };
 
   describe('POST /v0/build', () => {
-    const validCreateRequest = (token, cookie, params) =>
+    const validCreateRequest = (token, cookie, params, expectedStatus = 200) =>
       request(app)
         .post('/v0/build/')
         .set('x-csrf-token', token)
         .send(params)
         .set('Cookie', cookie)
-        .expect(200);
+        .expect(expectedStatus);
 
     beforeEach(() => {
       nock.cleanAll();
@@ -129,6 +129,7 @@ describe('Build API', () => {
         let user;
         let site;
         let reqBuild;
+        let invalidBuild;
         let cookie;
 
         beforeEach(async () => {
@@ -138,6 +139,14 @@ describe('Build API', () => {
             site,
             state: 'success',
             branch: 'main',
+            requestedCommitSha,
+            clonedCommitSha,
+            user,
+          });
+          invalidBuild = await factory.build({
+            site,
+            state: 'invalid',
+            branch: 'main 1',
             requestedCommitSha,
             clonedCommitSha,
             user,
@@ -176,6 +185,39 @@ describe('Build API', () => {
           expect(latestBuild.requestedCommitSha).to.equal(reqBuild.clonedCommitSha);
           expect(repoNock.isDone()).to.be.true;
           expect(statusNock.isDone()).to.be.true;
+        });
+
+        it(`should not create a new build for invalid existing build`, async () => {
+          githubAPINocks.status({
+            owner: site.owner,
+            repo: site.repository,
+            repository: site.repository,
+            sha: clonedCommitSha,
+            state: 'pending',
+          });
+          githubAPINocks.repo({
+            accessToken: user.githubAccessToken,
+            owner: site.owner,
+            repo: site.repository,
+            username: user.username,
+          });
+          await validCreateRequest(
+            csrfToken.getToken(),
+            cookie,
+            {
+              buildId: invalidBuild.id,
+              siteId: site.id,
+            },
+            422,
+          );
+          const latestBuild = await Build.findOne({
+            where: {
+              site: site.id,
+              branch: reqBuild.branch,
+            },
+            order: [['createdAt', 'DESC']],
+          });
+          expect(latestBuild.id).to.equal(reqBuild.id);
         });
 
         it(`should NOT create a new build

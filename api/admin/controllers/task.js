@@ -1,5 +1,7 @@
 const { BuildTask, Build, BuildTaskType, SiteBuildTask, Site } = require('../../models');
 const { paginate, wrapHandlers } = require('../../utils');
+const siteErrors = require('../../responses/siteErrors');
+const { isEmptyOrBranch } = require('../../utils/validators');
 
 module.exports = wrapHandlers({
   async list(req, res) {
@@ -52,6 +54,15 @@ module.exports = wrapHandlers({
   async addSiteBuildTask(req, res) {
     const { branch, runDay } = req.body;
     const metadata = runDay ? { runDay } : {};
+
+    try {
+      isEmptyOrBranch(branch);
+    } catch {
+      return res.status(422).send({
+        message: siteErrors.INVALID_BRANCH_NAME,
+        errors: siteErrors.INVALID_BRANCH_NAME,
+      });
+    }
 
     await SiteBuildTask.create({
       buildTaskTypeId: req.body.buildTaskTypeId,

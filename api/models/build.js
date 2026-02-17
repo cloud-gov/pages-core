@@ -15,6 +15,7 @@ const States = buildEnum([
   'queued',
   'tasked',
   'error',
+  'invalid',
   'processing',
   'skipped', // remove?
   'success',
@@ -99,6 +100,24 @@ async function beforeCreate(build) {
   const { Site, SiteBranchConfig, Domain } = this.sequelize.models;
   const site = await Site.findByPk(build.site, { include: [SiteBranchConfig, Domain] });
   build.url = buildUrl(build, site);
+
+  try {
+    isEmptyOrBranch(build.branch);
+  } catch (e) {
+    build.error = e.message;
+    build.state = States.Invalid;
+    build.completedAt = null;
+    build.startedAt = null;
+  }
+}
+
+async function beforeUpdate(build) {
+  if (build._previousDataValues.state === States.Invalid) {
+    build.state = build._previousDataValues.state;
+    build.error = build._previousDataValues.error;
+    build.completedAt = null;
+    build.startedAt = null;
+  }
 }
 
 const jobErrorMessage = (message = 'An unknown error occurred') =>
@@ -128,8 +147,13 @@ const jobStateUpdate = (buildStatus, build, site, timestamp) => {
   return build.update(atts);
 };
 
+// eslint-disable-next-line sonarjs/no-invariant-returns
 async function enqueue() {
   const build = this;
+
+  if (build.state === States.Invalid) {
+    return build;
+  }
 
   const { Site, Build } = build.sequelize.models;
 
@@ -161,7 +185,6 @@ async function enqueue() {
     });
   } catch (err) {
     const errMsg = `There was an error, adding the job to SiteBuildQueue: ${err}`;
-    // logger.error(errMsg);
 
     await build.updateJobStatus({
       status: States.Error,
@@ -214,9 +237,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       branch: {
         type: DataTypes.STRING,
-        validate: {
-          isEmptyOrBranch,
-        },
         allowNull: false,
       },
       requestedCommitSha: {
@@ -283,6 +303,7 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeValidate,
         beforeCreate,
+        beforeUpdate,
       },
       paranoid: true,
     },
