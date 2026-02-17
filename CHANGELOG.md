@@ -1,3 +1,31 @@
+## 0.21.0 (2026-02-17)
+
+### Added
+
+- Update app to Node v22 and update the dependencies
+- Add site delete webhook for publisher site
+
+### Fixed
+
+- branch with an invalid name should create an invalid build #2375
+- remove deprecated component
+- force patched version of fast-xml-parser
+- set node value in Docker
+- include screen reader text and update 404 test to expect updated login string
+- adjust slightly navigation text style
+- Audit and fix dependencies #4845
+- Publisher endpoint host environment variable
+- Use the correct bound route service domain by env
+
+### Maintenance
+
+- update to use new branding logos
+- update color palette
+- update styling to revise color palette
+- update admin-client node engine
+- update favicons with new pages logo
+- update styles and menus
+
 ## 0.20.1 (2025-12-01)
 
 ### Fixed
