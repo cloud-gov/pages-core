@@ -246,6 +246,8 @@ async function createData() {
           addUserToOrg(user, sandbox, managerRole),
         ]);
         return user;
+      }).catch(async (err) => {
+        console.log(err);
       }),
 
       User.create({
@@ -255,7 +257,9 @@ async function createData() {
         githubUserId: 123456,
       })
         .then(createUAAIdentity)
-        .then((user) => addUserToOrg(user, agency1, userRole)),
+        .then((user) => addUserToOrg(user, agency1, userRole)).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'user3',
@@ -264,7 +268,9 @@ async function createData() {
         githubUserId: 123456,
       })
         .then(createUAAIdentity)
-        .then((user) => addUserToOrg(user, agency3, userRole)),
+        .then((user) => addUserToOrg(user, agency3, userRole)).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'user4',
@@ -273,21 +279,27 @@ async function createData() {
         githubUserId: 123456,
       })
         .then(createUAAIdentity)
-        .then((user) => addUserToOrg(user, agency4, userRole)),
+        .then((user) => addUserToOrg(user, agency4, userRole)).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'userorgless',
         email: 'userorgless@example.com',
         githubAccessToken: 'access-token',
         githubUserId: 123456,
-      }).then(createUAAIdentity),
+      }).then(createUAAIdentity).catch(async (err) => {
+        console.log(err);
+      }),
 
       // Manager without Github credentials
       User.create({
         username: 'manager_no_github',
       })
         .then(createUAAIdentity)
-        .then((user) => addUserToOrg(user, agency1, managerRole)),
+        .then((user) => addUserToOrg(user, agency1, managerRole)).catch(async (err) => {
+        console.log(err);
+      }),
 
       // Manager with Github credentials
       User.create({
@@ -298,14 +310,18 @@ async function createData() {
       })
         .then(createUAAIdentity)
         .then((user) => addUserToOrg(user, agency1, userRole))
-        .then((user) => addUserToOrg(user, agency2, managerRole)),
+        .then((user) => addUserToOrg(user, agency2, managerRole)).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'support_role',
         email: 'support_role@example.com',
         githubAccessToken: 'access-token',
         githubUserId: 123456,
-      }).then(createUAAIdentity),
+      }).then(createUAAIdentity).catch(async (err) => {
+        console.log(err);
+      }),
 
       /**
        * Actual Github users
@@ -315,22 +331,30 @@ async function createData() {
       User.create({
         username: 'hursey013',
         adminEmail: 'brian.hurst@gsa.gov',
-      }).then(createUAAIdentity),
+      }).then(createUAAIdentity).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'svenaas',
         adminEmail: 'sven.aas@gsa.gov',
-      }).then(createUAAIdentity),
+      }).then(createUAAIdentity).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'apburnes',
         adminEmail: 'andrew.burnes@gsa.gov',
-      }).then(createUAAIdentity),
+      }).then(createUAAIdentity).catch(async (err) => {
+        console.log(err);
+      }),
 
       User.create({
         username: 'davemcorwin',
         adminEmail: 'david.corwin@gsa.gov',
-      }).then(createUAAIdentity),
+      }).then(createUAAIdentity).catch(async (err) => {
+        console.log(err);
+      }),
 
       // User without UAA
       User.create({
@@ -338,12 +362,16 @@ async function createData() {
         email: 'user_no_uaa@example.com',
         githubAccessToken: 'access-token',
         githubUserId: 123456,
+      }).catch(async (err) => {
+        console.log(err);
       }),
 
       // Auditor
       User.create({
         username: process.env.USER_AUDITOR,
         email: 'auditor@example.com',
+      }).catch(async (err) => {
+        console.log(err);
       }),
     ]);
 

@@ -9318,7 +9318,14 @@ passport-github@^1.1.0:
   dependencies:
     passport-oauth2 "1.x.x"
 
-passport-oauth2@1.x.x, passport-oauth2@^1.8.0:
+passport-gitlab2@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/passport-gitlab2/-/passport-gitlab2-5.0.0.tgz#ea37e5285321c026a02671e87469cac28cce9b69"
+  integrity sha512-cXQMgM6JQx9wHVh7JLH30D8fplfwjsDwRz+zS0pqC8JS+4bNmc1J04NGp5g2M4yfwylH9kQRrMN98GxMw7q7cg==
+  dependencies:
+    passport-oauth2 "^1.4.0"
+
+passport-oauth2@1.x.x, passport-oauth2@^1.4.0, passport-oauth2@^1.8.0:
   version "1.8.0"
   resolved "https://registry.npmjs.org/passport-oauth2/-/passport-oauth2-1.8.0.tgz"
   integrity sha512-cjsQbOrXIDE4P8nNb3FQRCCmJJ/utnFKEz2NX209f7KOHPoX18gF7gBzBbLLsj2/je4KrgiwLLGjf0lm9rtTBA==

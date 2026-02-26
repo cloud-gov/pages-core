@@ -10,6 +10,7 @@ const associate = ({
   UAAIdentity,
   User,
   UserAction,
+  UserOauthProvider,
 }) => {
   // Associations
   User.hasMany(Build, {
@@ -37,6 +38,9 @@ const associate = ({
     foreignKey: 'userId',
   });
   User.hasMany(OrganizationRole, {
+    foreignKey: 'userId',
+  });
+  User.hasMany(UserOauthProvider, {
     foreignKey: 'userId',
   });
 
@@ -128,6 +132,15 @@ const attributes = (DataTypes) => ({
   },
   githubUserId: {
     type: DataTypes.STRING,
+  },
+  gitlabToken: {
+    type: DataTypes.STRING,
+  },
+  gitlabRefreshToken: {
+    type: DataTypes.STRING,
+  },
+  gitlabExpiresAt: {
+    type: DataTypes.TIME,
   },
   signedInAt: {
     type: DataTypes.DATE,

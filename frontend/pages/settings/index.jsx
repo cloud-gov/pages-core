@@ -7,6 +7,7 @@ import { userSettingsUpdated } from '@actions/actionCreators/userActions';
 import federalistApi from '@util/federalistApi';
 import LoadingIndicator from '@shared/LoadingIndicator';
 import GithubAuthButton from '@shared/GithubAuthButton';
+import GitLabAuthButton from '@shared/GitLabAuthButton';
 import userActions from '@actions/userActions';
 import alertActions from '@actions/alertActions';
 import notificationActions from '@actions/notificationActions';
@@ -25,13 +26,21 @@ function buildInitialValues(sites, user) {
   };
 }
 
-const onGithubAuthSuccess = () => {
+const onGitProviderAuthSuccess = (gitProviderName) => {
   userActions.fetchUser();
-  alertActions.alertSuccess('Github authorization successful');
-  notificationActions.success('Github authorization successful');
+  alertActions.alertSuccess(`${gitProviderName} authorization successful`);
+  notificationActions.success(`${gitProviderName} authorization successful`);
 };
 
-const onGithubAuthFailure = (_error) => {
+const onGithubAuthSuccess = () => {
+  onGitProviderAuthSuccess('GitHub');
+};
+
+const onGitLabAuthSuccess = () => {
+  onGitProviderAuthSuccess('GitLab');
+};
+
+const onGitProviderAuthFailure = (_error) => {
   alertActions.alertError(_error.message);
 };
 
@@ -91,16 +100,30 @@ function UserSettings() {
       </div>
       <div className="well grid-row">
         <div className="grid-col">
-          <h2>Github Token</h2>
+          <h2>GitHub Token</h2>
         </div>
       </div>
       <div className="well grid-row">
         <div className="grid-col">
           <GithubAuthButton
             onSuccess={onGithubAuthSuccess}
-            onFailure={onGithubAuthFailure}
+            onFailure={onGitProviderAuthFailure}
             text="Reset your Github Access Token."
             revokeFirst
+          />
+        </div>
+      </div>
+      <div className="well grid-row">
+        <div className="grid-col">
+          <h2>GitLab Token</h2>
+        </div>
+      </div>
+      <div className="well grid-row">
+        <div className="grid-col">
+          <GitLabAuthButton
+            onSuccess={onGitLabAuthSuccess}
+            onFailure={onGitProviderAuthFailure}
+            text="Reset your GitLab Access Token."
           />
         </div>
       </div>

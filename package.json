@@ -45,6 +45,7 @@
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-github": "^1.1.0",
+    "passport-gitlab2": "^5.0.0",
     "passport-oauth2": "^1.8.0",
     "pretty-bytes": "^6.1.1",
     "react": "^18.2.0",

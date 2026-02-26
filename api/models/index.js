@@ -47,6 +47,8 @@ require('./organization')(sequelize, DataTypes);
 require('./organization-role')(sequelize, DataTypes);
 require('./uaa-identity')(sequelize, DataTypes);
 require('./domain')(sequelize, DataTypes);
+require('./user-oauth-provider')(sequelize, DataTypes);
+
 
 Object.keys(sequelize.models)
   .map((key) => sequelize.models[key])

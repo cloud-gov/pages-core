@@ -24,6 +24,32 @@ app.disable('x-powered-by');
 app.use(passport.initialize());
 app.get('/auth/github', passport.authenticate('github', { session: false }));
 app.get('/auth/github/callback', (req, res) => {
+  console.log('GITHUB CALLBACK!!!');
+  passport.authenticate('github', (error, user) => {
+    const response = error
+      ? script(res.locals.cspNonce, 'error', {
+          message: error.message,
+        })
+      : script(res.locals.cspNonce, 'success', {
+          token: user.accessToken,
+          provider: 'github',
+        });
+
+    if (error) {
+      EventCreator.error(Event.labels.AUTHENTICATION_NETLIFY_CMS, error);
+    } else {
+      EventCreator.audit(
+        Event.labels.AUTHENTICATION_NETLIFY_CMS,
+        null,
+        'Authenticated user with Github on Netlify CMS',
+      );
+    }
+
+    res.send(response);
+  })(req, res);
+});
+app.get('/auth/gitlab/callback', (req, res) => {
+  console.log('GITLAB CALLBACK!!!');
   passport.authenticate('github', (error, user) => {
     const response = error
       ? script(res.locals.cspNonce, 'error', {
