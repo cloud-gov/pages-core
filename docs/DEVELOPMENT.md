@@ -40,13 +40,21 @@ This will be the file that holds your S3 and SQS configurations.
 
 4. Make a copy of `api/bull-board/.env.sample`, name it `.env`, and place it in `api/bull-board/`.
 
-2. Assuming you have been added to the `FederalistLocal` Github organization, navigate to the [developer settings for the `FederalistLocal-Queues` OAuth application](https://github.com/organizations/FederalistLocal/settings/applications/1832231) and create a new Client secret.
+5. Assuming you have been added to the `FederalistLocal` Github organization, navigate to the [developer settings for the `FederalistLocal-Queues` OAuth application](https://github.com/organizations/FederalistLocal/settings/applications/1832231) and create a new Client secret.
 
-3. Once you have the new Client secret, you'll see a `Client ID` and `Client Secret`. Open the `api/bull-board/.env` file in your text or code editor and update it with the Client ID and Client secret from the `FederalistLocal-Queues` OAuth application:
+6. Once you have the new Client secret, you'll see a `Client ID` and `Client Secret`. Open the `api/bull-board/.env` file in your text or code editor and update it with the Client ID and Client secret from the `FederalistLocal-Queues` OAuth application:
     ```
     GITHUB_CLIENT_ID=VALUE FROM GITHUB
     GITHUB_CLIENT_SECRET=VALUE FROM GITHUB
     ```
+7. For Workshop integration add GitLab Client ID and Client secret to `config/local.js` file in your text or code editor:
+    ```js
+    const gitlabOptions = {
+      clientID: 'VALUE FROM GITLAB',
+      clientSecret: 'VALUE FROM GITLAB',
+    };
+    ```
+
 **For 18F/TTS developers:** This section is primarily for 18F/TTS developers working on the Federalist project. Before you get started, make sure you have been fully on-boarded, including getting access to the Federalist cloud.gov `staging` space.
 
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
@@ -73,6 +81,15 @@ In order to make it possible to log in with local UAA authentication in a develo
 
 1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env build`
 1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env up`
+
+#### GitLab in a Docker container
+
+1. To install GitLab in a Docker container, follow instructions at https://docs.gitlab.com/install/docker/installation/ollow .
+2. To configure GitLab as an OAuth 2.0 authentication identity provider, follow instructions at https://docs.gitlab.com/integration/oauth_provider/#create-an-instance-wide-application .
+3. To build and start GitLab in a Docker container, use
+- `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml -f ./docker-compose.gitlab.yml --env-file ./services/local/docker.env build`
+- `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml -f ./docker-compose.gitlab.yml --env-file ./services/local/docker.env up`
+
 
 #### Check to see if everything is working correctly
 
@@ -179,6 +196,8 @@ The app expects the following user provided services to be provided:
   - `GITHUB_CLIENT_SECRET`: The client secret used for GitHub authentication
   - `GITHUB_WEBHOOK_SECRET`: The secret used to sign and verify webhook requests from GitHub
   - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
+  - `GITLAB_CLIENT_ID` : The client ID used for GitLab authentication
+  - `GITLAB_CLIENT_SECRET` : The client secret used for GitLab authentication
 - `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app. This service provides the following:
   - `clientID`: The UAA client id for the environments admin app
   - `clientSecret`: The UAA client secret for the environments admin app

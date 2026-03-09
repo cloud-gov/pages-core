@@ -72,4 +72,23 @@ router.get(
   onGithubSuccess,
 );
 
+router.get('/auth/gitlab', passport.authenticate('gitlab'));
+router.get(
+  '/auth/gitlab/callback',
+  passport.authenticate('gitlab', { session: false }),
+  async (req, res) => {
+    await EventCreator.audit(
+      Event.labels.AUTHENTICATION_PAGES_GL_TOKEN,
+      req.user,
+      'GitLab authentication for token',
+    );
+
+    res.send(`
+    <script nonce="${res.locals.cspNonce}">
+      window.opener.postMessage("success", "*")
+    </script>
+  `);
+  },
+);
+
 module.exports = router;

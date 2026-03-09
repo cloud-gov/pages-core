@@ -1,3 +1,4 @@
+const { encryption } = require('../../../../config');
 const { expect } = require('chai');
 const { OrganizationRole, Role, Site, User } = require('../../../../api/models');
 const orgFactory = require('../../support/factory/organization');
@@ -27,6 +28,8 @@ describe('User model', () => {
   let managerRole;
 
   before(async () => {
+    encryption.key = 'test-key-exactly-32-characters!!';
+
     await clean();
     [userRole, managerRole] = await Promise.all([
       Role.findOne({
@@ -291,6 +294,77 @@ describe('User model', () => {
 
       expect(users.map((u) => u.id)).to.have.members([user2.id]);
       expect(users.map((u) => u.UAAIdentity.id)).to.have.members([uaaIdentity2.id]);
+    });
+  });
+
+  describe('GitLab tokens encryption', () => {
+    it('should encrypt and decrypt gitlabToken value', async () => {
+      const [user] = await Promise.all([createUser()]);
+
+      expect(user.gitlabToken).to.equal(null);
+      expect(user.gitlabRefreshToken).to.equal(null);
+      expect(user.gitlabExpiresAt).to.equal(null);
+
+      const rawGitlabToken = 'raw-gitlab-token';
+      await user.update({
+        gitlabToken: rawGitlabToken,
+      });
+      expect(user.gitlabToken).to.equal(rawGitlabToken);
+      const encryptedGitlabToken = user.getDataValue('__enc_gitlabToken');
+      expect(encryptedGitlabToken).not.to.equal(rawGitlabToken);
+      expect(encryptedGitlabToken.split(':').length - 1).to.equal(2);
+    });
+
+    it('should encrypt and decrypt gitlabRefreshToken value', async () => {
+      const [user] = await Promise.all([createUser()]);
+
+      expect(user.gitlabToken).to.equal(null);
+      expect(user.gitlabRefreshToken).to.equal(null);
+      expect(user.gitlabExpiresAt).to.equal(null);
+
+      const rawGitlabRefreshToken = 'raw-gitlab-refresh-token';
+      await user.update({
+        gitlabRefreshToken: rawGitlabRefreshToken,
+      });
+      expect(user.gitlabRefreshToken).to.equal(rawGitlabRefreshToken);
+      const encryptedGitlabRefreshToken = user.getDataValue('__enc_gitlabRefreshToken');
+      expect(encryptedGitlabRefreshToken).not.to.equal(rawGitlabRefreshToken);
+      expect(encryptedGitlabRefreshToken.split(':').length - 1).to.equal(2);
+    });
+
+    it('should return null if gitlabToken value can not be decrypted', async () => {
+      const [user] = await Promise.all([createUser()]);
+
+      await user.setDataValue('__enc_gitlabToken', 'invalid-encrypted-value');
+      expect(user.gitlabToken).to.equal(null);
+      expect(user.__enc_gitlabToken).to.equal('invalid-encrypted-value');
+    });
+
+    it('should return null if refresh token value can not be decrypted', async () => {
+      const [user] = await Promise.all([createUser()]);
+
+      await user.setDataValue('__enc_gitlabRefreshToken', 'invalid-encrypted-value');
+      expect(user.gitlabRefreshToken).to.equal(null);
+      expect(user.__enc_gitlabRefreshToken).to.equal('invalid-encrypted-value');
+    });
+
+    it('should reset tokens', async () => {
+      const [user] = await Promise.all([createUser()]);
+
+      await user.update({
+        gitlabToken: 'gitlabToken',
+        gitlabRefreshToken: 'gitlabRefreshToken',
+      });
+      expect(user.gitlabToken).to.equal('gitlabToken');
+      expect(user.gitlabRefreshToken).to.equal('gitlabRefreshToken');
+
+      await user.update({
+        gitlabToken: null,
+        gitlabRefreshToken: null,
+      });
+
+      expect(user.gitlabToken).to.equal(null);
+      expect(user.gitlabRefreshToken).to.equal(null);
     });
   });
 });

@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     AUTHENTICATION_ADMIN: 'authentication-admin',
     AUTHENTICATION_NETLIFY_CMS: 'authentication-netlify-cms',
     AUTHENTICATION_PAGES_GH_TOKEN: 'authentication-pages-github-token',
+    AUTHENTICATION_PAGES_GL_TOKEN: 'authentication-pages-gitlab-token',
     FEDERALIST_USERS_MEMBERSHIP: 'federalist-users-membership',
     BUILD_STATUS: 'build-status',
     BUILD_TASK: 'build-task',

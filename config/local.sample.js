@@ -3,6 +3,12 @@ const githubOptions = {
   clientSecret: 'GITHUB_OAUTH_CLIENT_SECRET',
 };
 
+const gitlabOptions = {
+  clientID: 'GITLAB_OAUTH_CLIENT_ID',
+  clientSecret: 'GITLAB_OAUTH_CLIENT_SECRET',
+  baseURL: 'GITLAB_OAUTH_BASE_URL',
+};
+
 if (process.env.NODE_ENV !== 'test') {
   module.exports = {
     passport: {
@@ -13,6 +19,9 @@ if (process.env.NODE_ENV !== 'test') {
         organizations: [
           46731192, // FederalistLocal
         ],
+      },
+      gitlab: {
+        authorizationOptions: gitlabOptions,
       },
       // Keep these options below in your local.js config
       // to connect the the docker-compose uaa service
