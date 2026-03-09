@@ -1,10 +1,12 @@
 const GitHubStrategy = require('passport-github').Strategy;
+const GitLabStrategy = require('passport-gitlab2').Strategy;
 const Passport = require('passport');
 const config = require('../../config');
 const { logger } = require('../../winston');
 const { User, Event } = require('../models');
 const EventCreator = require('./EventCreator');
 const { createUAAStrategy, verifyUAAUser } = require('./uaaStrategy');
+const { updateGitLabTokens } = require('./user');
 
 const passport = new Passport.Passport();
 const flashMessage = {
@@ -29,6 +31,7 @@ passport.deserializeUser((id, next) => {
  */
 const {
   github: { authorizationOptions: githubAuthorizationOptions },
+  gitlab: { authorizationOptions: gitlabAuthorizationOptions },
 } = config.passport;
 
 async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
@@ -61,6 +64,46 @@ async function verifyGithub2(accessToken, _refreshToken, profile, callback) {
 }
 
 passport.use('github2', new GitHubStrategy(githubAuthorizationOptions, verifyGithub2));
+
+passport.use(
+  'gitlab',
+  new GitLabStrategy(gitlabAuthorizationOptions, async function (
+    req,
+    accessToken,
+    refreshToken,
+    params,
+    profile,
+    callback,
+  ) {
+    try {
+      const user = req.user;
+
+      await updateGitLabTokens(user, {
+        accessToken,
+        refreshToken,
+        expiresIn: params.expires_in,
+        createdAt: params.created_at,
+      });
+
+      await EventCreator.audit(
+        Event.labels.AUTHENTICATION_PAGES_GL_TOKEN,
+        null,
+        'User authenticated',
+        {
+          username: user.username,
+          email: user.email,
+          adminEmail: user.adminEmail,
+        },
+      );
+
+      return callback(null, user);
+    } catch (err) {
+      await EventCreator.error(Event.labels.AUTHENTICATION_PAGES_GL_TOKEN, err);
+      logger.warn('GitLab authentication error: ', err);
+      return callback(err);
+    }
+  }),
+);
 
 let uaaLogoutRedirectURL = '';
 

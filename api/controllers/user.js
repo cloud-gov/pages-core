@@ -1,6 +1,8 @@
 const Ajv = require('ajv');
 const userSerializer = require('../serializers/user');
 const { revokeApplicationGrant } = require('../services/GitHub');
+const { revokeUserGitLabTokens } = require('../services/GitLab');
+const { resetGitLabTokens } = require('../services/user');
 
 const ajv = new Ajv();
 
@@ -51,6 +53,16 @@ module.exports = {
     await revokeApplicationGrant(user);
     // even if the token revoke fails, we return a
     // 200 because we still want to prompt a reauth flow
+    return res.json({});
+  },
+
+  async revokeUserGitLabTokens(req, res) {
+    const { user } = req;
+
+    await revokeUserGitLabTokens(user);
+
+    await resetGitLabTokens(user);
+
     return res.json({});
   },
 };

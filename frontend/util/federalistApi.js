@@ -329,6 +329,18 @@ export default {
     );
   },
 
+  revokeUserGitLabTokens() {
+    return request(
+      'me/gitlabtoken',
+      {
+        method: 'DELETE',
+      },
+      {
+        handleHttpError: false,
+      },
+    );
+  },
+
   getBuildTaskTypes() {
     return request('tasks/types');
   },

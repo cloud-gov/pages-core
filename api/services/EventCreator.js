@@ -49,8 +49,13 @@ const error = (label, err, body = {}) =>
 
 const requestDenyList = [
   'accessToken', // Github access token
+  'githubAccessToken',
+  'githubUserId',
   'password', // basicAuth password
   'value', // uev value
+  'gitlabToken',
+  'gitlabRefreshToken',
+  'gitlabExpiresAt',
 ];
 
 /**

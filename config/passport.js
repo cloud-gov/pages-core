@@ -2,6 +2,9 @@ const env = require('../services/environment')();
 
 const clientID = env.GITHUB_CLIENT_ID || 'not_set';
 const clientSecret = env.GITHUB_CLIENT_SECRET || 'not_set';
+const gitlabClientID = env.GITLAB_CLIENT_ID || 'not_set';
+const gitlabClientSecret = env.GITLAB_CLIENT_SECRET || 'not_set';
+const gitlabBaseUrl = env.GITLAB_BASE_URL || 'not_set';
 
 const url = (path) => `${env.APP_HOSTNAME}${path}`;
 
@@ -38,6 +41,18 @@ module.exports = {
       userURL: `${env.UAA_HOST_DOCKER_URL || env.UAA_HOST}/userinfo`,
       logoutURL: `${env.UAA_HOST}/logout.do`,
       scope: ['openid', 'scim.invite'],
+    },
+  },
+  gitlab: {
+    authorizationOptions: {
+      baseURL: gitlabBaseUrl,
+      clientID: gitlabClientID,
+      clientSecret: gitlabClientSecret,
+      callbackURL: `${env.APP_HOSTNAME}/auth/gitlab/callback`,
+      scope: ['read_repository api'],
+      state: true,
+      responseType: 'code',
+      passReqToCallback: true, // to extract refresh token and expires at.
     },
   },
 };

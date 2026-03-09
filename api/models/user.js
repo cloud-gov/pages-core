@@ -1,5 +1,8 @@
 const { Op } = require('sequelize');
 const { toInt } = require('../utils');
+const { encrypt, decrypt } = require('../services/Encryptor');
+const { encryption } = require('../../config');
+const { logger } = require('../../winston');
 
 const associate = ({
   Build,
@@ -116,6 +119,32 @@ function beforeValidate(user) {
   user.username = safeUsername || null;
 }
 
+function getEncryptedField(instance, field) {
+  const val = instance.getDataValue(field);
+  if (!val) return null;
+
+  try {
+    return decrypt(val, encryption.key);
+  } catch (error) {
+    logger.error(`Error decrypting GitLab token for field '${field}'.`, error);
+    return null;
+  }
+}
+
+function setEncryptedField(instance, field, val) {
+  let encrypted = null;
+
+  if (val) {
+    try {
+      encrypted = encrypt(val, encryption.key).ciphertext;
+    } catch (error) {
+      logger.error(`Error encrypting GitLab token for field '${field}'.`, error);
+    }
+  }
+
+  instance.setDataValue(field, encrypted);
+}
+
 const attributes = (DataTypes) => ({
   email: {
     type: DataTypes.STRING,
@@ -128,6 +157,35 @@ const attributes = (DataTypes) => ({
   },
   githubUserId: {
     type: DataTypes.STRING,
+  },
+  __enc_gitlabToken: {
+    type: DataTypes.TEXT,
+    field: 'gitlabToken',
+  },
+  gitlabToken: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return getEncryptedField(this, '__enc_gitlabToken');
+    },
+    set(val) {
+      setEncryptedField(this, '__enc_gitlabToken', val);
+    },
+  },
+  __enc_gitlabRefreshToken: {
+    type: DataTypes.TEXT,
+    field: 'gitlabRefreshToken',
+  },
+  gitlabRefreshToken: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return getEncryptedField(this, '__enc_gitlabRefreshToken');
+    },
+    set(val) {
+      setEncryptedField(this, '__enc_gitlabRefreshToken', val);
+    },
+  },
+  gitlabExpiresAt: {
+    type: DataTypes.TIME,
   },
   signedInAt: {
     type: DataTypes.DATE,
