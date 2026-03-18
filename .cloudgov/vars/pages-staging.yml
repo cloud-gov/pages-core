@@ -3,6 +3,7 @@ domain: pages-staging.cloud.gov
 env: staging
 env_postfix: -staging
 feature_file_storage_service: "true"
+feature_workshop-integration: "false"
 instances: 2
 log_level: verbose
 name: pages-staging

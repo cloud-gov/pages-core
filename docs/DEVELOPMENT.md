@@ -198,7 +198,8 @@ The app expects the following user provided services to be provided:
   - `GITHUB_WEBHOOK_URL`: The url where GitHub webhook requests should be sent
   - `GITLAB_CLIENT_ID` : The client ID used for GitLab authentication
   - `GITLAB_CLIENT_SECRET` : The client secret used for GitLab authentication
-- `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app. This service provides the following:
+  - `GITLAB_WEBHOOK_URL`: The url where GitLab webhook requests should be sent
+  - `admin-<environment>-uaa-client`: Credentials for cloud.gov's UAA to support authentication for the admin app. This service provides the following:
   - `clientID`: The UAA client id for the environments admin app
   - `clientSecret`: The UAA client secret for the environments admin app
   - `authorizationURL`: The url to login and authorize a user
@@ -389,6 +390,8 @@ Environment-specific feature flags are supported for both the api and frontend. 
 ### Current available features
 
 - `FEATURE_FILE_STORAGE_SERVICE`: The file storage service feature flag to gate the API's accessibility in production.
+
+- `FEATURE_WORKSHOP_INTEGRATION`: The Wokshop integration flag to gate the UI and API's accessibility in production.
 
 ### Api feature flags
 Api feature flags are evaluated at *runtime* and should be created explicitly in the code before the corresponding environment variable can be used. Example:

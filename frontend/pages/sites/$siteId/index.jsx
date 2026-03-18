@@ -98,6 +98,8 @@ export function SiteContainer() {
         <PagesHeader
           repository={site.repository}
           owner={site.owner}
+          sourceCodePlatform={site.sourceCodePlatform}
+          sourceCodeUrl={site.sourceCodeUrl}
           title={pageTitle}
           siteId={site.id}
           branch={params.branch || site.defaultBranch}

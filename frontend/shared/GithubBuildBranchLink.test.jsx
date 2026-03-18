@@ -8,6 +8,8 @@ const defaultBuild = {
   branch: 'branch_name',
 };
 const defaultSite = {
+  sourceCodePlatform: 'github',
+  sourceCodeUrl: 'https://github.com/repo_owner/repo_name',
   owner: 'repo_owner',
   repository: 'repo_name',
 };

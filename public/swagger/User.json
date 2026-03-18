@@ -14,6 +14,9 @@
     "hasGithubAuth": {
       "type": "boolean"
     },
+    "hasGitlabAuth": {
+      "type": "boolean"
+    },
     "signedInAt": {
       "type": "date-time"
     }

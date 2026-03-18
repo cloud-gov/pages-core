@@ -199,6 +199,7 @@ cf create-user-provided-service "${service_name_env}" \
       "GITHUB_CLIENT_SECRET": "${GITHUB_CLIENT_SECRET}",
       "GITHUB_WEBHOOK_SECRET": "$(openssl rand -hex 20)",
       "GITHUB_WEBHOOK_URL": "https://${domain}/webhook/github"
+      "GITLAB_WEBHOOK_URL": "https://${domain}/webhook/gitlab"
     }
 EOF
 )"

@@ -12,19 +12,36 @@ import globals from '@globals';
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
 
-function getOwnerAndRepo(repoUrl) {
-  const owner = repoUrl.split('/')[3];
-  const repository = repoUrl.split('/')[4];
+const isWorkshopIntegration = process.env.FEATURE_WORKSHOP_INTEGRATION === 'true';
 
-  return {
-    owner,
-    repository,
-  };
+export function getOwnerAndRepo(repoUrl, isWorkshopIntegration) {
+  if (repoUrl.startsWith(globals.GITLAB_BASE_URL) && isWorkshopIntegration) {
+    const [, owner, ...rest] = repoUrl.replace(globals.GITLAB_BASE_URL, '').split('/');
+
+    return {
+      owner,
+      repository: rest.join('/'),
+      sourceCodePlatform: globals.SOURCE_CODE_PLATFORM_WORKSHOP,
+      sourceCodeUrl: repoUrl,
+    };
+  } else {
+    const owner = repoUrl.split('/')[3];
+    const repository = repoUrl.split('/')[4];
+
+    return {
+      owner,
+      repository,
+      sourceCodePlatform: 'github',
+      sourceCodeUrl: repoUrl,
+    };
+  }
 }
 
 function defaultOwner(user) {
   return (user.data && user.data.username) || '';
 }
+
+const orGitLabProject = ` ${isWorkshopIntegration ? ' or GitLab project ' : ' '}`;
 
 function AddSite() {
   useEffect(
@@ -45,13 +62,18 @@ function AddSite() {
   const navigate = useNavigate();
 
   function onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
-    const { owner, repository } = getOwnerAndRepo(repoUrl);
+    const { owner, repository, sourceCodePlatform, sourceCodeUrl } = getOwnerAndRepo(
+      repoUrl,
+      isWorkshopIntegration,
+    );
     siteActions.addSite(
       {
         owner,
         repository,
         engine,
         organizationId: repoOrganizationId,
+        sourceCodePlatform,
+        sourceCodeUrl,
       },
       navigate,
     );
@@ -90,10 +112,11 @@ function AddSite() {
         <p className="usa-intro margin-0">
           There are two different ways you can add sites to
           {` ${globals.APP_NAME}. `}
-          You can specify the GitHub repository where your site&#39;s code lives. Or, you
-          can start with a brand new site by selecting one of our template sites below.
+          You can specify the GitHub repository{orGitLabProject}
+          where your site&#39;s code lives. Or, you can start with a brand new site by
+          selecting one of our template sites below.
         </p>
-        <h2>Use your own GitHub repository</h2>
+        <h2>Use your own GitHub repository{orGitLabProject}</h2>
       </div>
       <div className="grid-col-8">
         <AddRepoSiteForm

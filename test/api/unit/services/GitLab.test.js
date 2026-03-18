@@ -4,8 +4,9 @@ const sinon = require('sinon');
 
 const config = require('../../../../config');
 const {
-  refreshToken,
+  fetchRefreshTokens,
   revokeUserGitLabTokens,
+  getBaseUrl,
 } = require('../../../../api/services/GitLab');
 const { logger } = require('../../../../winston');
 
@@ -13,7 +14,7 @@ const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
 gitlabConfig.clientID = 'mock-client-id';
 gitlabConfig.clientSecret = 'mock-client-secret';
 gitlabConfig.callbackURL = 'https://localhost:1337/auth/gitlab/callback';
-gitlabConfig.baseURL = 'http://workshop.cloud.gov';
+gitlabConfig.baseURL = 'http://workshop.cloud.gov/';
 
 const clientCredentials = {
   client_id: gitlabConfig.clientID,
@@ -23,7 +24,8 @@ const clientCredentials = {
 const refreshToken200Response = {
   access_token: 'new-access-token',
   expires_in: 7200,
-  refresh_token: 'new- refresh-token',
+  refresh_token: 'new-refresh-token',
+  created_at: '2026-03-17T17:22:09.904Z',
 };
 
 const refreshToken400Response = {
@@ -99,7 +101,7 @@ function nockRefreshTokenWithError(accessToken, refreshToken, error) {
 }
 
 describe('GitLab', () => {
-  describe('.refreshToken(user)', () => {
+  describe('.fetchRefreshTokens(user)', () => {
     afterEach(() => {
       nock.cleanAll();
     });
@@ -112,7 +114,7 @@ describe('GitLab', () => {
         200,
         refreshToken200Response,
       );
-      const response = await refreshToken(user);
+      const response = await fetchRefreshTokens(user);
 
       expect(response.ok).to.equal(true);
       expect(await response.json()).to.deep.equal(refreshToken200Response);
@@ -128,7 +130,7 @@ describe('GitLab', () => {
         refreshToken400Response,
       );
 
-      const response = await refreshToken(user);
+      const response = await fetchRefreshTokens(user);
 
       expect(response.ok).to.be.false;
       expect(response.status).to.equal(400);
@@ -216,7 +218,7 @@ describe('GitLab', () => {
 
       expect(loggerWarnStub.called).to.be.true;
       expect(loggerWarnStub.args[0]).to.deep.equal([
-        'GitLab: Unexpected refresh response after revoke: 200',
+        'GitLab: Unexpected token refresh response after tokens were revoked: 200',
         refreshToken200Response,
       ]);
       expect(loggerErrorStub.called).to.be.false;
@@ -332,5 +334,25 @@ describe('GitLab', () => {
         'Network error while refreshing tokens.',
       );
     });
+  });
+
+  describe('.getBaseUrl()', () => {
+    it('should remove trailing slash from url', async () => {
+      gitlabConfig.baseURL = 'https://workshop.cloud.gov/trailing_slash/';
+      expect(getBaseUrl(gitlabConfig.baseURL)).to.equal(
+        'https://workshop.cloud.gov/trailing_slash',
+      );
+    });
+
+    it('should not update url if there is no trailing slash', async () => {
+      gitlabConfig.baseURL = 'https://workshop.cloud.gov/no_trailing_slash';
+      expect(getBaseUrl(gitlabConfig.baseURL)).to.equal(
+        'https://workshop.cloud.gov/no_trailing_slash',
+      );
+    });
+  });
+
+  it('does not throw an error', async () => {
+    expect(getBaseUrl(null)).to.equal(undefined);
   });
 });

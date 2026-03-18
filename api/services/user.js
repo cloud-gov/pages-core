@@ -3,7 +3,8 @@ module.exports = {
     return user.update({
       gitlabToken: accessToken,
       gitlabRefreshToken: refreshToken,
-      gitlabExpiresAt: new Date((createdAt + expiresIn) * 1000),
+      gitlabExpiresAt:
+        accessToken && refreshToken ? new Date((createdAt + expiresIn) * 1000) : null,
     });
   },
 

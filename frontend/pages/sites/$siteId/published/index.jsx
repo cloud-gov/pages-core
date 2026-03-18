@@ -22,7 +22,7 @@ function PublishedBranchesTable() {
     return <LoadingIndicator />;
   }
 
-  if (!publishedBranches.data.length) {
+  if (!publishedBranches?.data?.length) {
     return (
       <AlertBanner
         status="info"

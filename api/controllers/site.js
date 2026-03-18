@@ -82,7 +82,15 @@ module.exports = wrapHandlers({
 
   async create(req, res) {
     const {
-      body: { owner, template, organizationId, repository, engine },
+      body: {
+        owner,
+        template,
+        organizationId,
+        repository,
+        engine,
+        sourceCodePlatform,
+        sourceCodeUrl,
+      },
       user,
     } = req;
 
@@ -92,6 +100,8 @@ module.exports = wrapHandlers({
       organizationId: toInt(organizationId),
       repository,
       engine,
+      sourceCodePlatform,
+      sourceCodeUrl,
     };
 
     await authorizer.create(user, siteParams);

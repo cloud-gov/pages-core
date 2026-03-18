@@ -18,6 +18,10 @@ do:
       FEATURE_FILE_STORAGE_SERVICE: true
       #@ if/end env == 'production':
       FEATURE_FILE_STORAGE_SERVICE: false
+      #@ if/end env != 'production':
+      FEATURE_WORKSHOP_INTEGRATION: true
+      #@ if/end env == 'production':
+      FEATURE_WORKSHOP_INTEGRATION: false
 
   - task: deploy-api
     file: src/ci/partials/deploy.yml

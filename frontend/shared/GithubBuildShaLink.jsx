@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import GitHubLink from './GitHubLink';
+import SourceCodePlatformLink from './SourceCodePlatformLink';
 
 export default function GithubBuildShaLink({ build, site }) {
-  const { owner, repository } = site;
+  const { sourceCodePlatform, sourceCodeUrl } = site;
   const sha = build.clonedCommitSha || build.requestedCommitSha;
   if (sha) {
     return (
-      <GitHubLink
-        owner={owner}
-        repository={repository}
+      <SourceCodePlatformLink
+        sourceCodePlatform={sourceCodePlatform}
+        sourceCodeUrl={sourceCodeUrl}
         sha={sha}
         branch={null}
         text={sha.slice(0, 7)}
@@ -26,7 +26,7 @@ GithubBuildShaLink.propTypes = {
     requestedCommitSha: PropTypes.string,
   }).isRequired,
   site: PropTypes.shape({
-    owner: PropTypes.string.isRequired,
-    repository: PropTypes.string.isRequired,
+    sourceCodePlatform: PropTypes.string.isRequired,
+    sourceCodeUrl: PropTypes.string.isRequired,
   }).isRequired,
 };

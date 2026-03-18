@@ -2,12 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 
-import GitHubRepoUrlField from '@shared/Fields/GitHubRepoUrlField';
+import SourceCodePlatformUrlField from '@shared/Fields/SourceCodePlatformUrlField';
 import { validAddRepoSiteForm } from '@util/validators';
 import UserOrgSelect from '@shared/UserOrgSelect';
 import SelectSiteEngine from '@shared/SelectSiteEngine';
 
 import { ORGANIZATIONS } from '@propTypes';
+
+const orGitLabProject = `${
+  process.env.FEATURE_WORKSHOP_INTEGRATION === 'true' ? 'or GitLab project' : ''
+}`;
+const placeholderText = `${
+  process.env.FEATURE_WORKSHOP_INTEGRATION === 'true'
+    ? 'https://github.com/owner/repository or https://workshop.cloud.gov/group/subgroup/project'
+    : 'https://github.com/owner/repository'
+}`;
 
 export const AddRepoSiteForm = ({
   // even though initialValues is not directly used, it is used
@@ -21,11 +30,12 @@ export const AddRepoSiteForm = ({
 }) => (
   <form onSubmit={handleSubmit}>
     <div className="form-group margin-y-3">
-      <GitHubRepoUrlField
-        label="Already have a GitHub repo for your site? Paste the URL here."
+      <SourceCodePlatformUrlField
+        label={`Already have a GitHub repo ${orGitLabProject} for your site? 
+        Paste the URL here.`}
         name="repoUrl"
         id="repoUrl"
-        placeholder="https://github.com/owner/repository"
+        placeholder={placeholderText}
         readOnly={showAddNewSiteFields}
       />
     </div>

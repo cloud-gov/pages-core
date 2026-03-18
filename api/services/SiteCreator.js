@@ -1,9 +1,13 @@
 const GitHub = require('./GitHub');
+const GitLab = require('./GitLab');
+const GitLabHelper = require('./GitLabHelper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Organization, Site, User } = require('../models');
 const utils = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
+const { updateGitLabTokens } = require('./user');
+const { logger } = require('../../winston');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -23,6 +27,8 @@ function paramsForNewSite(params) {
     engine: params.engine || defaultEngine,
     organizationId,
     subdomain,
+    sourceCodePlatform: params.sourceCodePlatform,
+    sourceCodeUrl: params.sourceCodeUrl,
   };
 }
 
@@ -94,6 +100,25 @@ function checkGithubOrg({ user, owner }) {
     });
 }
 
+async function checkRepositoryAndOrg({
+  user,
+  owner,
+  repository,
+  sourceCodePlatform,
+  sourceCodeUrl,
+}) {
+  if (sourceCodePlatform === Site.Platforms.Workshop) {
+    return await checkGitlabRepository({ user, sourceCodeUrl });
+  } else {
+    const repo = await checkGithubRepository({ user, owner, repository });
+    await checkGithubOrg({
+      user,
+      owner,
+    });
+    return repo;
+  }
+}
+
 function checkGithubRepository({ user, owner, repository }) {
   return GitHub.getRepository(user, owner, repository).then((repo) => {
     if (!repo) {
@@ -110,6 +135,21 @@ function checkGithubRepository({ user, owner, repository }) {
     }
     return repo;
   });
+}
+
+function checkGitlabRepository({ user, sourceCodeUrl }) {
+  return GitLab.getProject(user, sourceCodeUrl, updateGitLabTokens).then(
+    async (response) => {
+      if (!response.ok) {
+        logger.error(await response.json());
+        throw {
+          message: `The repository ${sourceCodeUrl} does not exist.`,
+          status: response.status,
+        };
+      }
+      return await response.json();
+    },
+  );
 }
 
 function buildSite(params, s3) {
@@ -163,7 +203,10 @@ function validateSite(params) {
  * returns the new site record
  */
 async function saveAndBuildSite({ site, user }) {
-  const webhook = await GitHub.setWebhook(site, user.githubAccessToken);
+  const webhook =
+    site.sourceCodePlatform === Site.Platforms.Workshop
+      ? await GitLabHelper.createSiteWebhook(user, site)
+      : await GitHub.setWebhook(site, user.githubAccessToken);
 
   // This will be `undefined` if the webhook already exists
   if (webhook) {
@@ -191,21 +234,21 @@ async function saveAndBuildSite({ site, user }) {
 }
 
 async function createSiteFromExistingRepo({ siteParams, user }) {
-  const { owner, repository, organizationId } = siteParams;
+  const { owner, repository, organizationId, sourceCodePlatform, sourceCodeUrl } =
+    siteParams;
 
   await checkSiteExists({
     owner,
     repository,
     organizationId,
   });
-  const repo = await checkGithubRepository({
+
+  const repo = await checkRepositoryAndOrg({
     user,
     owner,
     repository,
-  });
-  await checkGithubOrg({
-    user,
-    owner,
+    sourceCodePlatform,
+    sourceCodeUrl,
   });
   const { site, s3 } = await validateSite({
     ...siteParams,

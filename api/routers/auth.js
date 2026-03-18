@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { Event, User } = require('../models');
 const passport = require('../services/passport');
 const EventCreator = require('../services/EventCreator');
+const Features = require('../features');
 
 function redirectIfAuthenticated(req, res, next) {
   req.session.authenticated ? res.redirect('/') : next();
@@ -72,23 +73,25 @@ router.get(
   onGithubSuccess,
 );
 
-router.get('/auth/gitlab', passport.authenticate('gitlab'));
-router.get(
-  '/auth/gitlab/callback',
-  passport.authenticate('gitlab', { session: false }),
-  async (req, res) => {
-    await EventCreator.audit(
-      Event.labels.AUTHENTICATION_PAGES_GL_TOKEN,
-      req.user,
-      'GitLab authentication for token',
-    );
+if (Features.enabled(Features.Flags.FEATURE_WORKSHOP_INTEGRATION)) {
+  router.get('/auth/gitlab', passport.authenticate('gitlab'));
+  router.get(
+    '/auth/gitlab/callback',
+    passport.authenticate('gitlab', { session: false }),
+    async (req, res) => {
+      await EventCreator.audit(
+        Event.labels.AUTHENTICATION_PAGES_GL_TOKEN,
+        req.user,
+        'GitLab authentication for token',
+      );
 
-    res.send(`
+      res.send(`
     <script nonce="${res.locals.cspNonce}">
       window.opener.postMessage("success", "*")
     </script>
   `);
-  },
-);
+    },
+  );
+}
 
 module.exports = router;

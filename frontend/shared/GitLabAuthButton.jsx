@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import globals from '../globals';
-import { IconGitLab } from './icons';
+import { IconGitLabWhite } from './icons';
 import api from '@util/federalistApi';
 
 const apiUrl = globals.APP_HOSTNAME;
@@ -73,7 +73,7 @@ const GitLabAuthButton = ({ onFailure, onSuccess, text, revokeFirst = false }) =
             authorize(revokeFirst).then(onSuccess).catch(onFailure);
           }}
         >
-          <IconGitLab /> Connect with GitLab
+          <IconGitLabWhite /> Connect with GitLab
         </button>
       </div>
     </>

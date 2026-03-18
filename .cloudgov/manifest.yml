@@ -39,6 +39,7 @@ applications:
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
       DOMAIN: ((domain))
       FEATURE_FILE_STORAGE_SERVICE: ((feature_file_storage_service))
+      FEATURE_WORKSHOP_INTEGRATION: ((feature_workshop-integration))
       HOMEPAGE_URL: https://cloud.gov/pages
       LOG_LEVEL: ((log_level))
       NEW_RELIC_APP_NAME: ((new_relic_app_name))

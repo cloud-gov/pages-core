@@ -12,6 +12,8 @@ const defaultBuild = {
 const defaultSite = {
   owner: 'repo_owner',
   repository: 'repo_name',
+  sourceCodePlatform: 'github',
+  sourceCodeUrl: 'https://github.com/repo_owner/repo_name',
 };
 
 const defaultProps = { build: defaultBuild, site: defaultSite };

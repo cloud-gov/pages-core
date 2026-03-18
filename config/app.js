@@ -14,4 +14,5 @@ module.exports = {
       ? 'pages-support@cloud.gov'
       : 'federalist-support@gsa.gov',
   appName: process.env.PRODUCT === 'pages' ? 'Pages' : 'Federalist',
+  githubBaseUrl: process.env.GITHUB_BASE_URL || 'https://github.com',
 };

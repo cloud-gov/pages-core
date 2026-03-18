@@ -1,10 +1,18 @@
 const { Op } = require('sequelize');
 const { toInt } = require('../utils');
+const { buildEnum } = require('../utils');
+const { buildSourceCodeUrl } = require('../utils/site');
 const {
   isEmptyOrBranch,
   isEmptyOrUrl,
   isValidSubdomain,
 } = require('../utils/validators');
+
+const SOURCE_CODE_PLATFORM_GITHUB = 'github';
+const SOURCE_CODE_PLATFORM_WORKSHOP = 'workshop';
+
+const Platforms = buildEnum([SOURCE_CODE_PLATFORM_GITHUB, SOURCE_CODE_PLATFORM_WORKSHOP]);
+const DEFAULT_SOURCE_CODE_PLATFORM = Platforms.Github;
 
 const afterValidate = (site) => {
   if (site.defaultBranch === site.demoBranch) {
@@ -25,6 +33,33 @@ const validationFailed = (site, options, validationError) => {
   const error = new Error(messages.join('\n'));
   error.status = 403;
   throw error;
+};
+
+function defaultSourceCodePlatform(site) {
+  if (!site.sourceCodePlatform) {
+    site.sourceCodePlatform = DEFAULT_SOURCE_CODE_PLATFORM;
+  }
+}
+
+function defaultSourceCodeUrl(site) {
+  if (!site.sourceCodeUrl) {
+    site.sourceCodeUrl = buildSourceCodeUrl(
+      site.owner,
+      site.repository,
+      site.sourceCodePlatform,
+      Platforms.GitHub,
+    );
+  }
+}
+
+const beforeCreate = (site) => {
+  defaultSourceCodePlatform(site);
+  defaultSourceCodeUrl(site);
+};
+
+const beforeUpdate = (site) => {
+  defaultSourceCodePlatform(site);
+  defaultSourceCodeUrl(site);
 };
 
 const associate = ({
@@ -133,6 +168,9 @@ const beforeValidate = (site) => {
   if (site.owner) {
     site.owner = site.owner.toLowerCase();
   }
+
+  defaultSourceCodePlatform(site);
+  defaultSourceCodeUrl(site);
 };
 
 async function getOrgUsers() {
@@ -267,6 +305,19 @@ module.exports = (sequelize, DataTypes) => {
       webhookId: {
         type: DataTypes.INTEGER,
       },
+      sourceCodePlatform: {
+        type: DataTypes.ENUM,
+        values: Platforms.values,
+        defaultValue: Platforms.Github,
+        allowNull: false,
+        validate: {
+          isIn: [Platforms.values],
+        },
+      },
+      sourceCodeUrl: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
     {
       tableName: 'site',
@@ -274,6 +325,8 @@ module.exports = (sequelize, DataTypes) => {
         beforeValidate,
         afterValidate,
         validationFailed,
+        beforeCreate,
+        beforeUpdate,
       },
       paranoid: true,
     },
@@ -296,5 +349,6 @@ module.exports = (sequelize, DataTypes) => {
   Site.branchFromContext = (context) =>
     context === 'site' ? 'defaultBranch' : 'demoBranch';
   Site.prototype.getOrgUsers = getOrgUsers;
+  Site.Platforms = Platforms;
   return Site;
 };

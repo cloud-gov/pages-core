@@ -113,21 +113,26 @@ function UserSettings() {
           />
         </div>
       </div>
-      <div className="well grid-row">
-        <div className="grid-col">
-          <h2>Connect to Workshop</h2>
-        </div>
-      </div>
-      <div className="well grid-row">
-        <div className="grid-col">
-          <GitLabAuthButton
-            onSuccess={onGitLabAuthSuccess}
-            onFailure={onGitProviderAuthFailure}
-            text="Reset your GitLab Access Token."
-            revokeFirst
-          />
-        </div>
-      </div>
+      {process.env.FEATURE_WORKSHOP_INTEGRATION === 'true' ? (
+        <>
+          <div className="well grid-row">
+            <div className="grid-col">
+              <h2>GitLab Token</h2>
+            </div>
+          </div>
+
+          <div className="well grid-row">
+            <div className="grid-col">
+              <GitLabAuthButton
+                onSuccess={onGitLabAuthSuccess}
+                onFailure={onGitProviderAuthFailure}
+                text="Reset your GitLab Access Token."
+                revokeFirst
+              />
+            </div>
+          </div>
+        </>
+      ) : null}
       <div className="well grid-row">
         <div className="grid-col">
           <h2 className="margin-top-5 margin-bottom-0">Build Notifications</h2>
