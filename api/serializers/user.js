@@ -9,6 +9,7 @@ const attributes = {
   username: '',
   buildNotificationSettings: '',
   hasGithubAuth: (_, user) => !!user.githubAccessToken,
+  hasGitlabAuth: (_, user) => !!user.gitlabToken && !!user.gitlabRefreshToken,
   UAAIdentity: (uaaIdentity, _, isSystemAdmin) =>
     uaaIdentitySerializer.serialize(uaaIdentity, isSystemAdmin),
   OrganizationRoles: (orgRoles, _, isSystemAdmin) =>

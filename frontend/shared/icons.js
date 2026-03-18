@@ -14,6 +14,7 @@ import IconExternalLink from '../../public/images/icons/icon-external-link.svg';
 import IconFolder from '../../public/images/icons/icon-folder.svg';
 import IconGear from '../../public/images/icons/icon-gear.svg';
 import IconGitHub from '../../public/images/icons/icon-github.svg';
+import IconGitLabWhite from '../../public/images/icons/icon-gitlab-white.svg';
 import IconGitLab from '../../public/images/icons/icon-gitlab.svg';
 import IconGlobe from '../../public/images/icons/icon-globe.svg';
 import IconIgnore from '../../public/images/icons/icon-ignore.svg';
@@ -43,6 +44,7 @@ export {
   IconFolder,
   IconGear,
   IconGitHub,
+  IconGitLabWhite,
   IconGitLab,
   IconGlobe,
   IconIgnore,

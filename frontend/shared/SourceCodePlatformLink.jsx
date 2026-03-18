@@ -1,30 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import globals from '@globals';
 
-import { IconGitHub, IconBranch } from './icons';
+import { IconBranch, IconGitHub, IconGitLab } from './icons';
 
-const BASE = 'https://github.com';
-
-const GitHubLink = ({
-  owner,
-  repository,
+const SourceCodePlatformLink = ({
+  sourceCodePlatform,
+  sourceCodeUrl,
   text,
   branch = null,
   sha = null,
   icon = 'repo',
   isButton = false,
 }) => {
-  const baseHref = `${BASE}/${owner}/${repository}`;
-
-  let href = baseHref;
-  let title = 'View repository on GitHub';
+  let href = sourceCodeUrl;
+  const isWorkshop = sourceCodePlatform == globals.SOURCE_CODE_PLATFORM_WORKSHOP;
+  let title = isWorkshop ? 'View repository on Workshop' : 'View repository on GitHub';
 
   if (branch) {
-    href = `${baseHref}/tree/${encodeURIComponent(branch)}`;
+    let tree = isWorkshop ? `/-/tree/` : `/tree/`;
+    href = `${sourceCodeUrl}${tree}${encodeURIComponent(branch)}`;
     title = 'View branch on GitHub';
   } else if (sha) {
-    href = `${baseHref}/commit/${sha}`;
-    title = 'View commit on GitHub';
+    href = `${sourceCodeUrl}/commit/${sha}`;
+    title = isWorkshop ? 'View commit on GitLab' : 'View commit on GitHub';
   }
   function chooseIcon(iconStr) {
     switch (iconStr) {
@@ -36,7 +35,7 @@ const GitHubLink = ({
         return '';
       case 'repo':
       default:
-        return <IconGitHub />;
+        return isWorkshop ? <IconGitLab /> : <IconGitHub />;
     }
   }
 
@@ -56,9 +55,9 @@ const GitHubLink = ({
   );
 };
 
-GitHubLink.propTypes = {
-  owner: PropTypes.string.isRequired,
-  repository: PropTypes.string.isRequired,
+SourceCodePlatformLink.propTypes = {
+  sourceCodePlatform: PropTypes.string.isRequired,
+  sourceCodeUrl: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   branch: PropTypes.string,
   isButton: PropTypes.bool,
@@ -66,4 +65,4 @@ GitHubLink.propTypes = {
   icon: PropTypes.string,
 };
 
-export default GitHubLink;
+export default SourceCodePlatformLink;

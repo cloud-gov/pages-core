@@ -3,6 +3,7 @@ domain: pages.cloud.gov
 env: production
 env_postfix: -production
 feature_file_storage_service: "true"
+feature_workshop-integration: "false"
 instances: 4
 log_level: info
 name: pages-production

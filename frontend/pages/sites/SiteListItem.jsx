@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { dateAndTime } from '@util/datetime';
 
-import GitHubLink from '@shared/GitHubLink';
+import SourceCodePlatformLink from '@shared/SourceCodePlatformLink';
 import { sandboxMsg } from '@util';
 import { ORGANIZATION } from '@propTypes';
 
@@ -41,10 +41,10 @@ function SiteListItem({ organization, site }) {
         </div>
         <div className="usa-card__footer usa-button-group">
           <div className="usa-button-group__item">
-            <GitHubLink
+            <SourceCodePlatformLink
               text="View repo"
-              owner={site.owner}
-              repository={site.repository}
+              sourceCodePlatform={site.sourceCodePlatform}
+              sourceCodeUrl={site.sourceCodeUrl}
               isButton
             />
           </div>
@@ -65,6 +65,8 @@ SiteListItem.propTypes = {
     createdAt: PropTypes.string,
     viewLink: PropTypes.string,
     isActive: PropTypes.bool,
+    sourceCodePlatform: PropTypes.string,
+    sourceCodeUrl: PropTypes.string,
   }).isRequired,
 };
 

@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import GitHubLink from './GitHubLink';
+import SourceCodePlatformLink from './SourceCodePlatformLink';
 
 export default function GithubBuildBranchLink({ build, site }) {
-  const { owner, repository } = site;
+  const { sourceCodePlatform, sourceCodeUrl } = site;
   const { branch } = build;
 
   return (
-    <GitHubLink
-      owner={owner}
-      repository={repository}
+    <SourceCodePlatformLink
+      sourceCodePlatform={sourceCodePlatform}
+      sourceCodeUrl={sourceCodeUrl}
       sha={null}
       branch={branch}
       text={branch}
@@ -25,5 +25,7 @@ GithubBuildBranchLink.propTypes = {
   site: PropTypes.shape({
     owner: PropTypes.string.isRequired,
     repository: PropTypes.string.isRequired,
+    sourceCodePlatform: PropTypes.string.isRequired,
+    sourceCodeUrl: PropTypes.string.isRequired,
   }).isRequired,
 };

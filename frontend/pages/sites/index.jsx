@@ -13,13 +13,24 @@ import alertActions from '@actions/alertActions';
 import userActions from '@actions/userActions';
 
 import SiteListItem from './SiteListItem';
+import GitLabAuthButton from '@shared/GitLabAuthButton';
+import notificationActions from '@actions/notificationActions';
 
-const onGithubAuthSuccess = () => {
+const onGitProviderAuthSuccess = (gitProviderName) => {
   userActions.fetchUser();
-  alertActions.alertSuccess('Github authorization successful');
+  alertActions.alertSuccess(`${gitProviderName} authorization successful`);
+  notificationActions.success(`${gitProviderName} authorization successful`);
 };
 
-const onGithubAuthFailure = (error) => {
+const onGithubAuthSuccess = () => {
+  onGitProviderAuthSuccess('GitHub');
+};
+
+const onGitLabAuthSuccess = () => {
+  onGitProviderAuthSuccess('GitLab');
+};
+
+const onGitProviderAuthFailure = (error) => {
   alertActions.alertError(error.message);
 };
 
@@ -63,10 +74,16 @@ export const Sites = () => {
   const [orgFilterValue, setOrgFilterValue] = useState('all-options');
   const groupedSites = groupSitesByOrg(sites, orgFilterValue);
 
-  let topButton = '';
+  let buttonAddSite = '';
+  let buttonGitHub = '';
+  let buttonGitLab = '';
 
-  if (user.hasGithubAuth && hasOrgs(organizations)) {
-    topButton = (
+  if (
+    (user.hasGithubAuth ||
+      (user.hasGitlabAuth && process.env.FEATURE_WORKSHOP_INTEGRATION === 'true')) &&
+    hasOrgs(organizations)
+  ) {
+    buttonAddSite = (
       <Link
         to="/sites/new"
         role="button"
@@ -76,23 +93,39 @@ export const Sites = () => {
         <UsaIcon name="add" /> Add site
       </Link>
     );
-  } else {
-    topButton = (
+  }
+  if (!user.hasGithubAuth) {
+    buttonGitHub = (
       <GithubAuthButton
         onSuccess={onGithubAuthSuccess}
-        onFailure={onGithubAuthFailure}
-        text="Sign in to your Github account to add sites to the platform."
+        onFailure={onGitProviderAuthFailure}
+        text="Sign in to your GitHub account to add sites to the platform."
+      />
+    );
+  }
+  if (!user.hasGitlabAuth && process.env.FEATURE_WORKSHOP_INTEGRATION === 'true') {
+    buttonGitLab = (
+      <GitLabAuthButton
+        onSuccess={onGitLabAuthSuccess}
+        onFailure={onGitProviderAuthFailure}
+        text="Sign in to your GitLab account to add sites to the platform."
       />
     );
   }
 
+  const buttonsClass =
+    'tablet:grid-col-auto grid-col-12 header-actions display-flex flex-column gap-3';
   return (
     <div className="grid-col-12">
       <div className="page-header grid-row flex-align-center">
         <div className="tablet:grid-col-fill grid-col-12">
           <h1 className="font-sans-2xl">Your sites</h1>
         </div>
-        <div className="tablet:grid-col-auto grid-col-12 header-actions">{topButton}</div>
+        <div className={buttonsClass}>
+          <div>{buttonAddSite}</div>
+          <div className="margin-top-1">{buttonGitHub}</div>
+          <div className="margin-top-1">{buttonGitLab}</div>
+        </div>
       </div>
       {hasOrgs(organizations) ? (
         <div className="margin-y-2 grid-row">

@@ -8,7 +8,11 @@ const validAddRepoSiteForm = (
   const errors = {};
 
   if (!repoUrl) {
-    errors.repoUrl = 'Please enter a Github repository URL';
+    const orGitLabProject = `${
+      process.env.FEATURE_WORKSHOP_INTEGRATION === 'true' ? ' or GitLab project ' : ' '
+    }`;
+
+    errors.repoUrl = `Please enter a GitHub repository${orGitLabProject}URL`;
   }
 
   if (hasOrgs(organizations) && !repoOrganizationId) {

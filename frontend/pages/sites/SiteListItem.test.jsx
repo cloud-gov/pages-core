@@ -7,12 +7,12 @@ import { createFixtureOrg } from '../../../test/frontend/support/data/organizati
 import * as datetimeUtils from '@util/datetime';
 
 import SiteListItem from './SiteListItem';
-import GitHubLink from '@shared/GitHubLink';
+import SourceCodePlatformLink from '@shared/SourceCodePlatformLink';
 
 const mockSite = createFixtureSite({ name: 'test-site' });
 const mockOrganization = createFixtureOrg({ name: 'test-org' });
 
-jest.mock('@shared/GitHubLink', () => {
+jest.mock('@shared/SourceCodePlatformLink', () => {
   return jest.fn(() => null);
 });
 
@@ -90,10 +90,8 @@ describe('<SiteListItem />', () => {
         <SiteListItem organization={mockOrganization} site={mockSite} />
       </MemoryRouter>,
     );
-    expect(GitHubLink).toHaveBeenCalledWith(
+    expect(SourceCodePlatformLink).toHaveBeenCalledWith(
       {
-        owner: mockSite.owner,
-        repository: mockSite.repository,
         text: 'View repo',
         isButton: true,
       },

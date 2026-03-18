@@ -13,6 +13,8 @@ const allowedAttributes = [
   'engine',
   'liveDomain',
   'owner',
+  'sourceCodePlatform',
+  'sourceCodeUrl',
   'publishedAt',
   'repository',
   's3ServiceName',

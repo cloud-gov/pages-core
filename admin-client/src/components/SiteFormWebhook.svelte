@@ -10,9 +10,9 @@
 
   const hookData = hooks.map((hook) => ({
     id: hook?.id,
-    url: hook?.config?.url,
-    status: hook?.last_response?.status,
-    message: hook?.last_response?.message,
+    url: hook?.config?.url || hook?.url,
+    status: hook?.last_response?.status || hook?.alert_status,
+    message: hook?.last_response?.message || '',
   }));
 </script>
 

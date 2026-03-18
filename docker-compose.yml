@@ -43,6 +43,7 @@ services:
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
       FEATURE_FILE_STORAGE_SERVICE: 'true'
+      FEATURE_WORKSHOP_INTEGRATION: 'true'
       FEATURE_LOCAL_BUILD_REPORTS: 'active'
       FEATURE_LOCAL_S3_ENDPOINT: 'true'
       NODE_ENV: development
@@ -59,6 +60,7 @@ services:
       PROXY_DOMAIN: localhost:1337
       QUEUES_BUILD_TASKS_CONCURRENCY: 1
       OPS_EMAIL: ops@example.gov
+      NODE_OPTIONS: --trace-warnings
   bull-board:
     build:
       dockerfile: Dockerfile-app

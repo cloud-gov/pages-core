@@ -41,6 +41,7 @@ describe('validAddRepoSiteForm', () => {
   });
 
   it('should return an object with repoUrl key if repoUrl is not truthy', () => {
+    process.env.FEATURE_WORKSHOP_INTEGRATION = 'false';
     const expected = validAddRepoSiteForm(
       {
         repoUrl: null,
@@ -50,7 +51,7 @@ describe('validAddRepoSiteForm', () => {
         organizations: withOrgs,
       },
     );
-    expect(expected.repoUrl).toBe('Please enter a Github repository URL');
+    expect(expected.repoUrl).toBe('Please enter a GitHub repository URL');
   });
 
   it('should return an object with repoOrganizationId key if it is not truthy', () => {
