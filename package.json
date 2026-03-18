@@ -60,7 +60,7 @@
     "redux-form": "^8.3.10",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "sequelize": "^6.37.7",
+    "sequelize": "^6.37.8",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "underscore": "^1.13.8",
