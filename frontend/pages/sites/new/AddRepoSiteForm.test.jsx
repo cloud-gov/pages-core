@@ -55,6 +55,7 @@ describe('<AddRepoSiteForm />', () => {
     submitting: false,
     invalid: false,
     valid: true,
+    initialValues: {},
   };
 
   it("renders selection for site's engine", () => {

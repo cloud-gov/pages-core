@@ -275,6 +275,7 @@ class CloudFoundryAPIClient {
       onlyEncryptKeys: [
         'STATUS_CALLBACK',
         'GITHUB_TOKEN',
+        'SOURCE_CODE_PLATFORM_TOKEN',
         'AWS_ACCESS_KEY_ID',
         'AWS_SECRET_ACCESS_KEY',
         'BUCKET',

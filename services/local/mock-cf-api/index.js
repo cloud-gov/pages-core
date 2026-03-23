@@ -3,22 +3,67 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const app = express();
 const {
-  createS3ServiceInstanaces,
+  createS3ServiceInstances,
   createS3ServiceBindings,
   createS3ServiceBindingDetails,
 } = require('./createResponse');
 
 const PORT = 3456;
 
-// Fetch service instanaces
-app.get('/v3/service_instances', (_, res) => {
-  const response = createS3ServiceInstanaces();
+const { MINIO_ROOT_USER, MINIO_ROOT_PASSWORD } = process.env;
+const s3ServiceInstancesMap = new Map();
+
+// Fetch service instances
+app.post('/v3/service_instances', express.json(), (req, res) => {
+  const response = createS3ServiceInstances();
+
+  const newS3ServiceInstance = {
+    guid: req.body.name,
+    name: req.body.name,
+    relationships: {},
+  };
+
+  response.resources.push(newS3ServiceInstance);
+  s3ServiceInstancesMap.set(req.body.name, newS3ServiceInstance);
 
   res.json(response);
 });
 
-// Fetch service instanace credentials bindings by name
+app.get('/v3/service_instances', (_, res) => {
+  const response = createS3ServiceInstances();
+
+  response.resources.push(...s3ServiceInstancesMap.values());
+
+  res.json(response);
+});
+
+app.get('/v3/service_plans', async (req, res) => {
+  const response = createS3ServiceInstances();
+
+  res.json(response);
+});
+
+// Fetch service instance credentials bindings by name
 app.get('/v3/service_credential_bindings', (req, res) => {
+  const { query } = req;
+  const { service_instance_names, names } = query;
+
+  const response = createS3ServiceBindings(service_instance_names);
+
+  response.resources.push({
+    name: names,
+    credentials: {
+      access_key_id: MINIO_ROOT_USER,
+      secret_access_key: MINIO_ROOT_PASSWORD,
+      region: 'us-gov-west-1',
+      bucket: `${names}-key`,
+    },
+  });
+
+  res.json(response);
+});
+
+app.post('/v3/service_credential_bindings', (req, res) => {
   const { query } = req;
   const { service_instance_names } = query;
 
@@ -27,12 +72,26 @@ app.get('/v3/service_credential_bindings', (req, res) => {
   res.json(response);
 });
 
-// Fetch service instanace credentials by binding guid
+// Fetch service instance credentials by binding guid
 app.get('/v3/service_credential_bindings/:guid/details', (req, res) => {
   const { params } = req;
   const { guid } = params;
 
-  const response = createS3ServiceBindingDetails(guid);
+  let response;
+
+  try {
+    response = createS3ServiceBindingDetails(guid);
+  } catch {
+    response = {
+      name: guid,
+      credentials: {
+        access_key_id: MINIO_ROOT_USER,
+        secret_access_key: MINIO_ROOT_PASSWORD,
+        region: 'us-gov-west-1',
+        bucket: `${guid}-key`,
+      },
+    };
+  }
 
   res.json(response);
 });

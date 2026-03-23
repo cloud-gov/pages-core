@@ -1,12 +1,10 @@
 const GitHub = require('./GitHub');
-const GitLab = require('./GitLab');
 const GitLabHelper = require('./GitLabHelper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Organization, Site, User } = require('../models');
 const utils = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
-const { updateGitLabTokens } = require('./user');
 const { logger } = require('../../winston');
 
 const apiClient = new CloudFoundryAPIClient();
@@ -138,18 +136,16 @@ function checkGithubRepository({ user, owner, repository }) {
 }
 
 function checkGitlabRepository({ user, sourceCodeUrl }) {
-  return GitLab.getProject(user, sourceCodeUrl, updateGitLabTokens).then(
-    async (response) => {
-      if (!response.ok) {
-        logger.error(await response.json());
-        throw {
-          message: `The repository ${sourceCodeUrl} does not exist.`,
-          status: response.status,
-        };
-      }
-      return await response.json();
-    },
-  );
+  return GitLabHelper.getProject(user, sourceCodeUrl).then(async (response) => {
+    if (!response.ok) {
+      logger.error(await response.json());
+      throw {
+        message: `The repository ${sourceCodeUrl} does not exist.`,
+        status: response.status,
+      };
+    }
+    return await response.json();
+  });
 }
 
 function buildSite(params, s3) {

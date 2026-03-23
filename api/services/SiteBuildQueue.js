@@ -9,9 +9,10 @@ const {
 } = require('../models');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const { sitePrefix, buildUrl } = require('../utils/build');
+const { sitePrefix, buildUrl, domain } = require('../utils/build');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const S3Helper = require('./S3Helper');
+const GitLabHelper = require('./GitLabHelper');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -44,9 +45,32 @@ const buildUEVs = (uevs) =>
       }))
     : [];
 
+function getSourceCodePlatformDomain(sourceCodePlatform) {
+  const sourceCodePlatformDomain =
+    sourceCodePlatform === Site.Platforms.Workshop
+      ? domain(GitLabHelper.getGitLabBaseUrl())
+      : domain(config.app.githubBaseUrl);
+  return sourceCodePlatformDomain;
+}
+
+async function getSourceCodePlatformToken(build, sourceCodePlatform) {
+  const githubToken = (build.User || {}).githubAccessToken; // temp hot-fix
+  const sourceCodePlatformToken =
+    sourceCodePlatform === Site.Platforms.Workshop
+      ? await GitLabHelper.getSiteBuildToken(build.User, build.Site)
+      : githubToken;
+  return sourceCodePlatformToken;
+}
+
 const generateDefaultCredentials = async (build) => {
-  const { engine, owner, repository, UserEnvironmentVariables, SiteBranchConfigs } =
-    build.Site;
+  const {
+    engine,
+    owner,
+    repository,
+    sourceCodePlatform,
+    UserEnvironmentVariables,
+    SiteBranchConfigs,
+  } = build.Site;
 
   const baseUrl = baseURLForBuild(build);
 
@@ -62,6 +86,12 @@ const generateDefaultCredentials = async (build) => {
     GENERATOR: engine,
     BUILD_ID: build.id,
     USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(UserEnvironmentVariables)),
+    SOURCE_CODE_PLATFORM: sourceCodePlatform,
+    SOURCE_CODE_PLATFORM_DOMAIN: getSourceCodePlatformDomain(sourceCodePlatform),
+    SOURCE_CODE_PLATFORM_TOKEN: await getSourceCodePlatformToken(
+      build,
+      sourceCodePlatform,
+    ),
   };
 };
 
@@ -71,6 +101,9 @@ const buildContainerEnvironment = async (build) => {
   if (!defaultCredentials.GITHUB_TOKEN) {
     defaultCredentials.GITHUB_TOKEN =
       await GithubBuildHelper.loadBuildUserAccessToken(build);
+    if (defaultCredentials.SOURCE_CODE_PLATFORM !== Site.Platforms.Workshop) {
+      defaultCredentials.SOURCE_CODE_PLATFORM_TOKEN = defaultCredentials.GITHUB_TOKEN;
+    }
   }
 
   return apiClient

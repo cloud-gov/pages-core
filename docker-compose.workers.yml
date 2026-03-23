@@ -23,6 +23,10 @@ services:
       APP_HOSTNAME: http://localhost:1337
       NODE_ENV: development
       PRODUCT: pages
+      CLOUD_FOUNDRY_API_HOST: ${CLOUD_FOUNDRY_API_HOST}
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: ${CLOUD_FOUNDRY_API_HOST}/oauth/token
+      CF_API_USERNAME: ${CF_API_USERNAME}
+      CF_API_PASSWORD: ${CF_API_PASSWORD}
   federalist-worker:
     build:
       dockerfile: Dockerfile-app
@@ -41,3 +45,7 @@ services:
       APP_HOSTNAME: http://localhost:1338
       NODE_ENV: development
       PRODUCT: federalist
+      CLOUD_FOUNDRY_API_HOST: ${CLOUD_FOUNDRY_API_HOST}
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: ${CLOUD_FOUNDRY_API_HOST}/oauth/token
+      CF_API_USERNAME: ${CF_API_USERNAME}
+      CF_API_PASSWORD: ${CF_API_PASSWORD}

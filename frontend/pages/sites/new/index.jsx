@@ -121,7 +121,7 @@ function AddSite() {
       <div className="grid-col-8">
         <AddRepoSiteForm
           initialValues={{
-            engine: 'jekyll',
+            engine: 'node.js',
           }}
           organizations={organizations}
           showAddNewSiteFields={showAddNewSiteFields}
