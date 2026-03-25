@@ -1,5 +1,6 @@
 const GitHub = require('./GitHub');
 const GitLabHelper = require('./GitLabHelper');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Organization, Site, User } = require('../models');
 const utils = require('../utils');
@@ -9,7 +10,7 @@ const { logger } = require('../../winston');
 
 const apiClient = new CloudFoundryAPIClient();
 
-const defaultEngine = 'jekyll';
+const defaultEngine = 'node.js';
 
 function paramsForNewSite(params) {
   const owner = params.owner ? params.owner.toLowerCase() : null;
@@ -199,10 +200,7 @@ function validateSite(params) {
  * returns the new site record
  */
 async function saveAndBuildSite({ site, user }) {
-  const webhook =
-    site.sourceCodePlatform === Site.Platforms.Workshop
-      ? await GitLabHelper.createSiteWebhook(user, site)
-      : await GitHub.setWebhook(site, user.githubAccessToken);
+  const webhook = await SourceCodePlatformHelper.setWebhook(user, site);
 
   // This will be `undefined` if the webhook already exists
   if (webhook) {

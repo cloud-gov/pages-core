@@ -2,7 +2,7 @@ const merge = require('lodash.merge');
 
 const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
-const GithubBuildHelper = require('../services/GithubBuildHelper');
+const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
 const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
@@ -123,7 +123,7 @@ module.exports = wrapHandlers({
       });
       await rebuild.enqueue();
       rebuild.Site = requestBuild.Site;
-      await GithubBuildHelper.reportBuildStatus(rebuild);
+      await SourceCodePlatformHelper.reportBuildStatus(rebuild);
       const rebuildJSON = await buildSerializer.serialize(rebuild);
       return res.json(rebuildJSON);
     }
@@ -162,7 +162,7 @@ module.exports = wrapHandlers({
     // The `requestedCommitSha` will not be present for initial builds
     // and there is no need to report status to Github
     if (build.requestedCommitSha) {
-      await GithubBuildHelper.reportBuildStatus(build);
+      await SourceCodePlatformHelper.reportBuildStatus(build);
     }
 
     return res.ok();

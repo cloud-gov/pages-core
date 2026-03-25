@@ -1,10 +1,10 @@
-const GitHub = require('../services/GitHub');
+const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
 const siteErrors = require('../responses/siteErrors');
 const { Organization } = require('../models');
 const { authorize } = require('./utils');
 
 const authorizeRepositoryAdmin = (user, site) =>
-  GitHub.checkPermissions(user, site.owner, site.repository)
+  SourceCodePlatformHelper.checkPermissions(user, site)
     .then((permissions) => {
       if (!permissions.admin) {
         throw {

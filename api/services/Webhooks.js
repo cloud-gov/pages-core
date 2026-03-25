@@ -1,7 +1,7 @@
 const config = require('../../config');
 const { Build, User, Site, Event, Organization } = require('../models');
 const authorizer = require('../authorizers/site');
-const GithubBuildHelper = require('./GithubBuildHelper');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const EventCreator = require('./EventCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');
 const { fetchModelById } = require('../utils/queryDatabase');
@@ -162,7 +162,7 @@ const pushWebhookRequest = async (payload) => {
         if (shouldBuildForSite(site)) {
           const build = await createBuildForWebhookRequest(payload, site);
           await build.reload({ include: Site });
-          await GithubBuildHelper.reportBuildStatus(build);
+          await SourceCodePlatformHelper.reportBuildStatus(build);
         }
       }),
     );

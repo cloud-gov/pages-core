@@ -88,7 +88,7 @@ app.get('/v3/service_credential_bindings/:guid/details', (req, res) => {
         access_key_id: MINIO_ROOT_USER,
         secret_access_key: MINIO_ROOT_PASSWORD,
         region: 'us-gov-west-1',
-        bucket: `${guid}-key`,
+        bucket: 'cg-123456789',
       },
     };
   }

@@ -38,6 +38,10 @@ const revokeUserGitLabTokens = async (user) =>
 
 const getGitLabBaseUrl = () => GitLab.getBaseUrl();
 
+const reportBuildStatus = async () => {
+  // TODO: Workshop Integration
+};
+
 module.exports = {
   revokeUserGitLabTokens,
   getGitLabBaseUrl,
@@ -45,4 +49,5 @@ module.exports = {
   createSiteWebhook,
   listSiteWebhooks,
   getSiteBuildToken,
+  reportBuildStatus,
 };

@@ -9,10 +9,9 @@ const {
 } = require('../models');
 const config = require('../../config');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
-const { sitePrefix, buildUrl, domain } = require('../utils/build');
-const GithubBuildHelper = require('./GithubBuildHelper');
+const { sitePrefix, buildUrl } = require('../utils/build');
 const S3Helper = require('./S3Helper');
-const GitLabHelper = require('./GitLabHelper');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -45,23 +44,6 @@ const buildUEVs = (uevs) =>
       }))
     : [];
 
-function getSourceCodePlatformDomain(sourceCodePlatform) {
-  const sourceCodePlatformDomain =
-    sourceCodePlatform === Site.Platforms.Workshop
-      ? domain(GitLabHelper.getGitLabBaseUrl())
-      : domain(config.app.githubBaseUrl);
-  return sourceCodePlatformDomain;
-}
-
-async function getSourceCodePlatformToken(build, sourceCodePlatform) {
-  const githubToken = (build.User || {}).githubAccessToken; // temp hot-fix
-  const sourceCodePlatformToken =
-    sourceCodePlatform === Site.Platforms.Workshop
-      ? await GitLabHelper.getSiteBuildToken(build.User, build.Site)
-      : githubToken;
-  return sourceCodePlatformToken;
-}
-
 const generateDefaultCredentials = async (build) => {
   const {
     engine,
@@ -74,6 +56,7 @@ const generateDefaultCredentials = async (build) => {
 
   const baseUrl = baseURLForBuild(build);
 
+  const token = await SourceCodePlatformHelper.getSourceCodePlatformToken(build);
   return {
     STATUS_CALLBACK: statusCallbackURL(build),
     BASEURL: baseUrl,
@@ -82,29 +65,19 @@ const generateDefaultCredentials = async (build) => {
     REPOSITORY: repository,
     OWNER: owner,
     SITE_PREFIX: sitePrefix(build, build.Site),
-    GITHUB_TOKEN: (build.User || {}).githubAccessToken, // temp hot-fix
+    GITHUB_TOKEN: token,
     GENERATOR: engine,
     BUILD_ID: build.id,
     USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(UserEnvironmentVariables)),
     SOURCE_CODE_PLATFORM: sourceCodePlatform,
-    SOURCE_CODE_PLATFORM_DOMAIN: getSourceCodePlatformDomain(sourceCodePlatform),
-    SOURCE_CODE_PLATFORM_TOKEN: await getSourceCodePlatformToken(
-      build,
-      sourceCodePlatform,
-    ),
+    SOURCE_CODE_PLATFORM_DOMAIN:
+      SourceCodePlatformHelper.getSourceCodePlatformDomain(sourceCodePlatform),
+    SOURCE_CODE_PLATFORM_TOKEN: token,
   };
 };
 
 const buildContainerEnvironment = async (build) => {
   const defaultCredentials = await generateDefaultCredentials(build);
-
-  if (!defaultCredentials.GITHUB_TOKEN) {
-    defaultCredentials.GITHUB_TOKEN =
-      await GithubBuildHelper.loadBuildUserAccessToken(build);
-    if (defaultCredentials.SOURCE_CODE_PLATFORM !== Site.Platforms.Workshop) {
-      defaultCredentials.SOURCE_CODE_PLATFORM_TOKEN = defaultCredentials.GITHUB_TOKEN;
-    }
-  }
 
   return apiClient
     .fetchServiceInstanceCredentials(build.Site.s3ServiceName)

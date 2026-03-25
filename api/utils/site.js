@@ -1,5 +1,5 @@
 const config = require('../../config');
-const { getGitLabBaseUrl } = require('../services/GitLabHelper');
+const GitLab = require('../services/GitLab');
 
 const { proxyDomain, githubBaseUrl } = config.app;
 
@@ -17,7 +17,7 @@ function siteViewDomain(site) {
 
 function buildSourceCodeUrl(owner, repository, sourceCodePlatform, platformsWorkshop) {
   // eslint-disable-next-line max-len
-  return `${sourceCodePlatform === platformsWorkshop ? getGitLabBaseUrl() : githubBaseUrl}/${owner}/${repository}`;
+  return `${sourceCodePlatform === platformsWorkshop ? GitLab.getBaseUrl() : githubBaseUrl}/${owner}/${repository}`;
 }
 
 function siteViewLink(site, deployment = 'site') {

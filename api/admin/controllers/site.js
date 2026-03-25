@@ -8,8 +8,7 @@ const {
   SiteBuildTask,
 } = require('../../models');
 const SiteDestroyer = require('../../services/SiteDestroyer');
-const GithubBuildHelper = require('../../services/GithubBuildHelper');
-const GitLabHelper = require('../../services/GitLabHelper');
+const SourceCodePlatformHelper = require('../../services/SourceCodePlatformHelper');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, pick, wrapHandlers } = require('../../utils');
 const { serializeNew, serializeMany } = require('../../serializers/site');
@@ -72,10 +71,7 @@ module.exports = wrapHandlers({
 
     const site = await Site.findOne({ where: { id } });
     const users = await site.getOrgUsers();
-    const hook =
-      site.sourceCodePlatform === Site.Platforms.Workshop
-        ? await GitLabHelper.createSiteWebhook(req.user, site)
-        : await GithubBuildHelper.createSiteWebhook(site, users);
+    const hook = await SourceCodePlatformHelper.createSiteWebhook(req.user, site, users);
 
     return res.json(hook || []);
   },
@@ -87,10 +83,7 @@ module.exports = wrapHandlers({
 
     const site = await Site.findOne({ where: { id } });
     const users = await site.getOrgUsers();
-    const hooks =
-      site.sourceCodePlatform === Site.Platforms.Workshop
-        ? await GitLabHelper.listSiteWebhooks(req.user, site)
-        : await GithubBuildHelper.listSiteWebhooks(site, users);
+    const hooks = await SourceCodePlatformHelper.createSiteWebhook(req.user, site, users);
 
     return res.json(hooks);
   },
