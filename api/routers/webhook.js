@@ -60,6 +60,14 @@ function verifySiteRequest(expectedKeys) {
   };
 }
 
+function verifyGitLabToken(req, res, next) {
+  if (config.webhook.gitlabSecret !== req.headers['X-Gitlab-Token']) {
+    res.badRequest();
+    next(new Error('Invalid GitLab webhook token'));
+  }
+  next();
+}
+
 const verifyNewEditorSite = verifySiteRequest([
   'userEmail',
   'apiKey',
@@ -71,6 +79,7 @@ const verifyNewEditorSite = verifySiteRequest([
 const verifyEditorSiteId = verifySiteRequest(['siteId']);
 
 router.post('/webhook/github', verifySignature, WebhookController.github);
+router.post('/webhook/gitlab', verifyGitLabToken, WebhookController.gitlab);
 router.post('/webhook/organization', verifySignature, WebhookController.organization);
 router.post('/webhook/site', verifyNewEditorSite, WebhookController.site);
 router.delete('/webhook/site', verifyEditorSiteId, WebhookController.siteDelete);

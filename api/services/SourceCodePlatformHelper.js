@@ -47,6 +47,9 @@ const checkPermissions = async (user, site) =>
     ? { admin: {} } // TODO: Workshop Integration
     : await GitHub.checkPermissions(user, site.owner, site.repository);
 
+const getProcessedGitLabWebhookPayload = (payload) =>
+  GitLab.processWebhookPayload(payload);
+
 module.exports = {
   checkPermissions,
   createSiteWebhook,
@@ -55,4 +58,5 @@ module.exports = {
   reportBuildStatus,
   getSourceCodePlatformDomain,
   getSourceCodePlatformToken,
+  getProcessedGitLabWebhookPayload,
 };

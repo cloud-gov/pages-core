@@ -55,6 +55,7 @@ const fetchAddWebhook = async (user, sourceCodeUrl, webhookEndpoint) => {
         url: webhookEndpoint,
         push_events: true,
         branch_filter_strategy: 'all_branches',
+        token: config.webhook.gitlabSecret,
       }),
     },
   );
@@ -241,6 +242,23 @@ const apiCallWithTokensRefresh = async (user, apiCall, persistUserOAuthTokens) =
   }
 };
 
+const getProcessedWebhookPayload = (payload) => {
+  const [, owner, ...rest] = payload.project.web_url
+    .replace(`${normalizeUrl(gitlabConfig.baseURL)}`, '')
+    .split('/');
+  return {
+    after: payload.after,
+    commits: payload.commits && payload.commits.length > 0 ? [{}] : undefined,
+    owner,
+    repository: {
+      repository_path: rest.join('/'),
+      pushed_at: Math.floor(new Date(payload.commits[0]?.timestamp).getTime() / 1000),
+    },
+    sender: payload.user_username,
+    ref: payload.ref,
+  };
+};
+
 module.exports = {
   getBaseUrl,
   normalizeUrl,
@@ -249,5 +267,6 @@ module.exports = {
   getProject,
   addWebhook,
   getWebhooks,
+  getProcessedWebhookPayload,
   getUserOAuthAccessToken,
 };

@@ -9,8 +9,17 @@ const { BuildService } = require('./build');
 
 const { OPS_EMAIL } = process.env;
 
-const findSiteForWebhookRequest = (payload) => {
-  const [owner, repository] = payload.repository.full_name.split('/');
+function getOwnerAndRepository(payload, sourceCodePlatform) {
+  if (sourceCodePlatform !== Site.Platforms.Workshop) {
+    const [owner, repository] = payload.repository.full_name.split('/');
+    return { owner, repository };
+  } else {
+    return { owner: payload.owner, repository: payload.repository.repository_path };
+  }
+}
+
+const findSiteForWebhookRequest = (payload, sourceCodePlatform) => {
+  const { owner, repository } = getOwnerAndRepository(payload, sourceCodePlatform);
 
   return Site.findAll({
     where: {
@@ -153,9 +162,12 @@ const createBuildForWebhookRequest = async (payload, site) => {
   }).then((build) => BuildService.enqueueOrLogBuild(build));
 };
 
-const pushWebhookRequest = async (payload) => {
+const pushWebhookRequest = async (
+  payload,
+  sourceCodePlatform = Site.Platforms.Github,
+) => {
   if (payload.commits && payload.commits.length > 0) {
-    const sites = await findSiteForWebhookRequest(payload);
+    const sites = await findSiteForWebhookRequest(payload, sourceCodePlatform);
 
     await Promise.all(
       sites.map(async (site) => {
