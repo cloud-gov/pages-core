@@ -77,7 +77,7 @@ function verifyGitLabToken(headers) {
   logger.info('GitLab verifyGitLabToken');
 
   const webhookSecret = config.webhook.gitlabSecret;
-  const headerSecret = headers['X-Gitlab-Token'];
+  const headerSecret = headers['x-gitlab-token'];
 
   if (!headerSecret) {
     throw new Error('No X-Gitlab-Token found on request');
