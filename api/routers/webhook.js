@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const router = require('express').Router();
 const config = require('../../config');
 const WebhookController = require('../controllers/webhook');
+const { logger } = require('../../winston');
 
 const signBlob = (key, blob) =>
   `sha1=${crypto.createHmac('sha1', key).update(blob).digest('hex')}`;
@@ -60,12 +61,31 @@ function verifySiteRequest(expectedKeys) {
   };
 }
 
-function verifyGitLabToken(req, res, next) {
-  if (config.webhook.gitlabSecret !== req.headers['X-Gitlab-Token']) {
+function verifyToken(req, res, next) {
+  logger.info('GitLab verifyToken', req.headers);
+
+  const { body: payload, headers } = req;
+
+  try {
+    verifyGitLabToken(payload, headers);
+  } catch (err) {
     res.badRequest();
-    next(new Error('Invalid GitLab webhook token'));
+    next(err);
   }
   next();
+}
+
+function verifyGitLabToken(headers) {
+  logger.info('GitLab verifyGitLabToken');
+
+  const webhookSecret = config.webhook.gitlabSecret;
+  const headerSecret = headers['X-Gitlab-Token'];
+
+  if (!headerSecret) {
+    throw new Error('No X-Gitlab-Token found on request');
+  } else if (webhookSecret !== headerSecret) {
+    throw new Error('X-Gitlab-Token does not match webhook secret');
+  }
 }
 
 const verifyNewEditorSite = verifySiteRequest([
@@ -79,7 +99,7 @@ const verifyNewEditorSite = verifySiteRequest([
 const verifyEditorSiteId = verifySiteRequest(['siteId']);
 
 router.post('/webhook/github', verifySignature, WebhookController.github);
-router.post('/webhook/gitlab', verifyGitLabToken, WebhookController.gitlab);
+router.post('/webhook/gitlab', verifyToken, WebhookController.gitlab);
 router.post('/webhook/organization', verifySignature, WebhookController.organization);
 router.post('/webhook/site', verifyNewEditorSite, WebhookController.site);
 router.delete('/webhook/site', verifyEditorSiteId, WebhookController.siteDelete);
