@@ -6,6 +6,7 @@ const EventCreator = require('./EventCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');
 const { fetchModelById } = require('../utils/queryDatabase');
 const { BuildService } = require('./build');
+const { logger } = require('../../winston');
 
 const { OPS_EMAIL } = process.env;
 
@@ -119,7 +120,12 @@ const organizationWebhookRequest = async (payload) => {
 };
 
 const createBuildForWebhookRequest = async (payload, site) => {
+  logger.info(`createBuildForWebhookRequest - payload: ${JSON.stringify(payload)}`);
+
   const { login } = payload.sender;
+
+  logger.info(`createBuildForWebhookRequest - login: ${login}`);
+
   const { pushed_at: pushedAt } = payload.repository;
   const username = login.toLowerCase();
 
