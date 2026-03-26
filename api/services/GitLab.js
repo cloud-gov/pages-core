@@ -82,6 +82,21 @@ const fetchGetProject = async (user, sourceCodeUrl) => {
   });
 };
 
+const fetchPostCommitStatus = async (user, sourceCodeUrl, options) => {
+  // eslint-disable-next-line max-len
+  const url = `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/projects/${getUrlEncodedProjectPath(sourceCodeUrl)}/statuses/${options.sha}`;
+  const headers = getHeaders(user);
+  return fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      state: options.state,
+      target_url: options.target_url,
+      description: options.description,
+    }),
+  });
+};
+
 const revokeToken = async (user, token, tokenType) => {
   if (!token) return;
 
@@ -169,6 +184,14 @@ const getWebhooks = async (user, sourceCodeUrl, persistUserOAuthTokens) => {
   return await apiCallWithTokensRefresh(
     user,
     () => fetchWebhooks(user, sourceCodeUrl),
+    persistUserOAuthTokens,
+  );
+};
+
+const sendCommitStatus = async (user, sourceCodeUrl, options, persistUserOAuthTokens) => {
+  return await apiCallWithTokensRefresh(
+    user,
+    () => fetchPostCommitStatus(user, sourceCodeUrl, options),
     persistUserOAuthTokens,
   );
 };
@@ -269,4 +292,5 @@ module.exports = {
   getWebhooks,
   getProcessedWebhookPayload,
   getUserOAuthAccessToken,
+  sendCommitStatus,
 };

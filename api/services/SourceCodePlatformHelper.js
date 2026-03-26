@@ -5,14 +5,58 @@ const GitHub = require('./GitHub');
 const { domain } = require('../utils/build');
 const GitLab = require('./GitLab');
 const config = require('../../config');
+const url = require('url');
 
 const isWorkshop = (sourceCodePlatform) => sourceCodePlatform === Site.Platforms.Workshop;
 
 const reportBuildStatus = async (build) => {
-  if (isWorkshop(build.Site.sourceCodePlatform)) {
-    await GitLabHelper.reportBuildStatus(build);
+  const sha = build.clonedCommitSha || build.requestedCommitSha;
+  if (!sha) {
+    throw new Error('Build or commit sha undefined. Unable to report build status');
+  }
+
+  const context =
+    config.app.appEnv === 'production'
+      ? `${config.app.product}/build`
+      : `${config.app.product}-${config.app.appEnv}/build`;
+
+  const site = build.Site;
+
+  const options = {
+    owner: site.owner,
+    repo: site.repository,
+    sha,
+    context,
+  };
+
+  if (build.isInProgress()) {
+    options.state = 'pending';
+    options.target_url = url.resolve(
+      config.app.hostname,
+      `/sites/${site.id}/builds/${build.id}/logs`,
+    );
+    options.description =
+      'The build is running. Click "Details" to see the Pages build status.';
+  } else if (build.state === 'success') {
+    options.state = 'success';
+    options.target_url = build.url;
+    options.description =
+      'The build is complete! Click "Details" to visit the Site Preview.';
+  } else if (build.state === 'error' || build.state === 'invalid') {
+    options.state = isWorkshop(build) ? 'failed' : 'error';
+    options.target_url = url.resolve(
+      config.app.hostname,
+      `/sites/${site.id}/builds/${build.id}/logs`,
+    );
+    options.description =
+      'The build has encountered an error. Click "Details" to see the Pages build logs.';
+  }
+
+  if (isWorkshop(build)) {
+    return await GitLabHelper.sendCommitStatus(build.user, site, options);
   } else {
-    await GithubBuildHelper.reportBuildStatus(build);
+    const accessToken = await GithubBuildHelper.loadBuildUserAccessToken(build);
+    return GitHub.sendCreateGithubStatusRequest(accessToken, options);
   }
 };
 
@@ -48,7 +92,7 @@ const checkPermissions = async (user, site) =>
     : await GitHub.checkPermissions(user, site.owner, site.repository);
 
 const getProcessedGitLabWebhookPayload = (payload) =>
-  GitLab.processWebhookPayload(payload);
+  GitLab.getProcessedWebhookPayload(payload);
 
 module.exports = {
   checkPermissions,

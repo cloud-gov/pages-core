@@ -1,6 +1,4 @@
-const url = require('url');
 const GitHub = require('./GitHub');
-const config = require('../../config');
 
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
@@ -77,53 +75,6 @@ const loadBuildUserAccessToken = async (build) => {
   return githubAccessToken;
 };
 
-const reportBuildStatus = async (build) => {
-  const sha = build.clonedCommitSha || build.requestedCommitSha;
-  if (!sha) {
-    throw new Error('Build or commit sha undefined. Unable to report build status');
-  }
-
-  const accessToken = await loadBuildUserAccessToken(build);
-
-  const context =
-    config.app.appEnv === 'production'
-      ? `${config.app.product}/build`
-      : `${config.app.product}-${config.app.appEnv}/build`;
-
-  const site = build.Site;
-
-  const options = {
-    owner: site.owner,
-    repo: site.repository,
-    sha,
-    context,
-  };
-
-  if (build.isInProgress()) {
-    options.state = 'pending';
-    options.target_url = url.resolve(
-      config.app.hostname,
-      `/sites/${site.id}/builds/${build.id}/logs`,
-    );
-    options.description =
-      'The build is running. Click "Details" to see the Pages build status.';
-  } else if (build.state === 'success') {
-    options.state = 'success';
-    options.target_url = build.url;
-    options.description =
-      'The build is complete! Click "Details" to visit the Site Preview.';
-  } else if (build.state === 'error' || build.state === 'invalid') {
-    options.state = 'error';
-    options.target_url = url.resolve(
-      config.app.hostname,
-      `/sites/${site.id}/builds/${build.id}/logs`,
-    );
-    options.description =
-      'The build has encountered an error. Click "Details" to see the Pages build logs.';
-  }
-  return GitHub.sendCreateGithubStatusRequest(accessToken, options);
-};
-
 const fetchContent = async (build, path) => {
   if (!build.clonedCommitSha) {
     throw new Error(
@@ -139,7 +90,6 @@ const fetchContent = async (build, path) => {
 module.exports = {
   createSiteWebhook,
   listSiteWebhooks,
-  reportBuildStatus,
   fetchContent,
   loadBuildUserAccessToken,
 };
