@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
-const { Site  } = require('../../../../api/models');
+const { Site } = require('../../../../api/models');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const { createSiteUserOrg } = require('../../support/site-user');

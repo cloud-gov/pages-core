@@ -6,6 +6,7 @@ const { domain } = require('../utils/build');
 const GitLab = require('./GitLab');
 const config = require('../../config');
 const url = require('url');
+const { logger } = require('../../winston');
 
 const isWorkshop = (sourceCodePlatform) => sourceCodePlatform === Site.Platforms.Workshop;
 
@@ -88,11 +89,24 @@ const getSourceCodePlatformToken = async (build) =>
 
 const checkPermissions = async (user, site) =>
   isWorkshop(site.sourceCodePlatform)
-    ? { admin: {} } // TODO: Workshop Integration
+    ? await checkGitlabRepository(user, site.sourceCodeUrl)
     : await GitHub.checkPermissions(user, site.owner, site.repository);
 
 const getProcessedGitLabWebhookPayload = (payload) =>
   GitLab.getProcessedWebhookPayload(payload);
+
+const checkGitlabRepository = async (user, sourceCodeUrl) => {
+  return GitLabHelper.getProject(user, sourceCodeUrl).then(async (response) => {
+    if (!response.ok) {
+      logger.error(await response.json());
+      throw {
+        message: `The repository ${sourceCodeUrl} does not exist.`,
+        status: response.status,
+      };
+    }
+    return await response.json();
+  });
+};
 
 module.exports = {
   checkPermissions,
@@ -103,4 +117,5 @@ module.exports = {
   getSourceCodePlatformDomain,
   getSourceCodePlatformToken,
   getProcessedGitLabWebhookPayload,
+  checkGitlabRepository,
 };

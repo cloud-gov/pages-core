@@ -1,12 +1,10 @@
 const GitHub = require('./GitHub');
-const GitLabHelper = require('./GitLabHelper');
 const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Organization, Site, User } = require('../models');
 const utils = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
-const { logger } = require('../../winston');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -107,7 +105,7 @@ async function checkRepositoryAndOrg({
   sourceCodeUrl,
 }) {
   if (sourceCodePlatform === Site.Platforms.Workshop) {
-    return await checkGitlabRepository({ user, sourceCodeUrl });
+    return await SourceCodePlatformHelper.checkGitlabRepository(user, sourceCodeUrl);
   } else {
     const repo = await checkGithubRepository({ user, owner, repository });
     await checkGithubOrg({
@@ -133,19 +131,6 @@ function checkGithubRepository({ user, owner, repository }) {
       };
     }
     return repo;
-  });
-}
-
-function checkGitlabRepository({ user, sourceCodeUrl }) {
-  return GitLabHelper.getProject(user, sourceCodeUrl).then(async (response) => {
-    if (!response.ok) {
-      logger.error(await response.json());
-      throw {
-        message: `The repository ${sourceCodeUrl} does not exist.`,
-        status: response.status,
-      };
-    }
-    return await response.json();
   });
 }
 
