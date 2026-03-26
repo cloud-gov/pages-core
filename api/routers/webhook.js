@@ -64,10 +64,8 @@ function verifySiteRequest(expectedKeys) {
 function verifyToken(req, res, next) {
   logger.info('GitLab verifyToken', req.headers);
 
-  const { body: payload, headers } = req;
-
   try {
-    verifyGitLabToken(payload, headers);
+    verifyGitLabToken(req.headers);
   } catch (err) {
     res.badRequest();
     next(err);
