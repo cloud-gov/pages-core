@@ -269,7 +269,7 @@ const getProcessedWebhookPayload = (payload) => {
   const [, owner, ...rest] = payload.project.web_url
     .replace(`${normalizeUrl(gitlabConfig.baseURL)}`, '')
     .split('/');
-  return {
+  const processedPayload = {
     after: payload.after,
     commits: payload.commits && payload.commits.length > 0 ? [{}] : undefined,
     owner,
@@ -280,6 +280,10 @@ const getProcessedWebhookPayload = (payload) => {
     sender: payload.user_username,
     ref: payload.ref,
   };
+
+  logger.info(`processedPayload: ${JSON.stringify(processedPayload)}`);
+
+  return processedPayload;
 };
 
 module.exports = {

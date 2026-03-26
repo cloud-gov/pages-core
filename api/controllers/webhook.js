@@ -5,7 +5,7 @@ const { encryption } = require('../../config');
 const QueueJobs = require('../queue-jobs');
 const { createQueueConnection } = require('../utils/queues');
 const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
-const {  Site} = require('../models');
+const { Site } = require('../models');
 
 const connection = createQueueConnection();
 const queueJob = new QueueJobs(connection);
@@ -14,7 +14,7 @@ module.exports = wrapHandlers({
   async github(req, res) {
     const { body: payload } = req;
 
-    await Webhooks.pushWebhookRequest(payload);
+    await Webhooks.pushWebhookRequest(payload, Site.Platforms.Github);
 
     res.ok();
   },
