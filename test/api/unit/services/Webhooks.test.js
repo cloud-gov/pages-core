@@ -5,7 +5,8 @@ const sinon = require('sinon');
 const { Build, User, Event } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
 const EventCreator = require('../../../../api/services/EventCreator');
-const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
+// eslint-disable-next-line max-len
+const SourceCodePlatformHelper = require('../../../../api/services/SourceCodePlatformHelper');
 
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
@@ -182,7 +183,9 @@ describe('Webhooks Service', () => {
 
     it(`should find the site by the lowercased
         owner and repository and upper cased github user`, async () => {
-      const reporterSpy = sinon.stub(GithubBuildHelper, 'reportBuildStatus').resolves();
+      const reporterSpy = sinon
+        .stub(SourceCodePlatformHelper, 'reportBuildStatus')
+        .resolves();
       const { site, user } = await createSiteUserOrg();
 
       user.username = user.username.toUpperCase();

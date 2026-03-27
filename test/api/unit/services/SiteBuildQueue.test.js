@@ -18,6 +18,13 @@ const {
 } = require('../../../../api/models');
 const CFApiClient = require('../../../../api/utils/cfApiClient');
 const S3Helper = require('../../../../api/services/S3Helper');
+const {
+  nockRefreshTokenWithResponse,
+  getRefreshToken200Response,
+} = require('../../support/gitlabAPINocks');
+
+const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
+gitlabConfig.baseURL = 'http://workshop.cloud.gov/';
 
 describe('SiteBuildQueue', () => {
   afterEach(() => {
@@ -693,7 +700,7 @@ describe('SiteBuildQueue', () => {
         .catch(done);
     });
 
-    it(`should set GITHUB_TOKEN in the
+    it(`should set GITHUB_TOKEN and SOURCE_CODE_PLATFORM_TOKEN in the
         message to the user's GitHub access token`, async () => {
       const user = await factory.user({
         githubAccessToken: 'fake-github-token-123',
@@ -716,6 +723,9 @@ describe('SiteBuildQueue', () => {
       });
 
       const message = await SiteBuildQueue.messageBodyForBuild(fullBuild);
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_TOKEN')).to.equal(
+        'fake-github-token-123',
+      );
       expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
     });
 
@@ -748,7 +758,94 @@ describe('SiteBuildQueue', () => {
 
       const message = await SiteBuildQueue.messageBodyForBuild(build);
 
-      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal(user2.githubAccessToken);
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_TOKEN')).to.equal(
+        user2.githubAccessToken,
+      );
+    });
+
+    it(`should set 
+        SOURCE_CODE_PLATFORM, SOURCE_CODE_PLATFORM_DOMAIN, SOURCE_CODE_PLATFORM_TOKEN 
+        in the message for GitHub repository`, async () => {
+      const user = await factory.user({
+        githubAccessToken: 'fake-github-token-123',
+        gitlabToken: 'fake-gitlab-token-123',
+      });
+      const site = await factory.site({
+        sourceCodePlatform: Site.Platforms.Github,
+      });
+      const { org } = await createSiteUserOrg(site);
+      await org.addRoleUser(user);
+      const build = await factory.build({
+        user,
+        site,
+      });
+
+      const fullBuild = await Build.findByPk(build.id, {
+        include: [
+          {
+            model: Site,
+            required: true,
+            include: [SiteBranchConfig],
+          },
+          User,
+        ],
+      });
+
+      const message = await SiteBuildQueue.messageBodyForBuild(fullBuild);
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM')).to.equal('github');
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_DOMAIN')).to.equal('github.com');
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_TOKEN')).to.equal(
+        'fake-github-token-123',
+      );
+      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
+    });
+
+    it(`should set 
+        SOURCE_CODE_PLATFORM, SOURCE_CODE_PLATFORM_DOMAIN, SOURCE_CODE_PLATFORM_TOKEN 
+        in the message for GitLab project`, async () => {
+      const user = await factory.user({
+        githubAccessToken: 'fake-github-token-123',
+        gitlabToken: 'fake-gitlab-token-123',
+      });
+      const site = await factory.site({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+      const { org } = await createSiteUserOrg(site);
+      await org.addRoleUser(user);
+      const build = await factory.build({
+        user,
+        site,
+      });
+
+      const fullBuild = await Build.findByPk(build.id, {
+        include: [
+          {
+            model: Site,
+            required: true,
+            include: [SiteBranchConfig],
+          },
+          User,
+        ],
+      });
+
+      const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
+        user.gitlabToken,
+        user.gitlabRefreshToken,
+        200,
+        getRefreshToken200Response({ access_token: 'fake-gitlab-token-123-refreshed' }),
+      );
+
+      const message = await SiteBuildQueue.messageBodyForBuild(fullBuild);
+
+      expect(refresh.isDone()).to.equal(true);
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM')).to.equal('workshop');
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_DOMAIN')).to.equal(
+        'workshop.cloud.gov',
+      );
+      expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_TOKEN')).to.equal(
+        'oauth2:fake-gitlab-token-123-refreshed',
+      );
     });
 
     it(`should set GENERATOR in the message

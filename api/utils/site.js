@@ -1,9 +1,7 @@
 const config = require('../../config');
-const { getBaseUrl } = require('../services/GitLab');
-const env = require('../../services/environment')();
+const GitLab = require('../services/GitLab');
 
 const { proxyDomain, githubBaseUrl } = config.app;
-const gitlabBaseUrl = getBaseUrl(env.GITLAB_BASE_URL);
 
 function path(site, deployment) {
   return `/${deployment}/${site.owner}/${site.repository}`;
@@ -19,7 +17,7 @@ function siteViewDomain(site) {
 
 function buildSourceCodeUrl(owner, repository, sourceCodePlatform, platformsWorkshop) {
   // eslint-disable-next-line max-len
-  return `${sourceCodePlatform === platformsWorkshop ? gitlabBaseUrl : githubBaseUrl}/${owner}/${repository}`;
+  return `${sourceCodePlatform === platformsWorkshop ? GitLab.getBaseUrl() : githubBaseUrl}/${owner}/${repository}`;
 }
 
 function siteViewLink(site, deployment = 'site') {
