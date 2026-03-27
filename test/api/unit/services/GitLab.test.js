@@ -424,7 +424,7 @@ describe('', () => {
           pushed_at: 1323692851,
           repository_path: 'pages/project',
         },
-        sender: 'jsmith',
+        sender: { login: 'jsmith' },
       });
     });
   });

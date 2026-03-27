@@ -277,7 +277,7 @@ const getProcessedWebhookPayload = (payload) => {
       repository_path: rest.join('/'),
       pushed_at: Math.floor(new Date(payload.commits[0]?.timestamp).getTime() / 1000),
     },
-    sender: payload.user_username,
+    sender: { login: payload.user_username },
     ref: payload.ref,
   };
 
