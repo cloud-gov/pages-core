@@ -49,7 +49,7 @@ module.exports = {
       clientID: gitlabClientID,
       clientSecret: gitlabClientSecret,
       callbackURL: `${env.APP_HOSTNAME}/auth/gitlab/callback`,
-      scope: ['read_repository api'],
+      scope: ['api'],
       state: true,
       responseType: 'code',
       passReqToCallback: true, // to extract refresh token and expires at.
