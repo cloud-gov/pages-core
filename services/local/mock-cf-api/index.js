@@ -39,6 +39,7 @@ app.get('/v3/service_credential_bindings/:guid/details', (req, res) => {
 
 // Returns a fake access token for CF API request calls
 app.post('/oauth/token', async (_, res) => {
+  // eslint-disable-next-line sonarjs/hardcoded-secret-signatures
   const token = jwt.sign({ type: 'local' }, 'local', { expiresIn: 3600 });
 
   res.json({
