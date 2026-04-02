@@ -70,8 +70,7 @@ module.exports = wrapHandlers({
     } = req;
 
     const site = await Site.findOne({ where: { id } });
-    const users = await site.getOrgUsers();
-    const hook = await SourceCodePlatformHelper.createSiteWebhook(req.user, site, users);
+    const hook = await SourceCodePlatformHelper.createSiteWebhook(req.user, site);
 
     return res.json(hook || []);
   },

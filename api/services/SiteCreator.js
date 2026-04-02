@@ -188,7 +188,7 @@ function validateSite(params) {
  * returns the new site record
  */
 async function saveAndBuildSite({ site, user }) {
-  const webhook = await SourceCodePlatformHelper.setWebhook(user, site);
+  const webhook = await SourceCodePlatformHelper.createSiteWebhook(user, site);
 
   // This will be `undefined` if the webhook already exists
   if (webhook) {

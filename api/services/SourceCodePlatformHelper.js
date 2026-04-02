@@ -78,19 +78,16 @@ const reportBuildStatus = async (build) => {
     : await GitHub.sendCreateGithubStatusRequest(accessToken, options);
 };
 
-const createSiteWebhook = async (user, site, users) =>
-  isWorkshop(site.sourceCodePlatform)
+const createSiteWebhook = async (user, site) => {
+  const users = await site.getOrgUsers();
+  return isWorkshop(site.sourceCodePlatform)
     ? await GitLabHelper.createSiteWebhook(user, site)
     : await GithubBuildHelper.createSiteWebhook(
         site,
         users,
         getAccessTokenWithAdminPermissions,
       );
-
-const setWebhook = async (user, site) =>
-  isWorkshop(site.sourceCodePlatform)
-    ? await GitLabHelper.createSiteWebhook(user, site)
-    : await GitHub.setWebhook(site, user.githubAccessToken);
+};
 
 const listSiteWebhooks = async (user, site, users) =>
   isWorkshop(site.sourceCodePlatform)
@@ -228,7 +225,6 @@ const loadBuildUserAccessToken = async (build) => {
 module.exports = {
   isWorkshop,
   createSiteWebhook,
-  setWebhook,
   listSiteWebhooks,
   reportBuildStatus,
   getSourceCodePlatformDomain,
