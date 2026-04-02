@@ -1,3 +1,9 @@
+## 0.21.1 (2026-04-02)
+
+### Fixed
+
+- **ci**: ClamAV REST image source
+
 ## 0.21.0 (2026-04-01)
 
 ### Added
