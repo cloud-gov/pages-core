@@ -19,8 +19,6 @@ const {
 
 const internalUAAHost = UAA_HOST_DOCKER_URL || UAA_LOGIN_HOST;
 
-// if (!REDIS_URL) throw new Error('No Redis credentials found');
-
 module.exports = {
   admin: {
     org: ADMIN_GITHUB_ORGANIZATION,
