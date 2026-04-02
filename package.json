@@ -212,7 +212,7 @@
     "lodash": "^4.17.22",
     "js-yaml": "^4.1.1",
     "@smithy/config-resolver": "^4.4.0",
-    "fast-xml-parser": "^5.5.7",
+    "fast-xml-parser": "^5.3.6",
     "minimatch": "^3.1.4",
     "underscore": "^1.13.8",
     "dottie": "^2.0.7",
@@ -220,8 +220,6 @@
     "diff": "^4.0.4",
     "svgo": "^3.3.3",
     "immutable": "^5.1.5",
-    "flatted": "^3.4.0",
-    "socket.io-parser": "^4.2.6",
-    "serialize-javascript": "^7.0.3"
+    "flatted": "^3.4.0"
   }
 }
