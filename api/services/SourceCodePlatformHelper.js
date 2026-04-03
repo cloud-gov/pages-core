@@ -5,6 +5,7 @@ const GitHub = require('./GitHub');
 const { domain } = require('../utils/build');
 const config = require('../../config');
 const url = require('url');
+const Organization = require('./organization');
 
 const PULL = [
   GitLabHelper.GITLAB_ACCESS_LEVEL_REPORTER,
@@ -79,14 +80,16 @@ const reportBuildStatus = async (build) => {
 };
 
 const createSiteWebhook = async (user, site) => {
-  const users = await site.getOrgUsers();
-  return isWorkshop(site.sourceCodePlatform)
-    ? await GitLabHelper.createSiteWebhook(user, site)
-    : await GithubBuildHelper.createSiteWebhook(
-        site,
-        users,
-        getAccessTokenWithAdminPermissions,
-      );
+  if (isWorkshop(site.sourceCodePlatform)) {
+    return await GitLabHelper.createSiteWebhook(user, site);
+  } else {
+    const users = await Organization.getOrganizationUsers(site);
+    return await GithubBuildHelper.createSiteWebhook(
+      site,
+      users,
+      getAccessTokenWithAdminPermissions,
+    );
+  }
 };
 
 const listSiteWebhooks = async (user, site, users) =>
@@ -159,6 +162,11 @@ const getAccessTokenWithCertainPermissions = async (
   sourceCodePlatform,
 ) => {
   let count = 0;
+
+  if (!users) {
+    return null;
+  }
+
   const filteredUsers = getUsersWithToken(users, sourceCodePlatform);
 
   const getNextToken = async (user) => {

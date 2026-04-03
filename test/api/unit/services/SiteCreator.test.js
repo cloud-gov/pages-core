@@ -12,6 +12,7 @@ const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, SiteBranchConfig } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
 const utils = require('../../../../api/utils');
+const Organization = require('../../../../api/services/organization');
 
 describe('SiteCreator', () => {
   beforeEach(() => {
@@ -60,7 +61,7 @@ describe('SiteCreator', () => {
       });
 
     const setupWebhook = (accessToken, owner, repo) => {
-      sinon.stub(Site.prototype, 'getOrgUsers').resolves([
+      sinon.stub(Organization, 'getOrganizationUsers').resolves([
         {
           githubAccessToken: accessToken,
           signedInAt: new Date(),
