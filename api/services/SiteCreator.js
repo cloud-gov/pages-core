@@ -1,17 +1,14 @@
 const GitHub = require('./GitHub');
-const GitLab = require('./GitLab');
-const GitLabHelper = require('./GitLabHelper');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const TemplateResolver = require('./TemplateResolver');
 const { Build, Organization, Site, User } = require('../models');
 const utils = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
-const { updateGitLabTokens } = require('./user');
-const { logger } = require('../../winston');
 
 const apiClient = new CloudFoundryAPIClient();
 
-const defaultEngine = 'jekyll';
+const defaultEngine = 'node.js';
 
 function paramsForNewSite(params) {
   const owner = params.owner ? params.owner.toLowerCase() : null;
@@ -107,8 +104,11 @@ async function checkRepositoryAndOrg({
   sourceCodePlatform,
   sourceCodeUrl,
 }) {
-  if (sourceCodePlatform === Site.Platforms.Workshop) {
-    return await checkGitlabRepository({ user, sourceCodeUrl });
+  if (SourceCodePlatformHelper.isWorkshop(sourceCodePlatform)) {
+    return await SourceCodePlatformHelper.getGitLabProjectToCreateSite(
+      user,
+      sourceCodeUrl,
+    );
   } else {
     const repo = await checkGithubRepository({ user, owner, repository });
     await checkGithubOrg({
@@ -135,21 +135,6 @@ function checkGithubRepository({ user, owner, repository }) {
     }
     return repo;
   });
-}
-
-function checkGitlabRepository({ user, sourceCodeUrl }) {
-  return GitLab.getProject(user, sourceCodeUrl, updateGitLabTokens).then(
-    async (response) => {
-      if (!response.ok) {
-        logger.error(await response.json());
-        throw {
-          message: `The repository ${sourceCodeUrl} does not exist.`,
-          status: response.status,
-        };
-      }
-      return await response.json();
-    },
-  );
 }
 
 function buildSite(params, s3) {
@@ -203,10 +188,7 @@ function validateSite(params) {
  * returns the new site record
  */
 async function saveAndBuildSite({ site, user }) {
-  const webhook =
-    site.sourceCodePlatform === Site.Platforms.Workshop
-      ? await GitLabHelper.createSiteWebhook(user, site)
-      : await GitHub.setWebhook(site, user.githubAccessToken);
+  const webhook = await SourceCodePlatformHelper.createSiteWebhook(user, site);
 
   // This will be `undefined` if the webhook already exists
   if (webhook) {

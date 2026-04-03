@@ -54,4 +54,6 @@ function sitePrefix(build, site) {
   return path.replace(/^(\/)+/, '');
 }
 
-module.exports = { buildUrl, sitePrefix };
+const domain = (url) => new URL(url).hostname;
+
+module.exports = { buildUrl, sitePrefix, domain };

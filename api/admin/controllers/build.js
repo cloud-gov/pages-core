@@ -1,6 +1,6 @@
 const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
-const GithubBuildHelper = require('../../services/GithubBuildHelper');
+const SourceCodePlatformHelper = require('../../services/SourceCodePlatformHelper');
 
 const { Build, Domain, Event, Site, SiteBranchConfig, User } = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
@@ -135,14 +135,23 @@ module.exports = wrapHandlers({
       const rebuild = await Build.create({
         branch: requestBuild.branch,
         site: requestBuild.site,
-        username: 'admin',
+        user: requestBuild.user,
+        username: requestBuild.username,
         requestedCommitSha:
           requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
       });
       await rebuild.enqueue();
       rebuild.Site = requestBuild.Site;
-      await GithubBuildHelper.reportBuildStatus(rebuild);
+      await SourceCodePlatformHelper.reportBuildStatus(rebuild);
       const rebuildJSON = await buildSerializer.serialize(rebuild);
+
+      EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Rebuild', {
+        build: {
+          id: rebuild.id,
+          state: rebuild.state,
+        },
+      });
+
       return res.json(rebuildJSON);
     }
     return res.ok({});

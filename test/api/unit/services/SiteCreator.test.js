@@ -12,6 +12,7 @@ const TemplateResolver = require('../../../../api/services/TemplateResolver');
 const { Build, Site, SiteBranchConfig } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
 const utils = require('../../../../api/utils');
+const Organization = require('../../../../api/services/organization');
 
 describe('SiteCreator', () => {
   beforeEach(() => {
@@ -58,6 +59,20 @@ describe('SiteCreator', () => {
         },
         include: [Build, SiteBranchConfig],
       });
+
+    const setupWebhook = (accessToken, owner, repo) => {
+      sinon.stub(Organization, 'getOrganizationUsers').resolves([
+        {
+          githubAccessToken: accessToken,
+          signedInAt: new Date(),
+        },
+      ]);
+      return githubAPINocks.webhook({
+        accessToken,
+        owner,
+        repo,
+      });
+    };
 
     context('from a GitHub repo', () => {
       let siteParams, name;
@@ -146,13 +161,6 @@ describe('SiteCreator', () => {
       let user;
       let webhookNock;
 
-      const setupWebhook = (accessToken, owner, repo) =>
-        githubAPINocks.webhook({
-          accessToken,
-          owner,
-          repo,
-        });
-
       context('when the owner of the repo is an authorized federalist org', () => {
         it(`creates new site record for the given repository,
             adds the webhook and build`, (done) => {
@@ -162,6 +170,7 @@ describe('SiteCreator', () => {
             .user()
             .then((model) => {
               user = model;
+              user.signedInAt = new Date();
               githubAPINocks.repo({
                 defaultBranch,
               });
@@ -171,6 +180,21 @@ describe('SiteCreator', () => {
                 organizations: [
                   {
                     login: siteParams.owner,
+                  },
+                ],
+              });
+
+              githubAPINocks.repo({
+                accessToken: user.accessToken,
+                owner: siteParams.owner,
+                repo: siteParams.repository,
+                response: [
+                  200,
+                  {
+                    permissions: {
+                      admin: true,
+                      push: false,
+                    },
                   },
                 ],
               });
@@ -214,7 +238,27 @@ describe('SiteCreator', () => {
               githubAPINocks.repo({
                 defaultBranch,
               });
-              githubAPINocks.webhook();
+
+              githubAPINocks.repo({
+                accessToken: user.accessToken,
+                owner: siteParams.owner,
+                repo: siteParams.repository,
+                response: [
+                  200,
+                  {
+                    permissions: {
+                      admin: true,
+                      push: false,
+                    },
+                  },
+                ],
+              });
+
+              webhookNock = setupWebhook(
+                user.githubAccessToken,
+                siteParams.owner,
+                siteParams.repository,
+              );
 
               githubAPINocks.userOrganizations({
                 accessToken: user.githubAccessToken,
@@ -466,7 +510,24 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
             githubAPINocks.createRepoUsingTemplate();
-            githubAPINocks.webhook();
+
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
+              owner: siteParams.owner,
+              repo: siteParams.repository,
+              response: [
+                200,
+                {
+                  permissions: {
+                    admin: true,
+                    push: false,
+                  },
+                },
+              ],
+            });
+
+            setupWebhook(user.githubAccessToken, siteParams.owner, siteParams.repository);
+
             return SiteCreator.createSite({
               user,
               siteParams,
@@ -498,7 +559,24 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
             githubAPINocks.createRepoUsingTemplate();
-            githubAPINocks.webhook();
+
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
+              owner: siteParams.owner,
+              repo: siteParams.repository,
+              response: [
+                200,
+                {
+                  permissions: {
+                    admin: true,
+                    push: false,
+                  },
+                },
+              ],
+            });
+
+            setupWebhook(user.githubAccessToken, siteParams.owner, siteParams.repository);
+
             return SiteCreator.createSite({
               siteParams,
               user,
@@ -527,7 +605,24 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
             githubAPINocks.createRepoUsingTemplate();
-            githubAPINocks.webhook();
+
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
+              owner: siteParams.owner,
+              repo: siteParams.repository,
+              response: [
+                200,
+                {
+                  permissions: {
+                    admin: true,
+                    push: false,
+                  },
+                },
+              ],
+            });
+
+            setupWebhook(user.githubAccessToken, siteParams.owner, siteParams.repository);
+
             return SiteCreator.createSite({
               siteParams,
               user,
@@ -558,11 +653,28 @@ describe('SiteCreator', () => {
           .then((model) => {
             user = model;
             githubAPINocks.createRepoUsingTemplate();
-            webhookNock = githubAPINocks.webhook({
-              accessToken: user.githubAccessToken,
+
+            githubAPINocks.repo({
+              accessToken: user.accessToken,
               owner: siteParams.owner,
               repo: siteParams.repository,
+              response: [
+                200,
+                {
+                  permissions: {
+                    admin: true,
+                    push: false,
+                  },
+                },
+              ],
             });
+
+            webhookNock = setupWebhook(
+              user.githubAccessToken,
+              siteParams.owner,
+              siteParams.repository,
+            );
+
             return SiteCreator.createSite({
               user,
               siteParams,
@@ -638,13 +750,6 @@ describe('SiteCreator', () => {
     context('with a private S3 bucket', () => {
       let user;
       let webhookNock;
-
-      const setupWebhook = (accessToken, owner, repo) =>
-        githubAPINocks.webhook({
-          accessToken,
-          owner,
-          repo,
-        });
 
       describe('for the Pages product', () => {
         it(`creates new bucket and site record for the given repository,
@@ -739,6 +844,21 @@ describe('SiteCreator', () => {
                 organizations: [
                   {
                     login: siteParams.owner,
+                  },
+                ],
+              });
+
+              githubAPINocks.repo({
+                accessToken: user.accessToken,
+                owner: siteParams.owner,
+                repo: siteParams.repository,
+                response: [
+                  200,
+                  {
+                    permissions: {
+                      admin: true,
+                      push: false,
+                    },
                   },
                 ],
               });

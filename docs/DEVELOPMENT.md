@@ -142,10 +142,10 @@ Endpoints:
 Fetch service instanaces:
 - __/v3/service_instances__
 
-Fetch service instanace credentials binding name:
+Fetch service instance credentials binding name:
 - __/v3/service_credential_bindings?service_instance_names=name__
 
-Fetch service instanace credentials by binding guid
+Fetch service instance credentials by binding guid
 - __/v3/service_credential_bindings/:guid/details__
 
 #### Front end application
