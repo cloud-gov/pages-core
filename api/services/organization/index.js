@@ -11,4 +11,6 @@ module.exports = {
     OrganizationService.deactivateOrganization.bind(OrganizationService),
   activateOrganization:
     OrganizationService.activateOrganization.bind(OrganizationService),
+  getOrganizationUsers:
+    OrganizationService.getOrganizationUsers.bind(OrganizationService),
 };

@@ -15,6 +15,8 @@ const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema'
 const csrfToken = require('../support/csrfToken');
 const { createSiteUserOrg } = require('../support/site-user');
 const utils = require('../../../api/utils');
+// eslint-disable-next-line max-len
+const SourceCodePlatformHelper = require('../../../api/services/SourceCodePlatformHelper');
 
 const { Organization, Role, Site } = require('../../../api/models');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
@@ -27,6 +29,9 @@ const authErrorMessage =
 describe('Site API', () => {
   beforeEach(() => {
     sinon.stub(QueueJobs.prototype, 'startSiteBuild').resolves();
+    sinon
+      .stub(SourceCodePlatformHelper, 'createSiteWebhook')
+      .resolves({ data: { id: 1 } });
     sinon.stub(EventCreator, 'error').resolves();
     sinon.stub(utils, 'generateS3ServiceName').callsFake((owner, repo) => {
       if (!owner || !repo) return undefined;
@@ -636,9 +641,31 @@ describe('Site API', () => {
     it('should respond with a 400 if a webhook cannot be created', (done) => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
+      SourceCodePlatformHelper.createSiteWebhook.restore();
 
       nock.cleanAll();
-      githubAPINocks.repo();
+
+      githubAPINocks.repo({
+        accessToken: 'fake-access-token',
+        owner: siteOwner,
+        repo: siteRepository,
+        response: [
+          200,
+          {
+            permissions: {
+              admin: true,
+              push: false,
+            },
+          },
+        ],
+      });
+
+      sinon.stub(Site.prototype, 'getOrgUsers').resolves([
+        {
+          githubAccessToken: 'fake-access-token',
+          signedInAt: new Date(),
+        },
+      ]);
       githubAPINocks.webhook({
         owner: siteOwner,
         repo: siteRepository,

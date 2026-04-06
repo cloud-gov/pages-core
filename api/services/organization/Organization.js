@@ -262,4 +262,20 @@ module.exports = {
   activateOrganization(organization) {
     return organization.update({ isActive: true });
   },
+
+  async getOrganizationUsers(site) {
+    const organization = await Organization.findOne({
+      where: {
+        id: site.organizationId,
+      },
+      include: [
+        {
+          model: OrganizationRole,
+          include: [Role, User],
+        },
+      ],
+    });
+
+    return organization?.OrganizationRoles?.map((role) => role.User);
+  },
 };

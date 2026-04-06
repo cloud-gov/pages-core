@@ -12,7 +12,7 @@ function createResponse() {
   return factory.createCFAPIResourceList({ resources: resources });
 }
 
-function createS3ServiceInstanaces() {
+function createS3ServiceInstances() {
   const response = createResponse();
 
   return response;
@@ -50,7 +50,7 @@ function createS3ServiceBindingDetails(guid) {
 }
 
 module.exports = {
-  createS3ServiceInstanaces,
+  createS3ServiceInstances,
   createS3ServiceBindings,
   createS3ServiceBindingDetails,
 };

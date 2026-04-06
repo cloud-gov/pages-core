@@ -4,6 +4,8 @@ const { decrypt } = require('../services/Encryptor');
 const { encryption } = require('../../config');
 const QueueJobs = require('../queue-jobs');
 const { createQueueConnection } = require('../utils/queues');
+const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
+const { Site } = require('../models');
 
 const connection = createQueueConnection();
 const queueJob = new QueueJobs(connection);
@@ -12,7 +14,7 @@ module.exports = wrapHandlers({
   async github(req, res) {
     const { body: payload } = req;
 
-    await Webhooks.pushWebhookRequest(payload);
+    await Webhooks.pushWebhookRequest(payload, Site.Platforms.Github);
 
     res.ok();
   },
@@ -69,5 +71,16 @@ module.exports = wrapHandlers({
     }
 
     return res.ok();
+  },
+
+  async gitlab(req, res) {
+    const { body: payload } = req;
+
+    await Webhooks.pushWebhookRequest(
+      SourceCodePlatformHelper.getProcessedGitLabWebhookPayload(payload),
+      Site.Platforms.Workshop,
+    );
+
+    res.ok();
   },
 });

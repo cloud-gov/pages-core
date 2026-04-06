@@ -1,7 +1,7 @@
 const config = require('../../config');
 const { Build, User, Site, Event, Organization } = require('../models');
 const authorizer = require('../authorizers/site');
-const GithubBuildHelper = require('./GithubBuildHelper');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const EventCreator = require('./EventCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');
 const { fetchModelById } = require('../utils/queryDatabase');
@@ -9,8 +9,17 @@ const { BuildService } = require('./build');
 
 const { OPS_EMAIL } = process.env;
 
-const findSiteForWebhookRequest = (payload) => {
-  const [owner, repository] = payload.repository.full_name.split('/');
+const getOwnerAndRepository = (payload, sourceCodePlatform) => {
+  if (SourceCodePlatformHelper.isWorkshop(sourceCodePlatform)) {
+    return { owner: payload.owner, repository: payload.repository.repository_path };
+  } else {
+    const [owner, repository] = payload.repository.full_name.split('/');
+    return { owner, repository };
+  }
+};
+
+const findSiteForWebhookRequest = (payload, sourceCodePlatform) => {
+  const { owner, repository } = getOwnerAndRepository(payload, sourceCodePlatform);
 
   return Site.findAll({
     where: {
@@ -153,16 +162,19 @@ const createBuildForWebhookRequest = async (payload, site) => {
   }).then((build) => BuildService.enqueueOrLogBuild(build));
 };
 
-const pushWebhookRequest = async (payload) => {
+const pushWebhookRequest = async (
+  payload,
+  sourceCodePlatform = Site.Platforms.Github,
+) => {
   if (payload.commits && payload.commits.length > 0) {
-    const sites = await findSiteForWebhookRequest(payload);
+    const sites = await findSiteForWebhookRequest(payload, sourceCodePlatform);
 
     await Promise.all(
       sites.map(async (site) => {
         if (shouldBuildForSite(site)) {
           const build = await createBuildForWebhookRequest(payload, site);
           await build.reload({ include: Site });
-          await GithubBuildHelper.reportBuildStatus(build);
+          await SourceCodePlatformHelper.reportBuildStatus(build);
         }
       }),
     );

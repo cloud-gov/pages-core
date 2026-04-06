@@ -1,8 +1,7 @@
 const Ajv = require('ajv');
 const userSerializer = require('../serializers/user');
 const { revokeApplicationGrant } = require('../services/GitHub');
-const { revokeUserGitLabTokens } = require('../services/GitLab');
-const { resetGitLabTokens } = require('../services/user');
+const { revokeUserGitLabTokens } = require('../services/GitLabHelper');
 
 const ajv = new Ajv();
 
@@ -60,8 +59,6 @@ module.exports = {
     const { user } = req;
 
     await revokeUserGitLabTokens(user);
-
-    await resetGitLabTokens(user);
 
     return res.json({});
   },

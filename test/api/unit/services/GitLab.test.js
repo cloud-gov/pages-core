@@ -3,30 +3,25 @@ const nock = require('nock');
 const sinon = require('sinon');
 
 const config = require('../../../../config');
-const {
-  fetchRefreshTokens,
-  revokeUserGitLabTokens,
-  getBaseUrl,
-} = require('../../../../api/services/GitLab');
 const { logger } = require('../../../../winston');
+const {
+  getReqHeaders,
+  getRefreshTokenBody,
+  nockRefreshTokenWithResponse,
+  getClientCredentials,
+  getRefreshToken200Response,
+} = require('../../support/gitlabAPINocks');
+const {
+  fetchRefreshUserOAuthTokens,
+  normalizeUrl,
+  revokeUserOAuthTokens,
+} = require('../../../../api/services/GitLab');
 
 const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
 gitlabConfig.clientID = 'mock-client-id';
 gitlabConfig.clientSecret = 'mock-client-secret';
 gitlabConfig.callbackURL = 'https://localhost:1337/auth/gitlab/callback';
-gitlabConfig.baseURL = 'http://workshop.cloud.gov/';
-
-const clientCredentials = {
-  client_id: gitlabConfig.clientID,
-  client_secret: gitlabConfig.clientSecret,
-};
-
-const refreshToken200Response = {
-  access_token: 'new-access-token',
-  expires_in: 7200,
-  refresh_token: 'new-refresh-token',
-  created_at: '2026-03-17T17:22:09.904Z',
-};
+gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
 
 const refreshToken400Response = {
   error: 'invalid_grant',
@@ -43,29 +38,9 @@ function getMockUser() {
   };
 }
 
-function getHeaders(accessToken) {
-  return {
-    'Content-Type': 'application/x-www-form-urlencoded',
-    Authorization: `Bearer ${accessToken}`,
-  };
-}
-
-function getReqheaders(accessToken) {
-  return { reqheaders: getHeaders(accessToken) };
-}
-
-function getRefreshTokenBody(refreshToken) {
-  return {
-    ...clientCredentials,
-    refresh_token: refreshToken,
-    grant_type: 'refresh_token',
-    redirect_uri: gitlabConfig.callbackURL,
-  };
-}
-
 function nockRevokeToken(accessToken, tokenToRevoke) {
-  return nock(gitlabConfig.baseURL, getReqheaders(accessToken)).post('/oauth/revoke', {
-    ...clientCredentials,
+  return nock(gitlabConfig.baseURL, getReqHeaders(accessToken)).post('/oauth/revoke', {
+    ...getClientCredentials(gitlabConfig),
     token: tokenToRevoke,
   });
 }
@@ -83,54 +58,45 @@ function nockRevokeTokenWithError(tokenToRevoke, accessToken, error) {
   return nockRevokeToken(accessToken, tokenToRevoke).replyWithError(error);
 }
 
-function nockRefreshTokenWithResponse(
-  accessToken,
-  refreshToken,
-  responseStatusCode,
-  response,
-) {
-  return nock(gitlabConfig.baseURL, getReqheaders(accessToken))
-    .post('/oauth/token', getRefreshTokenBody(refreshToken))
-    .reply(responseStatusCode, response);
-}
-
 function nockRefreshTokenWithError(accessToken, refreshToken, error) {
-  return nock(gitlabConfig.baseURL, getReqheaders(accessToken))
-    .post('/oauth/token', getRefreshTokenBody(refreshToken))
+  return nock(gitlabConfig.baseURL, getReqHeaders(accessToken))
+    .post('/oauth/token', getRefreshTokenBody(gitlabConfig, refreshToken))
     .replyWithError(error);
 }
 
 describe('GitLab', () => {
-  describe('.fetchRefreshTokens(user)', () => {
+  describe('.fetchRefreshUserOAuthTokens(user)', () => {
     afterEach(() => {
       nock.cleanAll();
     });
 
-    it('should call GitLab oauth/token endpoint and return response 200', async () => {
+    it('should call  oauth/token endpoint and return response 200', async () => {
       const user = getMockUser();
       const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
         200,
-        refreshToken200Response,
+        getRefreshToken200Response(),
       );
-      const response = await fetchRefreshTokens(user);
+      const response = await fetchRefreshUserOAuthTokens(user);
 
       expect(response.ok).to.equal(true);
-      expect(await response.json()).to.deep.equal(refreshToken200Response);
+      expect(await response.json()).to.deep.equal(getRefreshToken200Response());
       expect(refresh.isDone()).to.equal(true);
     });
 
-    it('should call GitLab oauth/token endpoint and return response 400', async () => {
+    it('should call  oauth/token endpoint and return response 400', async () => {
       const user = getMockUser();
       const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
         400,
         refreshToken400Response,
       );
 
-      const response = await fetchRefreshTokens(user);
+      const response = await fetchRefreshUserOAuthTokens(user);
 
       expect(response.ok).to.be.false;
       expect(response.status).to.equal(400);
@@ -139,9 +105,10 @@ describe('GitLab', () => {
     });
   });
 
-  describe('.revokeUserGitLabTokens(user)', () => {
+  describe('.revokeUserOAuthTokens(user, resetUserOAuthTokens)', () => {
     let loggerWarnStub;
     let loggerErrorStub;
+    let resetUserOAuthTokensStub;
 
     beforeEach(() => {
       nock.cleanAll();
@@ -149,6 +116,7 @@ describe('GitLab', () => {
 
       loggerWarnStub = sinon.stub(logger, 'warn');
       loggerErrorStub = sinon.stub(logger, 'error');
+      resetUserOAuthTokensStub = sinon.stub();
     });
 
     afterEach(() => {
@@ -172,17 +140,19 @@ describe('GitLab', () => {
         {},
       );
       const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
         400,
         refreshToken400Response,
       );
 
-      await revokeUserGitLabTokens(user);
+      await revokeUserOAuthTokens(user, resetUserOAuthTokensStub);
 
       expect(revokeAccessToken.isDone()).to.be.true;
       expect(revokeRefreshToken.isDone()).to.be.true;
       expect(refresh.isDone()).to.be.true;
+      expect(resetUserOAuthTokensStub.called).to.be.true;
 
       expect(loggerWarnStub.called).to.be.false;
       expect(loggerErrorStub.called).to.be.false;
@@ -204,22 +174,24 @@ describe('GitLab', () => {
         {},
       );
       const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
         200,
-        refreshToken200Response,
+        getRefreshToken200Response(),
       );
 
-      await revokeUserGitLabTokens(user);
+      await revokeUserOAuthTokens(user, resetUserOAuthTokensStub);
 
       expect(revokeAccessToken.isDone()).to.be.true;
       expect(revokeRefreshToken.isDone()).to.be.true;
       expect(refresh.isDone()).to.be.true;
+      expect(resetUserOAuthTokensStub.called).to.be.true;
 
       expect(loggerWarnStub.called).to.be.true;
       expect(loggerWarnStub.args[0]).to.deep.equal([
         'GitLab: Unexpected token refresh response after tokens were revoked: 200',
-        refreshToken200Response,
+        getRefreshToken200Response(),
       ]);
       expect(loggerErrorStub.called).to.be.false;
     });
@@ -239,17 +211,19 @@ describe('GitLab', () => {
         {},
       );
       const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
         400,
         refreshToken400Response,
       );
 
-      await revokeUserGitLabTokens(user);
+      await revokeUserOAuthTokens(user, resetUserOAuthTokensStub);
 
       expect(revokeAccessToken.isDone()).to.be.true;
       expect(revokeRefreshToken.isDone()).to.be.true;
       expect(refresh.isDone()).to.be.true;
+      expect(resetUserOAuthTokensStub.called).to.be.true;
 
       expect(loggerWarnStub.called).to.be.false;
       expect(loggerErrorStub.called).to.be.true;
@@ -276,17 +250,19 @@ describe('GitLab', () => {
         'Network error while revoking refresh token.',
       );
       const refresh = nockRefreshTokenWithResponse(
+        gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
         400,
         refreshToken400Response,
       );
 
-      await revokeUserGitLabTokens(user);
+      await revokeUserOAuthTokens(user, resetUserOAuthTokensStub);
 
       expect(revokeAccessToken.isDone()).to.be.true;
       expect(revokeRefreshToken.isDone()).to.be.true;
       expect(refresh.isDone()).to.be.true;
+      expect(resetUserOAuthTokensStub.called).to.be.true;
 
       expect(loggerWarnStub.called).to.be.false;
       expect(loggerErrorStub.called).to.be.true;
@@ -319,11 +295,12 @@ describe('GitLab', () => {
         'Network error while refreshing tokens.',
       );
 
-      await revokeUserGitLabTokens(user);
+      await revokeUserOAuthTokens(user, resetUserOAuthTokensStub);
 
       expect(revokeAccessToken.isDone()).to.be.true;
       expect(revokeRefreshToken.isDone()).to.be.true;
       expect(refresh.isDone()).to.be.true;
+      expect(resetUserOAuthTokensStub.called).to.be.true;
 
       expect(loggerWarnStub.called).to.be.false;
       expect(loggerErrorStub.called).to.be.true;
@@ -336,23 +313,23 @@ describe('GitLab', () => {
     });
   });
 
-  describe('.getBaseUrl()', () => {
+  describe('.normalizeUrl()', () => {
     it('should remove trailing slash from url', async () => {
       gitlabConfig.baseURL = 'https://workshop.cloud.gov/trailing_slash/';
-      expect(getBaseUrl(gitlabConfig.baseURL)).to.equal(
+      expect(normalizeUrl(gitlabConfig.baseURL)).to.equal(
         'https://workshop.cloud.gov/trailing_slash',
       );
     });
 
     it('should not update url if there is no trailing slash', async () => {
       gitlabConfig.baseURL = 'https://workshop.cloud.gov/no_trailing_slash';
-      expect(getBaseUrl(gitlabConfig.baseURL)).to.equal(
+      expect(normalizeUrl(gitlabConfig.baseURL)).to.equal(
         'https://workshop.cloud.gov/no_trailing_slash',
       );
     });
-  });
 
-  it('does not throw an error', async () => {
-    expect(getBaseUrl(null)).to.equal(undefined);
+    it('does not throw an error', async () => {
+      expect(normalizeUrl(null)).to.equal(undefined);
+    });
   });
 });
