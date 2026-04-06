@@ -60,6 +60,27 @@ function verifySiteRequest(expectedKeys) {
   };
 }
 
+function verifyToken(req, res, next) {
+  try {
+    verifyGitLabToken(req.headers);
+  } catch (err) {
+    res.badRequest();
+    next(err);
+  }
+  next();
+}
+
+function verifyGitLabToken(headers) {
+  const webhookSecret = config.webhook.gitlabSecret;
+  const headerSecret = headers['x-gitlab-token'];
+
+  if (!headerSecret) {
+    throw new Error('No X-Gitlab-Token found on request');
+  } else if (webhookSecret !== headerSecret) {
+    throw new Error('X-Gitlab-Token does not match webhook secret');
+  }
+}
+
 const verifyNewEditorSite = verifySiteRequest([
   'userEmail',
   'apiKey',
@@ -71,6 +92,7 @@ const verifyNewEditorSite = verifySiteRequest([
 const verifyEditorSiteId = verifySiteRequest(['siteId']);
 
 router.post('/webhook/github', verifySignature, WebhookController.github);
+router.post('/webhook/gitlab', verifyToken, WebhookController.gitlab);
 router.post('/webhook/organization', verifySignature, WebhookController.organization);
 router.post('/webhook/site', verifyNewEditorSite, WebhookController.site);
 router.delete('/webhook/site', verifyEditorSiteId, WebhookController.siteDelete);

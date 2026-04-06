@@ -83,6 +83,7 @@ async function siteBuildRunner(job, { sleepNumber = 15000, totalAttempts = 180 }
       state: Build.States.Error,
       error: err?.message,
     });
+    logger.log(err?.stack);
     throw new Error(message);
   }
 }
