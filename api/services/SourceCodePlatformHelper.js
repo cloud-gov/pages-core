@@ -6,6 +6,7 @@ const { domain } = require('../utils/build');
 const config = require('../../config');
 const url = require('url');
 const Organization = require('./organization');
+const { getBaseUrl } = require('./GitLab');
 
 const PULL = [
   GitLabHelper.GITLAB_ACCESS_LEVEL_REPORTER,
@@ -26,6 +27,7 @@ const ADMIN = [
 ];
 
 const isWorkshop = (sourceCodePlatform) => sourceCodePlatform === Site.Platforms.Workshop;
+const isWorkshopUrl = (url) => url?.startsWith(GitLabHelper.getGitLabBaseUrl());
 
 const reportBuildStatus = async (build) => {
   const sha = build.clonedCommitSha || build.requestedCommitSha;
@@ -113,7 +115,7 @@ const getTokenForSiteBuild = async (build) => {
     : build.User?.githubAccessToken;
   if (!token) token = await loadBuildUserAccessToken(build);
 
-  return workshop ? `oauth2:${token}` : token;
+  return workshop ? `${GitLabHelper.OAUTH_PREFIX}:${token}` : token;
 };
 
 const getProcessedGitLabWebhookPayload = (payload) =>
@@ -230,6 +232,38 @@ const loadBuildUserAccessToken = async (build) => {
   return accessToken;
 };
 
+const createRepoFromTemplate = async ({
+  user,
+  owner,
+  repository,
+  namespace,
+  project,
+  template,
+}) => {
+  if (isWorkshopUrl(template?.templateSourceCodeUrl)) {
+    const projectResponse = await GitLabHelper.createProjectFromTemplate(
+      user,
+      namespace,
+      project,
+      template?.templateSourceCodeUrl,
+    );
+    return await projectResponse.json();
+  } else return await GitHub.createRepoFromTemplate(user, owner, repository, template);
+};
+
+const updateSite = (repo, site, template) => {
+  if (isWorkshopUrl(template?.templateSourceCodeUrl)) {
+    const [, owner, ...rest] = repo.web_url.replace(getBaseUrl(), '').split('/');
+
+    site.sourceCodeUrl = repo.web_url;
+    site.owner = owner;
+    site.repository = rest.join('/');
+    site.sourceCodePlatform = Site.Platforms.Workshop;
+  } else {
+    site.sourceCodePlatform = Site.Platforms.Github;
+  }
+};
+
 module.exports = {
   isWorkshop,
   createSiteWebhook,
@@ -240,4 +274,7 @@ module.exports = {
   getProcessedGitLabWebhookPayload,
   getGitLabProjectToCreateSite,
   loadBuildUserAccessToken,
+  createRepoFromTemplate,
+  updateSite,
+  isWorkshopUrl,
 };

@@ -1,38 +1,39 @@
 const { logger } = require('../../winston');
 const config = require('../../config');
+const OAUTH_PREFIX = 'oauth2';
 
 const CONTENT_TYPE_URL_ENCODED = 'application/x-www-form-urlencoded';
 const CONTENT_TYPE_JSON = 'application/json';
 
 const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
 const normalizeUrl = (gitlabConfigBaseURL) => gitlabConfigBaseURL?.replace(/\/$/, '');
-const getBaseUrl = () => normalizeUrl(gitlabConfig.baseURL);
+const getNormalizedBaseUrl = () => normalizeUrl(gitlabConfig.baseURL);
+const getBaseUrl = () => getNormalizedBaseUrl();
+const getNormalizedBaseUrlWithOAuthToken = (userOAuthAccessToken) =>
+  getNormalizedBaseUrl().replace(
+    'https://',
+    `https://${OAUTH_PREFIX}:${userOAuthAccessToken}@`,
+  );
+const getApiUrl = (path) => `${getNormalizedBaseUrl()}/api/v4/${path}`;
 
-const getHeaders = ({ user, contentType }) => ({
-  Authorization: `Bearer ${user.gitlabToken}`,
+const getHeaders = (userOAuthAccessToken, contentType) => ({
+  Authorization: `Bearer ${userOAuthAccessToken}`,
   Accept: 'application/json',
   ...(contentType && { 'Content-Type': contentType }),
 });
 
-const getClientCredentials = (_gitlabConfig) => {
-  return {
-    client_id: _gitlabConfig.clientID,
-    client_secret: _gitlabConfig.clientSecret,
-  };
-};
+const getClientCredentials = (_gitlabConfig) => ({
+  client_id: _gitlabConfig.clientID,
+  client_secret: _gitlabConfig.clientSecret,
+});
 
-function getUrlEncodedProjectPath(sourceCodeUrl) {
-  const namespacedPath = sourceCodeUrl.replace(
-    `${normalizeUrl(gitlabConfig.baseURL)}/`,
-    '',
-  );
-  return encodeURIComponent(namespacedPath);
-}
+const getUrlEncodedPath = (sourceCodeUrl) =>
+  encodeURIComponent(sourceCodeUrl.replace(`${getNormalizedBaseUrl()}/`, ''));
 
-const fetchRefreshUserOAuthTokens = async (user) => {
-  return fetch(`${normalizeUrl(gitlabConfig.baseURL)}/oauth/token`, {
+const fetchRefreshUserOAuthTokens = async (user) =>
+  fetch(`${getNormalizedBaseUrl()}/oauth/token`, {
     method: 'POST',
-    headers: getHeaders({ user, contentType: CONTENT_TYPE_URL_ENCODED }),
+    headers: getHeaders(user.gitlabToken, CONTENT_TYPE_URL_ENCODED),
     body: new URLSearchParams({
       ...getClientCredentials(gitlabConfig),
       refresh_token: user.gitlabRefreshToken,
@@ -40,100 +41,98 @@ const fetchRefreshUserOAuthTokens = async (user) => {
       redirect_uri: gitlabConfig.callbackURL,
     }),
   });
-};
 
-const fetchAddWebhook = async (user, sourceCodeUrl, webhookEndpoint) => {
-  return fetch(
-    // eslint-disable-next-line max-len
-    `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/projects/${getUrlEncodedProjectPath(sourceCodeUrl)}/hooks`,
+const fetchAddWebhook = async (userOAuthAccessToken, sourceCodeUrl, webhookEndpoint) =>
+  fetch(getApiUrl(`projects/${getUrlEncodedPath(sourceCodeUrl)}/hooks`), {
+    method: 'POST',
+    headers: getHeaders(userOAuthAccessToken, CONTENT_TYPE_JSON),
+    body: JSON.stringify({
+      url: webhookEndpoint,
+      push_events: true,
+      branch_filter_strategy: 'all_branches',
+      token: config.webhook.gitlabSecret,
+    }),
+  });
+
+const fetchWebhooks = async (userOAuthAccessToken, sourceCodeUrl) =>
+  fetch(getApiUrl(`projects/${getUrlEncodedPath(sourceCodeUrl)}/hooks`), {
+    method: 'GET',
+    headers: getHeaders(userOAuthAccessToken),
+  });
+
+const fetchGetProject = async (userOAuthAccessToken, sourceCodeUrl) =>
+  fetch(getApiUrl(`projects/${getUrlEncodedPath(sourceCodeUrl)}`), {
+    method: 'GET',
+    headers: getHeaders(userOAuthAccessToken),
+  });
+
+const fetchProjectUser = async (userOAuthAccessToken, sourceCodeUrl, userId) =>
+  fetch(getApiUrl(`projects/${getUrlEncodedPath(sourceCodeUrl)}/members/all/${userId}`), {
+    method: 'GET',
+    headers: getHeaders(userOAuthAccessToken),
+  });
+
+const fetchUser = async (userOAuthAccessToken) =>
+  fetch(getApiUrl(`user`), {
+    method: 'GET',
+    headers: getHeaders(userOAuthAccessToken),
+  });
+
+const fetchPostCommitStatus = async (userOAuthAccessToken, sourceCodeUrl, options) =>
+  fetch(
+    getApiUrl(
+      // eslint-disable-next-line max-len
+      `projects/${getUrlEncodedPath(sourceCodeUrl)}/statuses/${options.sha}?state=${options.state}`,
+    ),
     {
       method: 'POST',
-      headers: getHeaders({ user, contentType: CONTENT_TYPE_JSON }),
-      body: JSON.stringify({
-        url: webhookEndpoint,
-        push_events: true,
-        branch_filter_strategy: 'all_branches',
-        token: config.webhook.gitlabSecret,
+      headers: getHeaders(userOAuthAccessToken, CONTENT_TYPE_URL_ENCODED),
+      body: new URLSearchParams({
+        state: options.state, // running, success, failed, canceled, skipped
+        target_url: options.target_url,
+        description: options.description,
+        name: `${config.app.product}-${config.app.appEnv}`,
       }),
     },
   );
-};
 
-const fetchWebhooks = async (user, sourceCodeUrl) => {
-  return fetch(
-    // eslint-disable-next-line max-len
-    `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/projects/${getUrlEncodedProjectPath(sourceCodeUrl)}/hooks`,
-    {
-      method: 'GET',
-      headers: getHeaders({ user }),
-    },
-  );
-};
-
-const fetchGetProject = async (user, sourceCodeUrl) => {
-  // eslint-disable-next-line max-len
-  const url = `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/projects/${getUrlEncodedProjectPath(sourceCodeUrl)}`;
-  const headers = getHeaders({ user });
-  return fetch(url, {
-    method: 'GET',
-    headers: headers,
-  });
-};
-
-const fetchProjectUser = async (user, sourceCodeUrl, userId) => {
-  // eslint-disable-next-line max-len
-  const url = `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/projects/${getUrlEncodedProjectPath(sourceCodeUrl)}/members/all/${userId}`;
-  const headers = getHeaders({ user });
-  return fetch(url, {
-    method: 'GET',
-    headers: headers,
-  });
-};
-
-const fetchUser = async (user) => {
-  const url = `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/user`;
-  const headers = getHeaders({ user });
-  return fetch(url, {
-    method: 'GET',
-    headers: headers,
-  });
-};
-
-const fetchPostCommitStatus = async (gitlabToken, sourceCodeUrl, options) => {
-  // eslint-disable-next-line max-len
-  const url = `${normalizeUrl(gitlabConfig.baseURL)}/api/v4/projects/${getUrlEncodedProjectPath(sourceCodeUrl)}/statuses/${options.sha}?state=${options.state}`;
-  const headers = getHeaders({
-    user: { gitlabToken },
-    contentType: CONTENT_TYPE_URL_ENCODED,
-  });
-
-  return fetch(url, {
+const fetchCreateProject = async (
+  userOAuthAccessToken,
+  namespaceId,
+  projectName,
+  importUrl,
+) =>
+  fetch(getApiUrl(`projects`), {
     method: 'POST',
-    headers: headers,
-    body: new URLSearchParams({
-      state: options.state, // running, success, failed, canceled, skipped
-      target_url: options.target_url,
-      description: options.description,
-      name: `${config.app.product}-${config.app.appEnv}`,
+    headers: getHeaders(userOAuthAccessToken, CONTENT_TYPE_JSON),
+    body: JSON.stringify({
+      path: projectName,
+      import_url: `${importUrl?.replace(
+        getNormalizedBaseUrl(),
+        getNormalizedBaseUrlWithOAuthToken(userOAuthAccessToken),
+      )}.git`,
+      namespace_id: namespaceId,
     }),
   });
-};
+
+const fetchGetNamespace = async (userOAuthAccessToken, namespace) =>
+  fetch(getApiUrl(`namespaces/${getUrlEncodedPath(namespace)}`), {
+    method: 'GET',
+    headers: getHeaders(userOAuthAccessToken),
+  });
 
 const revokeToken = async (user, token, tokenType) => {
   if (!token) return;
 
   try {
-    const revokeResponse = await fetch(
-      `${normalizeUrl(gitlabConfig.baseURL)}/oauth/revoke`,
-      {
-        method: 'POST',
-        headers: getHeaders({ user, contentType: CONTENT_TYPE_URL_ENCODED }),
-        body: new URLSearchParams({
-          ...getClientCredentials(gitlabConfig),
-          token: `${token}`,
-        }),
-      },
-    );
+    const revokeResponse = await fetch(`${getNormalizedBaseUrl()}/oauth/revoke`, {
+      method: 'POST',
+      headers: getHeaders(user.gitlabToken, CONTENT_TYPE_URL_ENCODED),
+      body: new URLSearchParams({
+        ...getClientCredentials(gitlabConfig),
+        token: `${token}`,
+      }),
+    });
 
     if (!revokeResponse.ok) {
       logger.warn(
@@ -171,13 +170,12 @@ const revokeUserOAuthTokens = async (user, resetUserOAuthTokens) => {
   resetUserOAuthTokens(user);
 };
 
-const getProject = async (user, sourceCodeUrl, persistUserOAuthTokens) => {
-  return await apiCallWithTokensRefresh(
+const getProject = async (user, sourceCodeUrl, persistUserOAuthTokens) =>
+  await apiCallWithTokensRefresh(
     user,
-    () => fetchGetProject(user, sourceCodeUrl),
+    (userOAuthAccessToken) => fetchGetProject(userOAuthAccessToken, sourceCodeUrl),
     persistUserOAuthTokens,
   );
-};
 
 const addWebhook = async (
   user,
@@ -187,7 +185,8 @@ const addWebhook = async (
 ) => {
   const response = await apiCallWithTokensRefresh(
     user,
-    () => fetchAddWebhook(user, sourceCodeUrl, webhookEndpoint),
+    (userOAuthAccessToken) =>
+      fetchAddWebhook(userOAuthAccessToken, sourceCodeUrl, webhookEndpoint),
     persistUserOAuthTokens,
   );
 
@@ -202,41 +201,55 @@ const addWebhook = async (
   };
 };
 
-const getWebhooks = async (user, sourceCodeUrl, persistUserOAuthTokens) => {
-  return await apiCallWithTokensRefresh(
+const getWebhooks = async (user, sourceCodeUrl, persistUserOAuthTokens) =>
+  await apiCallWithTokensRefresh(
     user,
-    () => fetchWebhooks(user, sourceCodeUrl),
+    (userOAuthAccessToken) => fetchWebhooks(userOAuthAccessToken, sourceCodeUrl),
     persistUserOAuthTokens,
   );
-};
 
-const getUser = async (user, persistUserOAuthTokens) => {
-  return await apiCallWithTokensRefresh(
+const getUser = async (user, persistUserOAuthTokens) =>
+  await apiCallWithTokensRefresh(
     user,
-    () => fetchUser(user),
+    (userOAuthAccessToken) => fetchUser(userOAuthAccessToken),
     persistUserOAuthTokens,
   );
-};
 
-const getProjectUser = async (user, sourceCodeUrl, userId, persistUserOAuthTokens) => {
-  return await apiCallWithTokensRefresh(
+const getProjectUser = async (user, sourceCodeUrl, userId, persistUserOAuthTokens) =>
+  await apiCallWithTokensRefresh(
     user,
-    () => fetchProjectUser(user, sourceCodeUrl, userId),
+    (userOAuthAccessToken) =>
+      fetchProjectUser(userOAuthAccessToken, sourceCodeUrl, userId),
     persistUserOAuthTokens,
   );
-};
 
-const sendCommitStatus = async (accessToken, sourceCodeUrl, options) => {
-  return await fetchPostCommitStatus(accessToken, sourceCodeUrl, options);
-};
-
-const getUserOAuthAccessToken = async (user, persistUserOAuthTokens) => {
-  const userOAuthAccessTokens = await refreshUserOAuthTokens(
+const getNamespace = async (user, namespace, persistUserOAuthTokens) =>
+  await apiCallWithTokensRefresh(
     user,
+    (userOAuthAccessToken) => fetchGetNamespace(userOAuthAccessToken, namespace),
     persistUserOAuthTokens,
   );
-  return userOAuthAccessTokens.accessToken;
-};
+
+const sendCommitStatus = async (userOAuthAccessToken, sourceCodeUrl, options) =>
+  await fetchPostCommitStatus(userOAuthAccessToken, sourceCodeUrl, options);
+
+const getUserOAuthAccessToken = async (user, persistUserOAuthTokens) =>
+  (await refreshUserOAuthTokens(user, persistUserOAuthTokens)).accessToken;
+
+const createProject = async (
+  user,
+  namespaceId,
+  projectName,
+  importUrl,
+  persistUserOAuthTokens,
+) =>
+  await apiCallWithTokensRefresh(
+    user,
+    (userOAuthAccessToken) =>
+      fetchCreateProject(userOAuthAccessToken, namespaceId, projectName, importUrl),
+    persistUserOAuthTokens,
+    true,
+  );
 
 const processError = async (response, message) => {
   const data = await response.json();
@@ -279,16 +292,33 @@ const refreshUserOAuthTokens = async (user, persistUserOAuthTokens) => {
   return userOAuthTokens;
 };
 
-const apiCallWithTokensRefresh = async (user, apiCall, persistUserOAuthTokens) => {
+const apiCallWithTokensRefresh = async (
+  user,
+  apiCall,
+  persistUserOAuthTokens,
+  refreshUserOAuthTokensFirst = false,
+) => {
   try {
-    const response = await apiCall();
+    if (refreshUserOAuthTokensFirst) {
+      const userOAuthAccessTokens = await refreshUserOAuthTokens(
+        user,
+        persistUserOAuthTokens,
+      );
 
-    if (response.status === 401) {
-      await refreshUserOAuthTokens(user, persistUserOAuthTokens);
-      return await apiCall();
+      return await apiCall(userOAuthAccessTokens.accessToken);
+    } else {
+      const response = await apiCall(user.gitlabToken);
+
+      if (response.status === 401) {
+        const userOAuthAccessTokens = await refreshUserOAuthTokens(
+          user,
+          persistUserOAuthTokens,
+        );
+        return await apiCall(userOAuthAccessTokens.accessToken);
+      }
+
+      return response;
     }
-
-    return response;
   } catch (error) {
     logger.error(
       'GitLab: Error calling API with tokens refresh.',
@@ -300,6 +330,7 @@ const apiCallWithTokensRefresh = async (user, apiCall, persistUserOAuthTokens) =
 };
 
 module.exports = {
+  OAUTH_PREFIX,
   getBaseUrl,
   normalizeUrl,
   fetchRefreshUserOAuthTokens,
@@ -311,4 +342,6 @@ module.exports = {
   getWebhooks,
   getUserOAuthAccessToken,
   sendCommitStatus,
+  createProject,
+  getNamespace,
 };

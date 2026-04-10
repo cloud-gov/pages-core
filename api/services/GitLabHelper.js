@@ -20,13 +20,16 @@ const getProject = async (user, sourceCodeUrl) => {
 };
 
 const createSiteWebhook = async (user, site) => {
-  const webhooks = await GitLab.getWebhooks(
+  const webhooksResponse = await GitLab.getWebhooks(
     user,
     site.sourceCodeUrl,
     updateGitLabTokens,
-  ).then((r) => r.json());
+  );
 
-  if (webhooks.some((w) => w.url === config.webhook.gitlabEndpoint)) return null;
+  if (webhooksResponse.ok) {
+    const webhooks = await webhooksResponse.json();
+    if (webhooks.some((w) => w.url === config.webhook.gitlabEndpoint)) return null;
+  }
 
   return GitLab.addWebhook(
     user,
@@ -70,12 +73,13 @@ const getProcessedWebhookPayload = (payload) => {
   const [, owner, ...rest] = payload.project.web_url
     .replace(`${getGitLabBaseUrl()}`, '')
     .split('/');
+  const repositoryPath = rest.join('/');
   const processedPayload = {
     after: payload.after,
     commits: payload.commits && payload.commits.length > 0 ? [{}] : undefined,
     owner,
     repository: {
-      repository_path: rest.join('/'),
+      repository_path: repositoryPath,
       pushed_at: Math.floor(new Date(payload.commits[0]?.timestamp).getTime() / 1000),
     },
     sender: { login: payload.user_username },
@@ -131,12 +135,51 @@ const getGitLabProjectToDestroySite = async (user, sourceCodeUrl) =>
     PAGES_ACCESS_LEVELS_DESTROY_SITE,
   );
 
+const createProjectFromTemplate = async (user, namespace, projectName, templateUrl) => {
+  const namespaceResponse = await GitLab.getNamespace(
+    user,
+    namespace,
+    updateGitLabTokens,
+  );
+  const { id: namespaceId } = await namespaceResponse.json();
+
+  if (!namespaceResponse.ok || !namespaceId) {
+    const message = `Cannot create project for namespace ${namespace}`;
+    const error = new Error(message);
+    error.status = 400;
+    error.message = message;
+    throw error;
+  }
+
+  const projectResponse = await GitLab.createProject(
+    user,
+    namespaceId,
+    projectName,
+    templateUrl,
+    updateGitLabTokens,
+  );
+
+  if (!projectResponse.ok) {
+    const responseData = await projectResponse.json();
+    const message = `Cannot create project from template ${templateUrl} 
+      - ${projectResponse.status}
+      - ${JSON.stringify(responseData)}`;
+    const error = new Error(message);
+    error.status = projectResponse.status;
+    error.message = message;
+    throw error;
+  }
+
+  return projectResponse;
+};
+
 module.exports = {
   GITLAB_ACCESS_LEVEL_GUEST,
   GITLAB_ACCESS_LEVEL_REPORTER,
   GITLAB_ACCESS_LEVEL_DEVELOPER,
   GITLAB_ACCESS_LEVEL_MAINTAINER,
   GITLAB_ACCESS_LEVEL_OWNER,
+  OAUTH_PREFIX: GitLab.OAUTH_PREFIX,
   revokeUserGitLabTokens,
   getGitLabBaseUrl,
   getProject,
@@ -148,4 +191,5 @@ module.exports = {
   sendCommitStatus,
   getProcessedWebhookPayload,
   getProjectAccessLevel,
+  createProjectFromTemplate,
 };

@@ -30,6 +30,7 @@ const templateGrid = (
           handleSubmit={handleSubmit}
           defaultOwner={defaultOwner}
           organizations={organizations}
+          templateSourceCodeUrl={template.templateSourceCodeUrl}
           {...template}
         />
       </ul>

@@ -5,17 +5,21 @@ import { hasOrgs } from '@selectors/organization';
 import { getSafeRepoName } from '@util';
 import UserOrgSelect from '@shared/UserOrgSelect';
 import { ORGANIZATIONS } from '@propTypes';
+import { getOwnerAndRepo } from '@util/site';
 
 class TemplateSite extends React.Component {
   constructor(props) {
     super(props);
 
+    const { isWorkshop } = getOwnerAndRepo(props.templateSourceCodeUrl);
+
     this.state = {
       error: null,
-      owner: props.defaultOwner,
+      owner: isWorkshop ? '' : props.defaultOwner,
       repository: '',
       template: props.templateKey,
       templateOrganizationId: '',
+      isWorkshop: isWorkshop,
       touched: false,
     };
 
@@ -88,9 +92,12 @@ class TemplateSite extends React.Component {
 
   render() {
     const { description, example, organizations, thumb, title } = this.props;
-    const { error, owner, templateOrganizationId, repository, touched } = this.state;
+    const { error, owner, templateOrganizationId, repository, touched, isWorkshop } =
+      this.state;
 
-    return (
+    const workshopIntegrationOn = process.env.FEATURE_WORKSHOP_INTEGRATION === 'true';
+
+    return !workshopIntegrationOn && isWorkshop ? null : (
       <li
         className={`
           federalist-template-list-item
@@ -118,7 +125,9 @@ class TemplateSite extends React.Component {
             {this.getFormVisible() ? (
               <form className="new-site-form" onSubmit={this.handleSubmit}>
                 <label className="usa-label text-bold" htmlFor="owner">
-                  What GitHub account will own your site?
+                  {isWorkshop
+                    ? `Which GitLab namespace will your site belong to?`
+                    : `What GitHub account will own your site?`}
                 </label>
                 <input
                   id="owner"
@@ -203,6 +212,7 @@ TemplateSite.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
   organizations: ORGANIZATIONS.isRequired,
+  templateSourceCodeUrl: PropTypes.string.isRequired,
 };
 
 export default TemplateSite;
