@@ -13,6 +13,10 @@ const { Build, Site, SiteBranchConfig } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
 const utils = require('../../../../api/utils');
 const Organization = require('../../../../api/services/organization');
+const config = require('../../../../config');
+
+const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
+gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
 
 describe('SiteCreator', () => {
   beforeEach(() => {
@@ -500,6 +504,94 @@ describe('SiteCreator', () => {
         apiNocks.mockFetchServiceInstanceCredentialsRequest(name, {
           guid: keyResponse.guid,
           credentials: keyCredentials,
+        });
+      });
+
+      it(`should process site parameters for GitHub template`, () => {
+        expect(
+          SiteCreator.getProcessedSiteParams(
+            { owner: ' owner ', repository: ' repository ' },
+            {
+              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
+              branch: 'main',
+              engine: 'engine',
+            },
+          ),
+        ).to.deep.equal({
+          owner: 'owner',
+          repository: 'repository',
+          namespace: '',
+          project: '',
+          defaultBranch: 'main',
+          engine: 'engine',
+          sourceCodePlatform: 'github',
+        });
+
+        expect(
+          SiteCreator.getProcessedSiteParams(
+            { owner: ' /cloud-gov/ ', repository: ' /repository/ ' },
+            {
+              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
+              branch: 'main',
+              engine: 'engine',
+            },
+          ),
+        ).to.deep.equal({
+          owner: 'cloud-gov',
+          repository: 'repository',
+          namespace: '',
+          project: '',
+          defaultBranch: 'main',
+          engine: 'engine',
+          sourceCodePlatform: 'github',
+        });
+      });
+
+      it(`should process site parameters for GitLab template`, () => {
+        expect(
+          SiteCreator.getProcessedSiteParams(
+            {
+              owner: ' /cloud-gov/pages/test/ ',
+              repository: ' project-name ',
+            },
+            {
+              templateSourceCodeUrl:
+                'https://workshop.cloud.gov/cloud-gov/pages/pages-uswds-11ty',
+              branch: 'main',
+              engine: 'engine',
+            },
+          ),
+        ).to.deep.equal({
+          owner: 'cloud-gov',
+          repository: 'pages/test/project-name',
+          namespace: 'cloud-gov/pages/test',
+          project: 'project-name',
+          defaultBranch: 'main',
+          engine: 'engine',
+          sourceCodePlatform: 'workshop',
+        });
+
+        expect(
+          SiteCreator.getProcessedSiteParams(
+            {
+              owner: ' /Firstname.Lastname/ ',
+              repository: ' /project-name ',
+            },
+            {
+              templateSourceCodeUrl:
+                'https://workshop.cloud.gov/cloud-gov/pages/pages-uswds-11ty',
+              branch: 'main',
+              engine: 'engine',
+            },
+          ),
+        ).to.deep.equal({
+          owner: 'firstname.lastname',
+          repository: 'project-name',
+          namespace: 'firstname.lastname',
+          project: 'project-name',
+          defaultBranch: 'main',
+          engine: 'engine',
+          sourceCodePlatform: 'workshop',
         });
       });
 

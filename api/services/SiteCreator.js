@@ -11,8 +11,8 @@ const apiClient = new CloudFoundryAPIClient();
 const defaultEngine = 'node.js';
 
 function paramsForNewSite(params) {
-  const owner = params.owner ? params.owner.toLowerCase() : null;
-  const repository = params.repository ? params.repository.toLowerCase() : null;
+  const owner = params.owner ? params.owner.toLowerCase().trim() : null;
+  const repository = params.repository ? params.repository.toLowerCase().trim() : null;
   const subdomain = utils.generateSubdomain(owner, repository);
   const organizationId = params.organizationId
     ? parseInt(params.organizationId, 10)
@@ -246,21 +246,54 @@ async function createSiteFromExistingRepo({ siteParams, user }) {
 }
 
 async function createSiteFromTemplate({ siteParams, user, template }) {
-  const params = {
-    ...siteParams,
-    defaultBranch: template.branch,
-    engine: template.engine,
-  };
-  const { owner, repository } = params;
+  const params = getProcessedSiteParams(siteParams, template);
+  const { owner, repository, namespace, project } = params;
 
   const { site, s3 } = await validateSite(params);
-  await GitHub.createRepoFromTemplate(user, owner, repository, template);
+  await SourceCodePlatformHelper.createRepoFromTemplate({
+    user,
+    owner,
+    repository,
+    namespace,
+    project,
+    template,
+  });
   const savedSite = await saveAndBuildSite({
     site,
     user,
   });
 
   return { site: savedSite, s3 };
+}
+
+function sanitize(userInput) {
+  return userInput?.trim().replace(/^\//, '').replace(/\/$/, '').trim().toLowerCase();
+}
+
+function getProcessedSiteParams(siteParams, template) {
+  const isWorkshop = SourceCodePlatformHelper.isWorkshopUrl(
+    template?.templateSourceCodeUrl,
+  );
+  const owner = sanitize(siteParams.owner);
+  const repository = sanitize(siteParams.repository);
+  const params = {
+    ...siteParams,
+    defaultBranch: template.branch,
+    engine: template.engine,
+    owner: owner,
+    repository: repository,
+    sourceCodePlatform: isWorkshop ? Site.Platforms.Workshop : Site.Platforms.Github,
+    namespace: '',
+    project: '',
+  };
+  if (isWorkshop) {
+    params.namespace = owner;
+    params.project = repository;
+    const [gitlabOwner, ...rest] = `${owner}/${repository}`.split('/');
+    params.owner = gitlabOwner;
+    params.repository = rest.join('/');
+  }
+  return params;
 }
 
 function createSite({ user, siteParams }) {
@@ -285,4 +318,5 @@ function createSite({ user, siteParams }) {
 
 module.exports = {
   createSite,
+  getProcessedSiteParams,
 };

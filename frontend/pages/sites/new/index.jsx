@@ -8,34 +8,10 @@ import siteActions from '@actions/siteActions';
 import addNewSiteFieldsActions from '@actions/addNewSiteFieldsActions';
 import { hasOrgs } from '@selectors/organization';
 import globals from '@globals';
+import { getOwnerAndRepo, isWorkshopIntegration } from '@util/site';
 
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
-
-const isWorkshopIntegration = process.env.FEATURE_WORKSHOP_INTEGRATION === 'true';
-
-export function getOwnerAndRepo(repoUrl, isWorkshopIntegration) {
-  if (repoUrl.startsWith(globals.GITLAB_BASE_URL) && isWorkshopIntegration) {
-    const [, owner, ...rest] = repoUrl.replace(globals.GITLAB_BASE_URL, '').split('/');
-
-    return {
-      owner,
-      repository: rest.join('/'),
-      sourceCodePlatform: globals.SOURCE_CODE_PLATFORM_WORKSHOP,
-      sourceCodeUrl: repoUrl,
-    };
-  } else {
-    const owner = repoUrl.split('/')[3];
-    const repository = repoUrl.split('/')[4];
-
-    return {
-      owner,
-      repository,
-      sourceCodePlatform: 'github',
-      sourceCodeUrl: repoUrl,
-    };
-  }
-}
 
 function defaultOwner(user) {
   return (user.data && user.data.username) || '';

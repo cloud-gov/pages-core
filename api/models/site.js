@@ -47,7 +47,7 @@ function defaultSourceCodeUrl(site) {
       site.owner,
       site.repository,
       site.sourceCodePlatform,
-      Platforms.GitHub,
+      Platforms.Workshop,
     );
   }
 }

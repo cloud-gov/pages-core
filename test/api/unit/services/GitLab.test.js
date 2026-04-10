@@ -319,6 +319,9 @@ describe('GitLab', () => {
       expect(normalizeUrl(gitlabConfig.baseURL)).to.equal(
         'https://workshop.cloud.gov/trailing_slash',
       );
+
+      gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
+      expect(normalizeUrl(gitlabConfig.baseURL)).to.equal('https://workshop.cloud.gov');
     });
 
     it('should not update url if there is no trailing slash', async () => {
@@ -326,6 +329,9 @@ describe('GitLab', () => {
       expect(normalizeUrl(gitlabConfig.baseURL)).to.equal(
         'https://workshop.cloud.gov/no_trailing_slash',
       );
+
+      gitlabConfig.baseURL = 'https://workshop.cloud.gov';
+      expect(normalizeUrl(gitlabConfig.baseURL)).to.equal('https://workshop.cloud.gov');
     });
 
     it('does not throw an error', async () => {
