@@ -84,7 +84,7 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
               Drag files here or
             </span>{' '}
             <span
-              className="usa-button usa-button--unstyled usa-file-input__choose"
+              className="usa-button--unstyled usa-file-input__choose"
               role="presentation"
             >
               choose from your computer
@@ -122,7 +122,7 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
                 <button
                   disabled={file.status === 'uploading'}
                   type="button"
-                  className="usa-button usa-button--unstyled file-input__remove"
+                  className="usa-button--unstyled file-input__remove"
                   onClick={() => removeFile(file.id)}
                   title={`Remove ${file.data.name}`}
                 >
