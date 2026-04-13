@@ -416,6 +416,14 @@ describe('utils', () => {
       expect(result).to.be.eq(expected);
     });
 
+    it('should convert file name and extension to low case', () => {
+      const input = 'TEST.PDF';
+      const expected = 'test.pdf';
+
+      const result = utils.slugify(input);
+      expect(result).to.be.eq(expected);
+    });
+
     it('should slugify a number', () => {
       const input = 25624;
       const expected = '25624';

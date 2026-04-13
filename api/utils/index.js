@@ -335,7 +335,7 @@ function slugify(text, len = 200) {
     // eslint-disable-next-line sonarjs/slow-regex
     .replace(/-+$/, ''); // Trim hyphens from the end
 
-  return extension ? `${slugifiedBase}.${extension}` : slugifiedBase;
+  return extension ? `${slugifiedBase}.${extension?.toLowerCase()}` : slugifiedBase;
 }
 
 function normalizeDirectoryPath(dir) {
