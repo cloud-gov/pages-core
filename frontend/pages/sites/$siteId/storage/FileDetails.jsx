@@ -79,13 +79,12 @@ const FileDetails = ({
           </tr>
           <tr>
             <th scope="row">Actions</th>
-            <td style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <td className="file-actions-cell">
               <a
                 href={fullPath}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="usa-button"
-                style={{ margin: '0' }}
+                className="usa-button margin-0"
               >
                 View File
               </a>

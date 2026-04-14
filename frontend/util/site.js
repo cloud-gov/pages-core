@@ -3,7 +3,7 @@ import globals from '@globals';
 const isWorkshopIntegration = process.env.FEATURE_WORKSHOP_INTEGRATION === 'true';
 
 function getOwnerAndRepo(repoUrl) {
-  if (repoUrl.startsWith(globals.GITLAB_BASE_URL) && isWorkshopIntegration) {
+  if (repoUrl.startsWith(globals.GITLAB_BASE_URL)) {
     const [, owner, ...rest] = repoUrl.replace(globals.GITLAB_BASE_URL, '').split('/');
 
     return {

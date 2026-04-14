@@ -622,6 +622,7 @@ $highlightedAndSelectedCellBackground: #dde7ef;
     width: 100%;
     border-top-width: 1px;
   }
+
   @media (max-width: 63.999em) {
     thead tr {
       display: inline-table;
@@ -758,6 +759,13 @@ $highlightedAndSelectedCellBackground: #dde7ef;
     }
   }
 }
+
+.file-actions-cell {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .file-details__header {
   display: flex;
   flex-flow: row nowrap;
