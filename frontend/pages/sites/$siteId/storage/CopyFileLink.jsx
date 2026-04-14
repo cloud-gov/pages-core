@@ -18,7 +18,7 @@ const CopyFileLink = ({ url }) => {
     <button
       type="button"
       title="Copy full url to clipboard"
-      className="usa-button usa-button--unstyled margin-right-2 text-bold"
+      className="usa-button--unstyled margin-right-2 text-bold"
       onClick={() => handleCopy(`${url}`)}
     >
       {copySuccess ? 'Copied!' : 'Copy link'}

@@ -14,6 +14,7 @@ import QueryPage from '@shared/layouts/QueryPage';
 import Dialog from '@shared/Dialog';
 import { currentSite } from '@selectors/site';
 import LoadingIndicator from '@shared/LoadingIndicator';
+import { cleanUrlPathSlashes } from '@util';
 
 function FileStoragePage() {
   const { id } = useParams();
@@ -239,7 +240,11 @@ function FileStoragePage() {
           <FileDetails
             name={foundFileDetails?.name || ''}
             id={foundFileDetails?.id}
-            fullPath={`${site.liveDomain}/${foundFileDetails?.key}`}
+            fullPath={
+              cleanUrlPathSlashes(
+                `${site.liveDomain || site.viewLink}/${foundFileDetails?.key}`,
+              ) || ''
+            }
             lastModifiedBy={foundFileDetails?.lastModifiedBy || ''}
             lastModifiedAt={foundFileDetails?.lastModifiedAt || ''}
             size={foundFileDetails?.metadata.size || 0}
@@ -261,7 +266,7 @@ function FileStoragePage() {
             )}
             <FileList
               path={path}
-              baseUrl={site.liveDomain}
+              baseUrl={site.liveDomain || site.viewLink}
               data={fetchedPublicFiles || []}
               onDelete={handleDelete}
               onNavigate={handleNavigate}

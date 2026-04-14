@@ -110,7 +110,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
               New folder
             </button>
             <Link
-              className="usa-button usa-button--unstyled text-top padding-105"
+              className="usa-button usa-button--outline text-top padding-105"
               to="./logs"
             >
               View file history logs

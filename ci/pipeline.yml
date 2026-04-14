@@ -642,7 +642,6 @@ resources:
       secret_access_key: ((test-results-secret-access-key))
       bucket: ((test-results-bucket))
       region: us-gov-west-1
-      change_dir_to: src
       options:
         - "--exclude '*'"
         - "--include 'playwright-report/*'"

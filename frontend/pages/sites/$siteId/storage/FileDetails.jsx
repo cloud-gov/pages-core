@@ -28,7 +28,7 @@ const FileDetails = ({
         <h3>File details</h3>
         <button
           title="close file details"
-          className="usa-button usa-button--unstyled file-details__close"
+          className="usa-button--unstyled file-details__close"
           onClick={onClose}
         >
           <svg className="usa-icon" aria-hidden="true" role="img">

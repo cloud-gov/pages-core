@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { dateAndTimeSimple, timeFrom } from '@util/datetime';
 import { IconAttachment, IconFolder } from '@shared/icons';
 import CopyFileLink from './CopyFileLink';
+import { cleanUrlPathSlashes } from '@util';
 
 // constants and functions used by both components
 
@@ -23,7 +24,7 @@ const FileListRow = ({
   onViewDetails,
   highlight = false,
 }) => {
-  const url = `${baseUrl}/${item.key}`;
+  const url = cleanUrlPathSlashes(`${baseUrl}/${item.key}`);
 
   return (
     <tr key={item.name} id={item.name} className={highlight ? 'highlight' : ''}>
@@ -135,10 +136,11 @@ const FileList = ({
             Name
             <button
               type="button"
-              className="usa-button usa-button--unstyled usa-table__sort-button"
+              className="usa-button--unstyled usa-table__sort-button"
               tabIndex="0"
               onClick={() => onSort(SORT_KEY_NAME)}
               aria-label="Sort by name"
+              style={{ color: '#e91e63' }}
             >
               <SortIcon
                 sort={currentSortKey === SORT_KEY_NAME ? currentSortOrder : null}
@@ -159,10 +161,11 @@ const FileList = ({
             Last Modified
             <button
               type="button"
-              className="usa-button usa-button--unstyled usa-table__sort-button"
+              className="usa-button--unstyled usa-table__sort-button"
               tabIndex="0"
               onClick={() => onSort(SORT_KEY_LAST_MODIFIED)}
               aria-label="Sort by last modified"
+              style={{ color: '#e91e63' }}
             >
               <SortIcon
                 sort={
