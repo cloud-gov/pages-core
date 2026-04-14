@@ -596,12 +596,12 @@ $highlightedAndSelectedCellBackground: #dde7ef;
   th[data-sort-active] {
     background-color: $selectedColumnBackground;
     color: $selectedColumnText;
-  }  
+  }
 
   td {
     border-color: $sortableBorderColor;
   }
-  
+
   tr.highlight td {
     background-color: $highlightedRowBackground;
     &[data-sort-active] {
@@ -673,7 +673,7 @@ $highlightedAndSelectedCellBackground: #dde7ef;
     }
     .width-last-mod {
       min-width: 17ch;
-    } 
+    }
     .width-actions {
       width: 24ch;
       text-align: right;
@@ -725,20 +725,39 @@ $highlightedAndSelectedCellBackground: #dde7ef;
     color: #d83933;
     &:hover {
       box-shadow: inset 0 0 0 2px #b50909;
-      color: #b50909
+      color: #b50909;
+      background-color: #f7d2d2;
     }
     &:active {
       box-shadow: inset 0 0 0 2px #8b0a03;
       color: #8b0a03
     }
   }
-
-
 }
 
 /* File details */
 
-.file-details {}
+.file-details {
+  .delete-button {
+    padding: 0.4em 0.6em;
+    font-size: 1.1em;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-right: 0;
+    // mimics error colors from USWDS -- no outline button for this
+    box-shadow: inset 0 0 0 2px #d83933;
+    color: #d83933;
+    &:hover {
+      box-shadow: inset 0 0 0 2px #b50909;
+      color: #b50909;
+      background-color: #f7d2d2;
+    }
+    &:active {
+      box-shadow: inset 0 0 0 2px #8b0a03;
+      color: #8b0a03
+    }
+  }
+}
 .file-details__header {
   display: flex;
   flex-flow: row nowrap;

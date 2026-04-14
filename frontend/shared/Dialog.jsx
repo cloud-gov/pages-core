@@ -141,7 +141,7 @@ const Dialog = ({
                       <button
                         tabIndex="0"
                         type="button"
-                        className="usa-button usa-button--unstyled padding-105"
+                        className="usa-button usa-button--outline padding-105"
                         data-close-modal
                         onClick={secondaryHandler}
                       >
@@ -156,7 +156,7 @@ const Dialog = ({
               <button
                 tabIndex="0"
                 type="button"
-                className="usa-button usa-modal__close"
+                className="usa-button--unstyled usa-modal__close"
                 aria-label="Close this window"
                 data-close-modal
                 onClick={closeHandler}
