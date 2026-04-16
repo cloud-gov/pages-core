@@ -1,3 +1,19 @@
+## 0.22.0 (2026-04-16)
+
+### Added
+
+- normalization on the file extension when uploading a public file 4859
+- create workshop project from template 4874
+- create workshop site build flow - build container env 4866
+
+### Fixed
+
+- getOwnerAndRepo to return workshop site designation when feature flag is on and off
+- Public File details modal buttons
+- **ci**: Ouptut config for e2e tests
+- Button colors and contrast on the public file storage views
+- **ci**: ClamAV REST image source
+
 ## 0.21.0 (2026-04-01)
 
 ### Added
