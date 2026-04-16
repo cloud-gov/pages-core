@@ -38,10 +38,8 @@ function AddSite() {
   const navigate = useNavigate();
 
   function onCreateSiteSubmit({ repoUrl, engine, repoOrganizationId }) {
-    const { owner, repository, sourceCodePlatform, sourceCodeUrl } = getOwnerAndRepo(
-      repoUrl,
-      isWorkshopIntegration,
-    );
+    const { owner, repository, sourceCodePlatform, sourceCodeUrl } =
+      getOwnerAndRepo(repoUrl);
     siteActions.addSite(
       {
         owner,
