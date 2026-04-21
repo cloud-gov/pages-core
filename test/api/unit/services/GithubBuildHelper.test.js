@@ -38,7 +38,7 @@ describe('GithubBuildHelper', () => {
 
     it('should fetch the content requested', async () => {
       sinon.stub(GitHub, 'getContent').resolves('testContent');
-      sinon.stub(GitHub, 'checkPermissions').resolves({
+      sinon.stub(GitHub, 'getRepoPermissions').resolves({
         push: true,
       });
       await build.reload({ include: Site });

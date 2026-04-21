@@ -8,6 +8,8 @@ const SourceCodePlatformLink = ({
   sourceCodePlatform,
   sourceCodeUrl,
   text,
+  textGitHub,
+  textGitLab,
   branch = null,
   sha = null,
   icon = 'repo',
@@ -15,7 +17,7 @@ const SourceCodePlatformLink = ({
 }) => {
   let href = sourceCodeUrl;
   const isWorkshop = sourceCodePlatform == globals.SOURCE_CODE_PLATFORM_WORKSHOP;
-  let title = isWorkshop ? 'View repository on Workshop' : 'View repository on GitHub';
+  let title = isWorkshop ? 'View project on Workshop' : 'View repository on GitHub';
 
   if (branch) {
     let tree = isWorkshop ? `/-/tree/` : `/tree/`;
@@ -50,7 +52,7 @@ const SourceCodePlatformLink = ({
       rel="noopener noreferrer"
     >
       {chooseIcon(icon)}
-      {text}
+      {text ?? (isWorkshop ? textGitLab : textGitHub)}
     </a>
   );
 };
@@ -58,7 +60,9 @@ const SourceCodePlatformLink = ({
 SourceCodePlatformLink.propTypes = {
   sourceCodePlatform: PropTypes.string.isRequired,
   sourceCodeUrl: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
+  text: PropTypes.string,
+  textGitHub: PropTypes.string,
+  textGitLab: PropTypes.string,
   branch: PropTypes.string,
   isButton: PropTypes.bool,
   sha: PropTypes.string,

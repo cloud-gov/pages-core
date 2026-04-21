@@ -1,6 +1,6 @@
 const IORedis = require('ioredis');
 
-const Github = require('./GitHub');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const S3SiteRemover = require('./S3SiteRemover');
 const config = require('../../config');
 const { SiteDeletionQueue } = require('../queues');
@@ -21,7 +21,7 @@ module.exports.destroySiteInfra = async function destroySiteInfra(site, user) {
   ];
 
   if (user) {
-    todos.push(Github.deleteWebhook(site, user.githubAccessToken));
+    todos.push(SourceCodePlatformHelper.deleteWebhook(site, user));
   }
 
   return Promise.allSettled(todos);

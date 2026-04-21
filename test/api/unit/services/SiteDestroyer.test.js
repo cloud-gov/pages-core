@@ -13,7 +13,7 @@ const stubs = {
   './slacker': {
     sendAlert: sinon.stub().resolves(),
   },
-  './GitHub': {
+  './SourceCodePlatformHelper': {
     deleteWebhook: sinon.stub().resolves(),
   },
   './S3SiteRemover': {
@@ -94,7 +94,7 @@ describe('SiteDestroyer', () => {
       // sinon.resetHistory() doesn't work here
       // maybe bc the stubs are created outside of the
       // test case?
-      stubs['./GitHub'].deleteWebhook.resetHistory();
+      stubs['./SourceCodePlatformHelper'].deleteWebhook.resetHistory();
       stubs['./S3SiteRemover'].removeSite.resetHistory();
       stubs['./S3SiteRemover'].removeInfrastructure.resetHistory();
     });
@@ -106,9 +106,9 @@ describe('SiteDestroyer', () => {
       await SiteDestroyer.destroySiteInfra(site, user);
 
       sinon.assert.calledOnceWithExactly(
-        stubs['./GitHub'].deleteWebhook,
+        stubs['./SourceCodePlatformHelper'].deleteWebhook,
         site,
-        user.githubAccessToken,
+        user,
       );
       sinon.assert.calledOnceWithExactly(stubs['./S3SiteRemover'].removeSite, site);
       sinon.assert.calledOnceWithExactly(
