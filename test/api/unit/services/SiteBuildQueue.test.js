@@ -753,7 +753,7 @@ describe('SiteBuildQueue', () => {
       });
 
       sinon
-        .stub(GitHub, 'checkPermissions')
+        .stub(GitHub, 'getRepoPermissions')
         .withArgs(sinon.match.any, sinon.match.any, sinon.match.any)
         .resolves({ push: {} });
 

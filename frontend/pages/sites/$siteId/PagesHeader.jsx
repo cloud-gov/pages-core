@@ -12,7 +12,8 @@ const PagesHeader = ({ owner, repository, title, sourceCodePlatform, sourceCodeU
     </div>
     <div className="desktop:grid-col-auto grid-col-12 header-actions margin-right-neg-1">
       <SourceCodePlatformLink
-        text="View repo"
+        textGitHub="View repo"
+        textGitLab="View project"
         sourceCodePlatform={sourceCodePlatform}
         sourceCodeUrl={sourceCodeUrl}
         isButton

@@ -7,6 +7,14 @@ module.exports = {
   NO_ASSOCIATED_ORGANIZATION: 'That user is not associated with this organization.',
   NO_ASSOCIATED_USER: 'That user is not associated with this site.',
   ADMIN_ACCESS_REQUIRED: 'You do not have administrative access to this repository',
+  CAN_NOT_RETRIEVE_USER_GITLAB_INFORMATION:
+    'Unable to retrieve the user’s GitLab information.',
+  CAN_NOT_RETRIEVE_USER_GITLAB_PROJECT_AUTHORIZATION:
+    'Unable to retrieve the user’s GitLab project authorization.',
+  GITLAB_ACCESS_REQUIRED_FOR_DELETED_GITLAB_PROJECT:
+    'You don’t have permission in GitLab to delete this site for a deleted project.',
+  DELETE_SITE_GITLAB_ACCESS_REQUIRED:
+    'You do not have GitLab project access level to delete this site.',
   NOT_FOUND: 'Not found',
   ORGANIZATION_REQUIRED: 'An organization must be specified when creating a new site',
   ORGANIZATION_INACTIVE: 'This organization has been deactivated.',

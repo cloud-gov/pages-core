@@ -1,7 +1,15 @@
 const { expect } = require('chai');
 
 const config = require('../../../../config');
-const { getProcessedWebhookPayload } = require('../../../../api/services/GitLabHelper');
+const {
+  mapWebhookResponseToGitHubFormat,
+} = require('../../../../api/services/GitLabHelper');
+const { logger } = require('../../../../winston');
+const nock = require('nock');
+const { createSiteUserOrg } = require('../../support/site-user');
+const { Site } = require('../../../../api/models');
+const GitLabHelper = require('../../../../api/services/GitLabHelper');
+const sinon = require('sinon');
 
 const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
 gitlabConfig.clientID = 'mock-client-id';
@@ -10,7 +18,7 @@ gitlabConfig.callbackURL = 'https://localhost:1337/auth/gitlab/callback';
 gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
 
 describe('GitLabHelper', () => {
-  describe('.getProcessedWebhookPayload(payload)', () => {
+  describe('.mapWebhookResponseToGitHubFormat(payload)', () => {
     const payload = {
       object_kind: 'push',
       event_name: 'push',
@@ -91,7 +99,7 @@ describe('GitLabHelper', () => {
 
     it('should return payload in GitHub format', async () => {
       gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
-      expect(getProcessedWebhookPayload(payload)).to.deep.equal({
+      expect(mapWebhookResponseToGitHubFormat(payload)).to.deep.equal({
         after: 'da1560886d4f094c3e6c9ef40349f7d38b5d27d7',
         commits: [{}],
         owner: 'cloud-gov',
@@ -102,6 +110,172 @@ describe('GitLabHelper', () => {
         },
         sender: { login: 'jsmith' },
       });
+    });
+  });
+
+  describe('.deleteWebhook(user, site)', () => {
+    let loggerErrorStub;
+
+    beforeEach(() => {
+      nock.cleanAll();
+      sinon.restore();
+      loggerErrorStub = sinon.stub(logger, 'error');
+    });
+    afterEach(() => {
+      nock.cleanAll();
+      sinon.restore();
+    });
+
+    it('should delete webhook if user authorized to delete site', async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const webhookId = 111;
+      site.update({
+        webhookId,
+      });
+
+      const gitlabToken = 'gitlabToken';
+      await user.update({ gitlabToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId });
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(200, { access_level: GitLabHelper.GITLAB_ACCESS_LEVEL_OWNER });
+
+      const deleteWebhook = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .delete(`/api/v4/projects/${site.owner}%2F${site.repository}/hooks/${webhookId}`)
+        .reply(200);
+
+      await GitLabHelper.deleteWebhook(user, site);
+
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+      return expect(deleteWebhook.isDone()).to.be.true;
+    });
+
+    it('should not delete webhook if user is not authorized to delete site', async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const webhookId = 111;
+      site.update({
+        webhookId,
+      });
+
+      const gitlabToken = 'gitlabToken';
+      await user.update({ gitlabToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId });
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(200, { access_level: GitLabHelper.GITLAB_ACCESS_LEVEL_MAINTAINER });
+
+      const deleteWebhook = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .delete(`/api/v4/projects/${site.owner}%2F${site.repository}/hooks/${webhookId}`)
+        .reply(200);
+
+      await GitLabHelper.deleteWebhook(user, site);
+
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+
+      expect(loggerErrorStub.called).to.be.true;
+      expect(loggerErrorStub.args[0][0]).to.deep.equal(
+        `GitLab: Error deleting webhook 111 for https://workshop.cloud.gov/${site.owner}/${site.repository}.`,
+      );
+      expect(loggerErrorStub.args[0][1]).to.deep.equal(
+        'You do not have required access level.',
+      );
+
+      return expect(deleteWebhook.isDone()).to.be.false;
+    });
+
+    it('should log error if delete webhook call fails', async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const webhookId = 111;
+      site.update({
+        webhookId,
+      });
+
+      const gitlabToken = 'gitlabToken';
+      await user.update({ gitlabToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId });
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(200, { access_level: GitLabHelper.GITLAB_ACCESS_LEVEL_OWNER });
+
+      const deleteWebhook = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .delete(`/api/v4/projects/${site.owner}%2F${site.repository}/hooks/${webhookId}`)
+        .reply(404);
+
+      await GitLabHelper.deleteWebhook(user, site);
+
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+
+      expect(loggerErrorStub.called).to.be.true;
+      expect(loggerErrorStub.args[0][0]).to.deep.equal(
+        `GitLab: Error deleting webhook 111 for https://workshop.cloud.gov/${site.owner}/${site.repository} - response: 404.`,
+      );
+      return expect(deleteWebhook.isDone()).to.be.true;
     });
   });
 });

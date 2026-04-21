@@ -1,31 +1,10 @@
-const GitHub = require('../services/GitHub');
+const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
 const siteErrors = require('../responses/siteErrors');
 const { Organization } = require('../models');
 const { authorize } = require('./utils');
 
-const authorizeRepositoryAdmin = (user, site) =>
-  GitHub.checkPermissions(user, site.owner, site.repository)
-    .then((permissions) => {
-      if (!permissions.admin) {
-        throw {
-          message: siteErrors.ADMIN_ACCESS_REQUIRED,
-          status: 403,
-        };
-      }
-      return site.id;
-    })
-    .catch((error) => {
-      if (error.status === 404) {
-        // authorize user if the site's repo does not exist:
-        // When a user attempts to delete a site after deleting the repo, Federalist
-        // attempts to fetch the repo but it no longer exists and receives a 404
-        return site.id;
-      }
-      throw {
-        message: siteErrors.ADMIN_ACCESS_REQUIRED,
-        status: 403,
-      };
-    });
+const authorizeToDestroySite = (user, site) =>
+  SourceCodePlatformHelper.authorizeToDestroySite(user, site);
 
 const createWithOrgs = (organizations, organizationId) => {
   if (!organizationId) {
@@ -82,7 +61,7 @@ const findOne = (user, site) => authorize(user.id, site.id);
 const update = (user, site) => authorize(user.id, site.id);
 
 const destroy = (user, site) =>
-  authorize(user.id, site.id).then(() => authorizeRepositoryAdmin(user, site));
+  authorize(user.id, site.id).then(() => authorizeToDestroySite(user, site));
 
 module.exports = {
   create,

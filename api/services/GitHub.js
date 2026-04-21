@@ -240,7 +240,7 @@ async function findWebhookId(github, site) {
 }
 
 module.exports = {
-  checkPermissions: async (user, owner, repo) => {
+  getRepoPermissions: async (user, owner, repo) => {
     const github = await githubClient(user.githubAccessToken);
     const repository = await getRepository(github, {
       owner,
