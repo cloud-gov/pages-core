@@ -8,7 +8,7 @@ ARG BUILD_ENV
 # Add the zscaler certificate to the trusted certs for local builds
 COPY ./uaa/Zscaler_Root_CA.pem /usr/local/share/ca-certificates/zscaler.crt
 
-RUN if [ "$BUILD_ENV" = "LOCAL" ] ; then update-ca-certificates ; fi
+RUN update-ca-certificates
 
 
 COPY ./uaa/uaa.yml /uaa/uaa.yml
