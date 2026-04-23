@@ -9,9 +9,12 @@ services:
     build:
       dockerfile: ./Dockerfile-uaa
       context: .
+      args:
+        BUILD_ENV: $(BUILD_ENV)
     ports:
       - 9001:8080
     environment:
+      BUILD_ENV: $(BUILD_ENV)
       POSTGRES_DB: federalist
       POSTGRES_PORT: 5432
       POSTGRES_HOST: db

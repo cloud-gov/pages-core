@@ -3,6 +3,14 @@ FROM openjdk:11.0.13-jre
 ENV UAA_CONFIG_PATH /uaa
 ENV CATALINA_HOME /tomcat
 
+ARG BUILD_ENV
+
+# Add the zscaler certificate to the trusted certs for local builds
+COPY ./uaa/Zscaler_Root_CA.pem /usr/local/share/ca-certificates/zscaler.crt
+
+RUN if [ "$BUILD_ENV" = "LOCAL" ] ; then update-ca-certificates ; fi
+
+
 COPY ./uaa/uaa.yml /uaa/uaa.yml
 
 RUN wget -q https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.45/bin/apache-tomcat-9.0.45.tar.gz

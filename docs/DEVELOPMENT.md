@@ -79,7 +79,7 @@ Any time the node dependencies are changed (like from a recently completed new f
 
 In order to make it possible to log in with local UAA authentication in a development environment it is necessary to also build and start the UAA container, which requires specifying a second docker compose configuration file when executing the docker compose commands which build containers or start the development environment, e.g.:
 
-1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env build`
+1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env build --build-arg BUILD_ENV=LOCAL`
 1. `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env up`
 
 #### GitLab in a Docker container
@@ -87,7 +87,7 @@ In order to make it possible to log in with local UAA authentication in a develo
 1. To install GitLab in a Docker container, follow instructions at https://docs.gitlab.com/install/docker/installation/ollow .
 2. To configure GitLab as an OAuth 2.0 authentication identity provider, follow instructions at https://docs.gitlab.com/integration/oauth_provider/#create-an-instance-wide-application .
 3. To build and start GitLab in a Docker container, use
-- `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml -f ./docker-compose.gitlab.yml --env-file ./services/local/docker.env build`
+- `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml -f ./docker-compose.gitlab.yml --env-file ./services/local/docker.env build --build-arg BUILD_ENV=LOCAL`
 - `docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml -f ./docker-compose.gitlab.yml --env-file ./services/local/docker.env up`
 
 
