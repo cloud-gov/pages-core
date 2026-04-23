@@ -3,13 +3,10 @@ FROM openjdk:11.0.13-jre
 ENV UAA_CONFIG_PATH /uaa
 ENV CATALINA_HOME /tomcat
 
-ARG BUILD_ENV
-
 # Add the zscaler certificate to the trusted certs for local builds
 COPY ./uaa/Zscaler_Root_CA.pem /usr/local/share/ca-certificates/zscaler.crt
 
 RUN update-ca-certificates
-
 
 COPY ./uaa/uaa.yml /uaa/uaa.yml
 
