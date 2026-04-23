@@ -65,7 +65,6 @@ const generateDefaultCredentials = async (build) => {
     REPOSITORY: repository,
     OWNER: owner,
     SITE_PREFIX: sitePrefix(build, build.Site),
-    GITHUB_TOKEN: token,
     GENERATOR: engine,
     BUILD_ID: build.id,
     USER_ENVIRONMENT_VARIABLES: JSON.stringify(buildUEVs(UserEnvironmentVariables)),

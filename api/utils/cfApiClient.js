@@ -274,7 +274,6 @@ class CloudFoundryAPIClient {
     const encryptedParams = Encryptor.encryptObjectValues(commandParams, encryption.key, {
       onlyEncryptKeys: [
         'STATUS_CALLBACK',
-        'GITHUB_TOKEN',
         'SOURCE_CODE_PLATFORM_TOKEN',
         'AWS_ACCESS_KEY_ID',
         'AWS_SECRET_ACCESS_KEY',

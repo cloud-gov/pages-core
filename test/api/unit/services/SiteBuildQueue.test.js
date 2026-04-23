@@ -700,7 +700,7 @@ describe('SiteBuildQueue', () => {
         .catch(done);
     });
 
-    it(`should set GITHUB_TOKEN and SOURCE_CODE_PLATFORM_TOKEN in the
+    it(`should set SOURCE_CODE_PLATFORM_TOKEN in the
         message to the user's GitHub access token`, async () => {
       const user = await factory.user({
         githubAccessToken: 'fake-github-token-123',
@@ -726,7 +726,6 @@ describe('SiteBuildQueue', () => {
       expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_TOKEN')).to.equal(
         'fake-github-token-123',
       );
-      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
     });
 
     it(`should find a github access token
@@ -800,7 +799,6 @@ describe('SiteBuildQueue', () => {
       expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_TOKEN')).to.equal(
         'fake-github-token-123',
       );
-      expect(messageEnv(message, 'GITHUB_TOKEN')).to.equal('fake-github-token-123');
     });
 
     it(`should set 
