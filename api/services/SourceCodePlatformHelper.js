@@ -1,4 +1,5 @@
 const { Site } = require('../models');
+const Github = require('./GitHub');
 const GithubBuildHelper = require('./GithubBuildHelper');
 const GitLabHelper = require('./GitLabHelper');
 const GitHub = require('./GitHub');
@@ -7,24 +8,8 @@ const config = require('../../config');
 const url = require('url');
 const Organization = require('./organization');
 const { getBaseUrl } = require('./GitLab');
-
-const PULL = [
-  GitLabHelper.GITLAB_ACCESS_LEVEL_REPORTER,
-  GitLabHelper.GITLAB_ACCESS_LEVEL_DEVELOPER,
-  GitLabHelper.GITLAB_ACCESS_LEVEL_MAINTAINER,
-  GitLabHelper.GITLAB_ACCESS_LEVEL_OWNER,
-];
-
-const PUSH = [
-  GitLabHelper.GITLAB_ACCESS_LEVEL_DEVELOPER,
-  GitLabHelper.GITLAB_ACCESS_LEVEL_MAINTAINER,
-  GitLabHelper.GITLAB_ACCESS_LEVEL_OWNER,
-];
-
-const ADMIN = [
-  GitLabHelper.GITLAB_ACCESS_LEVEL_MAINTAINER,
-  GitLabHelper.GITLAB_ACCESS_LEVEL_OWNER,
-];
+const siteErrors = require('../responses/siteErrors');
+const { PAGES_ACCESS_LEVELS_DESTROY_SITE } = require('./GitLabHelper');
 
 const isWorkshop = (sourceCodePlatform) => sourceCodePlatform === Site.Platforms.Workshop;
 const isWorkshopUrl = (url) => url?.startsWith(GitLabHelper.getGitLabBaseUrl());
@@ -118,8 +103,8 @@ const getTokenForSiteBuild = async (build) => {
   return workshop ? `${GitLabHelper.OAUTH_PREFIX}:${token}` : token;
 };
 
-const getProcessedGitLabWebhookPayload = (payload) =>
-  GitLabHelper.getProcessedWebhookPayload(payload);
+const mapWebhookResponseToGitHubFormat = (payload) =>
+  GitLabHelper.mapWebhookResponseToGitHubFormat(payload);
 
 const getGitLabProjectToCreateSite = async (user, sourceCodeUrl) =>
   await GitLabHelper.getGitLabProjectToCreateSite(user, sourceCodeUrl);
@@ -139,18 +124,74 @@ const getUsersWithGitLabToken = (users) =>
     .filter((u) => u.gitlabToken)
     .sort((a, b) => b.gitlabExpiresAt - a.gitlabExpiresAt);
 
-const mapGitLabAccessLevelToGitHubPermissions = (accessLevel) => ({
-  pull: PULL.includes(accessLevel),
-  push: PUSH.includes(accessLevel),
-  admin: ADMIN.includes(accessLevel),
-});
+const getPermissions = async (user, site) =>
+  isWorkshop(site.sourceCodeUrl)
+    ? await GitLabHelper.getProjectPermissions(user, site.sourceCodeUrl)
+    : await GitHub.getRepoPermissions(user, site.owner, site.repository);
 
-const getPermissions = async (user, site, sourceCodeUrl) =>
-  isWorkshop(sourceCodeUrl)
-    ? mapGitLabAccessLevelToGitHubPermissions(
-        await GitLabHelper.getProjectAccessLevel(user, site.sourceCodeUrl),
-      )
-    : await GitHub.checkPermissions(user, site.owner, site.repository);
+const authorizeToDestroySite = async (user, site) => {
+  if (isWorkshop(site.sourceCodePlatform)) {
+    const {
+      userResponseOk,
+      canCreateProject,
+      projectUserResponseOk,
+      projectUserResponseStatus,
+      accessLevel,
+    } = await GitLabHelper.getProjectAccessLevel(user, site.sourceCodeUrl);
+
+    if (!userResponseOk) {
+      throw {
+        message: siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_INFORMATION,
+        status: 403,
+      };
+    }
+
+    if (!projectUserResponseOk) {
+      if (projectUserResponseStatus === 404) {
+        if (canCreateProject) return site.id;
+        throw {
+          message: siteErrors.GITLAB_ACCESS_REQUIRED_FOR_DELETED_GITLAB_PROJECT,
+          status: 403,
+        };
+      }
+      throw {
+        message: siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_PROJECT_AUTHORIZATION,
+        status: 403,
+      };
+    }
+
+    if (!PAGES_ACCESS_LEVELS_DESTROY_SITE.includes(accessLevel)) {
+      throw {
+        message: siteErrors.DELETE_SITE_GITLAB_ACCESS_REQUIRED,
+        status: 403,
+      };
+    }
+    return site.id;
+  } else {
+    return GitHub.getRepoPermissions(user, site.owner, site.repository)
+      .then((permissions) => {
+        if (!permissions.admin) {
+          throw {
+            message: siteErrors.ADMIN_ACCESS_REQUIRED,
+            status: 403,
+          };
+        }
+        return site.id;
+      })
+      .catch((error) => {
+        if (error.status === 404) {
+          // authorize user if the site's repo does not exist:
+          // When a user attempts to delete a site after deleting the repo, Federalist
+          // attempts to fetch the repo but it no longer exists and receives a 404
+          return site.id;
+        }
+        throw {
+          message: siteErrors.ADMIN_ACCESS_REQUIRED,
+          status: 403,
+        };
+      });
+  }
+};
 
 const getToken = (user, sourceCodeUrl) =>
   isWorkshop(sourceCodeUrl) ? user.gitlabToken : user.githubAccessToken;
@@ -176,7 +217,7 @@ const getAccessTokenWithCertainPermissions = async (
       if (!user) {
         return null;
       }
-      const permissions = await getPermissions(user, site, sourceCodePlatform);
+      const permissions = await getPermissions(user, site);
 
       if (permissions[permission]) {
         return getToken(user, sourceCodePlatform);
@@ -264,6 +305,11 @@ const updateSite = (repo, site, template) => {
   }
 };
 
+const deleteWebhook = async (site, user) =>
+  isWorkshop(site.sourceCodePlatform)
+    ? await GitLabHelper.deleteWebhook(user, site)
+    : await Github.deleteWebhook(site, user.githubAccessToken);
+
 module.exports = {
   isWorkshop,
   createSiteWebhook,
@@ -271,10 +317,12 @@ module.exports = {
   reportBuildStatus,
   getSourceCodePlatformDomain,
   getTokenForSiteBuild,
-  getProcessedGitLabWebhookPayload,
+  mapWebhookResponseToGitHubFormat,
   getGitLabProjectToCreateSite,
   loadBuildUserAccessToken,
   createRepoFromTemplate,
   updateSite,
   isWorkshopUrl,
+  deleteWebhook,
+  authorizeToDestroySite,
 };

@@ -9,15 +9,23 @@ const GITLAB_ACCESS_LEVEL_DEVELOPER = 30;
 const GITLAB_ACCESS_LEVEL_MAINTAINER = 40;
 const GITLAB_ACCESS_LEVEL_OWNER = 50;
 
-const PAGES_ACCESS_LEVELS_CREATE_SITE = [
-  GITLAB_ACCESS_LEVEL_OWNER,
-  GITLAB_ACCESS_LEVEL_MAINTAINER,
-];
+const PAGES_ACCESS_LEVELS_CREATE_SITE = [GITLAB_ACCESS_LEVEL_OWNER];
 const PAGES_ACCESS_LEVELS_DESTROY_SITE = [GITLAB_ACCESS_LEVEL_OWNER];
 
-const getProject = async (user, sourceCodeUrl) => {
-  return await GitLab.getProject(user, sourceCodeUrl, updateGitLabTokens);
-};
+const PULL = [
+  GITLAB_ACCESS_LEVEL_REPORTER,
+  GITLAB_ACCESS_LEVEL_DEVELOPER,
+  GITLAB_ACCESS_LEVEL_MAINTAINER,
+  GITLAB_ACCESS_LEVEL_OWNER,
+];
+
+const PUSH = [
+  GITLAB_ACCESS_LEVEL_DEVELOPER,
+  GITLAB_ACCESS_LEVEL_MAINTAINER,
+  GITLAB_ACCESS_LEVEL_OWNER,
+];
+
+const ADMIN = [GITLAB_ACCESS_LEVEL_MAINTAINER, GITLAB_ACCESS_LEVEL_OWNER];
 
 const createSiteWebhook = async (user, site) => {
   const webhooksResponse = await GitLab.getWebhooks(
@@ -69,7 +77,7 @@ const sendCommitStatus = async (accessToken, site, options) => {
   return response;
 };
 
-const getProcessedWebhookPayload = (payload) => {
+const mapWebhookResponseToGitHubFormat = (payload) => {
   const [, owner, ...rest] = payload.project.web_url
     .replace(`${getGitLabBaseUrl()}`, '')
     .split('/');
@@ -91,27 +99,49 @@ const getProcessedWebhookPayload = (payload) => {
 
 async function getProjectAccessLevel(user, sourceCodeUrl) {
   const userResponse = await GitLab.getUser(user, updateGitLabTokens);
-  const { id: userId } = await userResponse.json();
+  if (!userResponse.ok) return { userResponseOk: userResponse.ok };
 
+  const { id: userId, can_create_project: canCreateProject } = await userResponse.json();
   const projectUserResponse = await GitLab.getProjectUser(
     user,
     sourceCodeUrl,
     userId,
     updateGitLabTokens,
   );
-  const { access_level: accessLevel } = await projectUserResponse.json();
-  return accessLevel;
+
+  return {
+    userResponseOk: userResponse.ok,
+    projectUserResponseOk: projectUserResponse.ok,
+    projectUserResponseStatus: projectUserResponse.status,
+    canCreateProject,
+    accessLevel: (await projectUserResponse.json()).access_level,
+  };
 }
 
-const getGitLabProjectForPermissions = async (user, sourceCodeUrl, accessLevels) => {
-  const accessLevel = await getProjectAccessLevel(user, sourceCodeUrl);
+const mapGitLabAccessLevelToGitHubPermissions = (accessLevel) => ({
+  pull: PULL.includes(accessLevel),
+  push: PUSH.includes(accessLevel),
+  admin: ADMIN.includes(accessLevel),
+});
+
+async function getProjectPermissions(user, sourceCodeUrl) {
+  const { accessLevel } = await getProjectAccessLevel(user, sourceCodeUrl);
+  return mapGitLabAccessLevelToGitHubPermissions(accessLevel);
+}
+
+async function checkProjectAccessLevel(user, sourceCodeUrl, accessLevels) {
+  const { accessLevel } = await getProjectAccessLevel(user, sourceCodeUrl);
 
   if (!accessLevels.includes(accessLevel)) {
     throw {
-      message: 'You do not have required access level',
+      message: 'You do not have required access level.',
       status: 403,
     };
   }
+}
+
+const getGitLabProjectForPermissions = async (user, sourceCodeUrl, accessLevels) => {
+  await checkProjectAccessLevel(user, sourceCodeUrl, accessLevels);
 
   const projectResponse = await GitLab.getProject(
     user,
@@ -126,13 +156,6 @@ const getGitLabProjectToCreateSite = async (user, sourceCodeUrl) =>
     user,
     sourceCodeUrl,
     PAGES_ACCESS_LEVELS_CREATE_SITE,
-  );
-
-const getGitLabProjectToDestroySite = async (user, sourceCodeUrl) =>
-  await getGitLabProjectForPermissions(
-    user,
-    sourceCodeUrl,
-    PAGES_ACCESS_LEVELS_DESTROY_SITE,
   );
 
 const createProjectFromTemplate = async (user, namespace, projectName, templateUrl) => {
@@ -173,23 +196,54 @@ const createProjectFromTemplate = async (user, namespace, projectName, templateU
   return projectResponse;
 };
 
+const deleteWebhook = async (user, site) => {
+  if (!site.webhookId) return null;
+
+  try {
+    await checkProjectAccessLevel(
+      user,
+      site.sourceCodeUrl,
+      PAGES_ACCESS_LEVELS_DESTROY_SITE,
+    );
+    const webhooksResponse = await GitLab.deleteWebhooks(
+      user,
+      site.sourceCodeUrl,
+      site.webhookId,
+      updateGitLabTokens,
+    );
+    if (!webhooksResponse?.ok) {
+      logger.error(
+        // eslint-disable-next-line max-len
+        `GitLab: Error deleting webhook ${site.webhookId} for ${site.sourceCodeUrl} - response: ${webhooksResponse.status}.`,
+      );
+    }
+  } catch (error) {
+    logger.error(
+      `GitLab: Error deleting webhook ${site.webhookId} for ${site.sourceCodeUrl}.`,
+      error.message,
+      error.stack,
+    );
+  }
+};
+
 module.exports = {
   GITLAB_ACCESS_LEVEL_GUEST,
   GITLAB_ACCESS_LEVEL_REPORTER,
   GITLAB_ACCESS_LEVEL_DEVELOPER,
   GITLAB_ACCESS_LEVEL_MAINTAINER,
   GITLAB_ACCESS_LEVEL_OWNER,
+  PAGES_ACCESS_LEVELS_DESTROY_SITE,
   OAUTH_PREFIX: GitLab.OAUTH_PREFIX,
   revokeUserGitLabTokens,
   getGitLabBaseUrl,
-  getProject,
   getGitLabProjectToCreateSite,
-  getGitLabProjectToDestroySite,
   createSiteWebhook,
   listSiteWebhooks,
   getUserOAuthAccessToken,
   sendCommitStatus,
-  getProcessedWebhookPayload,
+  mapWebhookResponseToGitHubFormat,
   getProjectAccessLevel,
   createProjectFromTemplate,
+  deleteWebhook,
+  getProjectPermissions,
 };

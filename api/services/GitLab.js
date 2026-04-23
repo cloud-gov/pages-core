@@ -121,6 +121,12 @@ const fetchGetNamespace = async (userOAuthAccessToken, namespace) =>
     headers: getHeaders(userOAuthAccessToken),
   });
 
+const fetchDeleteWebhook = async (userOAuthAccessToken, sourceCodeUrl, webhookId) =>
+  fetch(getApiUrl(`projects/${getUrlEncodedPath(sourceCodeUrl)}/hooks/${webhookId}`), {
+    method: 'DELETE',
+    headers: getHeaders(userOAuthAccessToken),
+  });
+
 const revokeToken = async (user, token, tokenType) => {
   if (!token) return;
 
@@ -173,7 +179,11 @@ const revokeUserOAuthTokens = async (user, resetUserOAuthTokens) => {
 const getProject = async (user, sourceCodeUrl, persistUserOAuthTokens) =>
   await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) => fetchGetProject(userOAuthAccessToken, sourceCodeUrl),
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchGetProject(userOAuthAccessToken, sourceCodeUrl),
+      apiCallName: 'fetchGetProject',
+    },
     persistUserOAuthTokens,
   );
 
@@ -185,8 +195,11 @@ const addWebhook = async (
 ) => {
   const response = await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) =>
-      fetchAddWebhook(userOAuthAccessToken, sourceCodeUrl, webhookEndpoint),
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchAddWebhook(userOAuthAccessToken, sourceCodeUrl, webhookEndpoint),
+      apiCallName: 'fetchAddWebhook',
+    },
     persistUserOAuthTokens,
   );
 
@@ -204,29 +217,54 @@ const addWebhook = async (
 const getWebhooks = async (user, sourceCodeUrl, persistUserOAuthTokens) =>
   await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) => fetchWebhooks(userOAuthAccessToken, sourceCodeUrl),
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchWebhooks(userOAuthAccessToken, sourceCodeUrl),
+      apiCallName: 'fetchWebhooks',
+    },
+    persistUserOAuthTokens,
+  );
+
+const deleteWebhooks = async (user, sourceCodeUrl, webhookId, persistUserOAuthTokens) =>
+  await apiCallWithTokensRefresh(
+    user,
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchDeleteWebhook(userOAuthAccessToken, sourceCodeUrl, webhookId),
+      apiCallName: 'fetchDeleteWebhook',
+    },
     persistUserOAuthTokens,
   );
 
 const getUser = async (user, persistUserOAuthTokens) =>
   await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) => fetchUser(userOAuthAccessToken),
+    {
+      apiCall: (userOAuthAccessToken) => fetchUser(userOAuthAccessToken),
+      apiCallName: 'fetchUser',
+    },
     persistUserOAuthTokens,
   );
 
 const getProjectUser = async (user, sourceCodeUrl, userId, persistUserOAuthTokens) =>
   await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) =>
-      fetchProjectUser(userOAuthAccessToken, sourceCodeUrl, userId),
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchProjectUser(userOAuthAccessToken, sourceCodeUrl, userId),
+      apiCallName: 'fetchProjectUser',
+    },
     persistUserOAuthTokens,
   );
 
 const getNamespace = async (user, namespace, persistUserOAuthTokens) =>
   await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) => fetchGetNamespace(userOAuthAccessToken, namespace),
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchGetNamespace(userOAuthAccessToken, namespace),
+      apiCallName: 'fetchGetNamespace',
+    },
     persistUserOAuthTokens,
   );
 
@@ -245,8 +283,11 @@ const createProject = async (
 ) =>
   await apiCallWithTokensRefresh(
     user,
-    (userOAuthAccessToken) =>
-      fetchCreateProject(userOAuthAccessToken, namespaceId, projectName, importUrl),
+    {
+      apiCall: (userOAuthAccessToken) =>
+        fetchCreateProject(userOAuthAccessToken, namespaceId, projectName, importUrl),
+      apiCallName: 'fetchCreateProject',
+    },
     persistUserOAuthTokens,
     true,
   );
@@ -294,7 +335,7 @@ const refreshUserOAuthTokens = async (user, persistUserOAuthTokens) => {
 
 const apiCallWithTokensRefresh = async (
   user,
-  apiCall,
+  { apiCall, apiCallName },
   persistUserOAuthTokens,
   refreshUserOAuthTokensFirst = false,
 ) => {
@@ -321,7 +362,7 @@ const apiCallWithTokensRefresh = async (
     }
   } catch (error) {
     logger.error(
-      'GitLab: Error calling API with tokens refresh.',
+      `GitLab: Error calling API with tokens refresh for ${apiCallName}`,
       error.message,
       error.stack,
     );
@@ -334,14 +375,15 @@ module.exports = {
   getBaseUrl,
   normalizeUrl,
   fetchRefreshUserOAuthTokens,
+  getUserOAuthAccessToken,
   revokeUserOAuthTokens,
   getUser,
+  createProject,
   getProject,
   getProjectUser,
   addWebhook,
   getWebhooks,
-  getUserOAuthAccessToken,
+  deleteWebhooks,
   sendCommitStatus,
-  createProject,
   getNamespace,
 };

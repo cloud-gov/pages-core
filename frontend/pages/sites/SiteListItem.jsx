@@ -42,7 +42,8 @@ function SiteListItem({ organization, site }) {
         <div className="usa-card__footer usa-button-group">
           <div className="usa-button-group__item">
             <SourceCodePlatformLink
-              text="View repo"
+              textGitHub="View repo"
+              textGitLab="View project"
               sourceCodePlatform={site.sourceCodePlatform}
               sourceCodeUrl={site.sourceCodeUrl}
               isButton

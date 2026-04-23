@@ -7,6 +7,7 @@ export function createFixtureSite({
   repository = 'test-repo',
   owner = 'test-owner',
   isActive = true,
+  sourceCodePlatform = 'github',
 } = {}) {
   return {
     createdAt,
@@ -17,5 +18,7 @@ export function createFixtureSite({
     repository,
     owner,
     isActive,
+    sourceCodePlatform,
+    sourceCodeUrl: `https://github.com/repos/${owner}/${repository}`,
   };
 }

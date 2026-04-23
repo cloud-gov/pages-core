@@ -92,8 +92,11 @@ describe('<SiteListItem />', () => {
     );
     expect(SourceCodePlatformLink).toHaveBeenCalledWith(
       {
-        text: 'View repo',
         isButton: true,
+        sourceCodePlatform: 'github',
+        sourceCodeUrl: 'https://github.com/repos/test-owner/test-repo',
+        textGitHub: 'View repo',
+        textGitLab: 'View project',
       },
       expect.anything(), // ref
     );

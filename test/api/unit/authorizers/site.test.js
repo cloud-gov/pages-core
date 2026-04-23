@@ -4,9 +4,18 @@ const nock = require('nock');
 const factory = require('../../support/factory');
 const githubAPINocks = require('../../support/githubAPINocks');
 const authorizer = require('../../../../api/authorizers/site');
-const { Role } = require('../../../../api/models');
+const { Role, Site } = require('../../../../api/models');
 const siteErrors = require('../../../../api/responses/siteErrors');
 const { createSiteUserOrg } = require('../../support/site-user');
+const config = require('../../../../config');
+const GitLabHelper = require('../../../../api/services/GitLabHelper');
+const { getRefreshToken200Response } = require('../../support/gitlabAPINocks');
+
+const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
+gitlabConfig.clientID = 'mock-client-id';
+gitlabConfig.clientSecret = 'mock-client-secret';
+gitlabConfig.callbackURL = 'https://localhost:1337/auth/gitlab/callback';
+gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
 
 describe('Site authorizer', () => {
   describe('.create(user, params)', () => {
@@ -208,7 +217,7 @@ describe('Site authorizer', () => {
     });
   });
 
-  describe('.destroy(user, site)', () => {
+  describe('.destroy(user, site) - GitHub site', () => {
     beforeEach(() => {
       nock.cleanAll();
     });
@@ -300,6 +309,290 @@ describe('Site authorizer', () => {
       expect(error).to.be.throw;
       expect(error.status).to.equal(403);
       return expect(error.message).to.equal(siteErrors.ADMIN_ACCESS_REQUIRED);
+    });
+  });
+
+  describe('.destroy(user, site) - GitLab site ', () => {
+    beforeEach(() => {
+      nock.cleanAll();
+    });
+    afterEach(() => {
+      nock.cleanAll();
+    });
+
+    it('should resolve if the user is an owner of the project', async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const gitlabToken = 'gitlabToken';
+      await user.update({ gitlabToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId });
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(200, { access_level: GitLabHelper.GITLAB_ACCESS_LEVEL_OWNER });
+
+      const expected = await authorizer.destroy(user, site);
+
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+      return expect(expected).to.equal(site.id);
+    });
+
+    it('should reject if the user is not an owner of the project', async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const gitlabToken = 'gitlabToken';
+      await user.update({ gitlabToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId });
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(200, { access_level: GitLabHelper.GITLAB_ACCESS_LEVEL_MAINTAINER });
+
+      const error = await authorizer.destroy(user, site).catch((err) => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal(siteErrors.DELETE_SITE_GITLAB_ACCESS_REQUIRED);
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+    });
+
+    it("should reject if can not retrieve user's GitLab info", async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const gitlabToken = 'gitlabToken',
+        gitlabRefreshToken = 'gitlabRefreshToken';
+      await user.update({ gitlabToken, gitlabRefreshToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .persist()
+        .get('/api/v4/user')
+        .reply(401, { message: '401 Unauthorized' });
+
+      const refreshToken = nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: gitlabRefreshToken,
+          }),
+        );
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(200, { access_level: GitLabHelper.GITLAB_ACCESS_LEVEL_MAINTAINER });
+
+      const error = await authorizer.destroy(user, site).catch((err) => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal(siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_INFORMATION);
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(refreshToken.isDone()).to.be.true;
+      expect(gitlabProjectUser.isDone()).to.be.false;
+    });
+
+    it(`should reject if there is a different than 404 error 
+           retrieving Gitlab user project info`, async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const gitlabToken = 'gitlabToken',
+        gitlabRefreshToken = 'gitlabRefreshToken';
+      await user.update({ gitlabToken, gitlabRefreshToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .persist()
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId });
+
+      const refreshToken = nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: gitlabRefreshToken,
+          }),
+        );
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(500, { error: 'some error' });
+
+      const error = await authorizer.destroy(user, site).catch((err) => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal(
+        siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_PROJECT_AUTHORIZATION,
+      );
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(refreshToken.isDone()).to.be.false;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+    });
+
+    it(`should reject if GitLab project does not exist 
+           and user is not authorized to create projects`, async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const gitlabToken = 'gitlabToken',
+        gitlabRefreshToken = 'gitlabRefreshToken';
+      await user.update({ gitlabToken, gitlabRefreshToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .persist()
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId, can_create_project: false });
+
+      const refreshToken = nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: gitlabRefreshToken,
+          }),
+        );
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(404, { error: 'some error' });
+
+      const error = await authorizer.destroy(user, site).catch((err) => err);
+
+      expect(error).to.be.throw;
+      expect(error.status).to.equal(403);
+      expect(error.message).to.equal(
+        siteErrors.GITLAB_ACCESS_REQUIRED_FOR_DELETED_GITLAB_PROJECT,
+      );
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(refreshToken.isDone()).to.be.false;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+    });
+
+    it(`should resolve if GitLab project does not exist 
+  and user is authorized to create projects`, async () => {
+      const { site, user } = await createSiteUserOrg({
+        sourceCodePlatform: Site.Platforms.Workshop,
+      });
+
+      const gitlabToken = 'gitlabToken',
+        gitlabRefreshToken = 'gitlabRefreshToken';
+      await user.update({ gitlabToken, gitlabRefreshToken });
+
+      const gitlabUserId = 1234567890;
+
+      const gitlabUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .persist()
+        .get('/api/v4/user')
+        .reply(200, { id: gitlabUserId, can_create_project: true });
+
+      const refreshToken = nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: gitlabRefreshToken,
+          }),
+        );
+
+      const gitlabProjectUser = nock(gitlabConfig.baseURL, {
+        Authorization: `Bearer ${gitlabToken}`,
+        Accept: 'application/json',
+      })
+        .get(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${site.owner}%2F${site.repository}/members/all/${gitlabUserId}`,
+        )
+        .reply(404, { error: 'some error' });
+
+      const expected = await authorizer.destroy(user, site).catch((err) => err);
+
+      expect(gitlabUser.isDone()).to.be.true;
+      expect(refreshToken.isDone()).to.be.false;
+      expect(gitlabProjectUser.isDone()).to.be.true;
+      return expect(expected).to.equal(site.id);
     });
   });
 });
