@@ -7,11 +7,12 @@ const { domain } = require('../utils/build');
 const config = require('../../config');
 const url = require('url');
 const Organization = require('./organization');
-const { getBaseUrl } = require('./GitLab');
 const siteErrors = require('../responses/siteErrors');
 const { PAGES_ACCESS_LEVELS_DESTROY_SITE } = require('./GitLabHelper');
+const { logger } = require('../../winston');
 
-const isWorkshop = (sourceCodePlatform) => sourceCodePlatform === Site.Platforms.Workshop;
+const isWorkshopPlatform = (sourceCodePlatform) =>
+  sourceCodePlatform === Site.Platforms.Workshop;
 const isWorkshopUrl = (url) => url?.startsWith(GitLabHelper.getGitLabBaseUrl());
 
 const reportBuildStatus = async (build) => {
@@ -34,7 +35,7 @@ const reportBuildStatus = async (build) => {
     context,
   };
 
-  const workshop = isWorkshop(site.sourceCodePlatform);
+  const workshop = isWorkshopPlatform(site.sourceCodePlatform);
 
   if (build.isInProgress()) {
     options.state = 'pending';
@@ -67,7 +68,7 @@ const reportBuildStatus = async (build) => {
 };
 
 const createSiteWebhook = async (user, site) => {
-  if (isWorkshop(site.sourceCodePlatform)) {
+  if (isWorkshopPlatform(site.sourceCodePlatform)) {
     return await GitLabHelper.createSiteWebhook(user, site);
   } else {
     const users = await Organization.getOrganizationUsers(site);
@@ -80,7 +81,7 @@ const createSiteWebhook = async (user, site) => {
 };
 
 const listSiteWebhooks = async (user, site, users) =>
-  isWorkshop(site.sourceCodePlatform)
+  isWorkshopPlatform(site.sourceCodePlatform)
     ? await GitLabHelper.listSiteWebhooks(user, site)
     : await GithubBuildHelper.listSiteWebhooks(
         site,
@@ -89,12 +90,12 @@ const listSiteWebhooks = async (user, site, users) =>
       );
 
 const getSourceCodePlatformDomain = (sourceCodePlatform) =>
-  isWorkshop(sourceCodePlatform)
+  isWorkshopPlatform(sourceCodePlatform)
     ? domain(GitLabHelper.getGitLabBaseUrl())
     : domain(config.app.githubBaseUrl);
 
 const getTokenForSiteBuild = async (build) => {
-  const workshop = isWorkshop(build.Site?.sourceCodePlatform);
+  const workshop = isWorkshopPlatform(build.Site?.sourceCodePlatform);
   let token = workshop
     ? build.User && (await GitLabHelper.getUserOAuthAccessToken(build.User))
     : build.User?.githubAccessToken;
@@ -109,11 +110,6 @@ const mapWebhookResponseToGitHubFormat = (payload) =>
 const getGitLabProjectToCreateSite = async (user, sourceCodeUrl) =>
   await GitLabHelper.getGitLabProjectToCreateSite(user, sourceCodeUrl);
 
-const getUsersWithToken = (users, sourceCodePlatform) =>
-  isWorkshop(sourceCodePlatform)
-    ? getUsersWithGitLabToken(users)
-    : getUsersWithGitHubToken(users);
-
 const getUsersWithGitHubToken = (users) =>
   users
     .filter((u) => u.githubAccessToken && u.signedInAt)
@@ -122,15 +118,10 @@ const getUsersWithGitHubToken = (users) =>
 const getUsersWithGitLabToken = (users) =>
   users
     .filter((u) => u.gitlabToken)
-    .sort((a, b) => b.gitlabExpiresAt - a.gitlabExpiresAt);
-
-const getPermissions = async (user, site) =>
-  isWorkshop(site.sourceCodeUrl)
-    ? await GitLabHelper.getProjectPermissions(user, site.sourceCodeUrl)
-    : await GitHub.getRepoPermissions(user, site.owner, site.repository);
+    .sort((a, b) => b.gitlabExpiresAt - a.gitlabExpiresAt); // ????
 
 const authorizeToDestroySite = async (user, site) => {
-  if (isWorkshop(site.sourceCodePlatform)) {
+  if (isWorkshopPlatform(site.sourceCodePlatform)) {
     const {
       userResponseOk,
       canCreateProject,
@@ -138,7 +129,6 @@ const authorizeToDestroySite = async (user, site) => {
       projectUserResponseStatus,
       accessLevel,
     } = await GitLabHelper.getProjectAccessLevel(user, site.sourceCodeUrl);
-
     if (!userResponseOk) {
       throw {
         message: siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_INFORMATION,
@@ -193,64 +183,69 @@ const authorizeToDestroySite = async (user, site) => {
   }
 };
 
-const getToken = (user, sourceCodeUrl) =>
-  isWorkshop(sourceCodeUrl) ? user.gitlabToken : user.githubAccessToken;
-
 // Loops through supplied list of users, until it
 // finds a user with a valid access token
-const getAccessTokenWithCertainPermissions = async (
-  site,
-  users,
-  permission,
-  sourceCodePlatform,
-) => {
+const getAccessTokenWithCertainPermissions = async (site, users, permission) => {
   let count = 0;
 
   if (!users) {
     return null;
   }
 
-  const filteredUsers = getUsersWithToken(users, sourceCodePlatform);
+  const isWorkshop = isWorkshopPlatform(site.sourceCodePlatform);
+  const filteredUsers = isWorkshop
+    ? getUsersWithGitLabToken(users)
+    : getUsersWithGitHubToken(users);
+  logger.info(filteredUsers.map((user) => `${user.id} - ${user.username}`));
 
   const getNextToken = async (user) => {
     try {
       if (!user) {
         return null;
       }
-      const permissions = await getPermissions(user, site);
+
+      const permissions = isWorkshop
+        ? await GitLabHelper.getProjectPermissions(user, site.sourceCodeUrl)
+        : await GitHub.getRepoPermissions(user, site.owner, site.repository);
+      logger.info(`${user?.id} - ${user?.username} - ${JSON.stringify(permissions)}`);
 
       if (permissions[permission]) {
-        return getToken(user, sourceCodePlatform);
+        const token = isWorkshop ? user.gitlabToken : user.githubAccessToken;
+        return token;
       }
       count += 1;
       return getNextToken(filteredUsers[count]);
-    } catch {
+    } catch (error) {
+      logger.error(
+        [
+          `Error retrieving token for - ${user?.id} - ${user?.username}`,
+          error.message,
+          error.stack,
+        ].join('\n'),
+      );
+
       count += 1;
-      return getNextToken(filteredUsers[count]);
+      return count < filteredUsers.length ? getNextToken(filteredUsers[count]) : null;
     }
   };
 
   return getNextToken(filteredUsers[count]);
 };
 
-const getAccessTokenWithPushPermissions = async (site, users, sourceCodePlatform) =>
-  getAccessTokenWithCertainPermissions(site, users, 'push', sourceCodePlatform);
+const getAccessTokenWithPushPermissions = async (site, users) =>
+  getAccessTokenWithCertainPermissions(site, users, 'push');
 
-const getAccessTokenWithAdminPermissions = async (site, users, sourceCodePlatform) =>
-  getAccessTokenWithCertainPermissions(site, users, 'admin', sourceCodePlatform);
+const getAccessTokenWithAdminPermissions = async (site, users) =>
+  getAccessTokenWithCertainPermissions(site, users, 'admin');
 
 const loadBuildUserAccessToken = async (build) => {
   let accessToken;
   const site = build.Site;
   const users = await build.getSiteOrgUsers();
-  const buildUser = users.find((u) => u.id === build.user);
+  const buildUser = users.find((u) => u?.id === build.user);
 
   if (buildUser) {
-    accessToken = await getAccessTokenWithPushPermissions(
-      site,
-      [buildUser],
-      site.sourceCodePlatform,
-    );
+    accessToken = await getAccessTokenWithPushPermissions(site, [buildUser]);
   }
   if (!accessToken) {
     /**
@@ -258,11 +253,7 @@ const loadBuildUserAccessToken = async (build) => {
      * an update, we need to find a valid GitHub access token among the
      * site's current users with which to report the build's status
      */
-    accessToken = await getAccessTokenWithPushPermissions(
-      site,
-      users,
-      site.sourceCodePlatform,
-    );
+    accessToken = await getAccessTokenWithPushPermissions(site, users);
   }
 
   if (!accessToken) {
@@ -292,26 +283,14 @@ const createRepoFromTemplate = async ({
   } else return await GitHub.createRepoFromTemplate(user, owner, repository, template);
 };
 
-const updateSite = (repo, site, template) => {
-  if (isWorkshopUrl(template?.templateSourceCodeUrl)) {
-    const [, owner, ...rest] = repo.web_url.replace(getBaseUrl(), '').split('/');
-
-    site.sourceCodeUrl = repo.web_url;
-    site.owner = owner;
-    site.repository = rest.join('/');
-    site.sourceCodePlatform = Site.Platforms.Workshop;
-  } else {
-    site.sourceCodePlatform = Site.Platforms.Github;
-  }
-};
-
 const deleteWebhook = async (site, user) =>
-  isWorkshop(site.sourceCodePlatform)
+  isWorkshopPlatform(site.sourceCodePlatform)
     ? await GitLabHelper.deleteWebhook(user, site)
     : await Github.deleteWebhook(site, user.githubAccessToken);
 
 module.exports = {
-  isWorkshop,
+  isWorkshopPlatform,
+  isWorkshopUrl,
   createSiteWebhook,
   listSiteWebhooks,
   reportBuildStatus,
@@ -321,8 +300,6 @@ module.exports = {
   getGitLabProjectToCreateSite,
   loadBuildUserAccessToken,
   createRepoFromTemplate,
-  updateSite,
-  isWorkshopUrl,
   deleteWebhook,
   authorizeToDestroySite,
 };

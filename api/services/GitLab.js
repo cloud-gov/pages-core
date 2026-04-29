@@ -204,7 +204,7 @@ const addWebhook = async (
   );
 
   if (!response.ok) {
-    throw await processError(response, 'Error creating webhook.');
+    throw await processError(user, response, 'Error creating webhook.');
   }
 
   return {
@@ -271,7 +271,7 @@ const getNamespace = async (user, namespace, persistUserOAuthTokens) =>
 const sendCommitStatus = async (userOAuthAccessToken, sourceCodeUrl, options) =>
   await fetchPostCommitStatus(userOAuthAccessToken, sourceCodeUrl, options);
 
-const getUserOAuthAccessToken = async (user, persistUserOAuthTokens) =>
+const getRefreshedUserOAuthAccessToken = async (user, persistUserOAuthTokens) =>
   (await refreshUserOAuthTokens(user, persistUserOAuthTokens)).accessToken;
 
 const createProject = async (
@@ -292,8 +292,13 @@ const createProject = async (
     true,
   );
 
-const processError = async (response, message) => {
+const processError = async (user, response, message) => {
   const data = await response.json();
+  logger.error(
+    // eslint-disable-next-line max-len
+    `Error: userName: ${user?.id} - ${user?.userName}, response: ${response.status} - ${JSON.stringify(data)}`,
+  );
+  logger.error(`GitLab processError:\n${new Error().stack}`);
   return Object.assign(
     new Error(
       [data.error, data.error_description, data.message, message]
@@ -311,13 +316,11 @@ const processError = async (response, message) => {
 const refreshUserOAuthTokens = async (user, persistUserOAuthTokens) => {
   const refreshResponse = await fetchRefreshUserOAuthTokens(user);
   if (!refreshResponse.ok) {
-    await persistUserOAuthTokens(user, {
-      accessToken: null,
-      refreshToken: null,
-      expiresIn: null,
-      createdAt: null,
-    });
-    throw await processError(refreshResponse, 'Try reconnecting your GitLab account.');
+    throw await processError(
+      user,
+      refreshResponse,
+      'Error refreshing user GitLab OAuth tokens. Try reconnecting your GitLab account.',
+    );
   }
 
   let refreshResponseData = await refreshResponse.json();
@@ -339,7 +342,14 @@ const apiCallWithTokensRefresh = async (
   persistUserOAuthTokens,
   refreshUserOAuthTokensFirst = false,
 ) => {
+  const errorMessage = `GitLab: Error calling API with tokens refresh for ${apiCallName}`;
   try {
+    if (!user.gitlabToken) {
+      const error = `${errorMessage}, user does not have a GitLab token.`;
+      logger.error(error);
+      throw new Error(error);
+    }
+
     if (refreshUserOAuthTokensFirst) {
       const userOAuthAccessTokens = await refreshUserOAuthTokens(
         user,
@@ -361,11 +371,7 @@ const apiCallWithTokensRefresh = async (
       return response;
     }
   } catch (error) {
-    logger.error(
-      `GitLab: Error calling API with tokens refresh for ${apiCallName}`,
-      error.message,
-      error.stack,
-    );
+    logger.error(errorMessage, error.message, error.stack);
     throw error;
   }
 };
@@ -375,7 +381,7 @@ module.exports = {
   getBaseUrl,
   normalizeUrl,
   fetchRefreshUserOAuthTokens,
-  getUserOAuthAccessToken,
+  getUserOAuthAccessToken: getRefreshedUserOAuthAccessToken,
   revokeUserOAuthTokens,
   getUser,
   createProject,

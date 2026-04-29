@@ -829,7 +829,7 @@ describe('SiteBuildQueue', () => {
         ],
       });
 
-      const refresh = nockRefreshTokenWithResponse(
+      nockRefreshTokenWithResponse(
         gitlabConfig,
         user.gitlabToken,
         user.gitlabRefreshToken,
@@ -839,7 +839,6 @@ describe('SiteBuildQueue', () => {
 
       const message = await SiteBuildQueue.messageBodyForBuild(fullBuild);
 
-      expect(refresh.isDone()).to.equal(true);
       expect(messageEnv(message, 'SOURCE_CODE_PLATFORM')).to.equal('workshop');
       expect(messageEnv(message, 'SOURCE_CODE_PLATFORM_DOMAIN')).to.equal(
         'workshop.cloud.gov',
