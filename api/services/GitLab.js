@@ -30,8 +30,8 @@ const getClientCredentials = (_gitlabConfig) => ({
 const getUrlEncodedPath = (sourceCodeUrl) =>
   encodeURIComponent(sourceCodeUrl.replace(`${getNormalizedBaseUrl()}/`, ''));
 
-const fetchRefreshUserOAuthTokens = async (user) =>
-  fetch(`${getNormalizedBaseUrl()}/oauth/token`, {
+const fetchRefreshUserOAuthTokens = async (user) => {
+  const response = fetch(`${getNormalizedBaseUrl()}/oauth/token`, {
     method: 'POST',
     headers: getHeaders(user.gitlabToken, CONTENT_TYPE_URL_ENCODED),
     body: new URLSearchParams({
@@ -41,6 +41,14 @@ const fetchRefreshUserOAuthTokens = async (user) =>
       redirect_uri: gitlabConfig.callbackURL,
     }),
   });
+
+  logger.error(
+    // eslint-disable-next-line max-len
+    `GitLab fetchRefreshUserOAuthTokens() - ${response.ok} - ${response.status}:\n${new Error().stack}`,
+  );
+
+  return response;
+};
 
 const fetchAddWebhook = async (userOAuthAccessToken, sourceCodeUrl, webhookEndpoint) =>
   fetch(getApiUrl(`projects/${getUrlEncodedPath(sourceCodeUrl)}/hooks`), {

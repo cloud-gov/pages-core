@@ -68,9 +68,9 @@ const sendCommitStatus = async (accessToken, site, options) => {
   );
 
   if (!response.ok) {
-    logger.error(`sendCommitStatus error: ${JSON.stringify(await response.json())}`);
     throw new Error(
-      `Failed to send commit status (${options.state}): ${response.status}`,
+      // eslint-disable-next-line max-len
+      `Failed to send commit status (${options.state}): ${response.status} - ${JSON.stringify(await response.json())}`,
     );
   }
 
