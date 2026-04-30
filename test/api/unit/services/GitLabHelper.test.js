@@ -10,6 +10,7 @@ const { createSiteUserOrg } = require('../../support/site-user');
 const { Site } = require('../../../../api/models');
 const GitLabHelper = require('../../../../api/services/GitLabHelper');
 const sinon = require('sinon');
+const { getRefreshToken200Response } = require('../../support/gitlabAPINocks');
 
 const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
 gitlabConfig.clientID = 'mock-client-id';
@@ -141,6 +142,17 @@ describe('GitLabHelper', () => {
 
       const gitlabUserId = 1234567890;
 
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
+
       const gitlabUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
         Accept: 'application/json',
@@ -186,6 +198,17 @@ describe('GitLabHelper', () => {
       await user.update({ gitlabToken });
 
       const gitlabUserId = 1234567890;
+
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
 
       const gitlabUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
@@ -248,6 +271,17 @@ describe('GitLabHelper', () => {
       })
         .get('/api/v4/user')
         .reply(200, { id: gitlabUserId });
+
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
 
       const gitlabProjectUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,

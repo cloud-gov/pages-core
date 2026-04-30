@@ -104,7 +104,7 @@ async function checkRepositoryAndOrg({
   sourceCodePlatform,
   sourceCodeUrl,
 }) {
-  if (SourceCodePlatformHelper.isWorkshop(sourceCodePlatform)) {
+  if (SourceCodePlatformHelper.isWorkshopPlatform(sourceCodePlatform)) {
     return await SourceCodePlatformHelper.getGitLabProjectToCreateSite(
       user,
       sourceCodeUrl,

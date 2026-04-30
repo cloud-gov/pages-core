@@ -10,7 +10,7 @@ const { BuildService } = require('./build');
 const { OPS_EMAIL } = process.env;
 
 const getOwnerAndRepository = (payload, sourceCodePlatform) => {
-  if (SourceCodePlatformHelper.isWorkshop(sourceCodePlatform)) {
+  if (SourceCodePlatformHelper.isWorkshopPlatform(sourceCodePlatform)) {
     return { owner: payload.owner, repository: payload.repository.repository_path };
   } else {
     const [owner, repository] = payload.repository.full_name.split('/');
