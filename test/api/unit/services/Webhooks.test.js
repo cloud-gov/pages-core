@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const nock = require('nock');
 const sinon = require('sinon');
-const { Build, User, Event } = require('../../../../api/models');
+const { Build, User, Site, Event } = require('../../../../api/models');
 const QueueJobs = require('../../../../api/queue-jobs');
 const EventCreator = require('../../../../api/services/EventCreator');
 // eslint-disable-next-line max-len
@@ -58,11 +58,11 @@ describe('Webhooks Service', () => {
     sinon.restore();
   });
 
-  describe('createBuildForEditor', () => {
-    // Generate Ops User
-    before(() => factory.userWithUAAIdentity.create({ email: process.env.OPS_EMAIL }));
-    after(() => User.truncate());
+  // Generate Ops User
+  before(() => factory.userWithUAAIdentity.create({ email: process.env.OPS_EMAIL }));
+  after(() => User.truncate());
 
+  describe('createBuildForEditor', () => {
     it('should start a site build', async () => {
       const site = await factory.site();
       const stub = sinon.stub(Build.prototype, 'enqueue').resolves();
@@ -677,6 +677,25 @@ describe('Webhooks Service', () => {
           expect(auditStub.notCalled).to.be.true;
           done();
         });
+    });
+  });
+
+  describe('resetWebhook', () => {
+    it('should reset a list of site webhooks by provider', async () => {
+      await Site.truncate();
+      const site1 = await factory.site();
+      const deleteWebhookStub = sinon
+        .stub(SourceCodePlatformHelper, 'deleteWebhook')
+        .resolves();
+      const createWebhookStub = sinon
+        .stub(SourceCodePlatformHelper, 'createSiteWebhook')
+        .resolves();
+
+      const expected = await Webhooks.resetWebhook(site1.id);
+
+      expect(deleteWebhookStub.calledOnce).to.be.equal(true);
+      expect(createWebhookStub.calledOnce).to.be.equal(true);
+      expect(expected.id).to.be.equal(site1.id);
     });
   });
 });

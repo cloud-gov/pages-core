@@ -25,7 +25,6 @@ class BuildStatusNotifier {
 
   listen() {
     /* eslint no-undef: "error" */
-    /* eslint-env browser */
     if (typeof Notification === 'undefined' || this.listening) {
       return Promise.resolve();
     }

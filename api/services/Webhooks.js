@@ -181,9 +181,24 @@ const pushWebhookRequest = async (
   }
 };
 
+const deleteCreateWebhook = async (site, user) => {
+  await SourceCodePlatformHelper.deleteWebhook(site, user);
+  await SourceCodePlatformHelper.createSiteWebhook(user, site);
+
+  return site;
+};
+
+const resetWebhook = async (siteId) => {
+  const user = await User.byUAAEmail(OPS_EMAIL).findOne();
+  const site = await Site.findByPk(siteId);
+
+  return deleteCreateWebhook(site, user);
+};
+
 module.exports = {
   createBuildForEditor,
   deleteEditorSite,
   organizationWebhookRequest,
   pushWebhookRequest,
+  resetWebhook,
 };

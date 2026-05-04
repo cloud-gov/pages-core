@@ -33,6 +33,82 @@ $ cf run-task pages-<env> --command "yarn migrate-site-repo 1 user@agency.gov ag
 $ cf logs --recent pages-<env>
 ```
 
+### Rotating site webhook secrets
+
+Run this script if a new webhook secret is genereated for a source code platform and you want to update the related sites' webhooks.
+
+__Update the pages-<env>-env credentials service:__
+
+```bash
+# Update the credentials service
+cf uups pages-$ENV-env -p { <SOURCECODE_PLATFORM>_WEBHOOK_SECRET,...rest of the credentials}
+
+# Restage app to pick updated creds
+cf restage pages-$ENV --strategy rolling
+```
+_Read more about managing [user provided services](#user-provided-services)_
+
+__Running the script from an app instance:__
+
+```bash
+# Run the web migrations script
+# Get onto the app
+cf ssh pages-$ENV
+
+# Start up the runtime in the app with proper config
+/tmp/lifecycle/launcher /home/vcap/app bash ''
+
+# run the script
+node ./scripts/update-webhooks.js <platform>
+```
+
+## Managing environment services
+
+### User Provided Services
+
+User provided services allow us to managage credentials for applications in each destinct environment. The service is attached to the app deployment in the `manifest.yml` and the services provide `credentials` for the app to consume. This allows the platform to also rotate credentials independently of the app deployment lifecyle. We can update the service's credentials and restage the related apps in their respective environments.
+
+This is the list of user provided services the core platform is consuming:
+
+|Service Name | Description|
+|-------------|------------|
+|`app-<env>-uaa-client`|OAuth credentials with Cloud.gov's UAA|
+|`pages-<env>-env` |Third party config and secrets|
+|`pages-<env>-proxy`|The Pages proxy app info|
+|`pages-<env>-domain`|The Pages domain info|
+|`federalist-deploy-user`|User info to run deployment tasks in our CF spaces|
+|`mailer`|Email service info|
+|`pages-<env>-encryption`|Platform encryption info|
+|`federalist-<env>-uev-key`|User encryption info|
+
+
+To create, update, and delete the user provided service credentials use the `cf` cli.
+
+__Creating a user provided service:__
+```bash
+# Use json to create credentials
+cf cups <service-name> -g '{ "KEY_1": "value", ...}'
+```
+
+__Updating a user provided service:__
+```bash
+# Make sure to pass all of the exsting credentials
+# along with the updated or added credentials
+cf uups <service-name> -p '{ "EXISTING_KEY_1": "value", "EXISTING_KEY_2": "updated value", "NEW_KEY": "value", ...}'
+
+# Restage the app so it can get the new/updated keys
+cf restage <app-name> --strategy rolling
+```
+
+__Deleting a user provided service:__
+
+To delete a service the app will have to go through a full deploymet. Remove the service from the `manifest.yml`, create a new pull requst, and deploy through all of the environments.
+
+Delete the service:
+```bash
+cf ds <service-name>
+```
+
 ## Operations user
 
 The platform uses a shared operations user to connect to Pages organizations and GitHub oauth token. This allows us to create organizations to support Pages Editor sites and pull the corresponding site template source code from GitHub. The account credentials are available in credhub under the `pages-operations-<env>` if you need to access Pages as the operations user.
