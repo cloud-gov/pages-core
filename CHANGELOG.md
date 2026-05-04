@@ -1,3 +1,20 @@
+## 0.23.0 (2026-05-04)
+
+### Added
+
+- clean build params 4893
+- delete workshop pages site 4887
+
+### Fixed
+
+- remove unecessary AGR in dockerfile
+- remove unecessary steps since this Dockerfile-uaa only runs locally
+- Add zscaler workaround steps for local development (https://github.com/cloud-gov/pages-editor/pull/95)
+
+### Maintenance
+
+- Add webhook rotation script
+
 ## 0.22.0 (2026-04-16)
 
 ### Added
