@@ -8,6 +8,8 @@ const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const { DomainQueue } = require('../../../../api/queues');
 const config = require('../../../../config');
+// eslint-disable-next-line max-len
+const SourceCodePlatformHelper = require('../../../../api/services/SourceCodePlatformHelper');
 
 describe('Domain Service', () => {
   before(DomainFactory.truncate);
@@ -220,7 +222,11 @@ describe('Domain Service', () => {
       });
 
       sinon.assert.notCalled(DomainQueue.prototype.add);
-      sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
+      sinon.assert.calledOnceWithExactly(
+        siteUpdateSpy,
+        domain,
+        SourceCodePlatformHelper.flows.FLOW__DOMAIN_DEPROV,
+      );
     });
 
     it('requeues the job if the service still exists', async () => {
@@ -353,7 +359,11 @@ describe('Domain Service', () => {
         domain.serviceName,
       );
       sinon.assert.notCalled(DomainQueue.prototype.add);
-      sinon.assert.calledOnceWithExactly(siteUpdateSpy, domain);
+      sinon.assert.calledOnceWithExactly(
+        siteUpdateSpy,
+        domain,
+        SourceCodePlatformHelper.flows.FLOW____DOMAIN_PROV,
+      );
     });
 
     it('sets the domain state to `failed` if failed', async () => {
@@ -432,7 +442,10 @@ describe('Domain Service', () => {
       await domain.reload({
         include: [SiteBranchConfig],
       });
-      await DomainService.rebuildAssociatedSite(domain);
+      await DomainService.rebuildAssociatedSite(
+        domain,
+        SourceCodePlatformHelper.flows.FLOW____DOMAIN_PROV,
+      );
 
       await site.reload({
         include: [Build],
@@ -462,7 +475,10 @@ describe('Domain Service', () => {
       await domain.reload({
         include: [SiteBranchConfig],
       });
-      await DomainService.rebuildAssociatedSite(domain, site);
+      await DomainService.rebuildAssociatedSite(
+        domain,
+        SourceCodePlatformHelper.flows.FLOW____DOMAIN_PROV,
+      );
 
       await site.reload({
         include: [Build],

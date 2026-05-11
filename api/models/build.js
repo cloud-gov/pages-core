@@ -70,6 +70,15 @@ const associate = ({ Build, BuildLog, BuildTask, Organization, Site, User }) => 
     },
     include: Site.scope('withOrgUsers'),
   }));
+  Build.addScope('lastSuccessfulBuildForSite', (site) => ({
+    limit: 1,
+    where: {
+      site,
+      state: 'success',
+    },
+    order: [['createdAt', 'DESC']],
+    include: [User, Site],
+  }));
 };
 
 async function getSiteOrgUsers() {
@@ -329,5 +338,8 @@ module.exports = (sequelize, DataTypes) => {
     Build.scope({
       method: ['forSiteUser', user],
     });
+  Build.siteScopeLastSuccessfulBuild = (site) => ({
+    method: ['lastSuccessfulBuildForSite', site],
+  });
   return Build;
 };

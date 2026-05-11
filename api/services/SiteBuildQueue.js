@@ -56,7 +56,7 @@ const generateDefaultCredentials = async (build) => {
 
   const baseUrl = baseURLForBuild(build);
 
-  const token = await SourceCodePlatformHelper.getTokenForSiteBuild(build);
+  const token = await SourceCodePlatformHelper.getTokenForSiteBuildQueue(build);
   return {
     STATUS_CALLBACK: statusCallbackURL(build),
     BASEURL: baseUrl,

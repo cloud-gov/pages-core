@@ -162,6 +162,11 @@ describe('SiteCreator', () => {
         });
       });
 
+      afterEach(() => {
+        nock.cleanAll();
+        sinon.restore();
+      });
+
       let user;
       let webhookNock;
 
@@ -984,6 +989,37 @@ describe('SiteCreator', () => {
             .catch(done);
         });
       });
+    });
+
+    it('should identify source code platform for a new site', () => {
+      expect(
+        SiteCreator.getSourceCodePlatformForNewSite(
+          {
+            templateSourceCodeUrl:
+              'https://workshop.cloud.gov/cloud-gov/pages/pages-uswds-11ty',
+          },
+          { sourceCodePlatform: Site.Platforms.Workshop },
+        ),
+      ).to.equal(Site.Platforms.Workshop);
+
+      expect(
+        SiteCreator.getSourceCodePlatformForNewSite(
+          { templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-11ty' },
+          { sourceCodePlatform: Site.Platforms.Workshop },
+        ),
+      ).to.equal(Site.Platforms.Github);
+
+      expect(
+        SiteCreator.getSourceCodePlatformForNewSite(null, {
+          sourceCodePlatform: Site.Platforms.Workshop,
+        }),
+      ).to.equal(Site.Platforms.Workshop);
+
+      expect(
+        SiteCreator.getSourceCodePlatformForNewSite(null, {
+          sourceCodePlatform: Site.Platforms.Github,
+        }),
+      ).to.equal(Site.Platforms.Github);
     });
   });
 });

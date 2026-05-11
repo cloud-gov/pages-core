@@ -7,6 +7,7 @@ const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 const EventCreator = require('../../services/EventCreator');
 const siteErrors = require('../../responses/siteErrors');
+const { BuildService } = require('../../services/build');
 
 module.exports = wrapHandlers({
   async list(req, res) {
@@ -132,14 +133,17 @@ module.exports = wrapHandlers({
     });
 
     if (!queuedBuild) {
-      const rebuild = await Build.create({
-        branch: requestBuild.branch,
-        site: requestBuild.site,
-        user: requestBuild.user,
-        username: requestBuild.username,
-        requestedCommitSha:
-          requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
-      });
+      const rebuild = await BuildService.createBuild(
+        {
+          branch: requestBuild.branch,
+          site: requestBuild.site,
+          user: requestBuild.user,
+          username: requestBuild.username,
+          requestedCommitSha:
+            requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
+        },
+        SourceCodePlatformHelper.flows.FLOW__ADMIN_REBUILD,
+      );
       await rebuild.enqueue();
       rebuild.Site = requestBuild.Site;
       await SourceCodePlatformHelper.reportBuildStatus(rebuild);

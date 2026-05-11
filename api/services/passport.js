@@ -83,6 +83,7 @@ passport.use(
         refreshToken,
         expiresIn: params.expires_in,
         createdAt: params.created_at,
+        gitlabUserId: `${profile.id}`,
       });
 
       await EventCreator.audit(

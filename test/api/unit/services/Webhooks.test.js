@@ -13,6 +13,10 @@ const githubAPINocks = require('../../support/githubAPINocks');
 const { createSiteUserOrg } = require('../../support/site-user');
 
 const Webhooks = require('../../../../api/services/Webhooks');
+const config = require('../../../../config');
+
+const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
+gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
 
 describe('Webhooks Service', () => {
   const buildWebhookPayload = (user, site, pushedAt = new Date().getTime() / 1000) => ({
@@ -696,6 +700,53 @@ describe('Webhooks Service', () => {
       expect(deleteWebhookStub.calledOnce).to.be.equal(true);
       expect(createWebhookStub.calledOnce).to.be.equal(true);
       expect(expected.id).to.be.equal(site1.id);
+    });
+  });
+
+  describe('getOwnerAndRepository', () => {
+    it('should return owner and repository for GitLab Webhook request', async () => {
+      expect(Webhooks.getOwnerAndRepository(null, Site.Platforms.Workshop)).to.deep.equal(
+        {
+          owner: undefined,
+          repository: undefined,
+        },
+      );
+      expect(
+        Webhooks.getOwnerAndRepository(
+          SourceCodePlatformHelper.mapWebhookRequestToGitHubFormat({}),
+          Site.Platforms.Workshop,
+        ),
+      ).to.deep.equal({
+        owner: undefined,
+        repository: undefined,
+      });
+      expect(
+        Webhooks.getOwnerAndRepository(
+          SourceCodePlatformHelper.mapWebhookRequestToGitHubFormat({
+            before: '349d0706de9ce96e8d12aeed0dca2ecfbc4db19b',
+            after: 'cbabe1308a82a6b00f0026022ec14e599b8e5f7d',
+            ref: 'refs/heads/main',
+            checkout_sha: 'cbabe1308a82a6b00f0026022ec14e599b8e5f7d',
+            message: null,
+            user_id: 374,
+            user_username: 'firstname.lastname',
+            project: {
+              web_url: 'https://workshop.cloud.gov/group/project',
+              default_branch: 'main',
+            },
+            commits: [
+              {
+                id: 'cbabe1308a82a6b00f0026022ec14e599b8e5f7d',
+                timestamp: '2026-05-05T18:58:50+00:00',
+              },
+            ],
+          }),
+          Site.Platforms.Workshop,
+        ),
+      ).to.deep.equal({
+        owner: 'group',
+        repository: 'project',
+      });
     });
   });
 });

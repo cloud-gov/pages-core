@@ -187,6 +187,9 @@ const attributes = (DataTypes) => ({
   gitlabExpiresAt: {
     type: DataTypes.TIME,
   },
+  gitlabUserId: {
+    type: DataTypes.TEXT,
+  },
   signedInAt: {
     type: DataTypes.DATE,
   },

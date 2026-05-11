@@ -1,10 +1,11 @@
 const GitHub = require('./GitHub');
 const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 const TemplateResolver = require('./TemplateResolver');
-const { Build, Organization, Site, User } = require('../models');
+const { Organization, Site, User } = require('../models');
 const utils = require('../utils');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const config = require('../../config');
+const { BuildService } = require('./build');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -104,7 +105,7 @@ async function checkRepositoryAndOrg({
   sourceCodePlatform,
   sourceCodeUrl,
 }) {
-  if (SourceCodePlatformHelper.isWorkshop(sourceCodePlatform)) {
+  if (SourceCodePlatformHelper.isWorkshopPlatform(sourceCodePlatform)) {
     return await SourceCodePlatformHelper.getGitLabProjectToCreateSite(
       user,
       sourceCodeUrl,
@@ -211,7 +212,12 @@ async function saveAndBuildSite({ site, user }) {
     user,
   });
 
-  await Build.create(buildParams).then((build) => build.enqueue());
+  const build = await BuildService.createBuild(
+    buildParams,
+    SourceCodePlatformHelper.flows.FLOW_NEW_SITE_BUILD,
+  );
+  await build.enqueue();
+
   return site;
 }
 
@@ -296,11 +302,25 @@ function getProcessedSiteParams(siteParams, template) {
   return params;
 }
 
-function createSite({ user, siteParams }) {
+function getSourceCodePlatformForNewSite(template, newSiteParams) {
+  const templateSourcecodePlatform = () =>
+    SourceCodePlatformHelper.isWorkshopUrl(template?.templateSourceCodeUrl)
+      ? Site.Platforms.Workshop
+      : Site.Platforms.Github;
+  return template ? templateSourcecodePlatform() : newSiteParams.sourceCodePlatform;
+}
+
+async function createSite({ user, siteParams }) {
   const templateName = siteParams.template;
 
   const template = templateName && TemplateResolver.getTemplate(templateName);
   const newSiteParams = paramsForNewSite(siteParams);
+
+  await SourceCodePlatformHelper.refreshUserGitLabTokenIfNeeded(
+    user,
+    getSourceCodePlatformForNewSite(template, newSiteParams),
+    SourceCodePlatformHelper.flows.FLOW____CREATE_SITE,
+  );
 
   if (template) {
     return createSiteFromTemplate({
@@ -319,4 +339,5 @@ function createSite({ user, siteParams }) {
 module.exports = {
   createSite,
   getProcessedSiteParams,
+  getSourceCodePlatformForNewSite,
 };

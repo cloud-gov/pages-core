@@ -1,21 +1,12 @@
-const { Site } = require('../models');
 const GitHub = require('./GitHub');
 
 const createSiteWebhook = async (site, users, getAccessTokenWithAdminPermissions) => {
-  const githubAccessToken = await getAccessTokenWithAdminPermissions(
-    site,
-    users,
-    Site.Platforms.Github,
-  );
+  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, users);
   return GitHub.setWebhook(site, githubAccessToken);
 };
 
 const listSiteWebhooks = async (site, users, getAccessTokenWithAdminPermissions) => {
-  const githubAccessToken = await getAccessTokenWithAdminPermissions(
-    site,
-    users,
-    Site.Platforms.Github,
-  );
+  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, users);
   return GitHub.listSiteWebhooks(site, githubAccessToken);
 };
 

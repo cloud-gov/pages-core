@@ -7,9 +7,10 @@ const siteAuthorizer = require('../authorizers/site');
 const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const { wrapHandlers } = require('../utils');
-const { Build, Domain, Event, Site, SiteBranchConfig } = require('../models');
+const { Build, Domain, Event, Site, User, SiteBranchConfig } = require('../models');
 const { getSocket } = require('../socketIO');
 const siteErrors = require('../responses/siteErrors');
+const { BuildService } = require('../services/build');
 
 const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
 
@@ -113,14 +114,17 @@ module.exports = wrapHandlers({
     });
 
     if (!queuedBuild) {
-      const rebuild = await Build.create({
-        branch: requestBuild.branch,
-        site: requestBuild.site,
-        user: req.user.id,
-        username: req.user.username,
-        requestedCommitSha:
-          requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
-      });
+      const rebuild = await BuildService.createBuild(
+        {
+          branch: requestBuild.branch,
+          site: requestBuild.site,
+          user: req.user.id,
+          username: req.user.username,
+          requestedCommitSha:
+            requestBuild.clonedCommitSha || requestBuild.requestedCommitSha,
+        },
+        SourceCodePlatformHelper.flows.FLOW___CORE_REBUILD,
+      );
       await rebuild.enqueue();
       rebuild.Site = requestBuild.Site;
       await SourceCodePlatformHelper.reportBuildStatus(rebuild);
@@ -133,7 +137,7 @@ module.exports = wrapHandlers({
   async status(req, res) {
     const { params, body } = req;
 
-    const build = await fetchModelById(params.id, Build, { include: Site });
+    const build = await fetchModelById(params.id, Build, { include: [Site, User] });
 
     if (!build) {
       return res.notFound();
@@ -141,6 +145,12 @@ module.exports = wrapHandlers({
     if (build.token !== params.token) {
       return res.forbidden();
     }
+
+    await SourceCodePlatformHelper.refreshUserGitLabTokenIfNeeded(
+      build.user,
+      build.site.sourceCodePlatform,
+      SourceCodePlatformHelper.flows.FLOW___BUILD_STATUS,
+    );
 
     const buildStatus = {
       status: body.status,

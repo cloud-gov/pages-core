@@ -330,6 +330,17 @@ describe('Site authorizer', () => {
 
       const gitlabUserId = 1234567890;
 
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
+
       const gitlabUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
         Accept: 'application/json',
@@ -363,6 +374,17 @@ describe('Site authorizer', () => {
       await user.update({ gitlabToken });
 
       const gitlabUserId = 1234567890;
+
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
 
       const gitlabUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
@@ -409,7 +431,7 @@ describe('Site authorizer', () => {
         .get('/api/v4/user')
         .reply(401, { message: '401 Unauthorized' });
 
-      const refreshToken = nock(gitlabConfig.baseURL)
+      nock(gitlabConfig.baseURL)
         .persist()
         .post('/oauth/token')
         .reply(
@@ -436,7 +458,6 @@ describe('Site authorizer', () => {
       expect(error.status).to.equal(403);
       expect(error.message).to.equal(siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_INFORMATION);
       expect(gitlabUser.isDone()).to.be.true;
-      expect(refreshToken.isDone()).to.be.true;
       expect(gitlabProjectUser.isDone()).to.be.false;
     });
 
@@ -460,7 +481,7 @@ describe('Site authorizer', () => {
         .get('/api/v4/user')
         .reply(200, { id: gitlabUserId });
 
-      const refreshToken = nock(gitlabConfig.baseURL)
+      nock(gitlabConfig.baseURL)
         .persist()
         .post('/oauth/token')
         .reply(
@@ -489,7 +510,6 @@ describe('Site authorizer', () => {
         siteErrors.CAN_NOT_RETRIEVE_USER_GITLAB_PROJECT_AUTHORIZATION,
       );
       expect(gitlabUser.isDone()).to.be.true;
-      expect(refreshToken.isDone()).to.be.false;
       expect(gitlabProjectUser.isDone()).to.be.true;
     });
 
@@ -513,7 +533,7 @@ describe('Site authorizer', () => {
         .get('/api/v4/user')
         .reply(200, { id: gitlabUserId, can_create_project: false });
 
-      const refreshToken = nock(gitlabConfig.baseURL)
+      nock(gitlabConfig.baseURL)
         .persist()
         .post('/oauth/token')
         .reply(
@@ -542,7 +562,6 @@ describe('Site authorizer', () => {
         siteErrors.GITLAB_ACCESS_REQUIRED_FOR_DELETED_GITLAB_PROJECT,
       );
       expect(gitlabUser.isDone()).to.be.true;
-      expect(refreshToken.isDone()).to.be.false;
       expect(gitlabProjectUser.isDone()).to.be.true;
     });
 
@@ -566,7 +585,7 @@ describe('Site authorizer', () => {
         .get('/api/v4/user')
         .reply(200, { id: gitlabUserId, can_create_project: true });
 
-      const refreshToken = nock(gitlabConfig.baseURL)
+      nock(gitlabConfig.baseURL)
         .persist()
         .post('/oauth/token')
         .reply(
@@ -590,7 +609,6 @@ describe('Site authorizer', () => {
       const expected = await authorizer.destroy(user, site).catch((err) => err);
 
       expect(gitlabUser.isDone()).to.be.true;
-      expect(refreshToken.isDone()).to.be.false;
       expect(gitlabProjectUser.isDone()).to.be.true;
       return expect(expected).to.equal(site.id);
     });
