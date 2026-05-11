@@ -5,7 +5,7 @@ const multer = require('multer');
 const app = express();
 const port = 8081;
 
-const multipartForm = multer({ limits: { fileSize: 200000000, files: 1 } });
+const multipartForm = multer({ limits: { fileSize: 300000000, files: 1 } });
 
 // POST /upload route with multer
 app.post('/v0/file-storage/123/upload', multipartForm.any(), (req, res) => {
