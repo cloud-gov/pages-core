@@ -13,6 +13,7 @@ const { wrapHandlers } = require('../utils');
 const { Event } = require('../models');
 const { SiteFileStorageSerivce } = require('../services/file-storage');
 const badRequest = require('../responses/badRequest');
+const { logger } = require('../../winston');
 
 module.exports = wrapHandlers({
   async create(req, res) {
@@ -132,6 +133,8 @@ module.exports = wrapHandlers({
   },
 
   async uploadFile(req, res) {
+    logger.info('Uploading file storage service');
+
     const { params, user } = req;
 
     const fssId = parseInt(params.file_storage_id, 10);
