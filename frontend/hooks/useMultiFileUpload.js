@@ -12,7 +12,7 @@ import { useState, useCallback } from 'react';
 //   onUpload: (file: File) => Promise<any>;
 // }
 
-const MEGABYTE_LIMIT = 100;
+const MEGABYTE_LIMIT = 250;
 const mbToBytes = (mb) => mb * 1024 * 1024;
 
 export const useMultiFileUpload = ({ onUpload, maxFileSizeMB = MEGABYTE_LIMIT }) => {
