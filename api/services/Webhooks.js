@@ -6,12 +6,15 @@ const EventCreator = require('./EventCreator');
 const SiteDestroyer = require('../services/SiteDestroyer');
 const { fetchModelById } = require('../utils/queryDatabase');
 const { BuildService } = require('./build');
+const { isWorkshopPlatform } = require('./SourceCodePlatformHelper');
+const { logger } = require('../../winston');
+const { gitlabLogUserInfo } = require('../utils/gitlabLogger');
 
 const { OPS_EMAIL } = process.env;
 
 const getOwnerAndRepository = (payload, sourceCodePlatform) => {
-  if (SourceCodePlatformHelper.isWorkshop(sourceCodePlatform)) {
-    return { owner: payload.owner, repository: payload.repository.repository_path };
+  if (SourceCodePlatformHelper.isWorkshopPlatform(sourceCodePlatform)) {
+    return { owner: payload?.owner, repository: payload?.repository?.repository_path };
   } else {
     const [owner, repository] = payload.repository.full_name.split('/');
     return { owner, repository };
@@ -46,12 +49,15 @@ const createBuildForEditor = async (siteId) => {
     return;
   }
 
-  const build = await Build.create({
-    branch,
-    site: siteId,
-    user: userId,
-    username,
-  });
+  const build = await BuildService.createBuild(
+    {
+      branch,
+      site: siteId,
+      user: userId,
+      username,
+    },
+    SourceCodePlatformHelper.flows.FLOW___EDITOR_BUILD,
+  );
 
   return build.enqueue();
 };
@@ -118,16 +124,31 @@ const organizationWebhookRequest = async (payload) => {
   }
 };
 
+async function findBuildUser(site, gitlabUserId, username) {
+  if (isWorkshopPlatform(site.sourceCodePlatform)) {
+    const user = await User.findOne({
+      where: { gitlabUserId: gitlabUserId },
+    });
+    logger.info(
+      // eslint-disable-next-line max-len
+      `GitLab: found user ${gitlabLogUserInfo(user)} for webhook request with user id ${gitlabUserId}`,
+    );
+    return user;
+  } else {
+    return await User.findOne({
+      where: { username },
+    });
+  }
+}
+
 const createBuildForWebhookRequest = async (payload, site) => {
-  const { login } = payload.sender;
+  const { login, gitlabUserId } = payload.sender;
   const { pushed_at: pushedAt } = payload.repository;
   const username = login.toLowerCase();
 
   // it's okay if we don't find a valid User here since we'll
   // still search for a token in loadBuildUserAccessToken
-  const user = await User.findOne({
-    where: { username },
-  });
+  let user = await findBuildUser(site, gitlabUserId, username);
   if (user) {
     await user.update({
       pushedAt: new Date(pushedAt * 1000),
@@ -143,23 +164,29 @@ const createBuildForWebhookRequest = async (payload, site) => {
       state: ['created', 'queued'],
       site: site.id,
     },
+    include: [User],
   });
 
   if (queuedBuild) {
     return queuedBuild.update({
       requestedCommitSha,
-      user: user ? user.id : null,
+      user: user ? user.id : queuedBuild.User?.id,
       username,
     });
   }
 
-  return Build.create({
-    branch,
-    requestedCommitSha,
-    site: site.id,
-    user: user ? user.id : null,
-    username,
-  }).then((build) => BuildService.enqueueOrLogBuild(build));
+  const build = await BuildService.createBuild(
+    {
+      branch,
+      requestedCommitSha,
+      site: site.id,
+      user: user ? user.id : null,
+      username,
+    },
+    SourceCodePlatformHelper.flows.FLOW__WEBHOOK_BUILD,
+  );
+
+  return await BuildService.enqueueOrLogBuild(build);
 };
 
 const pushWebhookRequest = async (
@@ -173,7 +200,7 @@ const pushWebhookRequest = async (
       sites.map(async (site) => {
         if (shouldBuildForSite(site)) {
           const build = await createBuildForWebhookRequest(payload, site);
-          await build.reload({ include: Site });
+          await build.reload({ include: Site, User });
           await SourceCodePlatformHelper.reportBuildStatus(build);
         }
       }),
@@ -200,5 +227,6 @@ module.exports = {
   deleteEditorSite,
   organizationWebhookRequest,
   pushWebhookRequest,
+  getOwnerAndRepository,
   resetWebhook,
 };

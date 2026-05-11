@@ -1,11 +1,13 @@
 const IORedis = require('ioredis');
 
-const { Domain, Build, Site, SiteBranchConfig } = require('../models');
+const { Domain, Site, SiteBranchConfig } = require('../models');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
 const config = require('../../config');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 
 const DnsService = require('./Dns');
+const { BuildService } = require('./build');
 
 const { States } = Domain;
 
@@ -136,14 +138,18 @@ function isSiteUrlManagedByDomain(site, domains, context) {
  * @param {DomainModel} domain
  * @param {SiteModel} site
  */
-async function rebuildAssociatedSite(domain) {
+async function rebuildAssociatedSite(domain, flow) {
   const { branch } = domain.SiteBranchConfig;
   if (branch) {
-    await Build.create({
-      site: domain.siteId,
-      branch,
-      username: 'Automated Platform Operation',
-    }).then((b) => b.enqueue());
+    const build = await BuildService.createBuild(
+      {
+        site: domain.siteId,
+        branch,
+        username: 'Automated Platform Operation',
+      },
+      flow,
+    );
+    await build.enqueue();
   }
 }
 
@@ -236,7 +242,10 @@ async function checkDeprovisionStatus(id) {
     await domain.update({
       state: States.Pending,
     });
-    await module.exports.rebuildAssociatedSite(domain);
+    await module.exports.rebuildAssociatedSite(
+      domain,
+      SourceCodePlatformHelper.flows.FLOW__DOMAIN_DEPROV,
+    );
     return `Domain ${id}|${domain.names} successfully deprovisioned.`;
   }
   // TODO - this does not handle the case where deprovisioning fails
@@ -267,7 +276,10 @@ async function checkProvisionStatus(id) {
       await domain.update({
         state: States.Provisioned,
       });
-      await module.exports.rebuildAssociatedSite(domain);
+      await module.exports.rebuildAssociatedSite(
+        domain,
+        SourceCodePlatformHelper.flows.FLOW____DOMAIN_PROV,
+      );
       return `Domain ${id}|${domain.names} successfully provisioned.`;
     case 'failed':
       await domain.update({

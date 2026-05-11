@@ -1,5 +1,7 @@
 const { Op } = require('sequelize');
-const { Build, SiteBranchConfig, User } = require('../models');
+const { SiteBranchConfig, User } = require('../models');
+const { BuildService } = require('./build');
+const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 
 const { USER_AUDITOR } = process.env;
 
@@ -17,12 +19,15 @@ const buildBranch = (siteId, branch) =>
     },
   })
     .then((user) =>
-      Build.create({
-        site: siteId,
-        user: user.id,
-        branch,
-        username: user.username,
-      }),
+      BuildService.createBuild(
+        {
+          site: siteId,
+          user: user.id,
+          branch,
+          username: user.username,
+        },
+        SourceCodePlatformHelper.flows.FLOW__NIGHTLY_BUILD,
+      ),
     )
     .then((build) => build.enqueue())
     .then(() => `site:${siteId}@${branch}`)

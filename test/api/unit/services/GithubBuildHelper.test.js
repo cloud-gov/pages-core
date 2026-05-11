@@ -8,7 +8,7 @@ const { createSiteUserOrg } = require('../../support/site-user');
 const GitHub = require('../../../../api/services/GitHub');
 const GithubBuildHelper = require('../../../../api/services/GithubBuildHelper');
 // eslint-disable-next-line max-len
-const SourcecodePlatformHelper = require('../../../../api/services/SourceCodePlatformHelper');
+const SourceCodePlatformHelper = require('../../../../api/services/SourceCodePlatformHelper');
 
 const requestedCommitSha = 'a172b66c31e19d456a448041a5b3c2a70c32d8b7';
 const clonedCommitSha = '7b8d23c07a2c3b5a140844a654d91e13c66b271a';
@@ -45,7 +45,7 @@ describe('GithubBuildHelper', () => {
       const content = await GithubBuildHelper.fetchContent(
         build,
         path,
-        SourcecodePlatformHelper.loadBuildUserAccessToken,
+        SourceCodePlatformHelper.loadBuildUserAccessToken,
       );
       expect(content).to.equal('testContent');
     });
@@ -59,7 +59,7 @@ describe('GithubBuildHelper', () => {
       const err = await GithubBuildHelper.fetchContent(
         build,
         path,
-        SourcecodePlatformHelper.loadBuildUserAccessToken,
+        SourceCodePlatformHelper.loadBuildUserAccessToken,
       ).catch((e) => e);
       expect(err.message).to.equal(
         `Build or commit sha undefined. Unable to fetch ${path} for build@id=${build.id}`,
@@ -90,7 +90,7 @@ describe('GithubBuildHelper', () => {
       });
       await build.reload({ include: Site });
       const githubAccessToken =
-        await SourcecodePlatformHelper.loadBuildUserAccessToken(build);
+        await SourceCodePlatformHelper.loadBuildUserAccessToken(build);
       expect(githubAccessToken).to.equal(user.githubAccessToken);
       expect(repoNock.isDone()).to.be.true;
     });
@@ -124,7 +124,7 @@ describe('GithubBuildHelper', () => {
       );
       await build.reload({ include: Site });
       const githubAccessToken =
-        await SourcecodePlatformHelper.loadBuildUserAccessToken(build);
+        await SourceCodePlatformHelper.loadBuildUserAccessToken(build);
       expect(githubAccessToken).to.equal(orgUser.githubAccessToken);
       repoNocks.forEach((repoNock) => expect(repoNock.isDone()).to.be.true);
     });
@@ -157,7 +157,7 @@ describe('GithubBuildHelper', () => {
       );
       await build.reload({ include: Site });
       const githubAccessToken =
-        await SourcecodePlatformHelper.loadBuildUserAccessToken(build);
+        await SourceCodePlatformHelper.loadBuildUserAccessToken(build);
       expect(githubAccessToken).to.equal(orgUser.githubAccessToken);
       repoNocks.forEach((repoNock) => expect(repoNock.isDone()).to.be.true);
     });
@@ -195,12 +195,13 @@ describe('GithubBuildHelper', () => {
         }),
       );
       await build.reload({ include: Site });
-      const err = await SourcecodePlatformHelper.loadBuildUserAccessToken(build).catch(
+      const err = await SourceCodePlatformHelper.loadBuildUserAccessToken(build).catch(
         (e) => e,
       );
       repoNocks.forEach((repoNock) => expect(repoNock.isDone()).to.be.true);
       expect(err.message).to.equal(
-        `Unable to find valid access token to report build@id=${build.id} status`,
+        // eslint-disable-next-line max-len
+        `Unable to find a user with valid access token to report build@id=${build.id} status`,
       );
     });
 
@@ -237,12 +238,13 @@ describe('GithubBuildHelper', () => {
         }),
       );
       await build.reload({ include: Site });
-      const err = await SourcecodePlatformHelper.loadBuildUserAccessToken(build).catch(
+      const err = await SourceCodePlatformHelper.loadBuildUserAccessToken(build).catch(
         (e) => e,
       );
       repoNocks.forEach((repoNock) => expect(repoNock.isDone()).to.be.true);
       expect(err.message).to.equal(
-        `Unable to find valid access token to report build@id=${build.id} status`,
+        // eslint-disable-next-line max-len
+        `Unable to find a user with valid access token to report build@id=${build.id} status`,
       );
     });
   });

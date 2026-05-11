@@ -77,7 +77,7 @@ module.exports = wrapHandlers({
     const { body: payload } = req;
 
     await Webhooks.pushWebhookRequest(
-      SourceCodePlatformHelper.mapWebhookResponseToGitHubFormat(payload),
+      SourceCodePlatformHelper.mapWebhookRequestToGitHubFormat(payload),
       Site.Platforms.Workshop,
     );
 

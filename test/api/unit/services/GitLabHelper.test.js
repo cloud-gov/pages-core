@@ -2,7 +2,7 @@ const { expect } = require('chai');
 
 const config = require('../../../../config');
 const {
-  mapWebhookResponseToGitHubFormat,
+  mapWebhookRequestToGitHubFormat,
 } = require('../../../../api/services/GitLabHelper');
 const { logger } = require('../../../../winston');
 const nock = require('nock');
@@ -10,6 +10,14 @@ const { createSiteUserOrg } = require('../../support/site-user');
 const { Site } = require('../../../../api/models');
 const GitLabHelper = require('../../../../api/services/GitLabHelper');
 const sinon = require('sinon');
+const {
+  getRefreshToken200Response,
+  nockRefreshTokenWithResponse,
+  getRefreshToken400Response,
+  getNockGetProjectUser,
+} = require('../../support/gitlabAPINocks');
+const { getUrlEncodedPath } = require('../../../../api/services/GitLab');
+const factory = require('../../support/factory');
 
 const { authorizationOptions: gitlabConfig } = config.passport.gitlab;
 gitlabConfig.clientID = 'mock-client-id';
@@ -18,7 +26,7 @@ gitlabConfig.callbackURL = 'https://localhost:1337/auth/gitlab/callback';
 gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
 
 describe('GitLabHelper', () => {
-  describe('.mapWebhookResponseToGitHubFormat(payload)', () => {
+  describe('.mapWebhookRequestToGitHubFormat(payload)', () => {
     const payload = {
       object_kind: 'push',
       event_name: 'push',
@@ -99,7 +107,7 @@ describe('GitLabHelper', () => {
 
     it('should return payload in GitHub format', async () => {
       gitlabConfig.baseURL = 'https://workshop.cloud.gov/';
-      expect(mapWebhookResponseToGitHubFormat(payload)).to.deep.equal({
+      expect(mapWebhookRequestToGitHubFormat(payload)).to.deep.equal({
         after: 'da1560886d4f094c3e6c9ef40349f7d38b5d27d7',
         commits: [{}],
         owner: 'cloud-gov',
@@ -108,7 +116,7 @@ describe('GitLabHelper', () => {
           pushed_at: 1323692851,
           repository_path: 'pages/project',
         },
-        sender: { login: 'jsmith' },
+        sender: { login: 'jsmith', gitlabUserId: '4' },
       });
     });
   });
@@ -137,16 +145,19 @@ describe('GitLabHelper', () => {
       });
 
       const gitlabToken = 'gitlabToken';
-      await user.update({ gitlabToken });
-
       const gitlabUserId = 1234567890;
+      await user.update({ gitlabToken, gitlabUserId });
 
-      const gitlabUser = nock(gitlabConfig.baseURL, {
-        Authorization: `Bearer ${gitlabToken}`,
-        Accept: 'application/json',
-      })
-        .get('/api/v4/user')
-        .reply(200, { id: gitlabUserId });
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
 
       const gitlabProjectUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
@@ -167,7 +178,6 @@ describe('GitLabHelper', () => {
 
       await GitLabHelper.deleteWebhook(user, site);
 
-      expect(gitlabUser.isDone()).to.be.true;
       expect(gitlabProjectUser.isDone()).to.be.true;
       return expect(deleteWebhook.isDone()).to.be.true;
     });
@@ -183,16 +193,19 @@ describe('GitLabHelper', () => {
       });
 
       const gitlabToken = 'gitlabToken';
-      await user.update({ gitlabToken });
-
       const gitlabUserId = 1234567890;
+      await user.update({ gitlabToken, gitlabUserId });
 
-      const gitlabUser = nock(gitlabConfig.baseURL, {
-        Authorization: `Bearer ${gitlabToken}`,
-        Accept: 'application/json',
-      })
-        .get('/api/v4/user')
-        .reply(200, { id: gitlabUserId });
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
 
       const gitlabProjectUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
@@ -213,7 +226,6 @@ describe('GitLabHelper', () => {
 
       await GitLabHelper.deleteWebhook(user, site);
 
-      expect(gitlabUser.isDone()).to.be.true;
       expect(gitlabProjectUser.isDone()).to.be.true;
 
       expect(loggerErrorStub.called).to.be.true;
@@ -238,16 +250,19 @@ describe('GitLabHelper', () => {
       });
 
       const gitlabToken = 'gitlabToken';
-      await user.update({ gitlabToken });
-
       const gitlabUserId = 1234567890;
+      await user.update({ gitlabToken, gitlabUserId });
 
-      const gitlabUser = nock(gitlabConfig.baseURL, {
-        Authorization: `Bearer ${gitlabToken}`,
-        Accept: 'application/json',
-      })
-        .get('/api/v4/user')
-        .reply(200, { id: gitlabUserId });
+      nock(gitlabConfig.baseURL)
+        .persist()
+        .post('/oauth/token')
+        .reply(
+          200,
+          getRefreshToken200Response({
+            access_token: gitlabToken,
+            refresh_token: 'gitlabRefreshToken',
+          }),
+        );
 
       const gitlabProjectUser = nock(gitlabConfig.baseURL, {
         Authorization: `Bearer ${gitlabToken}`,
@@ -268,14 +283,282 @@ describe('GitLabHelper', () => {
 
       await GitLabHelper.deleteWebhook(user, site);
 
-      expect(gitlabUser.isDone()).to.be.true;
       expect(gitlabProjectUser.isDone()).to.be.true;
 
       expect(loggerErrorStub.called).to.be.true;
       expect(loggerErrorStub.args[0][0]).to.deep.equal(
-        `GitLab: Error deleting webhook 111 for https://workshop.cloud.gov/${site.owner}/${site.repository} - response: 404.`,
+        `GitLab: Error deleting webhook 111 for https://workshop.cloud.gov/${site.owner}/${site.repository} - response: 404 - {}.`,
       );
       return expect(deleteWebhook.isDone()).to.be.true;
+    });
+  });
+
+  describe('.refreshUserGitLabTokenIfNeeded(user, now, site)', () => {
+    let refreshNock;
+    const dateNow = Date.now();
+    const expiresLessThanAnHour = new Date(
+      dateNow + GitLabHelper.TOKEN_PROACTIVE_REFRESH_MS - 1,
+    );
+    const expiresMoreThanInAnHour = new Date(
+      dateNow + GitLabHelper.TOKEN_PROACTIVE_REFRESH_MS + 1,
+    );
+    const alreadyExpired = new Date(dateNow - GitLabHelper.TOKEN_PROACTIVE_REFRESH_MS);
+
+    const user = {
+      gitlabToken: 'mock-access-token-old',
+      gitlabRefreshToken: 'mock-refresh-token-old',
+      update: () => {},
+    };
+
+    beforeEach(() => {
+      nock.cleanAll();
+      sinon.restore();
+
+      refreshNock = nockRefreshTokenWithResponse(
+        gitlabConfig,
+        user.gitlabToken,
+        user.gitlabRefreshToken,
+        200,
+        getRefreshToken200Response(),
+      );
+    });
+    afterEach(() => {
+      nock.cleanAll();
+      sinon.restore();
+    });
+
+    const testNoTokenRefresh = () => {
+      expect(refreshNock.isDone()).to.equal(false);
+    };
+
+    const testTokenRefresh = () => {
+      expect(refreshNock.isDone()).to.equal(true);
+    };
+
+    it('should refresh token if it expires in less than an hour', async () => {
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded(
+        { ...user, gitlabExpiresAt: expiresLessThanAnHour },
+        dateNow,
+        'flow',
+      );
+
+      testTokenRefresh();
+    });
+
+    it('should refresh token if it already expired', async () => {
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded(
+        { ...user, gitlabExpiresAt: alreadyExpired },
+        dateNow,
+        'flow',
+      );
+
+      testTokenRefresh();
+    });
+
+    it('should not throw error if token refresh fails', async () => {
+      refreshNock = nockRefreshTokenWithResponse(
+        gitlabConfig,
+        user.gitlabToken,
+        user.gitlabRefreshToken,
+        200,
+        getRefreshToken400Response(),
+      );
+
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded(
+        { ...user, gitlabExpiresAt: expiresLessThanAnHour },
+        dateNow,
+        'flow',
+      );
+
+      testNoTokenRefresh();
+    });
+
+    it(`should not refresh token or throw an error 
+             if there is no user or user  does not have a GitLab token`, async () => {
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded(null, dateNow, 'flow');
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded({}, dateNow, 'flow');
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded(
+        { gitlabToken: null },
+        dateNow,
+        'flow',
+      );
+
+      testNoTokenRefresh();
+    });
+
+    it('should not refresh token if token is valid for more than an hour', async () => {
+      await GitLabHelper.refreshUserGitLabTokenIfNeeded(
+        { gitlabExpiresAt: expiresMoreThanInAnHour },
+        dateNow,
+        'flow',
+      );
+
+      testNoTokenRefresh();
+    });
+  });
+
+  describe('.sendCommitState(user, site, options)', () => {
+    const now = new Date();
+    const user = {
+      gitlabToken: 'mock-access-token',
+      gitlabExpiresAt: now,
+      username: 'mock-username',
+      id: 12,
+      update: () => {},
+    };
+
+    const options = {
+      target_url: 'target_url',
+      description: 'description',
+      context: 'context',
+      sha: 'sha',
+    };
+
+    const sourceCodeUrl = 'sourceCodeUrl';
+
+    const nockPostCommitState = (state, responseStatusCode, responseBody) =>
+      nock(gitlabConfig.baseURL, {
+        reqheaders: {
+          authorization: `Bearer ${user.gitlabToken}`,
+          accept: 'application/json',
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+      })
+        .post(
+          // eslint-disable-next-line max-len
+          `/api/v4/projects/${getUrlEncodedPath(sourceCodeUrl)}/statuses/${options.sha}?state=${state}`,
+          {
+            state: state, // pending, running, success, failed, canceled, skipped
+            target_url: options.target_url,
+            description: options.description,
+            context: options.context,
+          },
+        )
+        .reply(responseStatusCode, responseBody);
+
+    beforeEach(() => {
+      nock.cleanAll();
+      sinon.restore();
+    });
+    afterEach(() => {
+      nock.cleanAll();
+      sinon.restore();
+    });
+
+    it('should not throw an error if commit state post is successful', async () => {
+      async function postState(state) {
+        const nock = nockPostCommitState(state, 200, {});
+
+        await GitLabHelper.sendCommitState(
+          user,
+          { sourceCodeUrl },
+          {
+            ...options,
+            state,
+          },
+        );
+
+        expect(nock.isDone()).to.be.true;
+      }
+
+      await postState(GitLabHelper.GITLAB_COMMIT_STATE_RUNNING);
+      await postState(GitLabHelper.GITLAB_COMMIT_STATE_SUCCESS);
+      await postState(GitLabHelper.GITLAB_COMMIT_STATE_FAILED);
+    });
+
+    it('should not throw an error if reposting the same commit status', async () => {
+      async function repostSate(state) {
+        const nock = nockPostCommitState(state, 400, {
+          message: 'Cannot transition status via ...',
+        });
+
+        await GitLabHelper.sendCommitState(
+          user,
+          { sourceCodeUrl },
+          {
+            ...options,
+            state,
+          },
+        );
+
+        expect(nock.isDone()).to.be.true;
+      }
+
+      await repostSate(GitLabHelper.GITLAB_COMMIT_STATE_RUNNING);
+      await repostSate(GitLabHelper.GITLAB_COMMIT_STATE_SUCCESS);
+      await repostSate(GitLabHelper.GITLAB_COMMIT_STATE_FAILED);
+    });
+
+    it(`should throw an error if different than reposting 
+             the same commit status`, async () => {
+      const nock = nockPostCommitState(GitLabHelper.GITLAB_COMMIT_STATE_RUNNING, 400, {
+        message: 'Another Error',
+      });
+
+      await expect(
+        GitLabHelper.sendCommitState(
+          user,
+          { sourceCodeUrl },
+          {
+            ...options,
+            state: GitLabHelper.GITLAB_COMMIT_STATE_RUNNING,
+          },
+        ),
+      ).to.be.rejectedWith(Error, /Failed to send commit state "running"*/);
+      expect(nock.isDone()).to.be.true;
+    });
+  });
+
+  describe('.getProjectAccessLevel(user, sourceCodeUrl))', () => {
+    const userConfig = {
+      gitlabToken: 'mock-access-token',
+      username: 'mock-username',
+      id: 12,
+      update: () => {},
+    };
+
+    const gitlabUserId = 1111;
+    const sourceCodeUrl = 'sourceCodeUrl';
+
+    const nockGetGitLabUser = (responseStatusCode, user) =>
+      nock(gitlabConfig.baseURL, {
+        reqheaders: {
+          authorization: `Bearer ${user.gitlabToken}`,
+          accept: 'application/json',
+        },
+      })
+        .get(`/api/v4/user`)
+        .reply(responseStatusCode, { id: gitlabUserId });
+
+    beforeEach(() => {
+      nock.cleanAll();
+    });
+    afterEach(() => {
+      nock.cleanAll();
+    });
+
+    it('should fetch user GitLab id if not in DB', async () => {
+      const user = await factory.user();
+      await user.update(userConfig);
+
+      const nockGetGitLabUser_ = nockGetGitLabUser(200, user);
+
+      const nockGetProjectUser = getNockGetProjectUser(
+        user.gitlabToken,
+        gitlabUserId,
+        sourceCodeUrl,
+        200,
+        20,
+      );
+
+      expect(user.gitlabUserId).to.equal(null);
+
+      const accessLevel = await GitLabHelper.getProjectAccessLevel(user, sourceCodeUrl);
+
+      expect(nockGetGitLabUser_.isDone()).to.be.true;
+      expect(nockGetProjectUser.isDone()).to.be.true;
+      expect(user.gitlabUserId).to.equal(`${gitlabUserId}`);
+      expect(accessLevel).to.deep.equal(20);
     });
   });
 });

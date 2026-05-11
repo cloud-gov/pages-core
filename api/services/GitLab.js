@@ -1,4 +1,9 @@
 const { logger } = require('../../winston');
+const {
+  gitlabLogError,
+  gitlabLogResponseError,
+  gitlabLogUserInfo,
+} = require('../utils/gitlabLogger');
 const config = require('../../config');
 const OAUTH_PREFIX = 'oauth2';
 
@@ -31,7 +36,7 @@ const getUrlEncodedPath = (sourceCodeUrl) =>
   encodeURIComponent(sourceCodeUrl.replace(`${getNormalizedBaseUrl()}/`, ''));
 
 const fetchRefreshUserOAuthTokens = async (user) =>
-  fetch(`${getNormalizedBaseUrl()}/oauth/token`, {
+  await fetch(`${getNormalizedBaseUrl()}/oauth/token`, {
     method: 'POST',
     headers: getHeaders(user.gitlabToken, CONTENT_TYPE_URL_ENCODED),
     body: new URLSearchParams({
@@ -78,7 +83,7 @@ const fetchUser = async (userOAuthAccessToken) =>
     headers: getHeaders(userOAuthAccessToken),
   });
 
-const fetchPostCommitStatus = async (userOAuthAccessToken, sourceCodeUrl, options) =>
+const fetchPostCommitState = async (userOAuthAccessToken, sourceCodeUrl, options) =>
   fetch(
     getApiUrl(
       // eslint-disable-next-line max-len
@@ -88,10 +93,10 @@ const fetchPostCommitStatus = async (userOAuthAccessToken, sourceCodeUrl, option
       method: 'POST',
       headers: getHeaders(userOAuthAccessToken, CONTENT_TYPE_URL_ENCODED),
       body: new URLSearchParams({
-        state: options.state, // running, success, failed, canceled, skipped
+        state: options.state, // pending, running, success, failed, canceled, skipped
         target_url: options.target_url,
         description: options.description,
-        name: `${config.app.product}-${config.app.appEnv}`,
+        context: options.context,
       }),
     },
   );
@@ -204,7 +209,7 @@ const addWebhook = async (
   );
 
   if (!response.ok) {
-    throw await processError(response, 'Error creating webhook.');
+    throw await gitlabLogResponseError(user, response, 'Error creating webhook.');
   }
 
   return {
@@ -246,12 +251,17 @@ const getUser = async (user, persistUserOAuthTokens) =>
     persistUserOAuthTokens,
   );
 
-const getProjectUser = async (user, sourceCodeUrl, userId, persistUserOAuthTokens) =>
+const getProjectUser = async (
+  user,
+  sourceCodeUrl,
+  gitlabUserId,
+  persistUserOAuthTokens,
+) =>
   await apiCallWithTokensRefresh(
     user,
     {
       apiCall: (userOAuthAccessToken) =>
-        fetchProjectUser(userOAuthAccessToken, sourceCodeUrl, userId),
+        fetchProjectUser(userOAuthAccessToken, sourceCodeUrl, gitlabUserId),
       apiCallName: 'fetchProjectUser',
     },
     persistUserOAuthTokens,
@@ -268,11 +278,8 @@ const getNamespace = async (user, namespace, persistUserOAuthTokens) =>
     persistUserOAuthTokens,
   );
 
-const sendCommitStatus = async (userOAuthAccessToken, sourceCodeUrl, options) =>
-  await fetchPostCommitStatus(userOAuthAccessToken, sourceCodeUrl, options);
-
-const getUserOAuthAccessToken = async (user, persistUserOAuthTokens) =>
-  (await refreshUserOAuthTokens(user, persistUserOAuthTokens)).accessToken;
+const sendCommitState = async (userOAuthAccessToken, sourceCodeUrl, options) =>
+  await fetchPostCommitState(userOAuthAccessToken, sourceCodeUrl, options);
 
 const createProject = async (
   user,
@@ -289,36 +296,27 @@ const createProject = async (
       apiCallName: 'fetchCreateProject',
     },
     persistUserOAuthTokens,
-    true,
   );
 
-const processError = async (response, message) => {
-  const data = await response.json();
-  return Object.assign(
-    new Error(
-      [data.error, data.error_description, data.message, message]
-        .filter(Boolean)
-        .map((s) => (s.endsWith('.') ? s : `${s}.`))
-        .join(' '),
-    ),
-    {
-      response: data,
-      status: response.status,
-    },
+const refreshUserOAuthAccessTokens = async (user, persistUserOAuthTokens) => {
+  logger.info(
+    `GitLab: token will be refreshed for, 
+         user ${gitlabLogUserInfo(user)}`,
   );
-};
-
-const refreshUserOAuthTokens = async (user, persistUserOAuthTokens) => {
   const refreshResponse = await fetchRefreshUserOAuthTokens(user);
   if (!refreshResponse.ok) {
-    await persistUserOAuthTokens(user, {
-      accessToken: null,
-      refreshToken: null,
-      expiresIn: null,
-      createdAt: null,
-    });
-    throw await processError(refreshResponse, 'Try reconnecting your GitLab account.');
+    throw await gitlabLogResponseError(
+      user,
+      refreshResponse,
+      // eslint-disable-next-line max-len
+      `error refreshing GitLab OAuth tokens for user ${gitlabLogUserInfo(user)}, try reconnecting your GitLab account manually.`,
+    );
   }
+
+  logger.info(
+    `GitLab: token refreshed for, 
+         user ${gitlabLogUserInfo(user)}`,
+  );
 
   let refreshResponseData = await refreshResponse.json();
   const userOAuthTokens = {
@@ -337,35 +335,40 @@ const apiCallWithTokensRefresh = async (
   user,
   { apiCall, apiCallName },
   persistUserOAuthTokens,
-  refreshUserOAuthTokensFirst = false,
 ) => {
+  const errorMessage = `GitLab: Error calling API with tokens refresh 
+                               for ${apiCallName} and user ${user.id}-${user.username}`;
   try {
-    if (refreshUserOAuthTokensFirst) {
-      const userOAuthAccessTokens = await refreshUserOAuthTokens(
+    if (!user?.gitlabToken) {
+      const error = new Error(`${errorMessage}, user does not have a GitLab token.`);
+      gitlabLogError(error);
+      throw error;
+    }
+
+    const response = await apiCall(user.gitlabToken);
+
+    if (response.status === 401) {
+      logger.info(
+        `GitLab: unexpected token refresh required for api call ${apiCallName}(), 
+         user id=${user.id} username=${user.username}`,
+      );
+
+      const userOAuthAccessTokens = await refreshUserOAuthAccessTokens(
         user,
         persistUserOAuthTokens,
       );
 
+      logger.info(
+        `Successful token refresh before api call ${apiCallName}(), 
+         user ${user.id}-${user.username}`,
+      );
+
       return await apiCall(userOAuthAccessTokens.accessToken);
-    } else {
-      const response = await apiCall(user.gitlabToken);
-
-      if (response.status === 401) {
-        const userOAuthAccessTokens = await refreshUserOAuthTokens(
-          user,
-          persistUserOAuthTokens,
-        );
-        return await apiCall(userOAuthAccessTokens.accessToken);
-      }
-
-      return response;
     }
+
+    return response;
   } catch (error) {
-    logger.error(
-      `GitLab: Error calling API with tokens refresh for ${apiCallName}`,
-      error.message,
-      error.stack,
-    );
+    gitlabLogError(error, errorMessage);
     throw error;
   }
 };
@@ -374,8 +377,8 @@ module.exports = {
   OAUTH_PREFIX,
   getBaseUrl,
   normalizeUrl,
-  fetchRefreshUserOAuthTokens,
-  getUserOAuthAccessToken,
+  getUrlEncodedPath,
+  refreshUserOAuthAccessTokens,
   revokeUserOAuthTokens,
   getUser,
   createProject,
@@ -384,6 +387,6 @@ module.exports = {
   addWebhook,
   getWebhooks,
   deleteWebhooks,
-  sendCommitStatus,
+  sendCommitState,
   getNamespace,
 };

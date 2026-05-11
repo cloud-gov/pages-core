@@ -3,8 +3,14 @@ const siteErrors = require('../responses/siteErrors');
 const { Organization } = require('../models');
 const { authorize } = require('./utils');
 
-const authorizeToDestroySite = (user, site) =>
-  SourceCodePlatformHelper.authorizeToDestroySite(user, site);
+const authorizeToDestroySite = async (user, site) => {
+  await SourceCodePlatformHelper.refreshUserGitLabTokenIfNeeded(
+    user,
+    site.sourceCodePlatform,
+    SourceCodePlatformHelper.flows.FLOW___DESTROY_SITE,
+  );
+  return await SourceCodePlatformHelper.authorizeToDestroySite(user, site);
+};
 
 const createWithOrgs = (organizations, organizationId) => {
   if (!organizationId) {

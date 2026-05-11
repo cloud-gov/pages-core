@@ -3,7 +3,9 @@ const { wrapHandlers } = require('../utils');
 const { serialize, serializeMany } = require('../serializers/site-branch-config');
 const EventCreator = require('../services/EventCreator');
 const { ValidationError, parseSiteConfig } = require('../utils/validators');
-const { Build, Site, SiteBranchConfig, Event } = require('../models');
+const { Site, SiteBranchConfig, Event } = require('../models');
+const { BuildService } = require('../services/build');
+const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
 
 function generateS3Key(site, context, branch) {
   if (context === 'site' || context === 'demo') {
@@ -91,12 +93,15 @@ module.exports = wrapHandlers({
       });
 
       if (context && context !== 'preview' && branch) {
-        const build = await Build.create({
-          user: req.user.id,
-          site: sbc.siteId,
-          branch,
-          username: req.user.username,
-        });
+        const build = await BuildService.createBuild(
+          {
+            user: req.user.id,
+            site: sbc.siteId,
+            branch,
+            username: req.user.username,
+          },
+          SourceCodePlatformHelper.flows.FLOW_____SBC_CREATE,
+        );
 
         await build.enqueue();
 
@@ -215,12 +220,15 @@ module.exports = wrapHandlers({
       });
 
       if (context && context !== 'preview' && branch) {
-        const build = await Build.create({
-          user: req.user.id,
-          site: sbcUpdated.siteId,
-          branch,
-          username: req.user.username,
-        });
+        const build = await BuildService.createBuild(
+          {
+            user: req.user.id,
+            site: sbcUpdated.siteId,
+            branch,
+            username: req.user.username,
+          },
+          SourceCodePlatformHelper.flows.FLOW_____SBC_UPDATE,
+        );
 
         await build.enqueue();
 
