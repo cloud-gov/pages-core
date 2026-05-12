@@ -1,6 +1,9 @@
 const multer = require('multer');
 
-// eslint-disable-next-line sonarjs/content-length
-const multipartForm = multer({ limits: { fileSize: 300000000, files: 1 } });
+const multipartForm = multer({
+  storage: multer.diskStorage({ destination: '/tmp' }),
+  // eslint-disable-next-line sonarjs/content-length
+  limits: { fileSize: 300000000, files: 1 },
+});
 
 module.exports = multipartForm;
