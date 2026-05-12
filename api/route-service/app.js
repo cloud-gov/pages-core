@@ -32,7 +32,7 @@ function shouldScan(req) {
   const forwardedURL = getForwardedURL(req);
 
   return (
-    req.method === 'POST' &&
+    req.method === 'POST_' &&
     forwardedURL?.pathname?.length < 100 &&
     regex.test(forwardedURL?.pathname)
   );
@@ -276,8 +276,10 @@ function main() {
     }
 
     if (shouldScan(req)) {
+      console.error('SCANNING ...');
       return scanThenProxy(req, res);
     } else {
+      console.error('NOT SCANNING ...');
       return passThroughProxy(req, res);
     }
   });
