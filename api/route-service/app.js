@@ -215,7 +215,7 @@ function scanThenProxy(req, res) {
       });
 
       console.log(`SCANNED!!!`);
-      
+
       return postScanProxy(req, res, forwardedURL, fileData);
     } catch (error) {
       let errorMessage;
