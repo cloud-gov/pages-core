@@ -198,7 +198,6 @@ function scanThenProxy(req, res) {
   });
 
   req.on('data', (chunk) => {
-    console.log(`on data`);
     chunks.push(chunk);
   });
 
@@ -224,6 +223,7 @@ function scanThenProxy(req, res) {
         errorMessage = `Error: File has been flagged as malicious`;
       } else {
         errorMessage = `Error: ${error.message}`;
+        console.error(error);
       }
 
       res.writeHead(error.status || 500);
