@@ -32,7 +32,7 @@ function shouldScan(req) {
   const forwardedURL = getForwardedURL(req);
 
   return (
-    req.method === 'POST_' &&
+    req.method === 'POST' &&
     forwardedURL?.pathname?.length < 100 &&
     regex.test(forwardedURL?.pathname)
   );
@@ -184,6 +184,8 @@ function scanThenProxy(req, res) {
   const forwardedURL = getForwardedURL(req);
   const chunks = [];
 
+  console.log(`forwardedURL ${forwardedURL}`);
+
   if (!forwardedURL) {
     res.writeHead(400);
     return res.end('No forwarded URL provided');
@@ -196,14 +198,17 @@ function scanThenProxy(req, res) {
   });
 
   req.on('data', (chunk) => {
+    console.log(`on data`);
     chunks.push(chunk);
   });
 
   req.on('end', async () => {
     try {
+      console.log(`end `);
       const fileData = Buffer.concat(chunks);
       const formData = await parseReqFormData(req, fileData);
 
+      console.log(`SCAN_ENDPOINT ${SCAN_ENDPOINT}`);
       await axios.post(SCAN_ENDPOINT, formData, {
         headers: {
           ...req.headers,
@@ -279,7 +284,6 @@ function main() {
       console.error('SCANNING ...');
       return scanThenProxy(req, res);
     } else {
-      console.error('NOT SCANNING ...');
       return passThroughProxy(req, res);
     }
   });
