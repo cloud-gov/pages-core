@@ -28,20 +28,20 @@ cf push -f source/cf/manifest.yml \
 #  sed -i 's/StreamMaxLength.*/StreamMaxLength 250M/' /etc/clamav/clamd.conf
 #"
 
-for i in 0 1; do
-  cf ssh pages-clamav-rest-dev -i $i -c "
-    sed -i 's/MaxFileSize.*/MaxFileSize 250M/' /etc/clamav/clamd.conf
-    sed -i 's/MaxScanSize.*/MaxScanSize 250M/' /etc/clamav/clamd.conf
-    sed -i 's/StreamMaxLength.*/StreamMaxLength 250M/' /etc/clamav/clamd.conf
-    pkill clamd
-    sleep 10
-    clamd &
-  "
-done
-
-for i in 0 1; do
-  echo "=== Instance $i ==="
-  cf ssh pages-clamav-rest-dev -i $i -c "grep -E 'MaxFileSize|MaxScanSize|StreamMaxLength' /etc/clamav/clamd.conf"
-  cf ssh pages-clamav-rest-dev -i $i -c "cat /etc/clamav/clamd.conf"
-done
+#for i in 0 1; do
+#  cf ssh pages-clamav-rest-dev -i $i -c "
+#    sed -i 's/MaxFileSize.*/MaxFileSize 250M/' /etc/clamav/clamd.conf
+#    sed -i 's/MaxScanSize.*/MaxScanSize 250M/' /etc/clamav/clamd.conf
+#    sed -i 's/StreamMaxLength.*/StreamMaxLength 250M/' /etc/clamav/clamd.conf
+#    pkill clamd
+#    sleep 2
+#    clamd &
+#  "
+#done
+#
+#for i in 0 1; do
+#  echo "=== Instance $i ==="
+#  cf ssh pages-clamav-rest-dev -i $i -c "grep -E 'MaxFileSize|MaxScanSize|StreamMaxLength' /etc/clamav/clamd.conf"
+#  cf ssh pages-clamav-rest-dev -i $i -c "cat /etc/clamav/clamd.conf"
+#done
 
