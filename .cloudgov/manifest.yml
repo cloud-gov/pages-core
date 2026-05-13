@@ -90,7 +90,7 @@ applications:
     command: yarn start-route-service
     disk_quota: 1G
     instances: ((route-service-instances))
-    memory: 1G
+    memory: 2G
     routes:
       - route: route-service.((domain))
     services:
