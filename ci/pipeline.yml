@@ -263,13 +263,16 @@ jobs:
           passed: [set-pipeline]
         - get: source
           resource: clamav-rest-source
-          trigger: false
+          trigger: true
+        - get: pages-core
+          resource: pages-core
+          trigger: true
         - get: general-task
         - get: clamav-rest-image
           params: {skip_download: true}
-          trigger: false
+          trigger: true
       - task: deploy
-        file: source/ci/deploy.yml
+        file: pages-core/ci/clamav-rest-image/deploy.yml
         image: general-task
         params:
           _: #@ template.replace(data.values.env_cf)
@@ -622,6 +625,14 @@ resources:
       aws_region: us-gov-west-1
       tag_regex: ".*"
       created_at_sort: true
+
+  - name: pages-core
+    type: git
+    icon: github
+    source:
+      uri: ((git-base-url))/cloud-gov/pages-core
+      branch: feat-Increase-file-size-limit-on-the-public-file-storage-4885   # or your branch
+      commit_verification_keys: ((cloud-gov-pgp-keys))
 
   - name: nightly
     type: time
