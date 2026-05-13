@@ -263,11 +263,11 @@ jobs:
           passed: [set-pipeline]
         - get: source
           resource: clamav-rest-source
-          trigger: true
+          trigger: false
         - get: general-task
         - get: clamav-rest-image
           params: {skip_download: true}
-          trigger: true
+          trigger: false
       - task: deploy
         file: source/ci/deploy.yml
         image: general-task

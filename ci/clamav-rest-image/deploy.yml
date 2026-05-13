@@ -1,0 +1,19 @@
+platform: linux
+inputs:
+  - name: source
+  - name: clamav-rest-image
+
+params:
+  CF_API: 
+  CF_DOCKER_PASSWORD:
+  CF_DOCKER_USERNAME:
+  CF_ORG:
+  CF_PASSWORD:
+  CF_SPACE:
+  CF_USERNAME:
+  CLAMAV_REST_DOMAIN:
+  CLAMAV_REST_HOSTNAME:
+  CLAMAV_REST_INSTANCES:
+
+run:
+  path: pages-core/ci/clamav-rest-image/deploy.sh
