@@ -175,7 +175,7 @@
     "json-schema-deref-sync": "^0.14.0",
     "jsonschema": "^1.4.0",
     "mini-css-extract-plugin": "^2.7.6",
-    "mocha": "^10.2.0",
+    "mocha": "11.7.5",
     "mock-fs": "^4.13.0",
     "nock": "14.0.1",
     "nodemon": "^3.0.1",

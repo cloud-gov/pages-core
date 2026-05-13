@@ -7,7 +7,7 @@ const Features = require('../features');
 router.get('/me', sessionAuth, UserController.me);
 router.put('/me/settings', sessionAuth, csrfProtection, UserController.updateSettings);
 router.delete('/me/githubtoken', sessionAuth, UserController.revokeApplicationGrant);
-if (Features.enabled(Features.Flags.FEATURE_FILE_STORAGE_SERVICE)) {
+if (Features.enabled(Features.Flags.FEATURE_WORKSHOP_INTEGRATION)) {
   router.delete('/me/gitlabtoken', sessionAuth, UserController.revokeUserGitLabTokens);
 }
 

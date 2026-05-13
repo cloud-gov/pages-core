@@ -60,15 +60,11 @@ export default [
     icon: 'IconCloudUpload',
     showInSidebar: true,
   },
-  ...(process.env.FEATURE_FILE_STORAGE_SERVICE === 'true'
-    ? [
-        {
-          Component: FileStorageLogs,
-          title: 'Public storage file logs',
-          path: 'storage/logs',
-        },
-      ]
-    : []),
+  {
+    Component: FileStorageLogs,
+    title: 'Public storage file logs',
+    path: 'storage/logs',
+  },
   {
     Component: PublishedBranchesTable,
     title: 'Site previews',

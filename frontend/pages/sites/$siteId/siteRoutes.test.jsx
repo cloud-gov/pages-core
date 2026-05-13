@@ -19,21 +19,9 @@ describe('siteRoutes', () => {
 
   describe('feature flags', () => {
     it('should include storage route logs', () => {
-      // Enable FEATURE_FILE_STORAGE_SERVICE
-      process.env.FEATURE_FILE_STORAGE_SERVICE = 'true';
-
       const routes = jest.requireActual('./siteRoutes').default;
       expect(routes.some((route) => route.path === 'storage')).toBe(true);
       expect(routes.some((route) => route.path === 'storage/logs')).toBe(true);
-    });
-
-    it('should not include storage route logs', () => {
-      // Disable FEATURE_FILE_STORAGE_SERVICE
-      process.env.FEATURE_FILE_STORAGE_SERVICE = 'false';
-
-      const routes = jest.requireActual('./siteRoutes').default;
-      expect(routes.some((route) => route.path === 'storage')).toBe(true);
-      expect(routes.some((route) => route.path === 'storage/logs')).toBe(false);
     });
   });
 

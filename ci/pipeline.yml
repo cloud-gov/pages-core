@@ -15,10 +15,6 @@ do:
       APP_HOSTNAME: https://((((deploy-env))-pages-domain))
       PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
       #@ if/end env != 'production':
-      FEATURE_FILE_STORAGE_SERVICE: true
-      #@ if/end env == 'production':
-      FEATURE_FILE_STORAGE_SERVICE: false
-      #@ if/end env != 'production':
       FEATURE_WORKSHOP_INTEGRATION: true
       #@ if/end env == 'production':
       FEATURE_WORKSHOP_INTEGRATION: false
