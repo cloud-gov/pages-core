@@ -18,6 +18,6 @@ cf push -f source/cf/manifest.yml \
     --var route=${CLAMAV_REST_HOSTNAME}.${CLAMAV_REST_DOMAIN} \
     --var image_version=${image_version}
 
-#cf set-env ${CLAMAV_REST_HOSTNAME} MAX_FILE_SIZE 250M
-#cf set-env ${CLAMAV_REST_HOSTNAME} MAX_SCAN_SIZE 250M
-#cf restage ${CLAMAV_REST_HOSTNAME}
+cf set-env ${CLAMAV_REST_HOSTNAME} MAX_FILE_SIZE 250M
+cf set-env ${CLAMAV_REST_HOSTNAME} MAX_SCAN_SIZE 250M
+cf restage ${CLAMAV_REST_HOSTNAME}
