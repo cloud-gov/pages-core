@@ -632,7 +632,6 @@ resources:
     source:
       uri: ((git-base-url))/cloud-gov/pages-core
       branch: feat-Increase-file-size-limit-on-the-public-file-storage-4885
-      commit_verification_keys: ((cloud-gov-pgp-keys))
 
   - name: nightly
     type: time
