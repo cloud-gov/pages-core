@@ -18,9 +18,9 @@ cf push -f source/cf/manifest.yml \
     --var route=${CLAMAV_REST_HOSTNAME}.${CLAMAV_REST_DOMAIN} \
     --var image_version=${image_version}
 
-cf set-env ${CLAMAV_REST_HOSTNAME} MAX_FILE_SIZE 250M
-cf set-env ${CLAMAV_REST_HOSTNAME} MAX_SCAN_SIZE 250M
-cf restage ${CLAMAV_REST_HOSTNAME}
+#cf set-env ${CLAMAV_REST_HOSTNAME} MAX_FILE_SIZE 250M
+#cf set-env ${CLAMAV_REST_HOSTNAME} MAX_SCAN_SIZE 250M
+#cf restage ${CLAMAV_REST_HOSTNAME}
 
 #cf ssh pages-clamav-rest-dev -c "
 #  sed -i 's/MaxFileSize.*/MaxFileSize 250M/' /etc/clamav/clamd.conf
@@ -34,7 +34,7 @@ for i in 0 1; do
     sed -i 's/MaxScanSize.*/MaxScanSize 250M/' /etc/clamav/clamd.conf
     sed -i 's/StreamMaxLength.*/StreamMaxLength 250M/' /etc/clamav/clamd.conf
     pkill clamd
-    sleep 2
+    sleep 10
     clamd &
   "
 done
