@@ -1,3 +1,13 @@
+## 0.23.1 (2026-05-14)
+
+### Fixed
+
+- unable to find valid access token to report build status 4898
+
+### Maintenance
+
+- Remove public file storage feature flag
+
 ## 0.23.0 (2026-05-04)
 
 ### Added
