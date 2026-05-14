@@ -272,7 +272,7 @@ jobs:
           params: {skip_download: true}
           trigger: true
       - task: deploy
-        file: pages-core/ci/clamav-rest-image/deploy.yml
+        file: source/ci/deploy.yml
         image: general-task
         params:
           _: #@ template.replace(data.values.env_cf)
@@ -282,8 +282,6 @@ jobs:
           CLAMAV_REST_DOMAIN: apps.internal
           CLAMAV_REST_HOSTNAME: pages-clamav-rest-((deploy-env))
           CLAMAV_REST_INSTANCES: 2
-          MAX_SCAN_SIZE: 250M
-          MAX_FILE_SIZE: 250M
     on_failure:
       in_parallel:
         -  #@ slack_hook("failure", "Deploy ClamAV REST")
