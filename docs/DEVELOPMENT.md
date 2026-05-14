@@ -389,8 +389,6 @@ Environment-specific feature flags are supported for both the api and frontend. 
 
 ### Current available features
 
-- `FEATURE_FILE_STORAGE_SERVICE`: The file storage service feature flag to gate the API's accessibility in production.
-
 - `FEATURE_WORKSHOP_INTEGRATION`: The Wokshop integration flag to gate the UI and API's accessibility in production.
 
 ### Api feature flags
