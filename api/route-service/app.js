@@ -151,7 +151,7 @@ async function parseReqFormData(req, data) {
     busboy.on('file', async (fieldName, file, filename, encoding, mimetype) => {
       const chunks = [];
 
-      console.error(`file name: ${filename}`);
+      console.error(`FST: file name: ${filename}`);
 
       file.on('data', (data) => {
         chunks.push(data);
@@ -186,7 +186,8 @@ function scanThenProxy(req, res) {
   const forwardedURL = getForwardedURL(req);
   const chunks = [];
 
-  console.log(`forwardedURL ${forwardedURL}`);
+  const start = Date.now();
+  console.error(`FST: Route service scanning start: ${start}`);
 
   if (!forwardedURL) {
     res.writeHead(400);
@@ -209,14 +210,16 @@ function scanThenProxy(req, res) {
       const fileData = Buffer.concat(chunks);
       const formData = await parseReqFormData(req, fileData);
 
-      console.log(`SCAN_ENDPOINT ${SCAN_ENDPOINT}`);
+      console.log(`FST: SCAN_ENDPOINT ${SCAN_ENDPOINT}`);
       await axios.post(SCAN_ENDPOINT, formData, {
         headers: {
           ...req.headers,
         },
       });
 
-      console.log(`SCANNED!!!`);
+      const end = Date.now();
+      console.error(`FST: Route service scanning end: ${end}`);
+      console.error(`FST: Route service scanning diff: ${end - start} ms`);
 
       return postScanProxy(req, res, forwardedURL, fileData);
     } catch (error) {
@@ -278,7 +281,7 @@ function main() {
 
   const server = http.createServer(async (req, res) => {
     const start = Date.now();
-    console.error(`Start: ${start}`);
+    console.error(`FST: Route service start processing: ${start} ______________________`);
 
     const authenticated = isAuthenticated(req);
 
@@ -288,17 +291,20 @@ function main() {
     }
 
     if (shouldScan(req)) {
-      console.error('SCANNING ...');
+      console.error('FST: SCANNING ...');
       const result = scanThenProxy(req, res);
       const end = Date.now();
-      console.error(`End with scanning: ${end}`);
-      console.error(`Diff with scanning: ${end - start} ms`);
+      console.error(`FST: Route service end with scanning: ${end}`);
+      console.error(`FST: Route service diff with scanning: ${end - start} ms`);
+      console.error(`FST: Route service end ______________________`);
       return result;
     } else {
       const result = passThroughProxy(req, res);
       const end = Date.now();
-      console.error(`End without scanning: ${end}`);
-      console.error(`Diff without scanning: ${end - start} ms`);
+      console.error('FST: NO SCANNING ...');
+      console.error(`FST: Route service end without scanning: ${end}`);
+      console.error(`FST: Route service diff without scanning: ${end - start} ms`);
+      console.error(`FST: Route service end ______________________`);
       return result;
     }
   });

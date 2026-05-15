@@ -134,7 +134,7 @@ module.exports = wrapHandlers({
 
   async uploadFile(req, res) {
     const start = new Date();
-    logger.info(`Uploading file: ${start}`);
+    logger.error(`FST: Uploading file start: ${start} ______________________`);
 
     const { params, user } = req;
 
@@ -158,6 +158,8 @@ module.exports = wrapHandlers({
 
     const { buffer: fileBuffer, originalname, encoding, mimetype, size } = file;
 
+    logger.info(`FST: originalname ${originalname}`);
+
     const siteStorageService = new SiteFileStorageSerivce(fileStorageService, user.id);
     const client = await siteStorageService.createClient();
     const fss = await client.uploadFile(name, fileBuffer, mimetype, parent, {
@@ -169,8 +171,8 @@ module.exports = wrapHandlers({
     const data = serializeFileStorageFile(fss, { includeLastModified: false });
 
     const end = new Date();
-    logger.info(`Uploading file end: ${end}`);
-    logger.info(`Uploaded file in: ${end - start} ms`);
+    logger.info(`FST: Uploading file end: ${end}`);
+    logger.info(`FST: Uploaded file in: ${end - start} ms ______________________`);
 
     return res.send(data);
   },
