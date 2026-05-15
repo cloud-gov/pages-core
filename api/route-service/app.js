@@ -275,6 +275,9 @@ function main() {
   }
 
   const server = http.createServer(async (req, res) => {
+    const start = Date.now();
+    console.error(`Start: ${start}`);
+
     const authenticated = isAuthenticated(req);
 
     if (!authenticated) {
@@ -284,9 +287,17 @@ function main() {
 
     if (shouldScan(req)) {
       console.error('SCANNING ...');
-      return scanThenProxy(req, res);
+      const result = scanThenProxy(req, res);
+      const end = Date.now();
+      console.error(`End with scanning: ${end}`);
+      console.error(`Diff with scanning: ${end - start} ms`);
+      return result;
     } else {
-      return passThroughProxy(req, res);
+      const result = passThroughProxy(req, res);
+      const end = Date.now();
+      console.error(`End without scanning: ${end}`);
+      console.error(`Diff without scanning: ${end - start} ms`);
+      return result;
     }
   });
 

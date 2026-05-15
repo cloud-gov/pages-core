@@ -133,7 +133,8 @@ module.exports = wrapHandlers({
   },
 
   async uploadFile(req, res) {
-    logger.info('Uploading file storage service');
+    const start = new Date();
+    logger.info(`Uploading file: ${start}`);
 
     const { params, user } = req;
 
@@ -166,6 +167,11 @@ module.exports = wrapHandlers({
     });
 
     const data = serializeFileStorageFile(fss, { includeLastModified: false });
+
+    const end = new Date();
+    logger.info(`Uploading file end: ${end}`);
+    logger.info(`Uploaded file in: ${end - start} ms`);
+
     return res.send(data);
   },
 });
