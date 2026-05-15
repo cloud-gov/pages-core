@@ -151,6 +151,8 @@ async function parseReqFormData(req, data) {
     busboy.on('file', async (fieldName, file, filename, encoding, mimetype) => {
       const chunks = [];
 
+      console.error(`file name: ${filename}`);
+
       file.on('data', (data) => {
         chunks.push(data);
       });
