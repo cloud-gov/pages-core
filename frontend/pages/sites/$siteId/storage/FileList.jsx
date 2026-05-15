@@ -80,6 +80,16 @@ const FileListRow = ({
           {item.updatedAt ? timeFrom(item.updatedAt) : 'N/A'}
         </span>
       </td>
+
+      <td
+        data-label="Uploaded"
+        data-sort-active={currentSortKey === SORT_KEY_LAST_MODIFIED ? true : undefined}
+      >
+        <span title={dateAndTimeSimple(item.updatedAt)}>
+          {item.updatedAt ? timeFrom(item.updatedAt) : 'N/A'}
+        </span>
+      </td>
+
       <td data-label="Actions" className="width-actions">
         {item.type !== 'directory' && <CopyFileLink url={url} />}
         <button
@@ -173,6 +183,19 @@ const FileList = ({
                 }
               />
             </button>
+          </th>
+          <th
+            scope="col"
+            className="width-last-mod"
+            data-is-sortable
+            role="columnheader"
+            aria-sort={
+              currentSortKey === SORT_KEY_LAST_MODIFIED
+                ? ariaFormatSort(currentSortOrder)
+                : undefined
+            }
+          >
+            Uploaded in, ms
           </th>
           <th
             scope="col"

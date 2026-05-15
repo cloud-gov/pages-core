@@ -32,7 +32,7 @@ function shouldScan(req) {
   const forwardedURL = getForwardedURL(req);
 
   return (
-    req.method === 'POST_' &&
+    req.method === 'POST' &&
     forwardedURL?.pathname?.length < 100 &&
     regex.test(forwardedURL?.pathname)
   );
@@ -198,15 +198,18 @@ function scanThenProxy(req, res) {
     console.error('Request error: ', error.message);
     res.writeHead(500);
     res.end('Request error');
+    console.error(`FST: Route service end error: ${error.message}______________________`);
   });
 
   req.on('data', (chunk) => {
     chunks.push(chunk);
+    console.error(`FST: Route service data chunk`);
   });
 
   req.on('end', async () => {
     try {
-      console.log(`end `);
+      console.error(`FST: Route file loaded ${new Date()}`);
+
       const fileData = Buffer.concat(chunks);
       const formData = await parseReqFormData(req, fileData);
 
@@ -271,6 +274,8 @@ function postScanProxy(req, res, forwardedURL, fileData) {
 
   proxyReq.write(fileData);
   proxyReq.end();
+
+  console.error(`FST: Route service proxy response: ${new Date()}______________________`);
 }
 
 function main() {
