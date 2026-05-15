@@ -32,7 +32,7 @@ function shouldScan(req) {
   const forwardedURL = getForwardedURL(req);
 
   return (
-    req.method === 'POST' &&
+    req.method === 'POST_' &&
     forwardedURL?.pathname?.length < 100 &&
     regex.test(forwardedURL?.pathname)
   );
