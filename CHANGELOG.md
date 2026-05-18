@@ -1,3 +1,9 @@
+## 0.24.0 (2026-05-18)
+
+### Added
+
+- Increase file size limit on the public file storage 4885
+
 ## 0.23.1 (2026-05-14)
 
 ### Fixed
