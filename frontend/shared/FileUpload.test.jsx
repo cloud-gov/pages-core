@@ -96,7 +96,7 @@ describe('FileUpload Component', () => {
     fireEvent.change(fileInput, { target: { files: [largeFile] } });
 
     await waitFor(() => {
-      expect(screen.getByText(/exceeds the 100MB limit/i)).toBeInTheDocument();
+      expect(screen.getByText(/exceeds the 250MB limit/i)).toBeInTheDocument();
     });
   });
 
@@ -110,7 +110,7 @@ describe('FileUpload Component', () => {
 
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
     await waitFor(() => {
-      expect(screen.getByText(/exceeds the 100MB limit/i)).toBeInTheDocument();
+      expect(screen.getByText(/exceeds the 250MB limit/i)).toBeInTheDocument();
     });
   });
 
