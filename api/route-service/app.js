@@ -151,6 +151,8 @@ async function parseReqFormData(req, data) {
     busboy.on('file', async (fieldName, file, filename, encoding, mimetype) => {
       const chunks = [];
 
+      console.error(`FST: file name: ${filename}`);
+
       file.on('data', (data) => {
         chunks.push(data);
       });
@@ -184,6 +186,9 @@ function scanThenProxy(req, res) {
   const forwardedURL = getForwardedURL(req);
   const chunks = [];
 
+  const start = Date.now();
+  console.error(`FST: Route service scanning start: ${start}`);
+
   if (!forwardedURL) {
     res.writeHead(400);
     return res.end('No forwarded URL provided');
@@ -193,22 +198,33 @@ function scanThenProxy(req, res) {
     console.error('Request error: ', error.message);
     res.writeHead(500);
     res.end('Request error');
+    console.error(`FST: Route service end error: ${error.message}______________________`);
   });
 
+  let chunkNum = 0;
   req.on('data', (chunk) => {
     chunks.push(chunk);
+    chunkNum = chunkNum + 1;
+    console.error(`FST: Route service data chunk ${chunkNum}`);
   });
 
   req.on('end', async () => {
     try {
+      console.error(`FST: Route file loaded ${new Date()}`);
+
       const fileData = Buffer.concat(chunks);
       const formData = await parseReqFormData(req, fileData);
 
+      console.log(`FST: SCAN_ENDPOINT ${SCAN_ENDPOINT}`);
       await axios.post(SCAN_ENDPOINT, formData, {
         headers: {
           ...req.headers,
         },
       });
+
+      const end = Date.now();
+      console.error(`FST: Route service scanning end: ${end}`);
+      console.error(`FST: Route service scanning diff: ${end - start} ms`);
 
       return postScanProxy(req, res, forwardedURL, fileData);
     } catch (error) {
@@ -219,6 +235,7 @@ function scanThenProxy(req, res) {
         errorMessage = `Error: File has been flagged as malicious`;
       } else {
         errorMessage = `Error: ${error.message}`;
+        console.error(error);
       }
 
       res.writeHead(error.status || 500);
@@ -259,6 +276,8 @@ function postScanProxy(req, res, forwardedURL, fileData) {
 
   proxyReq.write(fileData);
   proxyReq.end();
+
+  console.error(`FST: Route service proxy response: ${new Date()}______________________`);
 }
 
 function main() {
@@ -268,6 +287,9 @@ function main() {
   }
 
   const server = http.createServer(async (req, res) => {
+    let start = Date.now();
+    console.error(`FST: Route service start processing: ${start} ______________________`);
+
     const authenticated = isAuthenticated(req);
 
     if (!authenticated) {
@@ -276,9 +298,21 @@ function main() {
     }
 
     if (shouldScan(req)) {
-      return scanThenProxy(req, res);
+      console.error('FST: SCANNING ...');
+      const result = scanThenProxy(req, res);
+      const end = Date.now();
+      console.error(`FST: Route service end with scanning: ${end}`);
+      console.error(`FST: Route service diff with scanning: ${end - start} ms`);
+      console.error(`FST: Route service end ______________________`);
+      return result;
     } else {
-      return passThroughProxy(req, res);
+      const result = passThroughProxy(req, res);
+      const end = Date.now();
+      console.error('FST: NO SCANNING ...');
+      console.error(`FST: Route service end without scanning: ${end}`);
+      console.error(`FST: Route service diff without scanning: ${end - start} ms`);
+      console.error(`FST: Route service end ______________________`);
+      return result;
     }
   });
 
