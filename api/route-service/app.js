@@ -31,11 +31,15 @@ function shouldScan(req) {
   const regex = /^\/v0\/file-storage\/[^/]+\/upload$/;
   const forwardedURL = getForwardedURL(req);
 
-  return (
-    req.method === 'POST' &&
-    forwardedURL?.pathname?.length < 100 &&
-    regex.test(forwardedURL?.pathname)
-  );
+  const postMethod = req.method === 'POST';
+  const urlLength = forwardedURL?.pathname?.length;
+  const pathname = forwardedURL?.pathname;
+
+  console.log(`FST: req.method ${req.method}`);
+  console.log(`FST: urlLength ${urlLength}`);
+  console.log(`FST: pathname ${pathname}`);
+
+  return postMethod && urlLength < 100 && regex.test(pathname);
 }
 
 function sign(val, secret) {
