@@ -40,7 +40,9 @@ const canAdminCreateSiteFileStorage = async (siteId) => {
 };
 
 async function hasFileStorage(fssId) {
-  const fileStorageService = await FileStorageService.findByPk(fssId);
+  const fileStorageService = await FileStorageService.findByPk(fssId, {
+    include: [Site],
+  });
 
   if (!fileStorageService) {
     throw {

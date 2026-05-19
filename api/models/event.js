@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     ORG_MANAGER_ACTION: 'org-manager-action',
     ADMIN_ACTION: 'admin-action',
     TOKEN_ACTION: 'token-action',
+    FILE_UPLOAD: 'file-upload',
   };
 
   function isValidType(value) {
