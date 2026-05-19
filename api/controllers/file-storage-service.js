@@ -162,6 +162,15 @@ module.exports = wrapHandlers({
       originalname,
     });
 
+    const site = fileStorageService.Site;
+    EventCreator.audit(Event.labels.FILE_UPLOAD, req.user, 'File uploaded', {
+      fileName: originalname,
+      fileSize: size,
+      mimetype: mimetype,
+      user: user.username,
+      site: `${site?.id} (${site?.owner}/${site?.repository})`,
+    });
+
     const data = serializeFileStorageFile(fss, { includeLastModified: false });
     return res.send(data);
   },
