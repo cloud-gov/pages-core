@@ -1,6 +1,6 @@
 volumes:
   db-data:
-  yarn:
+  npm:
   nm-app:
   nm-admin:
   pw-deps:
@@ -24,9 +24,9 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: [ "yarn", "watch" ]
+    command: [ "npm", "run", "watch" ]
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - .:/app
       - /app/admin-client/
       - nm-app:/app/node_modules
@@ -64,9 +64,9 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: [ "scripts/wait-for-it.sh", "redis:6379", "--", "yarn", "start-bull-board:local" ]
+    command: [ "scripts/wait-for-it.sh", "redis:6379", "--", "npm", "run", "start-bull-board:local" ]
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - .:/app
       - /app/admin-client/
       - nm-app:/app/node_modules
@@ -92,7 +92,7 @@ services:
       dockerfile: ./admin-client/Dockerfile-admin
       context: .
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - ./admin-client:/app
       - nm-admin:/app/node_modules
     ports:
@@ -100,7 +100,7 @@ services:
       - "35729:35729"
     depends_on:
       - app
-    command: [ "yarn", "dev" ]
+    command: [ "npm", "run", "dev" ]
     environment:
       API_URL: http://localhost:1337
   db:
@@ -123,7 +123,7 @@ services:
   echo:
     image: node:22-bullseye
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - .:/app
       - /app/admin-client/
       - nm-app:/app/node_modules
@@ -147,9 +147,9 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: [ "yarn", "mock-cf-api" ]
+    command: [ "npm", "run", "mock-cf-api" ]
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - .:/app
     ports:
       - "3456:3456"

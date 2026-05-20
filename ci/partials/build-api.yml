@@ -8,4 +8,4 @@ params:
 run:
   dir: src
   path: bash
-  args: [-c, yarn build]
+  args: [-c, npm run build]

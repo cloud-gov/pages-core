@@ -4,4 +4,4 @@ outputs: [name: src]
 run:
   dir: src/admin-client
   path: bash
-  args: [-c, yarn build]
+  args: [-c, npm run build]

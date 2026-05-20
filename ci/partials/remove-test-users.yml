@@ -4,4 +4,4 @@ outputs: [name: src]
 run:
   dir: src
   path: bash
-  args: [-c, yarn remove-test-users]
+  args: [-c, npm run remove-test-users]
