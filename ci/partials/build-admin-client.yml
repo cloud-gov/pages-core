@@ -4,4 +4,8 @@ outputs: [name: src]
 run:
   dir: src/admin-client
   path: bash
-  args: [-c, npm run build]
+  args:
+    - -c
+    - |
+      npm install -g npm@11.14.1
+      npm run build
