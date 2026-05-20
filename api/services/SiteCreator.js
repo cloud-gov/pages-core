@@ -15,6 +15,7 @@ function paramsForNewSite(params) {
   const owner = params.owner ? params.owner.toLowerCase().trim() : null;
   const repository = params.repository ? params.repository.toLowerCase().trim() : null;
   const subdomain = utils.generateSubdomain(owner, repository);
+  const config = { containerConfig: { name: '', size: 'large' } };
   const organizationId = params.organizationId
     ? parseInt(params.organizationId, 10)
     : null;
@@ -27,6 +28,7 @@ function paramsForNewSite(params) {
     subdomain,
     sourceCodePlatform: params.sourceCodePlatform,
     sourceCodeUrl: params.sourceCodeUrl,
+    config,
   };
 }
 

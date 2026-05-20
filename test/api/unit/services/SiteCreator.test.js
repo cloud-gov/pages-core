@@ -53,6 +53,7 @@ describe('SiteCreator', () => {
       expect(site.Builds[0].user).to.equal(user.id);
       expect(site.SiteBranchConfigs[0].branch).to.equal(defaultBranch);
       expect(site.webhookId).to.not.be.null;
+      expect(site.config.containerConfig.size).to.equal('large');
     };
 
     const afterCreateSite = (owner, repository) =>
