@@ -6,12 +6,12 @@ applications:
       - route: ((domain))
     processes:
       - type: web
-        command: yarn start
+        command: npm run start
         disk_quota: 5G
         instances: ((instances))
         memory: 1G
       - type: worker
-        command: yarn start-workers
+        command: npm run start-workers
         disk_quota: 5G
         instances: 1
         memory: 2G
@@ -63,7 +63,7 @@ applications:
       - route: admin.((domain))
   - name: pages-queues-ui((env_postfix))
     buildpack: nodejs_buildpack
-    command: yarn start-bull-board:cg
+    command: npm run start-bull-board:cg
     disk_quota: 2G
     instances: 1
     memory: 512MB
@@ -86,7 +86,7 @@ applications:
       PRODUCT: pages
   - name: route-service((env_postfix))
     buildpack: nodejs_buildpack
-    command: yarn start-route-service
+    command: npm run start-route-service
     disk_quota: 1G
     instances: ((route-service-instances))
     memory: 2G

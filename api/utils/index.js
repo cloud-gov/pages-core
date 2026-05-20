@@ -131,7 +131,7 @@ function loadProductionManifest() {
   const manifestFile = 'webpack-manifest.json';
   if (!fs.existsSync(manifestFile)) {
     const msg =
-      'webpack-manifest.json does not exist. Have you run webpack (`yarn build`)?';
+      'webpack-manifest.json does not exist. Have you run webpack (`npm run build`)?';
     logger.error(msg);
     throw new Error(msg);
   }

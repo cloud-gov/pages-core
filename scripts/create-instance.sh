@@ -389,7 +389,7 @@ echo
 echo "You may now deploy the pages and applications:"
 echo
 if [[ "$product" = "pages" ]]; then
-  echo "- Bootstrap admins 'cf run-task <web app name> --name \"Bootstrap Admins\" --command \"yarn bootstrap-admins <uaa admin group name>\""
+  echo "- Bootstrap admins 'cf run-task <web app name> --name \"Bootstrap Admins\" --command \"npm run bootstrap-admins <uaa admin group name>\""
   echo
 fi
 

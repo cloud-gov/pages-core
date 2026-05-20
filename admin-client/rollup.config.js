@@ -24,7 +24,7 @@ function serve() {
     writeBundle() {
       if (server) return;
       // eslint-disable-next-line global-require
-      server = require('child_process').spawn('yarn', ['start'], {
+      server = require('child_process').spawn('npm', ['run', 'start'], {
         stdio: ['ignore', 'inherit', 'inherit'],
         shell: true,
       });

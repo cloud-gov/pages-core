@@ -84,10 +84,10 @@
     "debug": "node --inspect index.js",
     "watch:api": "nodemon index.js --config nodemon.json",
     "watch:frontend": "webpack --config webpack.config.js --watch",
-    "watch": "NODE_ENV=development concurrently \"yarn watch:api\" \"yarn watch:frontend\"",
-    "test": "yarn test:prepare && yarn test:server && yarn test:rtl",
+    "watch": "NODE_ENV=development concurrently \"npm run watch:api\" \"npm run watch:frontend\"",
+    "test": "npm run test:prepare && npm run test:server && npm run test:rtl",
     "test:cleandb": "NODE_ENV=test node migrate.js reset",
-    "test:prepare": "NODE_ENV=test yarn migrate:up && yarn build:test",
+    "test:prepare": "NODE_ENV=test npm run migrate:up && npm run build:test",
     "test:server": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor mocha --exit --timeout 2500 --recursive ./test/api",
     "test:server:cover": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor nyc --report-dir ./coverage/server mocha --exit --timeout 2500 --recursive ./test/api",
     "test:server:file": "NODE_ENV=test JWT_SECRET=shh USER_AUDITOR=user_auditor mocha --exit --timeout 2500 test/api/bootstrap.test.js",
@@ -97,8 +97,8 @@
     "lint": "eslint",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "format:lint": "yarn format && yarn lint",
-    "format:check:lint": "yarn format:check && yarn lint",
+    "format:lint": "npm run format && npm run lint",
+    "format:check:lint": "npm run format:check && npm run lint",
     "migrate:create": "node migrate.js create",
     "migrate:up": "node migrate.js up || true",
     "migrate:down": "node migrate.js down",
@@ -120,7 +120,7 @@
     "remove-bucket-website-configs": "node ./scripts/remove-bucket-website-configs.js",
     "check-object-paths": "node ./scripts/check-object-paths.js",
     "queued-builds-check": "node ./scripts/queued-builds-check.js",
-    "test:e2e": "yarn playwright test",
+    "test:e2e": "npm run playwright test",
     "create-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/create-test-users.js",
     "remove-test-users": "DOTENV_CONFIG_PATH=.env node -r dotenv/config ./scripts/remove-test-users.js",
     "run-scans-for-build": "node ./scripts/run-scans-for-build.js",
@@ -198,8 +198,7 @@
     "webpack-manifest-plugin": "^5.0.1"
   },
   "engines": {
-    "node": "^22.x.x",
-    "npm": "^10.x.x"
+    "node": "^22.x.x"
   },
   "lint-staged": {
     "*.js": "eslint",

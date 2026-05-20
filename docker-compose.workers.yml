@@ -1,7 +1,7 @@
 version: '3'
 
 volumes:
-  yarn:
+  npm:
   nm-app:
 
 services:
@@ -9,9 +9,9 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "npm run", "start-workers"]
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - .:/app
       - /app/admin-client/
       - nm-app:/app/node_modules
@@ -31,9 +31,9 @@ services:
     build:
       dockerfile: Dockerfile-app
       context: .
-    command: ["scripts/wait-for-it.sh", "db:5432", "--", "yarn", "start-workers"]
+    command: ["scripts/wait-for-it.sh", "db:5432", "--", "npm run", "start-workers"]
     volumes:
-      - yarn:/usr/local/share/.cache/yarn
+      - npm:/usr/local/share/.cache/npm
       - .:/app
       - /app/admin-client/
       - nm-app:/app/node_modules

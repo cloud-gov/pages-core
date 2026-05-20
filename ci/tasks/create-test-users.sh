@@ -2,5 +2,5 @@
 
 set -e
 
-yarn install
-yarn create-test-users
+npm install
+npm run create-test-users

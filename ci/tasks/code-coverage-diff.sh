@@ -10,8 +10,8 @@ branch=$(jq '.[] | select(.name=="head_name") | .value' .git/resource/metadata.j
 base_sha=$(jq '.[] | select(.name=="base_sha") | .value' .git/resource/metadata.json | tr -d '"')
 
 # generate test coverage
-yarn install
-cov_cmd() { yarn test:rtl --coverageReporters json-summary --coverageDirectory tmp; }
+npm ci
+cov_cmd() { npm run test:rtl -- --coverageReporters json-summary --coverageDirectory tmp; }
 tot_cmd() { jq '.["total"]["lines"]["pct"]' tmp/coverage-summary.json; }
 cov_cmd
 newcc=$(tot_cmd)

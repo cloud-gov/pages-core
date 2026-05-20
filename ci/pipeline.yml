@@ -401,7 +401,7 @@ jobs:
               _: #@ template.replace(data.values.env_cf)
               CF_APP_NAME: pages-((deploy-env))
               CF_TASK_NAME: queued-builds-check
-              CF_TASK_COMMAND: yarn queued-builds-check ((support-email))
+              CF_TASK_COMMAND: npm run queued-builds-check ((support-email))
         on_failure: #@ slack_hook("failure", "site builds checks")
 
   - name: audit-dependencies

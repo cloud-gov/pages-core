@@ -19,38 +19,38 @@ db: ## Connect to the database - it must already be running ie with `make start`
 	psql postgresql://postgres:password@localhost:5433/federalist
 
 build-client: ## Build client app - typically only done to test production artifacts
-	docker compose run -rm app yarn build
+	docker compose run --rm app npm run build
 
 install: ## Install npm deps
-	docker compose run --rm app yarn
-	docker compose run --rm admin-client yarn
+	docker compose run --rm app npm install
+	docker compose run --rm admin-client npm install
 
 lint-server: ## Format lint code
-	docker compose run --rm app yarn format:lint
+	docker compose run --rm app npm run format:lint
 
 lint-client: ## Lint admin client code
-	docker compose run --rm admin-client yarn lint
+	docker compose run --rm admin-client npm run lint
 
 lint: lint-server lint-client ## Lint project
 
 lint-fix: ## lint and fix
-	docker compose --env-file ./services/local/docker.env run --rm app yarn format:lint
+	docker compose --env-file ./services/local/docker.env run --rm app npm run format:lint
 
 format:
-	docker compose --env-file ./services/local/docker.env run --rm app yarn format
+	docker compose --env-file ./services/local/docker.env run --rm app npm run format
 
 format-check:
-	docker compose --env-file ./services/local/docker.env run --rm app yarn format:check
+	docker compose --env-file ./services/local/docker.env run --rm app npm run format:check
 
 migrate: ## Run database migrations
-	docker compose --env-file ./services/local/docker.env run  --rm app yarn migrate:up
+	docker compose --env-file ./services/local/docker.env run  --rm app npm run migrate:up
 
 rebuild: ## Rebuild docker images and database volumes
 	docker volume rm pages-core_db-data
 	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env build
 
 seed: ## (Re)Create seed data
-	docker compose --env-file ./services/local/docker.env run --rm app yarn create-dev-data
+	docker compose --env-file ./services/local/docker.env run --rm app npm run create-dev-data
 
 set-pipeline: ## Set Concourse `web` pipeline
 	fly -t pages-staging sp -p web -c ci/pipeline.yml
@@ -62,16 +62,16 @@ start-workers: ## Start with workers
 	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env up
 
 test-client: ## Run client tests
-	docker compose --env-file ./services/local/docker.env  run --rm app yarn test:rtl
+	docker compose --env-file ./services/local/docker.env  run --rm app npm run test:rtl
 
 test-server: ## Run server tests
-	docker compose --env-file ./services/local/docker.env  run --rm app yarn test:server
+	docker compose --env-file ./services/local/docker.env  run --rm app npm run test:server
 
 test-all: ## Run all tests
-	docker compose --env-file ./services/local/docker.env run --rm app yarn test
+	docker compose --env-file ./services/local/docker.env run --rm app npm run test
 
 test-watch:
-	docker compose --env-file ./services/local/docker.env run --rm app yarn test:rtl --watch --runInBand --silent=false
+	docker compose --env-file ./services/local/docker.env run --rm app npm run test:rtl --watch --runInBand --silent=false
 
 everything: # When you switch to a new branch and need to rebuild everything
 	docker compose -f ./docker-compose.yml -f ./docker-compose.uaa.yml --env-file ./services/local/docker.env down

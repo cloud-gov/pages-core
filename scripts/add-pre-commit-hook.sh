@@ -1,5 +1,5 @@
 #!/bin/sh
-COMMAND="yarn lint-staged"
+COMMAND="npm run lint-staged"
 PRECOMMIT_FILE=.git/hooks/pre-commit
 
 if [ ! -f "$PRECOMMIT_FILE" ]; then

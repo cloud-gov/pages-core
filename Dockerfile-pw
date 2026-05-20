@@ -1,9 +1,11 @@
 FROM node:22-bullseye
 
+RUN npm install -g npm@11.14.1
+
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json package-lock.json ./
 
-RUN yarn install
-RUN yarn playwright install-deps
-RUN yarn playwright install
+RUN npm ci
+RUN npm run playwright install-deps
+RUN npm run playwright install

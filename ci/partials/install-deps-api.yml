@@ -4,4 +4,4 @@ outputs: [name: src]
 run:
   dir: src
   path: bash
-  args: [-c, yarn --pure-lockfile]
+  args: [-c, npm ci]

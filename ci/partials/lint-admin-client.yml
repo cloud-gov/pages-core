@@ -3,4 +3,4 @@ inputs: [name: src]
 run:
   dir: src/admin-client
   path: bash
-  args: [-c, yarn lint]
+  args: [-c, npm run lint]

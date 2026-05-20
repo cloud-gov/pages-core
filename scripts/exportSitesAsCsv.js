@@ -66,7 +66,7 @@ function writeCSV(sites, fileName) {
 const args = Array.prototype.slice.call(process.argv);
 const destination = resolveDestination(args[2] || './current-sites.csv');
 console.log('Final output can be found at', destination);
-console.log('\tUse yarn export:sites -- /other/path/file.csv to change');
+console.log('\tUse npm run export:sites -- /other/path/file.csv to change');
 
 User.findAll({
   include: [Site],
