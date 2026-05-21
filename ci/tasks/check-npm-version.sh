@@ -1,6 +1,6 @@
 #!/bin/bash
 
-required="11"
+required="11.15.0"
 actual=$(npm --version | cut -d. -f1)
 
 if [ "$actual" -lt "$required" ]; then
