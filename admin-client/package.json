@@ -12,7 +12,7 @@
     "test:svelte:ui": "vitest --ui"
   },
   "engines": {
-    "node": "^24",
+    "node": "^24.x.x",
     "npm": "^11.10.0"
   },
   "devDependencies": {
