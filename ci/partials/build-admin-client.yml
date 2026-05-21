@@ -7,5 +7,5 @@ run:
   args:
     - -c
     - |
-      src/ci/tasks/check-npm-version.sh
+      ./ci/tasks/check-npm-version.sh
       npm run build
