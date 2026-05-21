@@ -2,5 +2,5 @@
 
 set -e
 
-npm install
+npm ci
 npm run create-test-users
