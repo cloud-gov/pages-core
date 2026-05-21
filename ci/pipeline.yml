@@ -10,7 +10,7 @@
 do:
   - task: build-api
     file: src/ci/partials/build-api.yml
-    image: node
+    image: node24
     params:
       APP_HOSTNAME: https://((((deploy-env))-pages-domain))
       PROXY_DOMAIN: sites.((((deploy-env))-pages-domain))
@@ -47,7 +47,7 @@ do:
 
   - task: run-database-migrations
     file: src/ci/partials/run-database-migrations.yml
-    image: node
+    image: node24
     params:
       _: #@ template.replace(data.values.env_cf)
       APP_ENV: ((deploy-env))
@@ -107,9 +107,9 @@ jobs:
           - get: postgres
             params:
               format: oci
-          - get: node
+          - get: node24
           - get: node-oci
-            resource: node
+            resource: node24
             params:
               format: oci
           - get: pipeline-tasks
@@ -118,12 +118,12 @@ jobs:
       -  #@ pr_hook("pending", "test-and-deploy-api-pages")
       - task: install-deps-api
         file: src/ci/partials/install-deps-api.yml
-        image: node
+        image: node24
 
       - in_parallel:
           - task: lint-api
             file: src/ci/partials/lint-api.yml
-            image: node
+            image: node24
 
           - task: test-api
             privileged: true
@@ -155,22 +155,22 @@ jobs:
           integration_tool: checkout
         passed: [set-pipeline]
         trigger: true
-      - get: node
+      - get: node24
       - get: pipeline-tasks
       - get: general-task
       #@ if/end env == 'dev':
       -  #@ pr_hook("pending", "test-and-deploy-admin-client-pages")
       - task: install-deps-admin-client
         file: src/ci/partials/install-deps-admin-client.yml
-        image: node
+        image: node24
 
       - task: lint-admin-client
         file: src/ci/partials/lint-admin-client.yml
-        image: node
+        image: node24
 
       - task: build-admin-client
         file: src/ci/partials/build-admin-client.yml
-        image: node
+        image: node24
         params:
           API_URL: https://((((deploy-env))-pages-domain))
           NODE_ENV: production
@@ -414,20 +414,20 @@ jobs:
           integration_tool: checkout
         trigger: true
         passed: [set-pipeline]
-      - get: node
+      - get: node24
       #@ if/end env == 'dev':
       -  #@ pr_hook("pending", "audit-dependencies")
       - in_parallel:
           - task: audit-app
             file: src/ci/partials/audit.yml
-            image: node
+            image: node24
             params:
-              VULN_THRESHOLD: 8 #! errors on critical or high
+              VULN_THRESHOLD: high #! errors on critical or high - https://docs.npmjs.com/cli/v10/using-npm/config?utm_source=chatgpt.com#audit-level
           - task: audit-admin
             file: src/ci/partials/audit-admin.yml
-            image: node
+            image: node24
             params:
-              VULN_THRESHOLD: 8 #! errors on critical or high
+              VULN_THRESHOLD: high #! errors on critical or high
     on_failure:
       in_parallel:
         -  #@ slack_hook("failure", "dependency audit")
@@ -450,11 +450,11 @@ jobs:
         passed: [set-pipeline]
       - get: nightly
         trigger: true
-      - get: node
+      - get: node24
       - get: general-task
       - task: install-deps-api
         file: src/ci/partials/install-deps-api.yml
-        image: node
+        image: node24
       - task: get-app-env
         file: src/ci/partials/get-app-env.yml
         image: general-task
@@ -464,7 +464,7 @@ jobs:
           CF_APP_NAME: pages-((deploy-env))
       - task: rotate-keys
         file: src/ci/partials/rotate-bucket-keys.yml
-        image: node
+        image: node24
         params:
           _: #@ template.replace(data.values.env_cf)
           APP_ENV: ((deploy-env))
@@ -481,10 +481,10 @@ jobs:
           integration_tool: checkout
         passed:
           - test-and-deploy-api-pages
-      - get: node
+      - get: node24
       - get: pipeline-tasks
       - task: code-coverage-diff
-        image: node
+        image: node24
         file: src/ci/partials/code-coverage-diff.yml
         params:
           APP_ENV: ((deploy-env))
@@ -505,7 +505,7 @@ jobs:
           - test-and-deploy-admin-client-pages
           - deploy-queues-ui-pages
       - get: general-task
-      - get: node
+      - get: node24
       #@ if/end env == 'dev':
       -  #@ pr_hook("pending", "e2e-test")
       - task: get-app-env
@@ -517,14 +517,14 @@ jobs:
           CF_APP_NAME: pages-((deploy-env))
       - task: create-test-users
         file: src/ci/partials/create-test-users.yml
-        image: node
+        image: node24
         params:
           DOMAIN: ((((deploy-env))-pages-domain))
           APP_ENV: ((deploy-env))
           PRODUCT: pages
       - task: run-e2e-tests
         file: src/ci/partials/e2e-test.yml
-        image: node
+        image: node24
         params:
           APP_ENV: ((deploy-env))
           APP_HOSTNAME: https://((((deploy-env))-pages-domain))
@@ -533,7 +533,7 @@ jobs:
           do:
             - task: remove-test-users
               file: src/ci/partials/remove-test-users.yml
-              image: node
+              image: node24
               params:
                 APP_ENV: ((deploy-env))
                 PRODUCT: pages
@@ -658,7 +658,7 @@ resources:
 
   - name: redis
   - name: postgres
-  - name: node
+  - name: node24
   - name: slack
   - name: general-task
   - name: pipeline-tasks
