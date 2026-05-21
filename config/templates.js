@@ -12,19 +12,6 @@ module.exports = {
     thumb: '/images/pages-uswds-v3-11ty-thumbnail.png',
     templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-11ty',
   },
-  'uswds-gatsby': {
-    owner: 'cloud-gov',
-    repo: 'pages-uswds-gatsby',
-    branch: 'main',
-    engine: 'node.js',
-    example: 'https://uswds-gatsby.pages.cloud.gov',
-    title: 'Gatsby - U.S. Web Design System v2.0',
-    description:
-      // eslint-disable-next-line max-len
-      'A flexible multi-page setup intended to introduce an agency or program using Gatsby.js. It offers an engaging Hero section for a current priority and a landing page layout designed to provide clarity and context for first time visitors. This template also offers navigation options for internal pages.',
-    thumb: '/images/pages-uswds-v2-gatsby-thumbnail.png',
-    templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
-  },
   'workshop-uswds-11ty': {
     owner: 'n/a',
     repo: 'n/a',
