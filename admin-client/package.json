@@ -12,7 +12,8 @@
     "test:svelte:ui": "vitest --ui"
   },
   "engines": {
-    "node": "^22.x.x"
+    "node": "^24",
+    "npm": "^11.10.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
