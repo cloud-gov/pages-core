@@ -53,6 +53,7 @@ describe('SiteCreator', () => {
       expect(site.Builds[0].user).to.equal(user.id);
       expect(site.SiteBranchConfigs[0].branch).to.equal(defaultBranch);
       expect(site.webhookId).to.not.be.null;
+      expect(site.config.containerConfig.size).to.equal('large');
     };
 
     const afterCreateSite = (owner, repository) =>
@@ -517,7 +518,7 @@ describe('SiteCreator', () => {
           SiteCreator.getProcessedSiteParams(
             { owner: ' owner ', repository: ' repository ' },
             {
-              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
+              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-11ty',
               branch: 'main',
               engine: 'engine',
             },
@@ -536,7 +537,7 @@ describe('SiteCreator', () => {
           SiteCreator.getProcessedSiteParams(
             { owner: ' /cloud-gov/ ', repository: ' /repository/ ' },
             {
-              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
+              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-11ty',
               branch: 'main',
               engine: 'engine',
             },

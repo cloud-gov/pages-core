@@ -535,7 +535,7 @@ describe('Site API', () => {
             .send({
               defaultBranch: 'main',
               engine: 'node.js',
-              template: 'uswds-gatsby',
+              template: 'uswds-11ty',
             })
             .set('Cookie', cookie)
             .expect(403),

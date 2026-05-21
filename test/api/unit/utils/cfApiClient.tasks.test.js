@@ -87,7 +87,7 @@ describe('CloudFoundryAPIClient', () => {
         ciphertext,
       });
       const taskParams = {
-        disk_in_mb: 7 * 1024,
+        disk_in_mb: 10 * 1024,
         memory_in_mb: 8 * 1024,
         name: `build-${jobId}`,
         command: `cd app && python main.py -p '${ciphertext}'`,
