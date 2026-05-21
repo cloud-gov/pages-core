@@ -7,7 +7,5 @@ run:
   args:
     - -c
     - |
-      echo "npm version before: $(npm --version)"
-      npm install -g npm@11.14.1
-      echo "npm version after: $(npm --version)"
+      ./ci/tasks/check-npm-version.sh
       npm run build
