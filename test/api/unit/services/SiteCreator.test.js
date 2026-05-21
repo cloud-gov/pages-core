@@ -518,7 +518,7 @@ describe('SiteCreator', () => {
           SiteCreator.getProcessedSiteParams(
             { owner: ' owner ', repository: ' repository ' },
             {
-              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
+              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-11ty',
               branch: 'main',
               engine: 'engine',
             },
@@ -537,7 +537,7 @@ describe('SiteCreator', () => {
           SiteCreator.getProcessedSiteParams(
             { owner: ' /cloud-gov/ ', repository: ' /repository/ ' },
             {
-              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-gatsby',
+              templateSourceCodeUrl: 'https://github.com/cloud-gov/pages-uswds-11ty',
               branch: 'main',
               engine: 'engine',
             },
