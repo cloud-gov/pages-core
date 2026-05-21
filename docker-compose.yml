@@ -121,7 +121,7 @@ services:
       - 6379:6379
     command: redis-server --loglevel warning
   echo:
-    image: node:22-bullseye
+    image: node:24-bullseye
     volumes:
       - npm:/usr/local/share/.cache/npm
       - .:/app
