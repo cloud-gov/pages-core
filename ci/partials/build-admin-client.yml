@@ -4,8 +4,4 @@ outputs: [name: src]
 run:
   dir: src/admin-client
   path: bash
-  args:
-    - -c
-    - |
-      ./ci/tasks/check-npm-version.sh
-      npm run build
+  args: [-c, yarn build]
