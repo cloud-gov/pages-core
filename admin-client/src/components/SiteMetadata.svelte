@@ -4,6 +4,7 @@
   import ExternalLink from './ExternalLink.svelte';
   import LabeledItem from './LabeledItem.svelte';
   import SectionHeader from './SectionHeader.svelte';
+  import { repositoryInfo } from '../helpers/repository';
 
   export let site = {};
 
@@ -18,11 +19,15 @@
     updatedAt,
     isActive,
     organizationId,
+    sourceCodePlatform
   } = site;
 
   const siteLinks = selectSiteLinks(site);
   const createDate = formatDateTime(createdAt);
   const updateDate = formatDateTime(updatedAt);
+
+  const {href, icon} = repositoryInfo(sourceCodePlatform, owner, repository);
+
 </script>
 
 <SectionHeader>
@@ -65,8 +70,8 @@
       </div>
       <div class="margin-y-05">
         <ExternalLink
-          icon="github"
-          href="https://github.com/{owner}/{repository}">
+          icon={icon}
+          href={href}>
           Repository
         </ExternalLink>
       </div>

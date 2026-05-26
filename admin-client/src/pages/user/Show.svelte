@@ -103,7 +103,7 @@
       {/if}
     </div>
 
-    <h3>Github Info</h3>
+    <h3>GitHub Info</h3>
     <div class="grid-row">
       {#if user.hasGithubAuth}
         <div class="tablet:grid-col-fill padding-bottom-1">
@@ -111,7 +111,16 @@
           <LabeledItem label="github username" value={user.username} />
         </div>
       {:else}
-      <p>User is not connected to Github</p>
+      <p>User is not connected to GitHub</p>
+      {/if}
+    </div>
+
+    <h3>GitLab Info</h3>
+    <div class="grid-row">
+      {#if user.hasGitlabAuth}
+        <p>User is connected to GitLab</p>
+      {:else}
+        <p>User is not connected to GitLab</p>
       {/if}
     </div>
 
