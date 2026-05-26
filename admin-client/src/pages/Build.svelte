@@ -6,6 +6,7 @@
     fetchBuild, fetchBuildLog, updateBuild, rebuildBuild,
   } from '../lib/api';
   import { formatDateTime } from '../helpers/formatter';
+  import { repositoryInfo } from '../helpers/repository';
   import {
     Await,
     ExternalLink,
@@ -51,6 +52,7 @@
     Build {id}
   </PageTitle>
   <Await on={buildPromise} let:response={build}>
+    {@const repo = repositoryInfo(build.site.sourceCodePlatform, build.site.owner, build.site.repository)}
     <h3>
       <div class="display-flex flex-justify flex-align-center font-sans-lg">
         <span><a href="/sites/{build.site.id}">{build.site.owner}/{build.site.repository}</a>#{build.branch}</span>
@@ -83,8 +85,8 @@
                 <ExternalLink href={build.url}>Live</ExternalLink>
             {/if}
             <ExternalLink
-              icon="github"
-              href="https://github.com/{build.site.owner}/{build.site.repository}">
+              icon={repo.icon}
+              href={repo.href}>
               Repository
             </ExternalLink>
           </div>

@@ -22,6 +22,10 @@
   a.github::before {
     background-image: url('/images/icon-github.svg');
   }
+
+  a.gitlab::before {
+      background-image: url('/images/icon-gitlab.svg');
+  }
 </style>
 
 <a

@@ -1,5 +1,6 @@
 <script>
   import { formatDateTime } from '../helpers/formatter';
+  import { repositoryInfo } from '../helpers/repository';
 
   import ExternalLink from './ExternalLink.svelte';
 
@@ -39,12 +40,16 @@
     viewLink,
     isActive,
     organizationId,
+    sourceCodePlatform
   } = site;
 
   const createDate = formatDateTime(createdAt);
   const updateDate = formatDateTime(updatedAt);
 
   $: bgColor = index % 2 === 0 ? 'bg-gray-5' : 'bg-white';
+
+  const {href, icon} = repositoryInfo(sourceCodePlatform, owner, repository);
+
 </script>
 
 <style>
@@ -94,8 +99,8 @@
         <ExternalLink href={viewLink}>Live</ExternalLink>
         <ExternalLink href={demoViewLink} className="padding-x-1">Demo</ExternalLink>
         <ExternalLink
-          icon="github"
-          href="https://github.com/{owner}/{repository}">
+          icon={icon}
+          href={href}>
           Repository
         </ExternalLink>
       </div>
