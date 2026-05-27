@@ -9,7 +9,7 @@ params:
   GH_BOT_GPG_KEY: ((pages-operations-github-user-gpg.private_key))
   GH_BOT_SSH_KEY: ((pages-gpg-operations-github-sshkey.private_key))
   GH_BOT_GPG_TRUST: ((pages-operations-github-user-gpg-trust))
-  GH_TOKEN: ((pages-operations-ci-github-token))
+  GH_TOKEN: ((gh-access-token))
 run:
   dir: src
   path: ci/tasks/code-coverage-diff.sh
