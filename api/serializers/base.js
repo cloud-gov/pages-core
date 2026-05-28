@@ -1,5 +1,5 @@
 const yaml = require('js-yaml');
-const _ = require('underscore');
+const utils = require('../utils');
 
 const transforms = {
   '': (value) => value,
@@ -31,7 +31,7 @@ class BaseSerializer {
       return transform(model.get(attribute), model, isSystemAdmin);
     }
 
-    return _.mapObject(allAttributes, applyTransforms);
+    return utils.mapObject(allAttributes, applyTransforms);
   }
 
   serializeMany(models, isSystemAdmin = false) {

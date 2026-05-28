@@ -508,4 +508,226 @@ describe('utils', () => {
       expect(result).to.be.eq(expected);
     });
   });
+
+  describe('omitByPredicate', () => {
+    it('omits keys with falsy values', () => {
+      expect(utils.omitByPredicate({ a: 1, b: null, c: 'x' }, (x) => !x)).to.deep.equal({
+        a: 1,
+        c: 'x',
+      });
+    });
+
+    it('omits keys with undefined values', () => {
+      expect(utils.omitByPredicate({ a: 1, b: undefined }, (x) => !x)).to.deep.equal({
+        a: 1,
+      });
+    });
+
+    it('omits keys with empty string values', () => {
+      expect(utils.omitByPredicate({ a: 1, b: '' }, (x) => !x)).to.deep.equal({ a: 1 });
+    });
+
+    it('returns empty object if all values are falsy', () => {
+      expect(utils.omitByPredicate({ a: null, b: undefined }, (x) => !x)).to.deep.equal(
+        {},
+      );
+    });
+
+    it('returns all keys if no values are falsy', () => {
+      expect(utils.omitByPredicate({ a: 1, b: 2 }, (x) => !x)).to.deep.equal({
+        a: 1,
+        b: 2,
+      });
+    });
+  });
+
+  describe('get', () => {
+    it('gets a top-level value', () => {
+      expect(utils.get({ a: 1 }, 'a')).to.be.eq(1);
+    });
+
+    it('gets a nested value', () => {
+      expect(utils.get({ a: { b: { c: 42 } } }, 'a.b.c')).to.be.eq(42);
+    });
+
+    it('returns undefined for missing path', () => {
+      expect(utils.get({ a: 1 }, 'a.b.c')).to.be.undefined;
+    });
+
+    it('returns undefined for null path', () => {
+      expect(utils.get({ a: 1 }, null)).to.be.undefined;
+    });
+
+    it('returns undefined for undefined path', () => {
+      expect(utils.get({ a: 1 }, undefined)).to.be.undefined;
+    });
+
+    it('accepts array path', () => {
+      expect(utils.get({ a: { b: 2 } }, ['a', 'b'])).to.be.eq(2);
+    });
+
+    it('does not throw on null nested value', () => {
+      expect(utils.get({ a: null }, 'a.b')).to.be.undefined;
+    });
+  });
+
+  describe('flatten', () => {
+    it('deep flattens by default', () => {
+      expect(utils.flatten([1, [2, [3, [4]]]])).to.deep.equal([1, 2, 3, 4]);
+    });
+
+    it('shallow flattens one level when shallow=true', () => {
+      expect(utils.flatten([1, [2, [3, [4]]]], true)).to.deep.equal([1, 2, [3, [4]]]);
+    });
+
+    it('returns same array if already flat', () => {
+      expect(utils.flatten([1, 2, 3])).to.deep.equal([1, 2, 3]);
+    });
+
+    it('handles empty array', () => {
+      expect(utils.flatten([])).to.deep.equal([]);
+    });
+  });
+
+  describe('where', () => {
+    const list = [
+      { id: 1, type: 'admin' },
+      { id: 2, type: 'user' },
+      { id: 3, type: 'admin' },
+    ];
+
+    it('returns items matching properties', () => {
+      expect(utils.where(list, { type: 'admin' })).to.deep.equal([
+        { id: 1, type: 'admin' },
+        { id: 3, type: 'admin' },
+      ]);
+    });
+
+    it('returns empty array if no match', () => {
+      expect(utils.where(list, { type: 'guest' })).to.deep.equal([]);
+    });
+
+    it('matches multiple properties', () => {
+      expect(utils.where(list, { id: 1, type: 'admin' })).to.deep.equal([
+        { id: 1, type: 'admin' },
+      ]);
+    });
+
+    it('returns all items if properties is empty object', () => {
+      expect(utils.where(list, {})).to.deep.equal(list);
+    });
+  });
+
+  describe('mapObject', () => {
+    it('transforms each value', () => {
+      expect(utils.mapObject({ a: 1, b: 2 }, (v) => v * 2)).to.deep.equal({ a: 2, b: 4 });
+    });
+
+    it('passes key as second argument to fn', () => {
+      expect(utils.mapObject({ a: 1 }, (v, k) => `${k}:${v}`)).to.deep.equal({
+        a: 'a:1',
+      });
+    });
+
+    it('handles empty object', () => {
+      expect(utils.mapObject({}, (v) => v)).to.deep.equal({});
+    });
+  });
+
+  describe('zip', () => {
+    it('zips two arrays', () => {
+      expect(utils.zip([1, 2], ['a', 'b'])).to.deep.equal([
+        [1, 'a'],
+        [2, 'b'],
+      ]);
+    });
+
+    it('zips three arrays', () => {
+      expect(utils.zip([1, 2], ['a', 'b'], [true, false])).to.deep.equal([
+        [1, 'a', true],
+        [2, 'b', false],
+      ]);
+    });
+
+    it('handles empty arrays', () => {
+      expect(utils.zip([], [])).to.deep.equal([]);
+    });
+  });
+
+  describe('isString', () => {
+    it('returns true for string', () => expect(utils.isString('hello')).to.be.eq(true));
+    it('returns false for number', () => expect(utils.isString(1)).to.be.eq(false));
+    it('returns false for null', () => expect(utils.isString(null)).to.be.eq(false));
+    it('returns false for array', () => expect(utils.isString([])).to.be.eq(false));
+  });
+
+  describe('isNumber', () => {
+    it('returns true for number', () => expect(utils.isNumber(42)).to.be.eq(true));
+    it('returns false for NaN', () => expect(utils.isNumber(NaN)).to.be.eq(false));
+    it('returns false for string', () => expect(utils.isNumber('1')).to.be.eq(false));
+    it('returns false for null', () => expect(utils.isNumber(null)).to.be.eq(false));
+  });
+
+  describe('isFunction', () => {
+    it('returns true for function', () =>
+      expect(utils.isFunction(() => {})).to.be.eq(true));
+    it('returns true for named function', () =>
+      expect(utils.isFunction(function foo() {})).to.be.eq(true));
+    it('returns false for object', () => expect(utils.isFunction({})).to.be.eq(false));
+    it('returns false for null', () => expect(utils.isFunction(null)).to.be.eq(false));
+  });
+
+  describe('isArray', () => {
+    it('returns true for array', () => expect(utils.isArray([])).to.be.eq(true));
+    it('returns true for array with items', () =>
+      expect(utils.isArray([1, 2])).to.be.eq(true));
+    it('returns false for object', () => expect(utils.isArray({})).to.be.eq(false));
+    it('returns false for string', () => expect(utils.isArray('abc')).to.be.eq(false));
+  });
+
+  describe('isObject', () => {
+    it('returns true for plain object', () =>
+      expect(utils.isObject({ a: 1 })).to.be.eq(true));
+    it('returns false for null', () => expect(utils.isObject(null)).to.be.eq(false));
+    it('returns false for array', () => expect(utils.isObject([])).to.be.eq(false));
+    it('returns false for string', () => expect(utils.isObject('abc')).to.be.eq(false));
+    it('returns false for number', () => expect(utils.isObject(42)).to.be.eq(false));
+  });
+
+  describe('isEmpty', () => {
+    it('returns true for null', () => expect(utils.isEmpty(null)).to.be.eq(true));
+    it('returns true for undefined', () =>
+      expect(utils.isEmpty(undefined)).to.be.eq(true));
+    it('returns true for empty array', () => expect(utils.isEmpty([])).to.be.eq(true));
+    it('returns true for empty string', () => expect(utils.isEmpty('')).to.be.eq(true));
+    it('returns true for empty object', () => expect(utils.isEmpty({})).to.be.eq(true));
+    it('returns false for non-empty array', () =>
+      expect(utils.isEmpty([1])).to.be.eq(false));
+    it('returns false for non-empty string', () =>
+      expect(utils.isEmpty('a')).to.be.eq(false));
+    it('returns false for non-empty object', () =>
+      expect(utils.isEmpty({ a: 1 })).to.be.eq(false));
+  });
+
+  describe('map', () => {
+    it('maps over array', () => {
+      expect(utils.map([1, 2, 3], (x) => x * 2)).to.deep.equal([2, 4, 6]);
+    });
+
+    it('maps over object values', () => {
+      expect(utils.map({ a: 1, b: 2 }, (v) => v * 2)).to.deep.equal({ a: 2, b: 4 });
+    });
+
+    it('passes key as second argument for objects', () => {
+      expect(utils.map({ a: 1 }, (v, k) => `${k}:${v}`)).to.deep.equal({ a: 'a:1' });
+    });
+
+    it('handles empty array', () => {
+      expect(utils.map([], (x) => x)).to.deep.equal([]);
+    });
+
+    it('handles empty object', () => {
+      expect(utils.map({}, (x) => x)).to.deep.equal({});
+    });
+  });
 });

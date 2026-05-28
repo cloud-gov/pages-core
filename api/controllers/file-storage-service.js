@@ -1,4 +1,4 @@
-const { isEmpty } = require('underscore');
+const { isEmpty } = require('../utils');
 const EventCreator = require('../services/EventCreator');
 const {
   canCreateSiteStorage,

@@ -1,6 +1,6 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
-const { zip } = require('underscore');
+const { zip } = require('../utils');
 
 const { Build } = require('../models');
 const CFApi = require('../utils/cfApiClient');

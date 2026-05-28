@@ -1,4 +1,4 @@
-const _ = require('underscore');
+const utils = require('../utils');
 const parse = require('json-templates');
 const {
   app: { appEnv },
@@ -24,7 +24,7 @@ function filterEntity(res, name, field = 'name') {
 
 function findEntity(res, name, field = 'name', { errorMessage } = {}) {
   const errMsg = errorMessage || `Not found: Entity @${field} = ${name}`;
-  const entity = res.resources.find((item) => _.get(item, field) === name);
+  const entity = res.resources.find((item) => utils.get(item, field) === name);
   if (!entity) {
     const error = new Error(errMsg);
     error.name = name;

@@ -1,9 +1,9 @@
-const _ = require('underscore');
+const utils2 = require('../utils');
 const utils = require('.');
 
 function buildWhereQuery(queryOptions = {}, queryFields = []) {
   const hasAllowed = queryFields.length > 0;
-  return hasAllowed ? _.pick(queryOptions, queryFields) : queryOptions;
+  return hasAllowed ? utils2.pick(queryFields, queryOptions) : queryOptions;
 }
 
 async function fetchModelById(id, Model, opts = {}) {

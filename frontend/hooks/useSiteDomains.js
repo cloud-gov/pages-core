@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import _ from 'underscore';
+import { omitByPredicate } from '@util';
 import api from '../util/federalistApi';
 import { useSiteBranchConfigs } from './useSiteBranchConfigs';
 
@@ -148,7 +148,7 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
   }, [siteId, domainId, domains, siteBranchConfigs]);
 
   function setDomainValues({ names, siteBranchConfigId }) {
-    const updated = _.omit(
+    const updated = omitByPredicate(
       {
         names,
         siteBranchConfigId,

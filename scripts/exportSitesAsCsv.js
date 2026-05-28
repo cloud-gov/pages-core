@@ -2,7 +2,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const _ = require('underscore');
+const utils = require('../api/utils');
 const json2csv = require('@json2csv/plainjs');
 
 const { User, Site } = require('../api/models');
@@ -22,7 +22,7 @@ function resolveDestination(d) {
 }
 
 function sitesFromUsers(users) {
-  return _.flatten(
+  return utils.flatten(
     users.map((user) =>
       user.Sites.map((site) => ({
         id: site.id,
@@ -38,7 +38,7 @@ function consolidateOnSiteId(sites) {
   const ids = sites.map((site) => site.id);
 
   return ids.map((id, i) => {
-    const sitesById = _.where(sites, { id });
+    const sitesById = utils.where(sites, { id });
     // TODO: if using this again, need to replace site.users
     const users = sitesById.map((site) => site.users[0]);
 

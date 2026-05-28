@@ -31,3 +31,7 @@ export function capitalize(str) {
 export function cleanUrlPathSlashes(urlPath) {
   return urlPath.replace(/([^:]\/)\/+/g, '$1');
 }
+
+export function omitByPredicate(obj, predicate) {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => !predicate(v)));
+}
