@@ -352,6 +352,52 @@ function normalizeDirectoryPath(dir) {
   return normalized;
 }
 
+const omitByPredicate = (obj, predicate) =>
+  Object.fromEntries(Object.entries(obj).filter(([, v]) => !predicate(v)));
+
+const get = (obj, path) => {
+  if (path == null) return undefined;
+  const keys = Array.isArray(path) ? path : path.toString().split('.');
+  return keys.reduce((acc, key) => acc?.[key], obj);
+};
+
+const flatten = (array, shallow = false) => array.flat(shallow ? 1 : Infinity);
+
+const where = (list, properties) =>
+  list.filter((item) =>
+    Object.entries(properties).every(([key, value]) => item[key] === value),
+  );
+
+const mapObject = (obj, fn) =>
+  Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, fn(value, key)]));
+
+const zip = (...arrays) => arrays[0].map((_, i) => arrays.map((arr) => arr[i]));
+
+const isString = (value) => typeof value === 'string';
+
+const isNumber = (value) => typeof value === 'number' && !isNaN(value);
+
+const isFunction = (value) => typeof value === 'function';
+
+const isArray = (value) => Array.isArray(value);
+
+const isObject = (value) =>
+  value !== null && typeof value === 'object' && !Array.isArray(value);
+
+const isEmpty = (value) => {
+  if (value == null) return true;
+  if (Array.isArray(value) || typeof value === 'string') return value.length === 0;
+  if (typeof value === 'object') return Object.keys(value).length === 0;
+  return false;
+};
+
+const map = (value, fn) =>
+  Array.isArray(value)
+    ? value.map(fn)
+    : Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [key, fn(item, key)]),
+      );
+
 module.exports = {
   appMatch,
   buildEnum,
@@ -380,4 +426,17 @@ module.exports = {
   defaultContext,
   DEFAULT_BUILD_TASK_PARAMS,
   DEFAULT_SCAN_RULES,
+  omitByPredicate,
+  get,
+  flatten,
+  where,
+  mapObject,
+  zip,
+  isString,
+  isNumber,
+  isFunction,
+  isArray,
+  isObject,
+  isEmpty,
+  map,
 };

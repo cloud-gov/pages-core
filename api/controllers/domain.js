@@ -1,4 +1,4 @@
-const _ = require('underscore');
+const utils = require('../utils');
 const EventCreator = require('../services/EventCreator');
 const domainSerializer = require('../serializers/domain');
 const { wrapHandlers } = require('../utils');
@@ -172,7 +172,7 @@ module.exports = wrapHandlers({
       });
     }
 
-    const payload = _.omit(
+    const payload = utils.omitByPredicate(
       {
         siteBranchConfigId,
         names,

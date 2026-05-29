@@ -1,5 +1,4 @@
-const _ = require('underscore');
-const { wrapHandlers } = require('../utils');
+const { wrapHandlers, omitByPredicate } = require('../utils');
 const { serialize, serializeMany } = require('../serializers/site-branch-config');
 const EventCreator = require('../services/EventCreator');
 const { ValidationError, parseSiteConfig } = require('../utils/validators');
@@ -196,7 +195,7 @@ module.exports = wrapHandlers({
         return res.notFound();
       }
 
-      const payload = _.omit(
+      const payload = omitByPredicate(
         {
           branch,
           config,

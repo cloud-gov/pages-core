@@ -1,5 +1,5 @@
 const Crypto = require('crypto');
-const _ = require('underscore');
+const utils = require('../utils');
 
 const ALGORITHM = 'aes-256-gcm';
 
@@ -39,11 +39,11 @@ function encryptObjectValues(
   { hintSize = 4, onlyEncryptKeys = [] } = {},
 ) {
   const returnEncrypted = (item, shouldEncrypt = true) => {
-    if (_.isString(item) && shouldEncrypt) {
+    if (utils.isString(item) && shouldEncrypt) {
       return encrypt(item, encryptionKey, { hintSize }).ciphertext;
     }
 
-    if (_.isNumber(item) && shouldEncrypt) {
+    if (utils.isNumber(item) && shouldEncrypt) {
       return encrypt(item.toString(), encryptionKey, { hintSize }).ciphertext;
     }
 
@@ -52,20 +52,20 @@ function encryptObjectValues(
 
   const encryptAll = onlyEncryptKeys.length === 0;
 
-  return _.mapObject(obj, (value, key) => {
+  return utils.mapObject(obj, (value, key) => {
     const shouldEncrypt = encryptAll || onlyEncryptKeys.includes(key);
 
-    if (_.isFunction(value)) {
+    if (utils.isFunction(value)) {
       return value;
     }
 
-    if (_.isArray(value) && shouldEncrypt) {
-      return _.map(value, (item) => {
-        if (_.isFunction(item)) {
+    if (utils.isArray(value) && shouldEncrypt) {
+      return utils.map(value, (item) => {
+        if (utils.isFunction(item)) {
           return item;
         }
 
-        if (_.isObject(item)) {
+        if (utils.isObject(item)) {
           return encryptObjectValues(item, encryptionKey, {
             hintSize,
             onlyEncryptKeys,
@@ -76,7 +76,7 @@ function encryptObjectValues(
       });
     }
 
-    if (_.isObject(value)) {
+    if (utils.isObject(value)) {
       return encryptObjectValues(value, encryptionKey, {
         hintSize,
         onlyEncryptKeys,

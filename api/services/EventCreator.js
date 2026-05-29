@@ -1,4 +1,4 @@
-const _ = require('underscore');
+const utils = require('../utils');
 const { logger } = require('../../winston');
 const { Event } = require('../models');
 
@@ -76,11 +76,11 @@ const handlerError = async (request, err) => {
   };
 
   if (params) {
-    errBody.request.params = _.omit(params, requestDenyList);
+    errBody.request.params = utils.omit(params, requestDenyList);
   }
 
   if (body) {
-    errBody.request.body = _.omit(body, requestDenyList);
+    errBody.request.body = utils.omit(body, requestDenyList);
   }
 
   return error(Event.labels.REQUEST_HANDLER, err, errBody);
