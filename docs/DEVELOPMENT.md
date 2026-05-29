@@ -263,7 +263,7 @@ Some credentials in this pipeline are "compound" credentials that use the pipeli
 |**`((support-email))`**| Our support email address | :x:|
 |**`((git-base-url))`**|The base url to the git server's HTTP endpoint|:x:|
 |**`((pages-repository-path))`**|The url path to the repository|:x:|
-|**`((pages-operations-ci-github-token))`**| The Github access token|:x:|
+|**`((gh-access-token))`**| The Github access token|:x:|
 
 ##### Setting up the pipeline for Core
 The pipeline and each of it's instances will only needed to be set once per instance to create the initial pipeline. After the pipelines are set, updates to the default branch will automatically set the pipeline. See the [`set_pipeline` step](https://concourse-ci.org/set-pipeline-step.html) for more information. First, a compiled pipeline file needs to be created with [`ytt`](https://carvel.dev/ytt/):
