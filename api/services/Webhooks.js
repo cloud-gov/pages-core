@@ -49,12 +49,14 @@ const createBuildForEditor = async (siteId) => {
     return;
   }
 
+  logger.info(`Creating Build with site id: ${siteId} `);
   const build = await BuildService.createBuild(
     {
       branch,
       site: siteId,
       user: userId,
       username,
+      isEditorSiteBuild: true,
     },
     SourceCodePlatformHelper.flows.FLOW___EDITOR_BUILD,
   );

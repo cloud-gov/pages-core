@@ -6,7 +6,7 @@ const { isEmptyOrBranch, isEmptyOrUrl, shaRegex } = require('../utils/validators
 const { buildUrl } = require('../utils/build');
 const { buildEnum } = require('../utils');
 const { createQueueConnection } = require('../utils/queues');
-
+const editorWebhookClient = require('../utils/editorWebhookClient');
 const connection = createQueueConnection();
 const queue = new QueueJobs(connection);
 
@@ -192,6 +192,18 @@ async function enqueue() {
     await build.updateJobStatus({
       status: States.Queued,
     });
+    await build.reload();
+    if (build.isEditorSiteBuild) {
+      await foundBuild.reload();
+      const data = {
+        pagesSiteId: Number(build.Site.editorSiteId),
+        state: States.Queued,
+        completedAt: build?.completedAt?.toISOString(),
+        startedAt: build?.startedAt?.toISOString(),
+      };
+
+      await editorWebhookClient.post(`/buildStatus/${foundBuild.id}`, data);
+    }
   } catch (err) {
     const errMsg = `There was an error, adding the job to SiteBuildQueue: ${err}`;
 
@@ -199,6 +211,18 @@ async function enqueue() {
       status: States.Error,
       message: errMsg,
     });
+    if (build.isEditorSiteBuild) {
+      await build.reload();
+      const data = {
+        pagesSiteId: Number(foundBuild.Site.editorSiteId),
+        state: States.Error,
+        message: errMsg,
+        completedAt: build?.completedAt?.toISOString(),
+        startedAt: build?.startedAt?.toISOString(),
+      };
+
+      await editorWebhookClient.post(`/buildStatus/${foundBuild.id}`, data);
+    }
   }
 
   return build;
@@ -305,6 +329,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       metrics: {
         type: DataTypes.JSON,
+      },
+      isEditorSiteBuild: {
+        type: DataTypes.BOOLEAN,
       },
     },
     {

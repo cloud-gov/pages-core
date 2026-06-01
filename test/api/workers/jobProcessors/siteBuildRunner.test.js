@@ -17,6 +17,7 @@ const SiteBuildQueueService = require('../../../../api/services/SiteBuildQueue')
 const factory = require('../../support/factory');
 const { promisedQueueEvents } = require('../../support/queues');
 const { createQueueConnection } = require('../../../../api/utils/queues');
+const editorClient = require('../../../../api/utils/editorWebhookClient');
 
 const buildIncludeOptions = {
   include: [
@@ -330,6 +331,132 @@ describe('siteBuildRunner', () => {
       expect(cfTaskStub.callCount).to.equal(3);
       sinon.assert.calledOnceWithExactly(stubSetupTaskEnv, build.id);
       sinon.assert.calledWith(stubTaskStatus, guid);
+    });
+
+    it('should have call editor webhook to build a pages editor site', async () => {
+      const guid = 'task-guid';
+      const taskState = 'SUCCEEDED';
+      const editorSiteId = 12345;
+      const stubStartSiteBuildTask = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'startSiteBuildTask',
+      );
+      stubStartSiteBuildTask.resolves({
+        guid,
+        state: taskState,
+      });
+      const webhookPost = sinon.stub(editorClient, 'post');
+      webhookPost.resolves({ data: 'success' });
+
+      const fb = await factory.build();
+      let build = await Build.findByPk(fb.id, buildIncludeOptions);
+
+      await build.update({
+        isEditorSiteBuild: true,
+      });
+
+      await build.Site.update({
+        editorSiteId,
+      });
+
+      const message = taskMessage(build.id);
+      const stubSetupTaskEnv = sinon.stub(SiteBuildQueue, 'setupTaskEnv');
+
+      stubSetupTaskEnv.resolves({
+        build,
+        message,
+      });
+
+      const stubTaskStatus = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'fetchTaskByGuid',
+      );
+      stubTaskStatus.resolves({
+        state: taskState,
+      });
+
+      const job = await queue.add('sendTaskMessage', {
+        buildId: build.id,
+      });
+      const result = await promisedQueueEvents(queueEvents, 'completed');
+      expect(result.jobId).to.equal(job.id);
+      sinon.assert.calledOnceWithExactly(stubStartSiteBuildTask, message, job.id, {
+        sleepInterval: 0,
+      });
+      sinon.assert.calledOnceWithExactly(stubSetupTaskEnv, build.id);
+      sinon.assert.calledWith(stubTaskStatus, guid);
+      const webhookArgs = webhookPost.getCall(0).args;
+
+      expect(webhookArgs[0]).to.equal(`/buildStatus/${build.id}`);
+      expect(webhookArgs[1]).to.have.property('pagesSiteId');
+      expect(webhookArgs[1]).to.have.property('state');
+      expect(webhookArgs[1]).to.have.property('completedAt');
+      expect(webhookArgs[1].pagesSiteId).to.equals(editorSiteId);
+      expect(webhookArgs[1].state).to.equals(Build.States.Created);
+      expect(webhookPost.calledOnce).to.equal(true);
+    });
+
+    it('should call editor webhook if fails', async () => {
+      const guid = 'task-guid';
+      const taskState = 'SUCCEEDED';
+      const taskFinishedState = 'FAILED';
+      const editorSiteId = 12345;
+
+      const stubStartSiteBuildTask = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'startSiteBuildTask',
+      );
+      stubStartSiteBuildTask.resolves({
+        guid,
+        state: taskState,
+      });
+
+      const fb = await factory.build();
+      const build = await Build.findByPk(fb.id, buildIncludeOptions);
+      const message = taskMessage(build.id);
+      const stubSetupTaskEnv = sinon.stub(SiteBuildQueue, 'setupTaskEnv');
+      stubSetupTaskEnv.resolves({
+        build,
+        message,
+      });
+
+      await build.update({
+        isEditorSiteBuild: true,
+      });
+
+      await build.Site.update({
+        editorSiteId,
+      });
+
+      const stubTaskStatus = sinon.stub(
+        CloudFoundryAPIClient.prototype,
+        'fetchTaskByGuid',
+      );
+      stubTaskStatus.resolves({
+        state: taskFinishedState,
+      });
+
+      const webhookPost = sinon.stub(editorClient, 'post');
+      webhookPost.resolves({ data: 'success' });
+
+      expect(build.state).to.equal(Build.States.Created);
+
+      await queue.add('sendTaskMessage', {
+        buildId: build.id,
+      });
+      await promisedQueueEvents(queueEvents, 'completed');
+
+      await build.reload();
+
+      const webhookArgs = webhookPost.getCall(0).args;
+
+      expect(webhookArgs[0]).to.equal(`/buildStatus/${build.id}`);
+      expect(webhookArgs[1]).to.have.property('pagesSiteId');
+      expect(webhookArgs[1]).to.have.property('state');
+      expect(webhookArgs[1]).to.have.property('completedAt');
+      expect(webhookArgs[1].pagesSiteId).to.equals(editorSiteId);
+      expect(webhookArgs[1].state).to.equals(Build.States.Error);
+      expect(webhookPost.calledOnce).to.equal(true);
     });
   });
 });

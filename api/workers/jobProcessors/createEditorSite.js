@@ -1,12 +1,12 @@
-const axios = require('axios');
 const SiteCreator = require('../../services/SiteCreator');
 const Organization = require('../../services/organization');
-const { encrypt, encryptObjectValues } = require('../../services/Encryptor');
+const { encrypt } = require('../../services/Encryptor');
 const Mailer = require('../../workers/Mailer');
 const { alert } = require('../../services/mailer/templates');
 const { UserEnvironmentVariable } = require('../../models');
 const { createJobLogger } = require('./utils');
-const { userEnvVar, encryption } = require('../../../config');
+const { userEnvVar } = require('../../../config');
+const editorClient = require('../../utils/editorWebhookClient');
 
 const { PAGES_PUBLISHER_HOST } = process.env;
 
@@ -26,12 +26,6 @@ const { PAGES_PUBLISHER_HOST } = process.env;
 async function createEditorSite(job) {
   // Webhook client to send success or error request to
   // Pages Editor site endpoint
-  const webhookClient = axios.create({
-    baseURL: `${PAGES_PUBLISHER_HOST}/api/webhook/site`,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
   const logger = createJobLogger(job);
   const {
     siteId: editorSiteId,
@@ -56,6 +50,7 @@ async function createEditorSite(job) {
         organizationId: parseInt(org.id, 10),
         repository: 'pages-site-gantry',
         engine: 'node.js',
+        editorSiteId,
       },
     });
 
@@ -81,15 +76,9 @@ async function createEditorSite(job) {
 
     logger.log('Posting site creation success webhook');
 
-    const data = encryptObjectValues(
-      {
-        siteId: site.id,
-        orgId: org.id,
-        bucket: s3.bucket,
-      },
-      encryption.key,
-    );
-    await webhookClient.post(`/${editorSiteId}`, data);
+    const data = { siteId: site.id, orgId: org.id, bucket: s3.bucket };
+
+    await editorClient.post(`/site/${editorSiteId}`, data);
 
     logger.log('Site successfully created');
 
