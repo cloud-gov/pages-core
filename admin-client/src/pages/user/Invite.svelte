@@ -37,7 +37,7 @@
   <Await on={metaPromise} let:response={meta}>
     <form
       class="usa-form usa-form--large"
-      on:submit|preventDefault={handleSubmit} >
+      on:submit={(e) => { e.preventDefault(); handleSubmit(e); }} >
 
       <legend class="usa-legend usa-legend--large">Invite User</legend>
 

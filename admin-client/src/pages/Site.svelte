@@ -318,7 +318,7 @@
                 class="usa-button"
                 type="button"
                 value="Edit"
-                on:click|preventDefault={() => handleOpenEditSiteBuildTask(sbt)}
+                on:click={(e) => { e.preventDefault(); handleOpenEditSiteBuildTask(sbt); }}
               />
             </td>
             <td>
@@ -326,7 +326,7 @@
                 class="usa-button usa-button--base"
                 type="reset"
                 value="Remove"
-                on:click|preventDefault={() => handleRemoveBuildTask(sbt)}
+                on:click={(e) => { e.preventDefault(); handleRemoveBuildTask(sbt); }}
               />
             </td>
           </tr>

@@ -7,9 +7,16 @@ export default defineConfig({
       hot: !process.env.VITEST,
       compilerOptions: {
         dev: true,
+        // Enable Svelte 5 legacy mode for Svelte 3 compatibility
+        compatibility: {
+          componentApi: 4
+        }
       },
     }),
   ],
+  resolve: {
+    conditions: ['browser']
+  },
   test: {
     environment: 'jsdom',
     globals: true,

@@ -41,7 +41,7 @@
   <Await on={orgPromise} let:response={org}>
     <form
       class="usa-form usa-form--large"
-      on:submit|preventDefault={handleSubmit}
+      on:submit={(e) => { e.preventDefault(); handleSubmit(e); }}
     >
       <legend class="usa-legend usa-legend--large">Edit Organization</legend>
 

@@ -20,7 +20,7 @@
     <div class="display-flex flex-column flex-align-end">
       <button
         class="usa-button usa-button--base"
-        on:click|preventDefault={() => closeModal()}
+        on:click={(e) => { e.preventDefault(); closeModal(); }}
       >
         Close
       </button>
