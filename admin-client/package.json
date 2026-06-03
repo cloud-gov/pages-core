@@ -37,11 +37,9 @@
   "dependencies": {
     "@uswds/uswds": "^3.8.2",
     "date-fns": "^4.1.0",
-    "page": "^1.11.6",
     "svelecte": "^5.3.0",
+    "path-to-regexp": "1.9.0",
     "svelte": "^5.0.0"
   },
-  "resolutions": {
-    "path-to-regexp": "1.9.0"
-  }
+  "resolutions": {}
 }

@@ -1,4 +1,4 @@
-import page from 'page';
+import page from '../lib/page';
 import { notification } from '../stores';
 import { deactivateOrganization, activateOrganization } from '../lib/api';
 

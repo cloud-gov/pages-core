@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../lib/page';
   import Svelecte from 'svelecte';
   import { formToObj, objToQueryString } from '../lib/utils';
   import { router } from '../stores';

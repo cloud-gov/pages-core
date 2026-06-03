@@ -7,5 +7,5 @@ run:
   args:
     [
       -c,
-      "npm audit --omit=dev; [[ $? -ge $VULN_THRESHOLD ]] && exit 1 || exit 0",
+      "npm audit --omit=dev --audit-level=$VULN_THRESHOLD",
     ]

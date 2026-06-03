@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../../lib/page';
   import { afterUpdate } from 'svelte';
   import { router } from '../../stores';
   import { Await, GridContainer } from '../../components';
