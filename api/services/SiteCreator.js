@@ -29,6 +29,7 @@ function paramsForNewSite(params) {
     sourceCodePlatform: params.sourceCodePlatform,
     sourceCodeUrl: params.sourceCodeUrl,
     config,
+    editorSiteId: params.editorSiteId || null,
   };
 }
 

@@ -2,6 +2,7 @@ const { Build } = require('../../models');
 const SiteBuildQueueService = require('../../services/SiteBuildQueue');
 const { createJobLogger } = require('./utils');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
+const editorWebhookClient = require('../../utils/editorWebhookClient');
 
 const apiClient = new CloudFoundryAPIClient();
 
@@ -25,11 +26,11 @@ const sleepInterval = process.env.NODE_ENV === 'test' ? 0 : 1000;
 async function siteBuildRunner(job, { sleepNumber = 15000, totalAttempts = 180 } = {}) {
   const logger = createJobLogger(job);
   const { buildId } = job.data;
-
+  let editorSiteId = null;
   logger.log(`Running site build: ${buildId}`);
   try {
     const { build, message } = await SiteBuildQueueService.setupTaskEnv(buildId);
-
+    editorSiteId = build.Site.editorSiteId;
     const {
       branch,
       Site: { owner, repository },
@@ -72,6 +73,19 @@ async function siteBuildRunner(job, { sleepNumber = 15000, totalAttempts = 180 }
       });
     }
 
+    if (build.isEditorSiteBuild) {
+      await build.reload();
+
+      const data = {
+        pagesSiteId: Number(editorSiteId),
+        state: build.state,
+        completedAt: build?.completedAt?.toISOString(),
+        startedAt: build?.startedAt?.toISOString(),
+      };
+      logger.log(`Updating Build Status ${build.id}.`);
+      await editorWebhookClient.post(`/buildStatus/${build.id}`, data);
+    }
+
     logger.log(`Site build completed with ${build.state}`);
 
     return true;
@@ -79,10 +93,24 @@ async function siteBuildRunner(job, { sleepNumber = 15000, totalAttempts = 180 }
     const message = `Error site build ${buildId}: ${err?.message}`;
     logger.log(message);
     const errorTask = await Build.findByPk(buildId);
+
     await errorTask.update({
       state: Build.States.Error,
-      error: err?.message,
+      error: err.message,
     });
+
+    if (errorTask.isEditorSiteBuild) {
+      const data = {
+        pagesSiteId: Number(editorSiteId),
+        state: Build.States.Error,
+        completedAt: errorTask?.completedAt?.toISOString(),
+        error: err.message,
+        startedAt: errorTask?.startedAt?.toISOString(),
+      };
+
+      await editorWebhookClient.post(`/buildStatus/${errorTask.id}`, data);
+    }
+
     logger.log(err?.stack);
     throw new Error(message);
   }

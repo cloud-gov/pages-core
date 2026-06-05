@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const axios = require('axios');
 const SiteCreator = require('../../../../api/services/SiteCreator');
 const { QueueEvents } = require('bullmq');
 const QueueWorker = require('../../../../api/workers/QueueWorker');
@@ -20,6 +19,7 @@ const jobProcessors = require('../../../../api/workers/jobProcessors');
 const factory = require('../../support/factory');
 const { promisedQueueEvents } = require('../../support/queues');
 const { createQueueConnection } = require('../../../../api/utils/queues');
+const editorClient = require('../../../../api/utils/editorWebhookClient');
 
 const testJobOptions = {
   sleepNumber: 0,
@@ -84,8 +84,8 @@ describe('createEditorSite', () => {
         return { site, s3 };
       });
 
-      const webhookPost = sinon.spy();
-      sinon.stub(axios, 'create').returns({ post: webhookPost });
+      const webhookPost = sinon.stub(editorClient, 'post');
+      webhookPost.resolves({ data: 'success' });
 
       const job = await queue.add('sendTaskMessage', {
         siteId,
@@ -96,9 +96,8 @@ describe('createEditorSite', () => {
 
       const result = await promisedQueueEvents(queueEvents, 'completed');
       expect(result.jobId).to.equal(job.id);
-
       const webhookArgs = webhookPost.getCall(0).args;
-      expect(webhookArgs[0]).to.equal(`/${siteId}`);
+      expect(webhookArgs[0]).to.equal(`/site/${siteId}`);
       expect(webhookArgs[1]).to.have.property('siteId');
       expect(webhookArgs[1]).to.have.property('orgId');
       expect(webhookArgs[1]).to.have.property('bucket');
@@ -129,9 +128,8 @@ describe('createEditorSite', () => {
         return { site, s3 };
       });
 
-      const webhookPost = sinon.spy();
-      sinon.stub(axios, 'create').returns({ post: webhookPost });
-
+      const webhookPost = sinon.stub(editorClient, 'post');
+      webhookPost.resolves({ data: 'success' });
       const job = await queue.add('sendTaskMessage', {
         siteId,
         siteName,
@@ -143,7 +141,7 @@ describe('createEditorSite', () => {
       expect(result.jobId).to.equal(job.id);
 
       const webhookArgs = webhookPost.getCall(0).args;
-      expect(webhookArgs[0]).to.equal(`/${siteId}`);
+      expect(webhookArgs[0]).to.equal(`/site/${siteId}`);
       expect(webhookArgs[1]).to.have.property('siteId');
       expect(webhookArgs[1]).to.have.property('orgId');
       expect(webhookArgs[1]).to.have.property('bucket');
