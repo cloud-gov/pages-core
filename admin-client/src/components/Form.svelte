@@ -40,7 +40,7 @@
 <form
   class="usa-form"
   class:usa-form--large={large}
-  on:submit|preventDefault={handleSubmit} >
+  on:submit={(e) => { e.preventDefault(); handleSubmit(); }} >
 
   <fieldset class="usa-fieldset">
     {#if title}

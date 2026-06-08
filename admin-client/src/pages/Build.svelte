@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../lib/page';
   import { afterUpdate } from 'svelte';
   import { notification, router } from '../stores';
   import {
@@ -71,7 +71,7 @@
       <div class="tablet:grid-col-auto padding-bottom-1">
         <div class="grid-row flex-column flex-align-end">
           {#if !['error', 'success', 'invalid'].includes(build.state)}
-            <form on:submit|preventDefault={handleFailSubmit}>
+            <form on:submit={(e) => { e.preventDefault(); handleFailSubmit(); }}>
               <input type="submit" value="Fail build" disabled={submitting}>
             </form>
           {/if}

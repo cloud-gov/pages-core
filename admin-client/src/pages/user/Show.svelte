@@ -94,7 +94,7 @@
         <div class="tablet:grid-col-auto padding-bottom-1">
           <button
             class="usa-button"
-            on:click|preventDefault={() => handleResendInvite(user.UAAIdentity.email)}>
+            on:click={(e) => { e.preventDefault(); handleResendInvite(user.UAAIdentity.email); }}>
             Resend Invite
           </button>
         </div>
@@ -166,7 +166,7 @@
                     padding-x-1
                     padding-y-05
                   "
-                  on:click|preventDefault={handleRemoveUserOrgRole(orgRole.Organization.id)}
+                  on:click={(e) => { e.preventDefault(); handleRemoveUserOrgRole(orgRole.Organization.id)(); }}
                 >
                   Remove
                 </button>

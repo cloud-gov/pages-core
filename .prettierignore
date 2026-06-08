@@ -1,8 +1,9 @@
 # Ignore artifacts:
 build
 coverage
+package-lock.json
 
-Ignore All Non JS
+# Ignore All Non JS
 **/*.yml
 **/*.md
 **/*.css

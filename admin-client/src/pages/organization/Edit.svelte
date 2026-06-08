@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../../lib/page';
   import { afterUpdate } from 'svelte';
   import { router } from '../../stores';
   import { Await, GridContainer } from '../../components';
@@ -41,7 +41,7 @@
   <Await on={orgPromise} let:response={org}>
     <form
       class="usa-form usa-form--large"
-      on:submit|preventDefault={handleSubmit}
+      on:submit={(e) => { e.preventDefault(); handleSubmit(e); }}
     >
       <legend class="usa-legend usa-legend--large">Edit Organization</legend>
 

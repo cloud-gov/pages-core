@@ -15,6 +15,6 @@
 
 <button
   class="usa-nav__link"
-  on:click|preventDefault={action}>
+  on:click={(e) => { e.preventDefault(); action(); }}>
   <span><slot/></span>
 </button>

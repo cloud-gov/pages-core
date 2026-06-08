@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { render, screen, beforeEach } from '@testing-library/svelte';
-import { describe, test, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/svelte';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { writable } from 'svelte/store';
 
 vi.mock('../stores', () => {

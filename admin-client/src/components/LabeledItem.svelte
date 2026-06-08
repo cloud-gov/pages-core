@@ -5,7 +5,7 @@
 </script>
 
 <p class="margin-y-05">
-  <span class="text-semibold text-lowercase text-ls-neg-3 font-sans-2xs">{label}: <span>
+  <span class="text-semibold text-lowercase text-ls-neg-3 font-sans-2xs">{label}:</span>
   {#if value}
     <span class="text-bold" title={title}>{value}</span>
   {:else}

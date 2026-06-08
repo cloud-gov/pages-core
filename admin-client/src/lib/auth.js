@@ -1,5 +1,5 @@
 /* global API_URL */
-import page from 'page';
+import page from './page/index.js';
 import { session } from '../stores';
 
 const apiUrl = API_URL;

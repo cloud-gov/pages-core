@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from './lib/page';
   import { get } from 'svelte/store';
   import { router, session } from './stores';
   import * as Pages from './pages';
@@ -11,8 +11,9 @@
 
   function queryString(ctx, next) {
     ctx.query = {};
-    new URLSearchParams(ctx.querystring)
-      .forEach((v, k) => { ctx.query[k] = v; });
+    new URLSearchParams(ctx.querystring).forEach((v, k) => {
+      ctx.query[k] = v;
+    });
     next();
   }
 
@@ -67,12 +68,20 @@
   page('/organizations/:id', queryString, render(Pages.Organization.Show));
   page('/organizations/:id/edit', queryString, render(Pages.Organization.Edit));
   page('/reports/organizations', queryString, render(Pages.Organization.OrgsReport));
-  page('/reports/published-sites', queryString, render(Pages.Organization.PublishedSitesReport));
+  page(
+    '/reports/published-sites',
+    queryString,
+    render(Pages.Organization.PublishedSitesReport),
+  );
   page('/reports/all-users', queryString, render(Pages.User.UsersReport));
   page('/reports/active-users', queryString, render(Pages.User.ActiveUsersReport));
   page('/reports', queryString, render(Pages.Reports));
   page('/tasks', queryString, render(Pages.Tasks));
-  page('/site-file-storage/:id/user-actions', queryString, render(Pages.FileStorageActions));
+  page(
+    '/site-file-storage/:id/user-actions',
+    queryString,
+    render(Pages.FileStorageActions),
+  );
   page('*', render(Pages.NotFound));
   page();
 </script>
