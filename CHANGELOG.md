@@ -1,3 +1,41 @@
+## 0.24.0 (2026-06-08)
+
+### Added
+
+- Call editor webhook when a editor build is running
+- add editor site id field
+- Update pages Admin project repository links for Workshop GitLab sites 4877
+- Site defaults to large container with new 10GB disk space
+- Increase file size limit on the public file storage 4885 - add audit event
+- Increase file size limit on the public file storage 4885
+
+### Fixed
+
+- fix linting
+- fix lint
+- add log
+- fix date check
+
+### Maintenance
+
+- **admin**: Vendor page router to allow for dependency updates
+- Upgrade admin client to svelte v5
+- **ci**: Update .prettierignore to ignore package-lock.json
+- add tests
+- remove empty space
+- add logs
+- stringify json
+- stringify json
+- stringify json
+- remove console logs
+- Update Pages ci pipelines to use the same creds value for Github. #2839
+- Remove underscore dependency from pages-core #2946
+- Update core to use NPM install with improved security config 2949
+- Remove archived gatsby template from site choices
+- Update core to use NPM install with improved security config 2949
+- Update core to use NPM install with improved security config 2949
+- Update core to use NPM install with improved security config 2949
+
 ## 0.23.1 (2026-05-14)
 
 ### Fixed
