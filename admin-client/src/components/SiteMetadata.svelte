@@ -19,7 +19,8 @@
     updatedAt,
     isActive,
     organizationId,
-    sourceCodePlatform
+    sourceCodePlatform,
+    editorSiteId
   } = site;
 
   const siteLinks = selectSiteLinks(site);
@@ -41,6 +42,9 @@
     <LabeledItem label="status" value={isActive ? 'Active' : 'Inactive'} />
     <LabeledItem label="created at" value={createDate} />
     <LabeledItem label="updated at" value={updateDate} />
+    {#if editorSiteId}
+      <LabeledItem label="editor site id" value={editorSiteId} />
+    {/if}
   </div>
   <div class="tablet:grid-col-auto padding-bottom-1">
     <div class="grid-row flex-column flex-align-end">

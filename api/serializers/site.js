@@ -21,6 +21,7 @@ const allowedAttributes = [
   'awsBucketName',
   'isActive',
   'organizationId',
+  'editorSiteId',
   'Domains',
   'FileStorageService',
   'Organization',
