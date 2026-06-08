@@ -15,6 +15,7 @@
         <p class="text-center">
           Welcome {$session.user.username}!
         </p>
+      </div>
     </div>
   </div>
 </GridContainer>

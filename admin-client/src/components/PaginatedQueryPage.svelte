@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../lib/page';
   import Svelecte from 'svelecte';
   import { formToObj, objToQueryString } from '../lib/utils';
   import { router } from '../stores';
@@ -83,7 +83,7 @@
                 <div class="grid-row grid-gap-4">
                   <form
                     class="usa-form maxw-none width-full"
-                    on:submit|preventDefault={handleSubmit}
+                    on:submit={(e) => { e.preventDefault(); handleSubmit(); }}
                   >
                     <div class="controls display-flex flex-wrap">
                       {#each fieldArray as field}
@@ -136,7 +136,7 @@
           <form
             class="usa-search usa-search--small flex-align-center"
             role="search"
-            on:submit|preventDefault={handleSubmit}
+            on:submit={(e) => { e.preventDefault(); handleSubmit(); }}
           >
             <label class="usa-label margin-top-0 margin-right-1" for="limit"
               >Limit:</label
@@ -174,6 +174,7 @@
           <button
             class="usa-button usa-button--unstyled"
             on:click={() => handleTagClick({ [key]: '' })}
+            aria-label="Remove {key} filter"
           >
             <svg
               class="usa-icon margin-right-1"

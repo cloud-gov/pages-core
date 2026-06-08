@@ -26,7 +26,7 @@
         <div class="grid-col flex-auto">
           <button
             class="usa-button usa-button--outline"
-            on:click|preventDefault={notification.clear}>
+            on:click={(e) => { e.preventDefault(); notification.clear(); }}>
             Close
           </button>
         </div>

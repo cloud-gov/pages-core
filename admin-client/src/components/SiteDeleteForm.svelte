@@ -22,7 +22,7 @@
 
 <form
   class="usa-form width-full maxw-none padding-1"
-  on:submit|preventDefault={handleSubmit}>
+  on:submit={(e) => { e.preventDefault(); handleSubmit(); }}>
   <fieldset class="usa-fieldset">
     <legend>
       This will perform a soft delete of a cloud.gov Pages site and remove the Cloud
@@ -40,7 +40,7 @@
   <Modal>
     <form
       class="usa-form width-full maxw-mobile-lg padding-1"
-      on:submit|preventDefault={handleVerification}>
+      on:submit={(e) => { e.preventDefault(); handleVerification(); }}>
       <fieldset class="usa-fieldset">
         <legend>
           Are you sure you want to delete site
@@ -58,7 +58,7 @@
             class="usa-button usa-button--base"
             type="reset"
             value="Cancel"
-            on:click|preventDefault={handleCancel} />
+            on:click={(e) => { e.preventDefault(); handleCancel(); }} />
         </div>
       </fieldset>
     </form>

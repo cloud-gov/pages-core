@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../../lib/page';
   import { afterUpdate } from 'svelte';
   import { Await, GridContainer } from '../../components';
   import { fetchOrganizations, fetchRoles, inviteUser } from '../../lib/api';
@@ -37,7 +37,7 @@
   <Await on={metaPromise} let:response={meta}>
     <form
       class="usa-form usa-form--large"
-      on:submit|preventDefault={handleSubmit} >
+      on:submit={(e) => { e.preventDefault(); handleSubmit(e); }} >
 
       <legend class="usa-legend usa-legend--large">Invite User</legend>
 

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, beforeEach } from '@testing-library/svelte';
-import { describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/svelte';
+import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { writable } from 'svelte/store';
 import { waitFor } from '@testing-library/react';
 

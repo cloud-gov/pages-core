@@ -52,9 +52,13 @@
 </style>
 
 <div
-  on:click|preventDefault={() => (isOpen ? toggleOpen() : '')}
-  on:keypress|preventDefault={() => (isOpen ? toggleOpen() : '')}
-  class="usa-overlay {visible}" />
+  on:click={(e) => { e.preventDefault(); if (isOpen) toggleOpen(); }}
+  on:keypress={(e) => { e.preventDefault(); if (isOpen) toggleOpen(); }}
+  class="usa-overlay {visible}"
+  role="button"
+  tabindex="0"
+  aria-label="Close navigation overlay">
+</div>
 <header class="usa-header usa-header--basic">
   <div class="usa-nav-container">
     <div class="usa-navbar">
@@ -69,14 +73,14 @@
           </a>
         </em>
       </div>
-      <button on:click|preventDefault={toggleOpen} class="usa-menu-btn">
+      <button on:click={(e) => { e.preventDefault(); toggleOpen(); }} class="usa-menu-btn">
         Menu
       </button>
     </div>
     <nav
       aria-label="Primary navigation"
       class=" bg-primary-darker usa-nav {visible}">
-      <button on:click|preventDefault={toggleOpen} class="usa-nav__close">
+      <button on:click={(e) => { e.preventDefault(); toggleOpen(); }} class="usa-nav__close">
         <img src="/img/close.svg" alt="close" />
       </button>
       <ul class="usa-nav__primary usa-accordion">

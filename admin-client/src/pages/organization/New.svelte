@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../../lib/page';
   import { afterUpdate } from 'svelte';
   import { GridContainer } from '../../components';
   import { createOrganization } from '../../lib/api';
@@ -32,7 +32,7 @@
 <GridContainer classes={['display-flex', 'flex-justify-center']}>
   <form
     class="usa-form usa-form--large"
-    on:submit|preventDefault={handleSubmit} >
+    on:submit={(e) => { e.preventDefault(); handleSubmit(e); }} >
 
     <legend class="usa-legend usa-legend--large">Create Organization</legend>
 

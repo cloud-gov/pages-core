@@ -1,5 +1,5 @@
 <script>
-  import page from 'page';
+  import page from '../../lib/page';
   import { notification, router } from '../../stores';
   import {
     fetchDomain,

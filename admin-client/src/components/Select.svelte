@@ -20,12 +20,12 @@
   }
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form on:submit={(e) => { e.preventDefault(); handleSubmit(); }}>
   {#each options as opt}
     <select
       bind:value={opt.selected}
-      on:blur|preventDefault={enableUpdate}
-      on:change|preventDefault={enableUpdate}
+      on:blur={(e) => { e.preventDefault(); enableUpdate(); }}
+      on:change={(e) => { e.preventDefault(); enableUpdate(); }}
     >
       {#each opt.values as value}
         <option value={value.id}>{value.name}</option>
