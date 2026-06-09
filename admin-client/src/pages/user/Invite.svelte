@@ -11,7 +11,10 @@
   $: metaPromise = Promise.all([
     fetchOrganizations({ limit: 100 }).then((payload) => payload.data),
     fetchRoles().then((payload) => payload.data),
-  ]).then(([orgs, roles]) => ({ orgs, roles }));
+  ]).then(([orgs, roles]) => ({
+    orgs: orgs.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())),
+    roles,
+  }));
 
   async function handleSubmit(event) {
     submitting = true;

@@ -4,11 +4,16 @@
 
   const fields = {
     organization: {
-      type: 'select-auto',
-      options: (meta) => meta.orgs.map((org) => ({
-        name: org.name,
-        value: org.id,
-      })),
+      type: 'select',
+      label: 'Organization',
+      options: (meta) => {
+        return (meta?.orgs || [])
+          .map((org) => ({
+            name: org.name,
+            value: org.id,
+          }))
+          .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+      },
     },
   };
 </script>

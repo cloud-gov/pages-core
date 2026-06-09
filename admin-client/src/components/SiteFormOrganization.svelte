@@ -8,8 +8,9 @@
   export let onSuccess;
   export let onFailure;
 
-  const siteOrg = orgs?.data?.find((org) => org.id === site.organizationId);
-  const orgOptions = orgs?.data?.map((org) => ({
+  $: orgList = orgs?.data || [];
+  $: siteOrg = orgList.find((org) => org.id === site.organizationId);
+  $: orgOptions = orgList.map((org) => ({
     value: org.id,
     label: org.name,
     id: org.id,
@@ -33,9 +34,9 @@
         <SelectInput
           error={errors.isActive}
           name="Organization"
-          label='Organizations'
+          label="Organizations"
           options={orgOptions}
-          bind:value={value}
+          bind:value
         />
       </fieldset>
     </Form>

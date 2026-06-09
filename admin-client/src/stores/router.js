@@ -4,7 +4,9 @@ const initial = {};
 
 const { set, subscribe } = writable(initial);
 
+export const currentPage = writable(null);
+
 export default {
-  setContext: ({ _, ...rest }) => set(rest),
+  setContext: (ctx) => set({ ...ctx }),
   subscribe,
 };

@@ -10,7 +10,12 @@
 
   $: idValue = id ?? name;
   $: errorMessageId = `${idValue}-error-message`;
-  $: if (!options.map((option) => option.value ?? option).includes(value)) {
+  $: sortedOptions = [...options].sort((a, b) => {
+    const labelA = (a.label ?? a).toString().toLowerCase();
+    const labelB = (b.label ?? b).toString().toLowerCase();
+    return labelA.localeCompare(labelB);
+  });
+  $: if (!sortedOptions.map((option) => option.value ?? option).includes(value)) {
     value = '';
   }
 </script>
@@ -32,7 +37,7 @@
   bind:value={value}
 >
   <option value="">--</option>
-  {#each options as option}
+  {#each sortedOptions as option}
     <option value={option.value ?? option}>{option.label ?? option}</option>
   {/each}
 </select>

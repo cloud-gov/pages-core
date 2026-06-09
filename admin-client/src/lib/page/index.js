@@ -645,10 +645,11 @@ function Context(path, state, _pageInstance) {
   // fragment
   this.hash = '';
   if (!hashbang) {
-    if (!~this.path.indexOf('#')) return;
-    var parts = this.path.split('#');
-    this.path = this.pathname = parts[0];
-    this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';
+    if (~this.path.indexOf('#')) {
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';
+    }
   }
 
   i = this.path.indexOf('?');
