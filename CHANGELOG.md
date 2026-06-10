@@ -1,3 +1,19 @@
+## 0.25.0 (2026-06-10)
+
+### Added
+
+- add editor site id to editor builds
+
+### Fixed
+
+- **admin**: Correct the asset paths for nested routes
+- remove empty space
+
+### Maintenance
+
+- add log
+- remove log and add editorSiteId to the serializers
+
 ## 0.24.0 (2026-06-08)
 
 ### Added
