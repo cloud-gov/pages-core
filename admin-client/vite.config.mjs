@@ -3,7 +3,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig(({ mode }) => ({
-  base: './',
+  base: '/',
   plugins: [
     svelte({
       compilerOptions: {
@@ -26,10 +26,10 @@ export default defineConfig(({ mode }) => ({
         {
           src: 'node_modules/@uswds/uswds/dist/css/uswds.min.css',
           dest: '..',
-        },
-        {
-          src: 'node_modules/@uswds/uswds/dist/css/uswds.min.css.map',
-          dest: '..',
+          transform: (contents) =>
+            contents
+              .toString()
+              .replace(/\n?\/\*# sourceMappingURL=uswds\.min\.css\.map \*\//, ''),
         },
       ],
     }),
@@ -62,5 +62,5 @@ export default defineConfig(({ mode }) => ({
     'process.env.NODE_ENV': JSON.stringify(mode),
     API_URL: JSON.stringify(process.env.API_URL || 'http://localhost:1337'),
   },
-  publicDir: false, // We're managing static assets via viteStaticCopy
+  publicDir: 'public', // Serve static assets from public/ in dev mode
 }));

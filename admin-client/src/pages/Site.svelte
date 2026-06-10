@@ -102,11 +102,7 @@
     notification.setError(`Public File Storage create error: ${error.message}`);
   }
 
-  async function handleSiteBuildTaskSubmit(
-    buildTaskTypeId,
-    branch,
-    runDay = null,
-  ) {
+  async function handleSiteBuildTaskSubmit(buildTaskTypeId, branch, runDay = null) {
     return addSiteBuildTask(id, { buildTaskTypeId, branch, runDay });
   }
 
@@ -118,8 +114,9 @@
   async function handleSiteBuildTaskFailure(error) {
     if (error?.erorrs) {
       notification.setError(error.errors);
+    } else {
+      notification.setError('Build task update error');
     }
-    else{notification.setError('Build task update error');}
   }
 
   async function handleCloseEditSiteBuildTask() {
@@ -241,9 +238,7 @@
           <p slot="empty">No domains configured</p>
         </DataTable>
         <div>
-          <a class="usa-button" href={`/domains/new?siteId=${id}`}>
-            Create Domain
-          </a>
+          <a class="usa-button" href={`/domains/new?siteId=${id}`}> Create Domain </a>
         </div>
       </AccordionContent>
       <Await on={siteFileStoragePromise} let:response={siteFileStorage}>
@@ -318,7 +313,10 @@
                 class="usa-button"
                 type="button"
                 value="Edit"
-                on:click={(e) => { e.preventDefault(); handleOpenEditSiteBuildTask(sbt); }}
+                on:click={(e) => {
+                  e.preventDefault();
+                  handleOpenEditSiteBuildTask(sbt);
+                }}
               />
             </td>
             <td>
@@ -326,7 +324,10 @@
                 class="usa-button usa-button--base"
                 type="reset"
                 value="Remove"
-                on:click={(e) => { e.preventDefault(); handleRemoveBuildTask(sbt); }}
+                on:click={(e) => {
+                  e.preventDefault();
+                  handleRemoveBuildTask(sbt);
+                }}
               />
             </td>
           </tr>

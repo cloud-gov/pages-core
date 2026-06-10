@@ -182,7 +182,8 @@ function pick(keys, obj) {
 }
 
 function omit(keys, obj) {
-  const pickedKeys = Object.keys(obj).filter((key) => !keys.includes(key));
+  const keysArray = Array.isArray(keys) ? keys : [keys];
+  const pickedKeys = Object.keys(obj).filter((key) => !keysArray.includes(key));
   return pick(pickedKeys, obj);
 }
 

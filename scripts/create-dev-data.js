@@ -820,6 +820,82 @@ async function createData() {
     }),
   ]);
 
+  // Generate 100 random builds across all sites
+  console.log('Creating 100 random sample builds...');
+  const allSites = [site1, nodeSite, goSite, goSite2, nodeSite2];
+  const allUsers = [user1, user2, user3, user4, managerWithGithub];
+  const buildStatuses = [
+    'success',
+    'error',
+    'processing',
+    'queued',
+    'created',
+    'skipped',
+  ];
+  const branches = ['main', 'develop', 'feature-branch', 'staging', 'release', 'hotfix'];
+
+  function randomElement(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function generateRandomSha() {
+    const chars = '0123456789abcdef';
+    let sha = '';
+    for (let i = 0; i < 40; i += 1) {
+      sha += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return sha;
+  }
+
+  const randomBuildData = [];
+  for (let i = 0; i < 100; i += 1) {
+    const site = randomElement(allSites);
+    const user = randomElement(allUsers);
+    const status = randomElement(buildStatuses);
+    const branch = randomElement(branches);
+    const daysAgo = Math.floor(Math.random() * 30);
+    const minutesAgo = Math.floor(Math.random() * 1440);
+    const createdAt = addMinutes(addDays(new Date(), -daysAgo), -minutesAgo);
+
+    const buildData = {
+      branch,
+      source: 'fake-build',
+      state: status,
+      site: site.id,
+      user: user.id,
+      username: user.username,
+      token: 'fake-token',
+      createdAt,
+      clonedCommitSha: generateRandomSha(),
+      requestedCommitSha: generateRandomSha(),
+    };
+
+    // Add timing based on status
+    if (['success', 'error'].includes(status)) {
+      buildData.startedAt = addMinutes(createdAt, 1);
+      buildData.completedAt = addMinutes(createdAt, Math.floor(Math.random() * 10) + 2);
+    } else if (status === 'processing') {
+      buildData.startedAt = addMinutes(createdAt, 1);
+    }
+
+    // Add error message for failed builds
+    if (status === 'error') {
+      const errorMessages = [
+        'The build timed out',
+        'Build script returned a non-zero exit code',
+        'Failed to fetch repository',
+        'Node modules installation failed',
+        'Memory limit exceeded',
+      ];
+      buildData.error = randomElement(errorMessages);
+    }
+
+    randomBuildData.push(buildData);
+  }
+
+  await Build.bulkCreate(randomBuildData, { individualHooks: false });
+  console.log('Created 100 random sample builds.');
+
   /** *****************************************
    *               Build Logs
    */

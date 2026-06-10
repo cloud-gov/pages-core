@@ -1,5 +1,4 @@
 <script>
-  import Svelecte from 'svelecte';
   import { siteName } from '../../lib/utils';
   import { Form, TextInput } from '../../components';
 
@@ -15,10 +14,12 @@
     siteId: siteId || '',
   };
 
-  $: siteOptions = sites.map((site) => ({
-    label: siteName(site),
-    value: site.id,
-  }));
+  $: siteOptions = sites
+    .map((site) => ({
+      label: siteName(site),
+      value: site.id,
+    }))
+    .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 
   $: contextOptions = !domain.siteId
     ? []
@@ -28,7 +29,8 @@
       .map((sbc) => ({
         label: `Branch: ${sbc.branch} | Context: ${sbc.context}`,
         value: sbc.id,
-      }));
+      }))
+      .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 
   $: {
     if (domain.siteId && domain.siteBranchConfigId) {
@@ -59,14 +61,17 @@
     <label class="usa-label" for="site">
       Site<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
     </label>
-    <Svelecte
-      clearable={true}
-      labelField="label"
+    <select
+      class="usa-select"
       name="site"
-      options={siteOptions}
-      placeholder="Select site"
+      id="site"
       bind:value={domain.siteId}
-    />
+    >
+      <option value="">Select site</option>
+      {#each siteOptions as opt}
+        <option value={opt.value}>{opt.label}</option>
+      {/each}
+    </select>
   </fieldset>
 
   <fieldset class="usa-fieldset">
@@ -74,14 +79,17 @@
       Branch Context
       <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
     </label>
-    <Svelecte
-      clearable={true}
-      labelField="label"
+    <select
+      class="usa-select"
       name="context"
-      options={contextOptions}
-      placeholder="Select site context and branch"
+      id="context"
       bind:value={domain.siteBranchConfigId}
-    />
+    >
+      <option value="">Select site context and branch</option>
+      {#each contextOptions as opt}
+        <option value={opt.value}>{opt.label}</option>
+      {/each}
+    </select>
   </fieldset>
 
   <TextInput

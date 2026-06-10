@@ -27,7 +27,7 @@
       on:blur={(e) => { e.preventDefault(); enableUpdate(); }}
       on:change={(e) => { e.preventDefault(); enableUpdate(); }}
     >
-      {#each opt.values as value}
+      {#each [...opt.values].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())) as value}
         <option value={value.id}>{value.name}</option>
       {/each}
     </select>

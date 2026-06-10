@@ -1,6 +1,5 @@
 <script>
   import page from '../lib/page';
-  import Svelecte from 'svelecte';
   import { formToObj, objToQueryString } from '../lib/utils';
   import { router } from '../stores';
   import Await from './Await.svelte';
@@ -83,7 +82,10 @@
                 <div class="grid-row grid-gap-4">
                   <form
                     class="usa-form maxw-none width-full"
-                    on:submit={(e) => { e.preventDefault(); handleSubmit(); }}
+                    on:submit={(e) => {
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }}
                   >
                     <div class="controls display-flex flex-wrap">
                       {#each fieldArray as field}
@@ -92,11 +94,7 @@
                             <label class="usa-label" for={field.name}
                               >{field.label || field.name}</label
                             >
-                            <select
-                              class="usa-select"
-                              name={field.name}
-                              id={field.name}
-                            >
+                            <select class="usa-select" name={field.name} id={field.name}>
                               <option value="">-</option>
                               {#each field.options(payload.meta) as opt}
                                 <option
@@ -107,20 +105,6 @@
                                 </option>
                               {/each}
                             </select>
-                          </fieldset>
-                        {/if}
-                        {#if field.type === 'select-auto'}
-                          <fieldset class="usa-fieldset">
-                            <label class="usa-label" for={field.name}
-                              >{field.label || field.name}</label
-                            >
-                            <Svelecte
-                              clearable={true}
-                              valueAsObject={true}
-                              labelField="name"
-                              name={field.name}
-                              options={field.options(payload.meta)}
-                            />
                           </fieldset>
                         {/if}
                       {/each}
@@ -136,10 +120,12 @@
           <form
             class="usa-search usa-search--small flex-align-center"
             role="search"
-            on:submit={(e) => { e.preventDefault(); handleSubmit(); }}
+            on:submit={(e) => {
+              e.preventDefault();
+              handleSubmit(e);
+            }}
           >
-            <label class="usa-label margin-top-0 margin-right-1" for="limit"
-              >Limit:</label
+            <label class="usa-label margin-top-0 margin-right-1" for="limit">Limit:</label
             >
             <select
               class="usa-select height-4 line-height-sans-1 margin-right-2"
@@ -192,11 +178,11 @@
   </header>
   <GridContainer>
     {#if payload.data && payload.data.length > 0}
-    <PaginationBanner pagination={payload} extraParams={params} />
+      <PaginationBanner pagination={payload} extraParams={params} />
     {/if}
     <slot data={payload.data}>Found {payload.data.length} items.</slot>
     {#if payload.data && payload.data.length > 0}
-    <PaginationBanner pagination={payload} extraParams={params} />
+      <PaginationBanner pagination={payload} extraParams={params} />
     {/if}
   </GridContainer>
 </Await>
@@ -216,8 +202,8 @@
   .usa-accordion__button.usa-nav__link[aria-expanded='true'] {
     color: #005ea2;
     background-color: #f0f0f0;
-    background-image: url(../img/angle-arrow-up-primary.svg),
-      linear-gradient(transparent, transparent);
+    background-image:
+      url(../img/angle-arrow-up-primary.svg), linear-gradient(transparent, transparent);
   }
 
   .usa-form .controls > fieldset {
@@ -269,11 +255,5 @@
   }
   .usa-navbar.controls > * {
     margin-right: 2rem;
-  }
-  :global(.svelecte-control) {
-    min-width: 400px;
-  }
-  :global(.inputBox) {
-    width: 100% !important;
   }
 </style>

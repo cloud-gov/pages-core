@@ -4,7 +4,11 @@
 
   import NotificationAlert from './containers/NotificationAlert.svelte';
 
-  import Router from './Router.svelte';
+  import { router } from './stores';
+  import { currentPage } from './stores/router';
+
+  // Derive a stable key from the full path including query string
+  $: routeKey = $router.path || '';
 </script>
 
 <NotificationAlert />
@@ -14,7 +18,13 @@
 <Nav />
 
 <main>
-  <Router />
+  {#if $currentPage}
+    {#key routeKey}
+      <svelte:component this={$currentPage} />
+    {/key}
+  {:else}
+    <p>Loading...</p>
+  {/if}
 </main>
 
 <style>

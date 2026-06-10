@@ -1,50 +1,50 @@
-<script>
-  import page from './lib/page';
-  import { get } from 'svelte/store';
-  import { router, session } from './stores';
-  import * as Pages from './pages';
+import page from './lib/page';
+import { get } from 'svelte/store';
+import { router, session } from './stores';
+import { currentPage } from './stores/router';
+import * as Pages from './pages';
 
-  let currentPage;
-  let redirect;
+let redirect;
 
-  const HOME = '/sites';
+const HOME = '/sites';
 
-  function queryString(ctx, next) {
-    ctx.query = {};
-    new URLSearchParams(ctx.querystring).forEach((v, k) => {
-      ctx.query[k] = v;
-    });
-    next();
+function queryString(ctx, next) {
+  ctx.query = {};
+  new URLSearchParams(ctx.querystring).forEach((v, k) => {
+    ctx.query[k] = v;
+  });
+  next();
+}
+
+function ensureAuthenticated(ctx, next) {
+  if (get(session).authenticated) next();
+  else {
+    redirect = ctx.path;
+    page.redirect('/login');
   }
+}
 
-  function ensureAuthenticated(ctx, next) {
-    if (get(session).authenticated) next();
-    else {
-      redirect = ctx.path;
-      page.redirect('/login');
-    }
+function ensureUnauthenticated(ctx, next) {
+  if (!get(session).authenticated) next();
+  else page.redirect('/');
+}
+
+function checkRedirect(ctx, next) {
+  if (!redirect) next();
+  else {
+    page.redirect(redirect);
+    redirect = null;
   }
+}
 
-  function ensureUnauthenticated(ctx, next) {
-    if (!get(session).authenticated) next();
-    else page.redirect('/');
-  }
+function render(component) {
+  return (ctx) => {
+    router.setContext(ctx);
+    currentPage.set(component);
+  };
+}
 
-  function checkRedirect(ctx, next) {
-    if (!redirect) next();
-    else {
-      page.redirect(redirect);
-      redirect = null;
-    }
-  }
-
-  function render(component) {
-    return (ctx) => {
-      currentPage = component;
-      router.setContext(ctx);
-    };
-  }
-
+export function initRouter() {
   // Routes
   page('/login', ensureUnauthenticated, render(Pages.Login));
 
@@ -83,9 +83,6 @@
     render(Pages.FileStorageActions),
   );
   page('*', render(Pages.NotFound));
-  page();
-</script>
 
-{#if currentPage}
-  <svelte:component this={currentPage} />
-{/if}
+  page();
+}
