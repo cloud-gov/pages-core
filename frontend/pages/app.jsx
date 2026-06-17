@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import { Outlet, useLocation } from 'react-router-dom';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import alertActions from '@actions/alertActions';
-import BuildStatusNotifier from '@util/buildStatusNotifier';
 
 function shouldClearAlert(alert) {
   if (alert.stale) {
@@ -18,14 +17,12 @@ function shouldClearAlert(alert) {
   }
 }
 export function App({ onEnter }) {
-  const notifier = new BuildStatusNotifier();
   const location = useLocation();
   const queryClient = new QueryClient();
   const alert = useSelector((state) => state.alert);
   const notifications = useSelector((state) => state.notifications);
 
   useEffect(() => {
-    notifier.listen();
     onEnter();
   }, []);
 

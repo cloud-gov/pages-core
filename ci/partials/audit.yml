@@ -1,11 +1,14 @@
 platform: linux
 inputs: [name: src]
 outputs: [name: src]
+params:
+  AUDIT_DIR: .
+  AUDIT_MAX_CRITICAL: 0
+  AUDIT_MAX_HIGH: 0
 run:
   dir: src
   path: bash
   args:
-    [
-      -c,
-      "npm audit --omit=dev --audit-level=$VULN_THRESHOLD",
-    ]
+    - -c
+    - |
+      node ./ci/tasks/check-audit.js

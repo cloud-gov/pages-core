@@ -422,12 +422,16 @@ jobs:
             file: src/ci/partials/audit.yml
             image: node24
             params:
-              VULN_THRESHOLD: high #! errors on critical or high - https://docs.npmjs.com/cli/v10/using-npm/config?utm_source=chatgpt.com#audit-level
+              AUDIT_DIR: .
+              AUDIT_MAX_CRITICAL: 0
+              AUDIT_MAX_HIGH: 5
           - task: audit-admin
-            file: src/ci/partials/audit-admin.yml
+            file: src/ci/partials/audit.yml
             image: node24
             params:
-              VULN_THRESHOLD: high #! errors on critical or high
+              AUDIT_DIR: admin-client
+              AUDIT_MAX_CRITICAL: 0
+              AUDIT_MAX_HIGH: 5
     on_failure:
       in_parallel:
         -  #@ slack_hook("failure", "dependency audit")

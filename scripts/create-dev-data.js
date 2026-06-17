@@ -109,28 +109,6 @@ function memberAddedPayload() {
   };
 }
 
-function socketIOError() {
-  return {
-    error: `
-    AbortError: PUBLISH can't be processed. The connection is already closed.
-    at handle_offline_command (/home/vcap/app/node_modules/redis/index.js:779:15)
-    at RedisClient.internal_send_command
-    (/home/vcap/app/node_modules/redis/index.js:813:9)
-    at RedisClient.publish
-    (/home/vcap/app/node_modules/redis/lib/commands.js:46:25)
-    at RedisAdapter.broadcast
-    (/home/vcap/app/node_modules/socket.io-redis/dist/index.js:265:28)
-    at Namespace.emit (/home/vcap/app/node_modules/socket.io/dist/namespace.js:175:22)
-    at Server.<computed> [as emit]
-    (/home/vcap/app/node_modules/socket.io/dist/index.js:445:33)
-    at emitBuildStatus (/home/vcap/app/api/controllers/build.js:32:30)
-    at runMicrotasks (<anonymous>)
-    at processTicksAndRejections (internal/process/task_queues.js:93:5)
-    `,
-    message: 'redisAdapter pubClient error',
-  };
-}
-
 // Chainable helpers
 async function createUAAIdentity(user) {
   await user.createUAAIdentity({
@@ -996,9 +974,6 @@ async function createData() {
   console.log('Creating Error Events');
   await Promise.all([
     EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), {
-      some: 'info',
-    }),
-    EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, {
       some: 'info',
     }),
   ]);

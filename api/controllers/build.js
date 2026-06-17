@@ -4,35 +4,13 @@ const { fetchModelById } = require('../utils/queryDatabase');
 const buildSerializer = require('../serializers/build');
 const SourceCodePlatformHelper = require('../services/SourceCodePlatformHelper');
 const siteAuthorizer = require('../authorizers/site');
-const SocketIOSubscriber = require('../services/SocketIOSubscriber');
 const EventCreator = require('../services/EventCreator');
 const { wrapHandlers } = require('../utils');
 const { Build, Domain, Event, Site, User, SiteBranchConfig } = require('../models');
-const { getSocket } = require('../socketIO');
 const siteErrors = require('../responses/siteErrors');
 const { BuildService } = require('../services/build');
 
 const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
-
-const emitBuildStatus = async (build) => {
-  try {
-    const site = await Site.findByPk(build.site);
-    const msg = {
-      id: build.id,
-      state: build.state,
-      site: build.site,
-      branch: build.branch,
-      owner: site.owner,
-      repository: site.repository,
-    };
-    const siteRoom = SocketIOSubscriber.getSiteRoom(build.site);
-    getSocket().to(siteRoom).emit('build status', msg);
-    const builderRoom = SocketIOSubscriber.getBuilderRoom(build.site, build.user);
-    getSocket().to(builderRoom).emit('build status', msg);
-  } catch (err) {
-    EventCreator.error(Event.labels.SOCKET_IO, err, { buildId: build.id });
-  }
-};
 
 module.exports = wrapHandlers({
   async find(req, res) {
@@ -166,8 +144,6 @@ module.exports = wrapHandlers({
     }
 
     await build.updateJobStatus(buildStatus);
-
-    emitBuildStatus(build);
 
     // The `requestedCommitSha` will not be present for initial builds
     // and there is no need to report status to Github

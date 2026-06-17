@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     BUILD_STATUS: 'build-status',
     BUILD_TASK: 'build-task',
     ADMIN: 'admin',
-    SOCKET_IO: 'socket.io',
     SITE_USER: 'site-user',
     REQUEST_HANDLER: 'request-handler',
     USER_ACTION: 'user-action',
