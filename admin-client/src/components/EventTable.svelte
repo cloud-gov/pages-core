@@ -33,6 +33,13 @@
       <td>{#if event.model}{event.model}: {event.modelId}{/if}</td>
     {/if}
     <td>{event.body.message || '--'}</td>
-    <td><JSONTreeView data={event.body}/></td>
+    <td class="body-cell"><JSONTreeView data={event.body}/></td>
   </tr>
 </DataTable>
+
+<style>
+  .body-cell {
+    min-width: 20rem;
+    vertical-align: top;
+  }
+</style>
