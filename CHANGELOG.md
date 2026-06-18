@@ -1,3 +1,13 @@
+## 0.25.1 (2026-06-18)
+
+### Fixed
+
+- **admin**: Fix event body rendering in admin UI
+
+### Maintenance
+
+- Remove build status notifications and dependencies
+
 ## 0.25.0 (2026-06-10)
 
 ### Added
