@@ -7,7 +7,6 @@ const attributes = {
   id: '',
   email: '',
   username: '',
-  buildNotificationSettings: '',
   hasGithubAuth: (_, user) => !!user.githubAccessToken,
   hasGitlabAuth: (_, user) => !!user.gitlabToken && !!user.gitlabRefreshToken,
   UAAIdentity: (uaaIdentity, _, isSystemAdmin) =>

@@ -210,19 +210,6 @@ export default {
     });
   },
 
-  updateUserSettings(userSettings) {
-    return request(
-      'me/settings',
-      {
-        method: 'PUT',
-        data: userSettings,
-      },
-      {
-        handleHttpError: false,
-      },
-    );
-  },
-
   deleteSiteBranchConfig(siteId, siteBranchConfigId) {
     return request(`site/${siteId}/branch-config/${siteBranchConfigId}`, {
       method: 'DELETE',

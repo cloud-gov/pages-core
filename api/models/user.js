@@ -211,18 +211,6 @@ const attributes = (DataTypes) => ({
     type: DataTypes.JSONB,
     defaultValue: {},
   },
-  buildNotificationSettings: {
-    type: DataTypes.VIRTUAL,
-    get() {
-      return this.settings.buildNotificationSettings || {};
-    },
-    set(buildNotificationSettings) {
-      this.setDataValue('settings', {
-        ...this.settings,
-        buildNotificationSettings,
-      });
-    },
-  },
 });
 
 const options = {
