@@ -12,6 +12,7 @@ import { getOwnerAndRepo, isWorkshopIntegration } from '@util/site';
 
 import TemplateSiteList from './TemplateSiteList';
 import AddRepoSiteForm from './AddRepoSiteForm';
+import AddTemplateSiteForm from '@pages/sites/new/AddTemplateSiteForm';
 
 function defaultOwner(user) {
   return (user.data && user.data.username) || '';
@@ -66,7 +67,7 @@ function AddSite() {
         <div className="page-header grid-col-12">
           <AlertBanner {...alert} />
           <div className="header-title">
-            <h1 className="font-sans-2xl">Make a new site</h1>
+            <h1 className="font-sans-2xl">Add a new site</h1>
             <AlertBanner status="warning" message={alertMessage} alertRole={false} />
           </div>
         </div>
@@ -79,24 +80,17 @@ function AddSite() {
       <div className="page-header grid-col-12">
         <AlertBanner {...alert} />
         <div className="header-title">
-          <h1 className="font-sans-2xl">Make a new site</h1>
+          <h1 className="font-sans-2xl">Add a new site</h1>
         </div>
       </div>
       <div className="usa-prose grid-col-12">
         <p className="usa-intro margin-0">
-          There are two different ways you can add sites to
-          {` ${globals.APP_NAME}. `}
-          You can specify the GitHub repository{orGitLabProject}
-          where your site&#39;s code lives. Or, you can start with a brand new site by
-          selecting one of our template sites below.
+          Set up a new site using {`${globals.APP_NAME}`} ready-made, USWDS-powered site template.
+          If you already have GitHub repository ${orGitLabProject} for your new site, add details below.
         </p>
-        <h2>Use your own GitHub repository{orGitLabProject}</h2>
       </div>
       <div className="grid-col-8">
-        <AddRepoSiteForm
-          initialValues={{
-            engine: 'node.js',
-          }}
+        <AddTemplateSiteForm
           organizations={organizations}
           showAddNewSiteFields={showAddNewSiteFields}
           onSubmit={onCreateSiteSubmit}
@@ -106,6 +100,17 @@ function AddSite() {
         <TemplateSiteList
           defaultOwner={defaultOwner(user)}
           organizations={organizations}
+        />
+      </div>
+      <div className="grid-col-8">
+        <h2>Use an existing GitHub repository {orGitLabProject}</h2>
+        <AddRepoSiteForm
+          initialValues={{
+            engine: 'node.js',
+          }}
+          organizations={organizations}
+          showAddNewSiteFields={showAddNewSiteFields}
+          onSubmit={onCreateSiteSubmit}
         />
       </div>
     </div>

@@ -8,6 +8,7 @@ import UserOrgSelect from '@shared/UserOrgSelect';
 import SelectSiteEngine from '@shared/SelectSiteEngine';
 
 import { ORGANIZATIONS } from '@propTypes';
+import SelectSourceCodePlatform from '@shared/SelectSourceCodePlatform';
 
 const orGitLabProject = `${
   process.env.FEATURE_WORKSHOP_INTEGRATION === 'true' ? 'or GitLab project' : ''
@@ -19,15 +20,15 @@ const placeholderText = `${
 }`;
 
 export const AddRepoSiteForm = ({
-  // even though initialValues is not directly used, it is used
-  // by reduxForm, and we want PropType validation on it, so we'll
-  // keep it here but disable the eslint rule below
-  initialValues, // eslint-disable-line no-unused-vars
-  pristine,
-  handleSubmit,
-  organizations,
-  showAddNewSiteFields,
-}) => (
+                                  // even though initialValues is not directly used, it is used
+                                  // by reduxForm, and we want PropType validation on it, so we'll
+                                  // keep it here but disable the eslint rule below
+                                  initialValues, // eslint-disable-line no-unused-vars
+                                  pristine,
+                                  handleSubmit,
+                                  organizations,
+                                  showAddNewSiteFields,
+                                }) => (
   <form onSubmit={handleSubmit}>
     <div className="form-group margin-y-3">
       <Field
@@ -57,14 +58,14 @@ export const AddRepoSiteForm = ({
     </div>
     <div className="form-group margin-y-3">
       <label className="usa-label text-bold" htmlFor="engine">
-        Site&apos;s build engine
+        Source Code provider
       </label>
       <Field
-        name="engine"
+        name="sourceCodePlatform"
         component={(p) => (
-          <SelectSiteEngine
-            name="engine"
-            id="engine"
+          <SelectSourceCodePlatform
+            name="sourceCodePlatform"
+            id="sourceCodePlatform"
             value={p.input.value}
             onChange={p.input.onChange}
             {...p.meta}

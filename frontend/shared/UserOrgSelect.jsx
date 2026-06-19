@@ -14,7 +14,7 @@ function makeOptions(opts) {
 const UserOrgSelect = ({
   className = '',
   id,
-  label = "Select the site's organization",
+  label = "Cloud.gov Pages organization to contain this site",
   touched = false,
   error,
   mustChooseOption = false,
@@ -36,7 +36,7 @@ const UserOrgSelect = ({
     >
       {mustChooseOption ? (
         <option className="user-org-select-option" value="">
-          Please select an organization
+          - Select an organization -
         </option>
       ) : null}
       {makeOptions(orgData)}
