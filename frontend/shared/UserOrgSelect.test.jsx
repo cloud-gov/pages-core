@@ -29,7 +29,7 @@ describe('<UserOrgSelect />', () => {
   it('renders a select element', () => {
     render(<UserOrgSelect {...initialProps} />);
     expect(screen.getByLabelText(label)).toBeTruthy();
-    expect(screen.queryByText('Please select an organization')).toBeFalsy();
+    expect(screen.queryByText('- Select an organization -')).toBeFalsy();
     expect(screen.getByText(org1.name)).toBeTruthy();
     expect(screen.getByText(org2.name)).toBeTruthy();
 
@@ -40,7 +40,7 @@ describe('<UserOrgSelect />', () => {
   });
 
   it('renders a select element with a must choose option', () => {
-    const mustChooseOption = 'Please select an organization';
+    const mustChooseOption = '- Select an organization -';
     const props = { ...initialProps, mustChooseOption: true };
 
     render(<UserOrgSelect {...props} />);
