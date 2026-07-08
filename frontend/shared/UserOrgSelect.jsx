@@ -36,7 +36,7 @@ const UserOrgSelect = ({
     >
       {mustChooseOption ? (
         <option className="user-org-select-option" value="">
-          Please select an organization
+          - Select an organization -
         </option>
       ) : null}
       {makeOptions(orgData)}

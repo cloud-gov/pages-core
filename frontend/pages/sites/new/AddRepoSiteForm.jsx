@@ -31,8 +31,7 @@ export const AddRepoSiteForm = ({
   <form onSubmit={handleSubmit}>
     <div className="form-group margin-y-3">
       <SourceCodePlatformUrlField
-        label={`Already have a GitHub repo ${orGitLabProject} for your site? 
-        Paste the URL here.`}
+        label={`GitHub repository ${orGitLabProject} URL`}
         name="repoUrl"
         id="repoUrl"
         placeholder={placeholderText}
@@ -47,6 +46,7 @@ export const AddRepoSiteForm = ({
           <UserOrgSelect
             id="repoOrganizationId"
             name="repoOrganizationId"
+            label="Cloud.gov Pages organization to contain this site"
             value={p.input.value}
             onChange={p.input.onChange}
             orgData={organizations.data}
@@ -58,7 +58,7 @@ export const AddRepoSiteForm = ({
     </div>
     <div className="form-group margin-y-3">
       <label className="usa-label text-bold" htmlFor="engine">
-        Select the site&apos;s engine
+        Site&apos;s build engine
       </label>
       <Field
         name="engine"
@@ -78,7 +78,7 @@ export const AddRepoSiteForm = ({
       className="usa-button usa-button--primary inline-block"
       disabled={pristine}
     >
-      Add repository-based site
+      Create new site from repository
     </button>
   </form>
 );

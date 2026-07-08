@@ -60,7 +60,7 @@ describe('<AddRepoSiteForm />', () => {
 
   it("renders selection for site's engine", () => {
     render(<AddRepoSiteForm {...props} />);
-    expect(screen.getByText("Select the site's engine")).toBeInTheDocument();
+    expect(screen.getByText("Site's build engine")).toBeInTheDocument();
     expect(screen.getByText('Please select a site engine')).toBeInTheDocument();
   });
 });
