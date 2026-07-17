@@ -52,7 +52,7 @@ do:
       _: #@ template.replace(data.values.env_cf)
       APP_ENV: ((deploy-env))
     on_failure: #@ slack_hook("failure", "to migrate database")
-  #@ end
+#@ end
 
 #!  JOBS
 
@@ -78,6 +78,48 @@ jobs:
         instance_vars:
           deploy-env: ((deploy-env))
 
+  - name: validate-env-vars
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'dev':
+          depth: 1
+          #@ if/end env == 'dev':
+          integration_tool: checkout
+        passed: [set-pipeline]
+        trigger: true
+      - get: node24
+      - get: general-task
+      #@ if/end env == 'dev':
+      -  #@ pr_hook("pending", "validate-env-vars")
+      - task: install-deps-api
+        file: src/ci/partials/install-deps-api.yml
+        image: node24
+      - task: get-app-env
+        file: src/ci/partials/get-app-env.yml
+        image: general-task
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+      - task: validate-env-vars
+        file: src/ci/partials/validate-env-vars.yml
+        image: node24
+        params:
+          _: #@ template.replace(data.values.env_cf)
+          APP_ENV: ((deploy-env))
+          CF_APP_NAME: pages-((deploy-env))
+    on_failure:
+      in_parallel:
+        -  #@ slack_hook("failure", "Validate environment variables")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("failure", "validate-env-vars")
+    on_success:
+      in_parallel:
+        -  #@ slack_hook("success", "Validate environment variables")
+        #@ if/end env == 'dev':
+        -  #@ pr_hook("success", "validate-env-vars")
+
   #@ if/end env == 'staging':
   - name: update-release-branch
     plan:
@@ -98,7 +140,7 @@ jobs:
           #@ if/end env == 'dev':
           integration_tool: checkout
         trigger: true
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
       - in_parallel:
           - get: general-task
           - get: redis
@@ -153,7 +195,7 @@ jobs:
           depth: 1
           #@ if/end env == 'dev':
           integration_tool: checkout
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
         trigger: true
       - get: node24
       - get: pipeline-tasks
@@ -218,7 +260,7 @@ jobs:
           depth: 1
           #@ if/end env == 'dev':
           integration_tool: checkout
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
         trigger: true
       - get: general-task
       - get: pipeline-tasks
@@ -256,7 +298,7 @@ jobs:
     plan:
       - in_parallel:
         - get: src
-          passed: [set-pipeline]
+          passed: [set-pipeline, validate-env-vars]
         - get: source
           resource: clamav-rest-source
           trigger: true
@@ -295,7 +337,7 @@ jobs:
             depth: 1
             #@ if/end env == 'dev':
             integration_tool: checkout
-          passed: [set-pipeline]
+          passed: [set-pipeline, validate-env-vars]
           trigger: true
         - get: general-task
         - get: pipeline-tasks
@@ -336,7 +378,7 @@ jobs:
             depth: 1
             #@ if/end env == 'dev':
             integration_tool: checkout
-          passed: [deploy-route-service]
+          passed: [deploy-route-service, validate-env-vars]
           trigger: true
         - get: general-task
         - get: pipeline-tasks
@@ -365,7 +407,7 @@ jobs:
           depth: 1
           #@ if/end env == 'dev':
           integration_tool: checkout
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
       - get: general-task
       - get: pipeline-tasks
       - get: nightly
@@ -388,7 +430,7 @@ jobs:
   - name: sites-builds-checks
     plan:
       - get: src
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
         params: { depth: 1 }
       - get: general-task
       - get: five-minutes
@@ -413,7 +455,7 @@ jobs:
           #@ if/end env == 'dev':
           integration_tool: checkout
         trigger: true
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
       - get: node24
       #@ if/end env == 'dev':
       -  #@ pr_hook("pending", "audit-dependencies")
@@ -451,7 +493,7 @@ jobs:
           depth: 1
           #@ if/end env == 'dev':
           integration_tool: checkout
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
       - get: nightly
         trigger: true
       - get: node24
@@ -508,6 +550,7 @@ jobs:
           - test-and-deploy-api-pages
           - test-and-deploy-admin-client-pages
           - deploy-queues-ui-pages
+          - validate-env-vars
       - get: general-task
       - get: node24
       #@ if/end env == 'dev':
@@ -559,7 +602,7 @@ jobs:
       - get: src
         params: { depth: 1 }
         trigger: true
-        passed: [set-pipeline]
+        passed: [set-pipeline, validate-env-vars]
       -  #@ template.replace(data.values.release_steps)
       - put: slack-cg-pages
         params:
