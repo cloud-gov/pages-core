@@ -21,4 +21,7 @@ cf push $CF_APP_NAME \
   --path $CF_PATH \
   --manifest $CF_MANIFEST \
   --vars-file $CF_VARS_FILE \
-  --stack $CF_STACK
+  --stack $CF_STACK || {
+  cf logs $CF_APP_NAME --recent  | grep "FATAL: Missing required secrets"
+  exit 1
+  }

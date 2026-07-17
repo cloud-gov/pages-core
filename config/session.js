@@ -1,3 +1,4 @@
+const { validateEnvVar } = require('./envVarValidator');
 const env = require('../services/environment')();
 
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
     sameSite: 'lax',
   },
   key: 'pages.sid',
-  secret: env.FEDERALIST_SESSION_SECRET || 'keyboard-cat',
+  secret: validateEnvVar(env.FEDERALIST_SESSION_SECRET, 'FEDERALIST_SESSION_SECRET'),
   proxy: true,
   resave: true,
   saveUninitialized: true,

@@ -1,3 +1,5 @@
+const { validateEnvVar } = require('../../config/envVarValidator');
+
 const {
   ADMIN_GITHUB_ORGANIZATION,
   ADMIN_GITHUB_TEAM,
@@ -57,7 +59,7 @@ module.exports = {
   },
   product: PRODUCT,
   session: {
-    secret: SESSION_SECRET || 'test-secret',
+    secret: validateEnvVar(SESSION_SECRET, 'SESSION_SECRET'),
   },
   uaa: {
     apiUrl: internalUAAHost,

@@ -38,7 +38,7 @@ services:
       - db
       - redis
       - minio
-    environment:
+    environment: &appenv
       <<: *minioenv
       APP_HOSTNAME: http://localhost:1337
       DOMAIN: localhost:1337
@@ -60,6 +60,10 @@ services:
       QUEUES_BUILD_TASKS_CONCURRENCY: 1
       OPS_EMAIL: ops@example.gov
       NODE_OPTIONS: --trace-warnings
+      FEDERALIST_SESSION_SECRET: dc1234567890123456789012345678901234567890
+      GITHUB_WEBHOOK_SECRET: dc1234567890123456789012345678901234567890
+      GITLAB_WEBHOOK_SECRET: dc1234567890123456789012345678901234567890
+      SESSION_SECRET: dc1234567890123456789012345678901234567890
   bull-board:
     build:
       dockerfile: Dockerfile-app
@@ -154,4 +158,4 @@ services:
     ports:
       - "3456:3456"
     environment:
-      <<: *minioenv
+      <<: *appenv
