@@ -3,7 +3,7 @@ const { requiredEnvVarsCi } = require('../../config/envVarValidator');
 
 function main() {
   const appEnv = cfenv.getAppEnv();
-  const apiCredentials = appEnv.getServiceCreds('pages-dev-env');
+  const apiCredentials = appEnv.getServiceCreds(`pages-${process.env.APP_ENV}-env`);
 
   let missing = [];
   requiredEnvVarsCi.forEach((envVar) => {
