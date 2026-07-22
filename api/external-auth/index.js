@@ -1,4 +1,5 @@
 const express = require('express');
+const { rateLimit } = require('express-rate-limit');
 const passport = require('./passport');
 const EventCreator = require('../services/EventCreator');
 const { Event } = require('../models');
@@ -19,7 +20,16 @@ const script = (nonce, status, content) => `
   </script>
 `;
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 10, // 10 attempts per window
+  message: 'Too many authentication attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const app = express();
+app.use(limiter);
 app.disable('x-powered-by');
 app.use(passport.initialize());
 app.get('/auth/github', passport.authenticate('github', { session: false }));
