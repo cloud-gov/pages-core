@@ -1,3 +1,17 @@
+## 0.26.0 (2026-07-24)
+
+### Added
+
+- Don't allow folder names to have ../ in the public file storage #2906
+- Implement new New Site UI with the addition of Workshop 4899 - Remove old components and tests that no longer apply
+- Implement new New Site UI with the addition of Workshop 4899
+
+### Maintenance
+
+- add rate limiting on external endpoints
+- Dont allow for a default value on the FEDERALIST_SESSION_SECRET env var
+- Dont allow for a default value on the FEDERALIST_SESSION_SECRET env var
+
 ## 0.25.1 (2026-06-18)
 
 ### Fixed
