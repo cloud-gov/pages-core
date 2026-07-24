@@ -774,4 +774,26 @@ describe('FileStorage services', () => {
       expect(error.status).to.be.eq(400);
     });
   });
+
+  describe('buildKeyPath', async () => {
+    const testCases = [
+      '../../../etc/passwd',
+      '%2e%2e/secret',
+      '/uploads/%2e%2e%2fsecret',
+      '../../../etc/passwd',
+      '~assets/../../../etc/passwd',
+      '~assets/legit/../../etc/passwd',
+    ];
+
+    testCases.forEach((testCase) => {
+      it(`throws "Path traversal detected" for input: ${testCase}`, async () => {
+        const { fss, user } = await stubFileStorageClient();
+        const siteStorageService = new SiteFileStorageSerivce(fss, user.id);
+
+        await expect(siteStorageService.listDirectoryFiles(testCase)).to.be.rejectedWith(
+          'Path traversal detected',
+        );
+      });
+    });
+  });
 });

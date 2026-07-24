@@ -7,7 +7,12 @@ const {
 } = require('../../models');
 const S3Helper = require('../S3Helper');
 const CloudFoundryAPIClient = require('../../utils/cfApiClient');
-const { normalizeDirectoryPath, paginate, slugify } = require('../../utils');
+const {
+  normalizeDirectoryPath,
+  paginate,
+  slugify,
+  validatePath,
+} = require('../../utils');
 const {
   serializeFileStorageFile,
   serializeFileStorageFiles,
@@ -315,6 +320,8 @@ class SiteFileStorageSerivce {
 
   #buildKeyPath(keyPath) {
     const normalized = normalizeDirectoryPath(keyPath);
+    validatePath(this.S3_BASE_PATH, normalized);
+
     const root = normalized.split('/').filter((x) => x)[0];
 
     if (`${root}/` !== this.S3_BASE_PATH) {
