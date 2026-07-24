@@ -26,6 +26,7 @@ module.exports = {
   SITE_FILE_STORAGE_DOES_NOT_EXIST: 'The specified site file storage does not exist.',
   DIRECTORY_MUST_BE_EMPTIED:
     'This directory cannot be deleted. Please delete file contents first.',
+  PATH_TRAVERSAL_DETECTED: 'Path traversal detected.',
   DIRECTORY_EXISTS_ALREADY:
     'A directory with the same name already exists. Please rename your new directory.',
   FILE_EXISTS_ALREADY:

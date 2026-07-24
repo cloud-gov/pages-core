@@ -5,6 +5,7 @@ const moment = require('moment');
 
 const config = require('../../config');
 const { logger } = require('../../winston');
+const siteErrors = require('../responses/siteErrors');
 
 /**
  * @param {string[]} values The enum values
@@ -339,8 +340,20 @@ function slugify(text, len = 200) {
   return extension ? `${slugifiedBase}.${extension?.toLowerCase()}` : slugifiedBase;
 }
 
+function throwPathTraversalError() {
+  const error = new Error(siteErrors.PATH_TRAVERSAL_DETECTED);
+  error.status = 400;
+  throw error;
+}
+
 function normalizeDirectoryPath(dir) {
-  let normalized = path.normalize(dir);
+  const sanitized = sanitizePathInput(dir);
+  let normalized = path.normalize(sanitized);
+
+  // Verify no traversal after normalization
+  if (normalized.includes('..')) {
+    throwPathTraversalError();
+  }
 
   if (normalized.startsWith('/') && normalized.endsWith('/')) {
     normalized = normalized.slice(1);
@@ -351,6 +364,36 @@ function normalizeDirectoryPath(dir) {
   }
 
   return normalized;
+}
+
+function validateInputPath(inputPath) {
+  const decoded = decodeURIComponent(inputPath);
+  if (decoded.includes('..') || decoded.includes('\0')) {
+    throwPathTraversalError();
+  }
+}
+
+function sanitizePathInput(inputPath) {
+  if (!inputPath) {
+    return inputPath;
+  }
+
+  // Decode and check for traversal sequences
+  validateInputPath(inputPath);
+
+  // Remove dangerous characters
+  // eslint-disable-next-line no-control-regex
+  return inputPath.replace(/[<>:"|?*\x00-\x1f]/g, '');
+}
+
+function validatePath(basePath, keyPath) {
+  const fullPath = path.join(basePath, keyPath);
+  const resolved = path.resolve('/', fullPath);
+  const baseResolved = path.resolve('/', basePath);
+
+  if (!resolved.startsWith(baseResolved)) {
+    throwPathTraversalError();
+  }
 }
 
 const omitByPredicate = (obj, predicate) =>
@@ -412,6 +455,9 @@ module.exports = {
   loadProductionManifest,
   mapValues,
   normalizeDirectoryPath,
+  sanitizePathInput,
+  validatePath,
+  validateInputPath,
   omitBy,
   omit,
   paginate,

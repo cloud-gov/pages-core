@@ -1,4 +1,4 @@
-const { isEmpty } = require('../utils');
+const { isEmpty, validateInputPath } = require('../utils');
 const EventCreator = require('../services/EventCreator');
 const {
   canCreateSiteStorage,
@@ -41,6 +41,9 @@ module.exports = wrapHandlers({
       params,
       user,
     } = req;
+
+    validateInputPath(parent);
+    validateInputPath(name);
 
     const fssId = parseInt(params.file_storage_id, 10);
     const { fileStorageService } = await isFileStorageUser(user.id, fssId);
@@ -151,6 +154,9 @@ module.exports = wrapHandlers({
       const err = new Error('No file name or parent directory defined.');
       return badRequest(err, { res });
     }
+
+    validateInputPath(parent);
+    validateInputPath(name);
 
     const { buffer: fileBuffer, originalname, encoding, mimetype, size } = file;
 

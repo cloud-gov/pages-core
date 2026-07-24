@@ -8,6 +8,7 @@ const fsMock = require('mock-fs');
 const proxyquire = require('proxyquire').noCallThru();
 
 const config = require('../../../../config');
+const { sanitizePathInput, validatePath } = require('../../../../api/utils');
 
 const publicPath = '/publicPath/';
 const filename = 'bundle';
@@ -506,6 +507,123 @@ describe('utils', () => {
       const result = utils.normalizeDirectoryPath(dir);
 
       expect(result).to.be.eq(expected);
+    });
+  });
+
+  describe('sanitizePathInput', () => {
+    describe('path traversal detection', () => {
+      it('throws on plain ".." traversal', () => {
+        expect(() => sanitizePathInput('../etc/passwd')).to.throw(
+          'Path traversal detected',
+        );
+      });
+
+      it('throws on nested ".." traversal', () => {
+        expect(() => sanitizePathInput('/uploads/../../etc/passwd')).to.throw(
+          'Path traversal detected',
+        );
+      });
+
+      it('throws on URI-encoded ".." (%2e%2e)', () => {
+        expect(() => sanitizePathInput('%2e%2e/etc/passwd')).to.throw(
+          'Path traversal detected',
+        );
+      });
+
+      it('throws on mixed-encoding traversal (%2e%2e/)', () => {
+        expect(() => sanitizePathInput('/uploads/%2e%2e/secret')).to.throw(
+          'Path traversal detected',
+        );
+      });
+
+      it('throws on null byte injection', () => {
+        expect(() => sanitizePathInput('/uploads/image.png\0.jpg')).to.throw(
+          'Path traversal detected',
+        );
+      });
+
+      it('throws on URI-encoded null byte (%00)', () => {
+        expect(() => sanitizePathInput('/uploads/image.png%00.jpg')).to.throw(
+          'Path traversal detected',
+        );
+      });
+
+      it('throws if decodeURIComponent reveals ".." only after decoding', () => {
+        // %2e%2e decodes to ".." — not visible before decoding
+        const input = '/uploads/%2e%2e%2fsecret';
+        expect(() => sanitizePathInput(input)).to.throw('Path traversal detected');
+      });
+    });
+
+    describe('malformed URI handling', () => {
+      it('throws (or handles gracefully) on invalid percent-encoding', () => {
+        // decodeURIComponent throws URIError on malformed sequences like '%'
+        expect(() => sanitizePathInput('/uploads/%')).to.throw();
+      });
+    });
+
+    describe('dangerous character stripping', () => {
+      it('removes angle brackets', () => {
+        expect(sanitizePathInput('/uploads/<script>.png')).to.equal(
+          '/uploads/script.png',
+        );
+      });
+
+      it('removes colons', () => {
+        expect(sanitizePathInput('C:/uploads/image.png')).to.equal('C/uploads/image.png');
+      });
+
+      it('removes double quotes', () => {
+        expect(sanitizePathInput('/uploads/"image".png')).to.equal('/uploads/image.png');
+      });
+
+      it('removes pipe characters', () => {
+        expect(sanitizePathInput('/uploads/image|rm -rf.png')).to.equal(
+          '/uploads/imagerm -rf.png',
+        );
+      });
+
+      it('removes question marks', () => {
+        expect(sanitizePathInput('/uploads/image.png?query=1')).to.equal(
+          '/uploads/image.pngquery=1',
+        );
+      });
+
+      it('removes asterisks', () => {
+        expect(sanitizePathInput('/uploads/*.png')).to.equal('/uploads/.png');
+      });
+
+      it('removes control characters (0x00-0x1f)', () => {
+        const input = '/uploads/image\x01\x02.png';
+        expect(sanitizePathInput(input)).to.equal('/uploads/image.png');
+      });
+
+      it('removes multiple dangerous characters at once', () => {
+        const input = '/uploads/<foo>:"bar"|*?.png';
+        expect(sanitizePathInput(input)).to.equal('/uploads/foobar.png');
+      });
+    });
+
+    describe('valid input passthrough', () => {
+      it('returns a normal path unchanged', () => {
+        expect(sanitizePathInput('/uploads/image.png')).to.equal('/uploads/image.png');
+      });
+
+      it('returns a relative-but-safe filename unchanged', () => {
+        expect(sanitizePathInput('photo123.jpg')).to.equal('photo123.jpg');
+      });
+    });
+  });
+
+  describe('validatePath', () => {
+    it('resolves successfully when keyPath is within basePath', () => {
+      validatePath('/uploads', 'image');
+    });
+
+    it('throws when keyPath attempts to traverse outside basePath', async () => {
+      expect(() => validatePath('/uploads', '../../../etc/passwd')).to.throw(
+        'Path traversal detected',
+      );
     });
   });
 

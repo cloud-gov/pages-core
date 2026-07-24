@@ -248,7 +248,7 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('GET', endpoint, 404, body);
       });
 
-      it('returns a 404 when file exists in differnt file service', async () => {
+      it('returns a 404 when file exists in different file service', async () => {
         const { site, org, user } = await stubSiteS3();
         const fss = await factory.fileStorageService.create({
           siteId: site.id,
@@ -874,6 +874,52 @@ describe('File Storgage API', () => {
         validateAgainstJSONSchema('POST', endpoint, 400, body);
       });
     });
+
+    describe('when a user creates a directory with path traversal', () => {
+      async function tester(parent, name) {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const cookie = await authenticatedSession(user);
+        const payload = { parent: parent, name: name };
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/directory`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send(payload)
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      }
+
+      const parentsNames = [
+        ['../../../etc/passwd', 'name'],
+        ['~assets/../../../etc/passwd', 'name'],
+        ['~assets/legit/../../etc/passwd', 'name'],
+        ['%2E%2E%2F%2E%2E%2Ftest', 'name'],
+        ['../../../', 'name'],
+        ['parent', '../../../etc/passwd'],
+        ['parent', '~assets/../../../etc/passwd'],
+        ['parent', '~assets/legit/../../etc/passwd'],
+        ['parent', '%2E%2E%2F%2E%2E%2Ftest'],
+        ['parent', '../../../'],
+      ];
+
+      parentsNames.forEach((parentName) => {
+        // eslint-disable-next-line max-len
+        it(`returns a 400 for parent: '${parentName[0]}' and name: '${parentName[1]}'`, async () => {
+          await tester(parentName[0], parentName[1]);
+        });
+      });
+    });
   });
 
   describe('POST /v0/file-storage/:file_storage_id/upload', () => {
@@ -980,6 +1026,45 @@ describe('File Storgage API', () => {
           .expect(400);
 
         validateAgainstJSONSchema('POST', endpoint, 400, body);
+      });
+    });
+
+    describe('when a user uploads a file with path traversal in parent field', () => {
+      async function tester(parent) {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+        const name = 'test.txt';
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/upload`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .field('name', name)
+          .field('parent', parent)
+          .attach('file', path.join(__dirname, '../support/fixtures/lorem.txt'))
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      }
+
+      const parents = [
+        '../../../etc/passwd',
+        '~assets/../../../etc/passwd',
+        '~assets/legit/../../etc/passwd',
+        '%2E%2E%2F%2E%2E%2Ftest',
+      ];
+
+      parents.forEach((path) => {
+        it(`returns a 400 for ${path}`, async () => {
+          await tester(path);
+        });
       });
     });
 
