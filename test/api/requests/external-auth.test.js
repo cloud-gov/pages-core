@@ -7,12 +7,17 @@ const { unauthenticatedSession } = require('../support/session');
 const app = require('../../../app');
 const factory = require('../support/factory');
 const EventCreator = require('../../../api/services/EventCreator');
+const { limiter } = require('../../../api/external-auth');
 
 describe('External authentication request', () => {
   let eventAuditStub;
   let eventErrorStub;
 
   beforeEach(async () => {
+    // Reset the rate limiter store so counts don't leak between tests.
+    limiter.resetKey('::ffff:127.0.0.1');
+    limiter.resetKey('127.0.0.1');
+    limiter.resetKey('::1');
     eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
     eventErrorStub = sinon.stub(EventCreator, 'error').resolves();
   });
@@ -25,6 +30,21 @@ describe('External authentication request', () => {
         .get('/external/auth/github')
         .expect('Location', /^https:\/\/github.com\/login\/oauth\/authorize.*/)
         .expect(302, done);
+    });
+  });
+
+  describe('rate limiting', () => {
+    it('returns 429 after exceeding the request limit', async () => {
+      const limit = 10;
+      for (let i = 0; i < limit; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await request(app).get('/external/auth/github').expect(302);
+      }
+
+      const res = await request(app).get('/external/auth/github').expect(429);
+      expect(res.text).to.contain(
+        'Too many authentication attempts, please try again later.',
+      );
     });
   });
 
