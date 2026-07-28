@@ -1,8 +1,11 @@
 const express = require('express');
 const { rateLimit } = require('express-rate-limit');
+const IORedis = require('ioredis');
+const { RedisStore } = require('rate-limit-redis');
 const passport = require('./passport');
 const EventCreator = require('../services/EventCreator');
 const { Event } = require('../models');
+const config = require('../../config');
 
 const script = (nonce, status, content) => `
   <script nonce="${nonce}">
@@ -20,12 +23,21 @@ const script = (nonce, status, content) => `
   </script>
 `;
 
+const { redis: redisConfig } = config;
+const connection = new IORedis(redisConfig.url, {
+  tls: redisConfig.tls,
+  maxRetriesPerRequest: null,
+});
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 10, // 10 attempts per window
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  store: new RedisStore({
+    sendCommand: (...args) => connection.call(...args),
+  }),
 });
 
 const app = express();
@@ -59,3 +71,4 @@ app.get('/auth/github/callback', (req, res) => {
 });
 
 module.exports = app;
+module.exports.limiter = limiter;
