@@ -1,117 +1,151 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Field, reduxForm, formValueSelector } from 'redux-form';
 import { validAddTemplateSiteForm } from '@util/validators';
 import UserOrgSelect from '@shared/UserOrgSelect';
-import { useSelector } from 'react-redux';
-
 import { ORGANIZATIONS } from '@propTypes';
 import globals from '@globals';
 import { IconGitHub, IconGitLab } from '@shared/icons';
 import { getRepoUrl, isGitHub, isGitLab } from '@util/site';
 
-const isWorkshopIntegration = process.env.FEATURE_WORKSHOP_INTEGRATION === 'true';
+export const AddTemplateSiteForm = ({ organizations, onSubmit }) => {
+  const [values, setValues] = useState({
+    repoOrganizationId: '',
+    sourceCodePlatform: '',
+    owner: '',
+    repository: '',
+  });
+  const [touched, setTouched] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-const selector = formValueSelector('addTemplateSite');
-const renderOwner = (p) => (
-  <input id="owner" type="text" className="usa-input" {...p.input} />
-);
-
-const renderRepository = (p) => (
-  <input id="repository" type="text" className="usa-input" {...p.input} />
-);
-
-const getPlatformLabel = (sourceCodePlatform) => {
-  if (isGitHub(sourceCodePlatform)) return 'GitHub account';
-  if (isGitLab(sourceCodePlatform)) return 'GitLab namespace';
-  return process.env.FEATURE_WORKSHOP_INTEGRATION === 'true'
-    ? 'GitHub account or GitLab namespace'
-    : 'GitHub account';
-};
-
-const getOwnerLabel = (sourceCodePlatform) =>
-  `${getPlatformLabel(sourceCodePlatform)} your site belongs to`;
-
-const getRepoTypeLabel = (sourceCodePlatform) => {
-  if (isGitHub(sourceCodePlatform)) return 'GitHub repository ';
-  if (isGitLab(sourceCodePlatform)) return 'GitLab project ';
-  return process.env.FEATURE_WORKSHOP_INTEGRATION === 'true'
-    ? 'GitHub repository or GitLab project '
-    : 'GitHub repository';
-};
-
-const getRepoLabel = (sourceCodePlatform) =>
-  `Name your new site and ${getRepoTypeLabel(sourceCodePlatform)} (lowercase, no spaces)`;
-
-const renderIcon = (sourceCodePlatform, repoUrl) => {
-  if (repoUrl && isGitHub(sourceCodePlatform)) return <IconGitHub />;
-  if (repoUrl && isGitLab(sourceCodePlatform)) return <IconGitLab />;
-  return null;
-};
-
-export const AddTemplateSiteForm = ({
-  // even though initialValues is not directly used, it is used
-  // by reduxForm, and we want PropType validation on it, so we'll
-  // keep it here but disable the eslint rule below
-  initialValues, // eslint-disable-line no-unused-vars
-  pristine,
-  invalid,
-  submitting,
-  handleSubmit,
-  organizations,
-}) => {
-  const sourceCodePlatform = useSelector((state) =>
-    selector(state, 'sourceCodePlatform'),
-  );
-  const owner = useSelector((state) => selector(state, 'owner'));
-  const repository = useSelector((state) => selector(state, 'repository'));
+  const { repoOrganizationId, sourceCodePlatform, owner, repository } = values;
+  const errors = validAddTemplateSiteForm(values);
+  const invalid = Object.keys(errors).length > 0;
   const repoUrl = getRepoUrl(sourceCodePlatform, owner, repository);
+
+  let ownerLabel = 'GitHub account your site belongs to';
+  if (isGitLab(sourceCodePlatform)) {
+    ownerLabel = 'GitLab namespace your site belongs to';
+  } else if (
+    !isGitHub(sourceCodePlatform) &&
+    process.env.FEATURE_WORKSHOP_INTEGRATION === 'true'
+  ) {
+    ownerLabel = 'GitHub account or GitLab namespace your site belongs to';
+  }
+
+  let repoTypeLabel = 'GitHub repository';
+  if (isGitHub(sourceCodePlatform)) {
+    repoTypeLabel = 'GitHub repository ';
+  } else if (isGitLab(sourceCodePlatform)) {
+    repoTypeLabel = 'GitLab project ';
+  } else if (process.env.FEATURE_WORKSHOP_INTEGRATION === 'true') {
+    repoTypeLabel = 'GitHub repository or GitLab project ';
+  }
+
+  let icon = null;
+  if (repoUrl && isGitHub(sourceCodePlatform)) {
+    icon = <IconGitHub />;
+  } else if (repoUrl && isGitLab(sourceCodePlatform)) {
+    icon = <IconGitLab />;
+  }
+
+  const isFieldInvalid = (name) => (touched[name] || submitted) && !!errors[name];
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setValues((prevValues) => ({ ...prevValues, [name]: value }));
+    setTouched((prevTouched) => ({ ...prevTouched, [name]: true }));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    setSubmitted(true);
+
+    if (invalid) {
+      return;
+    }
+
+    setSubmitting(true);
+    onSubmit(values);
+    setValues({
+      repoOrganizationId: '',
+      sourceCodePlatform: '',
+      owner: '',
+      repository: '',
+    });
+    setTouched({});
+    setSubmitted(false);
+  }
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-group margin-y-3">
-        <Field
+        <UserOrgSelect
+          id="repoOrganizationId"
           name="repoOrganizationId"
-          type="select"
-          component={(p) => (
-            <UserOrgSelect
-              id="repoOrganizationId"
-              name="repoOrganizationId"
-              label="Cloud.gov Pages organization to contain this site"
-              value={p.input.value}
-              onChange={p.input.onChange}
-              orgData={organizations.data}
-              mustChooseOption
-              {...p.meta}
-            />
-          )}
+          label="Cloud.gov Pages organization to contain this site"
+          value={repoOrganizationId}
+          onChange={handleChange}
+          orgData={organizations.data}
+          mustChooseOption
+          touched={isFieldInvalid('repoOrganizationId')}
+          error={errors.repoOrganizationId}
         />
-        <label className="usa-label text-bold" htmlFor="engine">
+        <label className="usa-label text-bold" htmlFor="sourceCodePlatform">
           Source code provider
         </label>
-        <Field name="sourceCodePlatform" component="select" className="usa-select">
+        {isFieldInvalid('sourceCodePlatform') && (
+          <span className="usa-error-message">{errors.sourceCodePlatform}</span>
+        )}
+        <select
+          id="sourceCodePlatform"
+          name="sourceCodePlatform"
+          className="usa-select"
+          value={sourceCodePlatform}
+          onChange={handleChange}
+        >
           <option value="">-- Select a source code provider --</option>
           <option value={globals.SOURCE_CODE_PLATFORM_GITHUB}>GitHub</option>
-          {isWorkshopIntegration && (
+          {process.env.FEATURE_WORKSHOP_INTEGRATION === 'true' && (
             <option value={globals.SOURCE_CODE_PLATFORM_WORKSHOP}>Workshop GitLab</option>
           )}
-        </Field>
+        </select>
       </div>
       <div className="form-group margin-y-3">
         <label className="usa-label text-bold" htmlFor="owner">
-          {getOwnerLabel(sourceCodePlatform)}
+          {ownerLabel}
         </label>
-        <Field name="owner" component={renderOwner} />
+        {isFieldInvalid('owner') && (
+          <span className="usa-error-message">{errors.owner}</span>
+        )}
+        <input
+          id="owner"
+          name="owner"
+          type="text"
+          className="usa-input"
+          value={owner}
+          onChange={handleChange}
+        />
         <label className="usa-label text-bold" htmlFor="repository">
-          {getRepoLabel(sourceCodePlatform)}
+          {`Name your new site and ${repoTypeLabel} (lowercase, no spaces)`}
         </label>
-        <Field name="repository" component={renderRepository} />
-        <label className="usa-label text-bold" htmlFor="repository">
+        {isFieldInvalid('repository') && (
+          <span className="usa-error-message">{errors.repository}</span>
+        )}
+        <input
+          id="repository"
+          name="repository"
+          type="text"
+          className="usa-input"
+          value={repository}
+          onChange={handleChange}
+        />
+        <label className="usa-label text-bold" htmlFor="repoUrl">
           New site will be created at
         </label>
         <div className="usa-input-group">
           <div className="usa-input-prefix" aria-hidden="true">
-            {renderIcon(sourceCodePlatform, repoUrl)}
+            {icon}
           </div>
           <input
             className="usa-input"
@@ -126,7 +160,7 @@ export const AddTemplateSiteForm = ({
       <button
         type="submit"
         className="usa-button usa-button--primary inline-block"
-        disabled={pristine || invalid || submitting}
+        disabled={invalid || submitting}
       >
         Create new site from template
       </button>
@@ -136,16 +170,7 @@ export const AddTemplateSiteForm = ({
 
 AddTemplateSiteForm.propTypes = {
   organizations: ORGANIZATIONS.isRequired,
-  initialValues: PropTypes.shape({}).isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  pristine: PropTypes.bool.isRequired,
-  invalid: PropTypes.bool.isRequired,
-  submitting: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
-AddTemplateSiteForm.defaultProps = {};
-
-export default reduxForm({
-  form: 'addTemplateSite',
-  validate: validAddTemplateSiteForm,
-})(AddTemplateSiteForm);
+export default AddTemplateSiteForm;
