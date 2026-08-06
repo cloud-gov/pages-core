@@ -338,7 +338,7 @@
         </Await>
       </AccordionContent>
       <AccordionContent title="Delete Site">
-        <SiteDeleteForm {site} on:submit={destroySite(site)} />
+        <SiteDeleteForm {site} onsubmit={destroySite(site)} />
       </AccordionContent>
     </Accordion>
   </Await>

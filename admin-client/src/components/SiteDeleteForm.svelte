@@ -1,10 +1,9 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
   import Modal from './Modal.svelte';
 
   export let site;
+  export let onsubmit = () => {};
 
-  const dispatch = createEventDispatcher();
   let submitting = false;
 
   function handleCancel() {
@@ -16,7 +15,7 @@
   }
 
   function handleVerification() {
-    return dispatch('submit');
+    return onsubmit();
   }
 </script>
 
