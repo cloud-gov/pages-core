@@ -106,5 +106,6 @@ apiRouter.get('/users', AdminControllers.User.list);
 apiRouter.get('/users/:id', AdminControllers.User.findById);
 apiRouter.post('/users/invite', AdminControllers.User.invite);
 apiRouter.post('/users/resend-invite', AdminControllers.User.resendInvite);
+apiRouter.post('/users/migrate-user', AdminControllers.User.migrateUserToLoginGov);
 
 module.exports = apiRouter;

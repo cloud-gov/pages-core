@@ -7,6 +7,7 @@ const EventCreator = require('../../services/EventCreator');
 const OrganizationService = require('../../services/organization');
 const QueueJobs = require('../../queue-jobs');
 const { createQueueConnection } = require('../../utils/queues');
+const { migrateUserLoginGov } = require('../../services/user');
 
 const connection = createQueueConnection();
 const queueJob = new QueueJobs(connection);
@@ -222,5 +223,15 @@ module.exports = wrapHandlers({
     };
 
     return res.json(json);
+  },
+
+  async migrateUserToLoginGov(req, res) {
+    const {
+      body: { uaaEmail },
+    } = req;
+
+    const uaaUser = await migrateUserLoginGov(uaaEmail);
+
+    return res.json(uaaUser);
   },
 });

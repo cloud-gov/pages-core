@@ -124,6 +124,22 @@ function mockFetchUserByEmail(email, token, profile) {
 /**
  * @param {string} email
  * @param {string} token
+ * @param {object[]} resources - UAA user resources (supports multiple origins)
+ */
+function mockFetchUserOriginByEmail(email, token, resources = []) {
+  return nock(uaaHost, tokenAuth(token))
+    .get('/Users')
+    .query({
+      filter: `email eq "${email}"`,
+    })
+    .reply(200, {
+      resources,
+    });
+}
+
+/**
+ * @param {string} email
+ * @param {string} token
  */
 function mockInviteUser(email, token, profile) {
   return nock(uaaHost, tokenAuth(token))
@@ -298,6 +314,7 @@ module.exports = {
   mockFetchGroupMembers,
   mockFetchUser,
   mockFetchUserByEmail,
+  mockFetchUserOriginByEmail,
   mockInviteUser,
   mockInviteUserToUserGroup,
   mockRefreshToken,
