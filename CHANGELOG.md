@@ -1,3 +1,10 @@
+## 0.26.1 (2026-08-18)
+
+### Fixed
+
+- update dependencies
+- remove auto added dependencies
+
 ## 0.26.0 (2026-08-07)
 
 ### Added
