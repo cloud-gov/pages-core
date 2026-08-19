@@ -356,6 +356,10 @@ async function removeBuildTask(id) {
   return destroy(`/site-build-tasks/${id}`);
 }
 
+async function migrateUserToLoginGov(params) {
+  return post('/users/migrate-user', params);
+}
+
 export {
   addSiteBuildTask,
   updateSiteBuildTask,
@@ -411,4 +415,5 @@ export {
   fetchSiteFileStorage,
   createSiteFileStorage,
   fetchSiteFileStorageUserActions,
+  migrateUserToLoginGov,
 };

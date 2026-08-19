@@ -7,6 +7,7 @@
     resendInvite,
     updateUserOrgRole,
     removeUserOrgRole,
+    migrateUserToLoginGov,
   } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import {
@@ -30,6 +31,21 @@
 
   async function handleResendInvite(uaaEmail) {
     return resendInvite({ uaaEmail });
+  }
+  function handleMigrateUserToLoginGov(uaaEmail) {
+      return async () => {
+      const response = await migrateUserToLoginGov({ uaaEmail });
+
+      if (response) {
+        notification.setSuccess('User migrated to Login.gov Succesfully.');
+      }
+
+      if (!response) {
+        notification.setError('Error. Unable to migrate user to Login.gov.');
+      }
+
+      userPromise = fetchUser(id);
+    };
   }
 
   function handleUpdateUserOrgRole(organizationId) {
@@ -91,16 +107,24 @@
           <LabeledItem label="uaa email" value={user.UAAIdentity.email} />
           <LabeledItem label="uaa username" value={user.UAAIdentity.username} />
         </div>
-        <div class="tablet:grid-col-auto padding-bottom-1">
+        <div class="tablet:grid-col-auto padding-bottom-1 display-flex flex-column flex-align-start">
           <button
-            class="usa-button"
+            class="usa-button margin-bottom-1"
             on:click={(e) => { e.preventDefault(); handleResendInvite(user.UAAIdentity.email); }}>
             Resend Invite
           </button>
+          {#if user.UAAIdentity.origin !==  "login.gov"}
+            <button
+              class="usa-button usa-button--secondary"
+              on:click={(e) => { e.preventDefault(); handleMigrateUserToLoginGov(user.UAAIdentity.email)(); }}>
+              Migrate User to Login.gov
+            </button>
+          {/if}
         </div>
       {:else}
         <p>User does not have a UAA Identity</p>
       {/if}
+
     </div>
 
     <h3>GitHub Info</h3>

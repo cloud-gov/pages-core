@@ -1,9 +1,11 @@
 const request = require('supertest');
 const { expect } = require('chai');
+const sinon = require('sinon');
 const app = require('../../../../api/admin');
 const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
+const csrfToken = require('../../support/csrfToken');
 const config = require('../../../../config');
 const {
   Organization,
@@ -13,6 +15,7 @@ const {
   UAAIdentity,
 } = require('../../../../api/models');
 const { createUAAIdentity } = require('../../support/factory/uaa-identity');
+const UAAClient = require('../../../../api/utils/uaaClient');
 
 describe('Admin - Users API', () => {
   let userRole;
@@ -34,6 +37,7 @@ describe('Admin - Users API', () => {
   });
 
   afterEach(async () => {
+    sinon.restore();
     await Organization.truncate({
       force: true,
       cascade: true,
@@ -318,6 +322,77 @@ describe('Admin - Users API', () => {
         // eslint-disable-next-line max-len
         `${user2.id},"user2@example.com","${org1.name}","${org1.name}: user","${user2.createdAt.toISOString()}","${user2.signedInAt.toISOString()}"`,
       );
+    });
+  });
+
+  describe('POST /admin/users/migrate-user', () => {
+    it('should require admin authentication', async () => {
+      const response = await request(app)['post']('/users/migrate-user').expect(401);
+      expect(response.body.message).to.equal('Unauthorized');
+    });
+
+    it('returns true when the user is migrated to login.gov', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const oldUaaId = 'old-uaa-id';
+      const loginUaaId = 'login-gov-uaa-id';
+      const groupId = 1;
+
+      const user = await factory.user();
+      const targetUser = await factory.user();
+      await createUAAIdentity({
+        uaaId: oldUaaId,
+        email: uaaEmail,
+        userId: targetUser.id,
+        origin: 'gsa.gov',
+      });
+
+      sinon.stub(UAAClient.prototype, 'fetchClientToken').resolves('client-token');
+      sinon.stub(UAAClient.prototype, 'fetchUserOriginByEmail').resolves({
+        resources: [
+          { id: oldUaaId, origin: 'gsa.gov' },
+          { id: loginUaaId, origin: 'login.gov' },
+        ],
+      });
+      sinon.stub(UAAClient.prototype, 'fetchGroupId').resolves(groupId);
+      sinon.stub(UAAClient.prototype, 'addUserToGroup').resolves();
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      const { body } = await request(app)
+        .post('/users/migrate-user')
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ uaaEmail })
+        .expect(200);
+
+      expect(body).to.equal(true);
+
+      const identity = await UAAIdentity.findOne({
+        where: { userId: targetUser.id },
+      });
+      expect(identity.uaaId).to.equal(loginUaaId);
+      expect(identity.origin).to.equal('login.gov');
+    });
+
+    it('returns false when the user cannot be migrated', async () => {
+      const uaaEmail = 'foo@bar.com';
+      const user = await factory.user();
+
+      sinon.stub(UAAClient.prototype, 'fetchClientToken').resolves('client-token');
+      sinon.stub(UAAClient.prototype, 'fetchUserOriginByEmail').resolves({
+        resources: [{ id: 'only-id', origin: 'gsa.gov' }],
+      });
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      const { body } = await request(app)
+        .post('/users/migrate-user')
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ uaaEmail })
+        .expect(200);
+
+      expect(body).to.equal(false);
     });
   });
 });

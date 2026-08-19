@@ -314,6 +314,26 @@ class UAAClient {
     };
   }
 
+  /**
+   * @param {string} email - a UAA user email
+   * @param {string} clientToken - a client token with the `scim.read` scope
+   *
+   * Fetches a UAA user by email and return multple users if the user has multiple origins
+   */
+  async fetchUserOriginByEmail(email, clientToken) {
+    const path = '/Users';
+    const options = {
+      params: {
+        filter: `email eq "${email}"`,
+      },
+      token: clientToken,
+    };
+
+    const result = await this.request(path, options);
+
+    return result;
+  }
+
   request(path, opts = {}) {
     const { body, form, method = 'get', params, token } = opts;
 
