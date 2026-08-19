@@ -1,7 +1,7 @@
 {
   "name": "pages-core",
   "private": true,
-  "version": "0.25.1",
+  "version": "0.26.0",
   "description": "",
   "keywords": [],
   "dependencies": {
@@ -15,7 +15,7 @@
     "@supercharge/promise-pool": "^1.5.0",
     "@tanstack/react-query": "^5.59.20",
     "@uswds/uswds": "^3.8.1",
-    "axios": "^1.15.0",
+    "axios": "^1.18.0",
     "bullmq": "^5.7.0",
     "cfenv": "^1.2.3",
     "connect-flash": "^0.1.1",
@@ -36,13 +36,13 @@
     "helmet": "^4.6.0",
     "inflection": "^1.13.1",
     "ioredis": "^4.27.6",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.3.1",
     "json-templates": "^5.1.0",
     "jsonwebtoken": "^9.0.3",
     "lodash": "^4.17.22",
     "lodash.merge": "^4.6.2",
     "moment": "^2.29.2",
-    "multer": "^2.1.1",
+    "multer": "^2.2.0",
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-github": "^1.1.0",
@@ -227,8 +227,8 @@
     "dottie": "^2.0.7",
     "qs": "^6.14.2",
     "diff": "^4.0.4",
-    "svgo": "^3.3.3",
-    "immutable": "^5.1.5",
+    "svgo": "^3.3.4",
+    "immutable": "^5.1.8",
     "flatted": "^3.4.0"
   }
 }
