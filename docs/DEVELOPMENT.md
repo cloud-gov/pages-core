@@ -55,14 +55,14 @@ This will be the file that holds your S3 and SQS configurations.
     };
     ```
 
-**For 18F/TTS developers:** This section is primarily for 18F/TTS developers working on the Federalist project. Before you get started, make sure you have been fully on-boarded, including getting access to the Federalist cloud.gov `staging` space.
+**For Cloud.gov developers:** This section is primarily for Cloud.gov developers working on Cloud.gov Pages. Before you get started, make sure you have been fully on-boarded, including getting access to the Cloud.gov `staging` space.
 
 1. Paste `cf login --sso -a https://api.fr.cloud.gov -o gsa-18f-federalist -s staging` into your terminal window.
 2. Visit https://login.fr.cloud.gov/passcode to get a Temporary Authentication Code.
 3. Paste this code into the terminal, and hit the return key. (For security purposes, the code won't be rendered in the terminal.)
 4. Type `npm run update-local-config` to read necessary service keys from the staging environment and load them into a local file called `config/local-from-staging.js`.
 
-Note that `npm run update-local-config` will need to be re-run with some frequency, as service keys are changed every time Federalist's staging instance is deployed.
+Note that `npm run update-local-config` will need to be re-run with some frequency, as service keys are changed every time Pages' staging instance is deployed.
 
 #### Setting up Docker
 
@@ -93,12 +93,12 @@ In order to make it possible to log in with local UAA authentication in a develo
 
 #### Check to see if everything is working correctly
 
-1. If you've successfully completed all of the steps the Federalist app is now ready to run locally! :tada:
-1. You should now be able to see Federalist running at [http://localhost:1337](http://localhost:1337). Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
+1. If you've successfully completed all of the steps the Pages app is now ready to run locally! :tada:
+1. You should now be able to see Pages running at [http://localhost:1337](http://localhost:1337). Local file changes will cause the server to restart and/or the front end bundles to be rebuilt.
 
 **Pro tips:**
 
-In our Docker Compose environment, `app` is the name of the container where the Federalist web application runs. You can run any command in the context of the web application by running `docker compose run --rm app <THE COMMAND>`.
+In our Docker Compose environment, `app` is the name of the container where the Pages web application runs. You can run any command in the context of the web application by running `docker compose run --rm app <THE COMMAND>`.
 
 For example:
 
@@ -176,7 +176,7 @@ The following environment variables are set on the Cloud Foundry environment in 
 - `APP_ENV`: The application environment in which the app should run. Valid values are `production` and `staging`.
 - `LOG_LEVEL`: Sets the log level for the app.
 - `NPM_CONFIG_PRODUCTION`: This should be set to true in Cloud Foundry to prevent NPM from installing dev dependencies
-- `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Federalist
+- `NODE_MODULES_CACHE`: This should be set to true in Cloud Foundry to prevent caching node modules since those are vendored by Pages
 - `APP_NAME`: The name of the Cloud Foundry application
 - `APP_DOMAIN`: The hostname where the application runs in Cloud Foundry
 - `NEW_RELIC_APP_NAME`: The app name to report to New Relic
@@ -189,7 +189,7 @@ The app expects the following user provided services to be provided:
 - `federalist-<environment>-uev`: A user-provided service that provides the application with the secret key to securely encrypt user environment variable; this service provides the following credential:
   - `key`: The encryption key to decrypt user environment variables
 - `federalist-<environment>-env`: A user-provided service that provides the application with secrets that cannot be added to `manifest.yml` b/c that file is under version control; this service provides the following:
-  - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Federalist's session store
+  - `FEDERALIST_SESSION_SECRET`: The session secret used to sign entries in Pages' session store
   - `GITHUB_CLIENT_CALLBACK_URL`: The callback URL used for GitHub authentication
   - `GITHUB_CLIENT_EXTERNAL_CALLBACK_URL`: The callback URL used for external GitHub authentication
   - `GITHUB_CLIENT_ID`: The client ID used for GitHub authentication
