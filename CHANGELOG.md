@@ -1,3 +1,19 @@
+## 0.27.0 (2026-09-09)
+
+### Added
+
+- Create migration user to login.gov
+
+### Fixed
+
+- update dependencies
+- remove auto added dependencies
+
+### Maintenance
+
+- Clean up Federalist references in DEVELOPMENT.md
+- add tests
+
 ## 0.26.0 (2026-08-07)
 
 ### Added
