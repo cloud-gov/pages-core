@@ -47,11 +47,11 @@ cf target -o "${CF_ORG}" -s "${CF_SPACE}"
 wait_for_service_instance() {
   local service_name=$1
   local guid=$(cf service --guid $service_name)
-  local status=$(cf curl /v2/service_instances/${guid} | jq -r '.entity.last_operation.state')
+  local status=$(cf curl /v3/service_instances/${guid} | jq -r '.last_operation.state')
 
   while [ "$status" == "in progress" ]; do
     sleep 60
-    status=$(cf curl /v2/service_instances/${guid} | jq -r '.entity.last_operation.state')
+    status=$(cf curl /v3/service_instances/${guid} | jq -r '.last_operation.state')
   done
 }
 
