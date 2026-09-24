@@ -1,5 +1,3 @@
-Test
-
 # Cloud.gov Pages
 ***Cloud.gov Pages is updated regularly. [Join our public chat room](https://chat.18f.gov/?channel=cg-pages-public) to talk to us and stay informed. You can also check out our [documentation](https://cloud.gov/pages/) to learn more.***
 
@@ -67,3 +65,5 @@ This project is in the worldwide [public domain](LICENSE.md). As stated in [CONT
 Berkah Icon, from the Noun
 Project](https://thenounproject.com/berkahicon/collection/startup/?i=1441102)
 made available under [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode).
+
+
