@@ -9,7 +9,7 @@ volumes:
 
 services:
   mc:
-    image: minio/mc
+    image: cgr.dev/chainguard/minio-client:latest
     depends_on:
       - minio
     restart: "no"
@@ -50,6 +50,8 @@ services:
       PRODUCT: pages
       UAA_HOST: http://localhost:9001
       UAA_HOST_DOCKER_URL: http://uaa:8080
+      UAA_CLIENT_ID: pages-client
+      UAA_CLIENT_SECRET: client-secret
       USER_AUDITOR: federalist
       CLOUD_FOUNDRY_API_HOST: ${CLOUD_FOUNDRY_API_HOST}
       CLOUD_FOUNDRY_OAUTH_TOKEN_URL: ${CLOUD_FOUNDRY_API_HOST}/oauth/token
@@ -136,7 +138,7 @@ services:
       PORT: 8989
     command: node app/scripts/echo.js
   minio:
-    image: minio/minio
+    image: cgr.dev/chainguard/minio:latest
     container_name: minio
     ports:
       - "9100:9000"

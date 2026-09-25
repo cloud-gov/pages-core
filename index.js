@@ -1,7 +1,6 @@
-const env = require('./services/environment')();
-const { requiredEnvVarsNode } = require('./config/envVarValidator');
+const { getMissingEnvVarsAtStartup } = require('./config/envVarValidator');
 
-const missing = requiredEnvVarsNode.filter((key) => !env[key]);
+const missing = getMissingEnvVarsAtStartup();
 
 if (missing.length > 0) {
   // eslint-disable-next-line
