@@ -1,4 +1,7 @@
-const { validateEnvVar } = require('../../config/envVarValidator');
+const {
+  validateEnvVarPresent,
+  validateEnvVarSecret,
+} = require('../../config/envVarValidator');
 
 const {
   ADMIN_GITHUB_ORGANIZATION,
@@ -48,8 +51,8 @@ module.exports = {
     xssFilter: false,
   },
   github: {
-    clientID: GITHUB_CLIENT_ID || 'test',
-    clientSecret: GITHUB_CLIENT_SECRET || 'test',
+    clientID: validateEnvVarSecret(GITHUB_CLIENT_ID, 'GITHUB_CLIENT_ID'),
+    clientSecret: validateEnvVarSecret(GITHUB_CLIENT_SECRET, 'GITHUB_CLIENT_SECRET'),
     callbackURL: `${APP_HOSTNAME}/auth/github/callback`,
     scope: ['user', 'repo'],
     state: true,
@@ -59,14 +62,14 @@ module.exports = {
   },
   product: PRODUCT,
   session: {
-    secret: validateEnvVar(SESSION_SECRET, 'SESSION_SECRET'),
+    secret: validateEnvVarSecret(SESSION_SECRET, 'SESSION_SECRET'),
   },
   uaa: {
     apiUrl: internalUAAHost,
     authorizationURL: `${UAA_LOGIN_HOST}/oauth/authorize`,
     callbackURL: `${APP_HOSTNAME}/auth/uaa/callback`,
-    clientID: UAA_CLIENT_ID || 'test',
-    clientSecret: UAA_CLIENT_SECRET || 'test',
+    clientID: validateEnvVarPresent(UAA_CLIENT_ID, 'UAA_CLIENT_ID'),
+    clientSecret: validateEnvVarPresent(UAA_CLIENT_SECRET, 'UAA_CLIENT_SECRET'),
     logoutCallbackURL: `${APP_HOSTNAME}/auth/uaa/logout`,
     logoutURL: `${UAA_LOGIN_HOST}/logout.do`,
     tokenURL: `${internalUAAHost}/oauth/token`,
