@@ -8,7 +8,11 @@ const fsMock = require('mock-fs');
 const proxyquire = require('proxyquire').noCallThru();
 
 const config = require('../../../../config');
-const { sanitizePathInput, validatePath } = require('../../../../api/utils');
+const {
+  sanitizePathInput,
+  validateFilePaths,
+  validatePath,
+} = require('../../../../api/utils');
 
 const publicPath = '/publicPath/';
 const filename = 'bundle';
@@ -623,6 +627,162 @@ describe('utils', () => {
     it('throws when keyPath attempts to traverse outside basePath', async () => {
       expect(() => validatePath('/uploads', '../../../etc/passwd')).to.throw(
         'Path traversal detected',
+      );
+    });
+  });
+
+  describe('validateFilePaths', () => {
+    let mockReq;
+    let mockRes;
+    let mockNext;
+
+    beforeEach(() => {
+      mockReq = { body: {}, query: {} };
+      mockRes = { badRequest: sinon.spy() };
+      mockNext = sinon.spy();
+    });
+
+    describe('valid input passthrough', () => {
+      it('calls next for valid parent, name and path', () => {
+        mockReq.body = { parent: '~assets/images/', name: 'photo-1.png' };
+        mockReq.query = { path: '~assets/images/' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.calledOnce).to.equal(true);
+        expect(mockRes.badRequest.called).to.equal(false);
+      });
+
+      it('calls next when body and query are missing', () => {
+        validateFilePaths({}, mockRes, mockNext);
+        expect(mockNext.calledOnce).to.equal(true);
+      });
+
+      it('calls next for empty and falsy values', () => {
+        mockReq.body = { parent: '', name: null, path: 0 };
+        mockReq.query = { path: false };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.calledOnce).to.equal(true);
+      });
+
+      it('ignores params other than parent, name and path', () => {
+        mockReq.body = { foo: '../../etc/passwd' };
+        mockReq.query = { bar: '<script>' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.calledOnce).to.equal(true);
+      });
+    });
+
+    describe('path traversal detection', () => {
+      it('rejects "../" traversal in body parent', () => {
+        mockReq.body = { parent: '../etc/passwd' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.firstCall.args[0].message).to.equal(
+          'Invalid path parameter: Invalid characters in parent',
+        );
+      });
+
+      it('rejects nested "../" traversal in body name', () => {
+        mockReq.body = { name: '~assets/legit/../../etc/passwd' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.firstCall.args[0].message).to.equal(
+          'Invalid path parameter: Invalid characters in name',
+        );
+      });
+
+      it('rejects "..\\" traversal in body path', () => {
+        mockReq.body = { path: '..\\etc\\passwd' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.firstCall.args[0].message).to.equal(
+          'Invalid path parameter: Invalid characters in path',
+        );
+      });
+
+      it('rejects "../" traversal in query path', () => {
+        mockReq.query = { path: '../etc/passwd' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.firstCall.args[0].message).to.equal(
+          'Invalid path parameter: Invalid characters in path',
+        );
+      });
+
+      it('rejects URI-encoded traversal (%2e%2e%2f) in query parent', () => {
+        mockReq.query = { parent: '%2e%2e%2fetc' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.firstCall.args[0].message).to.equal(
+          'Invalid path parameter: Invalid characters in parent',
+        );
+      });
+    });
+
+    describe('dangerous character rejection', () => {
+      it('rejects angle brackets', () => {
+        mockReq.body = { name: '<script>' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects colons', () => {
+        mockReq.body = { name: 'C:image.png' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects double quotes', () => {
+        mockReq.body = { name: '"image".png' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects pipe characters', () => {
+        mockReq.body = { name: 'image|rm -rf.png' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects question marks', () => {
+        mockReq.body = { name: 'image.png?query=1' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects asterisks', () => {
+        mockReq.body = { name: '*.png' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects control characters (0x00-0x1f)', () => {
+        mockReq.body = { name: 'image\x01\x1f.png' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+
+      it('rejects URI-encoded dangerous characters (%3C)', () => {
+        mockReq.query = { path: '~assets/%3Cscript%3E' };
+        validateFilePaths(mockReq, mockRes, mockNext);
+        expect(mockNext.called).to.equal(false);
+        expect(mockRes.badRequest.calledOnce).to.equal(true);
+      });
+    });
+
+    it('lists every invalid param in the message', () => {
+      mockReq.body = { parent: '../foo', name: 'a<b' };
+      mockReq.query = { path: 'a|b' };
+      validateFilePaths(mockReq, mockRes, mockNext);
+      expect(mockRes.badRequest.firstCall.args[0].message).to.equal(
+        'Invalid path parameter: Invalid characters in parent, ' +
+          'Invalid characters in name, Invalid characters in path',
       );
     });
   });

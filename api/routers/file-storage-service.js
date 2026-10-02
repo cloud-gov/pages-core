@@ -1,12 +1,14 @@
 const router = require('express').Router();
 const FileStorageServiceController = require('../controllers/file-storage-service');
 const { csrfProtection, multipartForm, sessionAuth } = require('../middlewares');
+const { validateFilePaths } = require('../utils');
 
 router.use(sessionAuth);
 router.use(csrfProtection);
 
 router.get(
   '/file-storage/:file_storage_id/',
+  validateFilePaths,
   FileStorageServiceController.listDirectoryFiles,
 );
 router.get(
@@ -27,11 +29,13 @@ router.get(
 );
 router.post(
   '/file-storage/:file_storage_id/directory',
+  validateFilePaths,
   FileStorageServiceController.createDirectory,
 );
 router.post(
   '/file-storage/:file_storage_id/upload',
   multipartForm.any(),
+  validateFilePaths,
   FileStorageServiceController.uploadFile,
 );
 
