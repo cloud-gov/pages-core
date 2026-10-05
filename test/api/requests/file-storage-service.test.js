@@ -190,6 +190,44 @@ describe('File Storgage API', () => {
       expect(body.totalItems).to.be.eq(expectedCount);
       validateAgainstJSONSchema('GET', endpoint, 200, body);
     });
+
+    describe('when a user lists a directory with invalid path', () => {
+      async function tester(dir) {
+        const { site, org, user } = await stubSiteS3();
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .get(`/v0/file-storage/${fss.id}?path=${dir}`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .expect(400);
+
+        expect(body.message).to.be.eq(
+          'Invalid path parameter: Invalid characters in path',
+        );
+        validateAgainstJSONSchema('GET', endpoint, 400, body);
+      }
+
+      const dirs = [
+        '../../../etc/passwd',
+        '~assets/../../../etc/passwd',
+        '%2E%2E%2F%2E%2E%2Ftest',
+        '~assets/%3Cscript%3E',
+        '~assets/a|b',
+      ];
+
+      dirs.forEach((dir) => {
+        it(`returns a 400 for ${dir}`, async () => {
+          await tester(dir);
+        });
+      });
+    });
   });
 
   describe('GET /v0/file-storage/:file_storage_id/file/:file_id', () => {
@@ -920,6 +958,46 @@ describe('File Storgage API', () => {
         });
       });
     });
+
+    describe('when a user creates a directory with invalid characters', () => {
+      async function tester(parent, name) {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+
+        const cookie = await authenticatedSession(user);
+        const payload = { parent: parent, name: name };
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/directory`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .type('json')
+          .send(payload)
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      }
+
+      const parentsNames = [
+        ['~assets/a<b', 'name'],
+        ['~assets/a|b', 'name'],
+        ['parent', 'a:b'],
+        ['parent', 'a*b'],
+      ];
+
+      parentsNames.forEach((parentName) => {
+        // eslint-disable-next-line max-len
+        it(`returns a 400 for parent: '${parentName[0]}' and name: '${parentName[1]}'`, async () => {
+          await tester(parentName[0], parentName[1]);
+        });
+      });
+    });
   });
 
   describe('POST /v0/file-storage/:file_storage_id/upload', () => {
@@ -1064,6 +1142,45 @@ describe('File Storgage API', () => {
       parents.forEach((path) => {
         it(`returns a 400 for ${path}`, async () => {
           await tester(path);
+        });
+      });
+    });
+
+    describe('when a user uploads a file with invalid characters', () => {
+      async function tester(parent, name) {
+        const { site, org, user } = await stubSiteS3({
+          roleName: 'manager',
+        });
+        const fss = await factory.fileStorageService.create({
+          siteId: site.id,
+          serviceName: site.s3ServiceName,
+          org,
+        });
+        const cookie = await authenticatedSession(user);
+
+        const { body } = await request(app)
+          .post(`/v0/file-storage/${fss.id}/upload`)
+          .set('Cookie', cookie)
+          .set('x-csrf-token', csrfToken.getToken())
+          .field('name', name)
+          .field('parent', parent)
+          .attach('file', path.join(__dirname, '../support/fixtures/lorem.txt'))
+          .expect(400);
+
+        validateAgainstJSONSchema('POST', endpoint, 400, body);
+      }
+
+      const parentsNames = [
+        ['~assets/a<b', 'test.txt'],
+        ['~assets/a|b', 'test.txt'],
+        ['~assets/', 'a:b.txt'],
+        ['~assets/', 'a?b.txt'],
+      ];
+
+      parentsNames.forEach((parentName) => {
+        // eslint-disable-next-line max-len
+        it(`returns a 400 for parent: '${parentName[0]}' and name: '${parentName[1]}'`, async () => {
+          await tester(parentName[0], parentName[1]);
         });
       });
     });
