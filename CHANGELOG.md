@@ -1,3 +1,14 @@
+## 0.28.0 (2026-10-05)
+
+### Added
+
+- VULN-011 User-controlled Path is not validated 3071
+- Upgrade CF version
+
+### Maintenance
+
+- VULN-005 Hardcoded Bull Board Session Secret 3065
+
 ## 0.27.0 (2026-09-09)
 
 ### Added
