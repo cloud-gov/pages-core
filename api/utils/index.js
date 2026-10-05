@@ -396,6 +396,46 @@ function validatePath(basePath, keyPath) {
   }
 }
 
+// eslint-disable-next-line no-control-regex
+const pathTraversalPattern = /(\.\.[/\\]|[<>:"|?*\x00-\x1f])/;
+
+function isInvalid(value) {
+  if (!value) return false;
+  if (typeof value != 'string') return true;
+  const decoded = decodeURIComponent(value);
+  return pathTraversalPattern.test(decoded);
+}
+
+function validatePathParams(paramNames) {
+  return (req, res, next) => {
+    const errors = [];
+
+    // Check body parameters
+    paramNames.forEach((param) => {
+      if (req.body && isInvalid(req.body[param])) {
+        errors.push(`Invalid characters in ${param}`);
+      }
+    });
+
+    // Check query parameters
+    paramNames.forEach((param) => {
+      if (req.query && isInvalid(req.query[param])) {
+        errors.push(`Invalid characters in ${param}`);
+      }
+    });
+
+    if (errors.length > 0) {
+      return res.badRequest({
+        message: `Invalid path parameter: ${errors.join(', ')}`,
+      });
+    }
+
+    next();
+  };
+}
+
+const validateFilePaths = validatePathParams(['parent', 'name', 'path']);
+
 const omitByPredicate = (obj, predicate) =>
   Object.fromEntries(Object.entries(obj).filter(([, v]) => !predicate(v)));
 
@@ -456,6 +496,7 @@ module.exports = {
   mapValues,
   normalizeDirectoryPath,
   sanitizePathInput,
+  validateFilePaths,
   validatePath,
   validateInputPath,
   omitBy,
