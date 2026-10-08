@@ -22,7 +22,7 @@
     "connect-redis": "^6.1.1",
     "connect-session-sequelize": "^7.1.7",
     "cors": "^2.8.5",
-    "csurf": "^1.2.2",
+    "csurf": "^1.11.0",
     "db-migrate": "^0.11.14",
     "db-migrate-pg": "^1.5.2",
     "deep-extend": "^0.6",
@@ -177,7 +177,7 @@
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-mocha": "^10.5.0",
     "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-sonarjs": "^3.0.1",
+    "eslint-plugin-sonarjs": "^3.0.7",
     "eslint-plugin-svelte": "^2.46.1",
     "eslint-plugin-testing-library": "^6.4.0",
     "jest": "^30.2.0",
@@ -215,6 +215,20 @@
   "lint-staged": {
     "*.js": "eslint",
     "*.jsx": "eslint"
+  },
+  "overrides": {
+    "csurf": {
+      "cookie": "^0.7.0"
+    },
+    "eslint-plugin-sonarjs": {
+      "minimatch": "^10.2.3"
+    },
+    "concurrently": {
+      "shell-quote": "1.11.0"
+    },
+    "serve": {
+      "compression": "1.8.2"
+    }
   },
   "resolutions": {
     "**/cheerio": "1.0.0-rc.12",
