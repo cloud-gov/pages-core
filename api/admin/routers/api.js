@@ -15,6 +15,7 @@ const AdminControllers = require('../controllers');
 const apiRouter = Router();
 apiRouter.use(ensureOrigin(config.app.adminHostname));
 apiRouter.use(ensureAuthenticated);
+apiRouter.use(authorize(['pages.admin', 'pages.support']));
 apiRouter.use(csrfProtection);
 apiRouter.use(parseJson);
 apiRouter.get('/builds', AdminControllers.Build.list);
