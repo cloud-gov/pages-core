@@ -148,7 +148,7 @@
               value={params.search}
             />
             <button class="usa-button" type="submit">
-              <span class="usa-sr-only">Search</span>
+              <img src="/images/search--white.svg" alt="Search" />
             </button>
           </form>
         {/if}
