@@ -87,4 +87,3 @@ describe('Admin - API authorization', () => {
     });
   });
 });
-
