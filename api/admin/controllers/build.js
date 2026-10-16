@@ -2,7 +2,15 @@ const buildSerializer = require('../../serializers/build');
 const BuildLogs = require('../../services/build-logs');
 const SourceCodePlatformHelper = require('../../services/SourceCodePlatformHelper');
 
-const { Build, Domain, Event, Site, SiteBranchConfig, User } = require('../../models');
+const {
+  Build,
+  Domain,
+  Event,
+  Organization,
+  Site,
+  SiteBranchConfig,
+  User,
+} = require('../../models');
 const { fetchModelById } = require('../../utils/queryDatabase');
 const { paginate, wrapHandlers } = require('../../utils');
 const EventCreator = require('../../services/EventCreator');
@@ -11,7 +19,7 @@ const { BuildService } = require('../../services/build');
 
 module.exports = wrapHandlers({
   async list(req, res) {
-    const { limit, page, site } = req.query;
+    const { limit, organization, page, site } = req.query;
 
     const scopes = [];
 
@@ -19,16 +27,24 @@ module.exports = wrapHandlers({
       scopes.push(Build.siteScope(site));
     }
 
-    const [pagination, sites] = await Promise.all([
+    if (organization) {
+      scopes.push(Build.orgScope(organization));
+    }
+
+    const [pagination, sites, orgs] = await Promise.all([
       paginate(Build.scope(scopes), buildSerializer.serialize, { limit, page }),
       Site.findAll({
         attributes: ['id', 'owner', 'repository'],
         raw: true,
       }),
+      Organization.findAll({
+        attributes: ['id', 'name'],
+        raw: true,
+      }),
     ]);
 
     const json = {
-      meta: { sites },
+      meta: { orgs, sites },
       ...pagination,
     };
 
