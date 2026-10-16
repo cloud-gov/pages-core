@@ -1,3 +1,22 @@
+## 0.28.0 (2026-10-16)
+
+### Added
+
+- VULN-011 User-controlled Path is not validated 3071
+- Upgrade CF version
+
+### Fixed
+
+- lint build controller
+- standardize variable ordering
+- typo in meta object
+
+### Maintenance
+
+- add organization select to builds view
+- add search icon
+- VULN-005 Hardcoded Bull Board Session Secret 3065
+
 ## 0.27.0 (2026-09-09)
 
 ### Added
