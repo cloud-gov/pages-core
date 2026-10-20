@@ -16,3 +16,6 @@ queues_site_builds_concurrency: 10
 route-service-instances: 6
 uaa_host: https://uaa.fr.cloud.gov
 uaa_login_host: https://login.fr.cloud.gov
+cf_api_host: https://api.fr.cloud.gov
+cf_oauth_token_url: https://login.fr.cloud.gov/oauth/token
+cf_domain_with_cdn_plan_guid: 440cce96-8989-428b-a60e-91c1393bf3f2

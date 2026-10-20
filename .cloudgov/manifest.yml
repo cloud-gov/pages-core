@@ -34,9 +34,9 @@ applications:
       APP_ENV: ((env))
       APP_HOSTNAME: https://((domain))
       CF_CDN_SPACE_NAME: ((cf_cdn_space_name))
-      CF_DOMAIN_WITH_CDN_PLAN_GUID: 440cce96-8989-428b-a60e-91c1393bf3f2
-      CLOUD_FOUNDRY_API_HOST: https://api.fr.cloud.gov
-      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: https://login.fr.cloud.gov/oauth/token
+      CF_DOMAIN_WITH_CDN_PLAN_GUID: ((cf_domain_with_cdn_plan_guid))440cce96-8989-428b-a60e-91c1393bf3f2
+      CLOUD_FOUNDRY_API_HOST: ((cf_api_host))https://api.fr.cloud.gov
+      CLOUD_FOUNDRY_OAUTH_TOKEN_URL: ((cf_oauth_token_url))https://login.fr.cloud.gov/oauth/token
       DOMAIN: ((domain))
       FEATURE_WORKSHOP_INTEGRATION: ((feature_workshop-integration))
       HOMEPAGE_URL: https://cloud.gov/pages
