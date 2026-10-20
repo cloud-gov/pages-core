@@ -43,7 +43,9 @@ describe('EventCreator', () => {
       expect(event.modelId).to.be.null;
       expect(event.body.bye).to.equal('hi');
       expect(event.body.message).to.equal(err.message);
-      expect(event.body.error).to.equal(err.stack);
+      expect(event.body.error).to.deep.equal({
+        name: err.name,
+      });
     });
 
     it('.error event created - w/ message', async () => {
@@ -58,12 +60,25 @@ describe('EventCreator', () => {
       expect(event.modelId).to.be.null;
       expect(event.body.bye).to.equal('hi');
       expect(event.body.message).to.equal(message);
-      expect(event.body.error).to.equal(err.stack);
+      expect(event.body.error).to.deep.equal({
+        name: err.name,
+      });
     });
 
     it('.error event fail', async () => {
       await error('invalidLabel', err, { hi: 'bye' });
       expect(errorSpy.called).to.be.true;
+    });
+
+    it('.error does not persist raw stack data', async () => {
+      const event = await error('request-handler', err, { bye: 'hi' });
+      err.stack = `
+        Error: not working at secretThing (/app/internal/secret.js:42:5)
+      `;
+      expect(JSON.stringify(event.body)).to.not.contain('/app/internal/secret.js');
+      expect(event.body).to.not.have.property('stack');
+      expect(JSON.stringify(event.body)).to.not.contain('/app/');
+      expect(JSON.stringify(event.body)).to.not.contain('EventCreator.test.js');
     });
   });
 });
