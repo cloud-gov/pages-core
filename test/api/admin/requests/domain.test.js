@@ -1,5 +1,6 @@
 const request = require('supertest');
 const { expect } = require('chai');
+const sinon = require('sinon');
 const app = require('../../../../api/admin');
 const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
@@ -14,6 +15,8 @@ const {
   Organization,
 } = require('../../../../api/models');
 const { siteViewOrigin } = require('../../../../api/utils/site');
+const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
+const DomainService = require('../../../../api/services/Domain');
 
 describe('Admin - Domains API', () => {
   afterEach(() =>
@@ -59,6 +62,14 @@ describe('Admin - Domains API', () => {
       {
         method: 'post',
         path: '/domains/:id/provision',
+      },
+      {
+        method: 'get',
+        path: '/domains/:id/migration-candidates',
+      },
+      {
+        method: 'post',
+        path: '/domains/:id/migrate',
       },
       {
         method: 'post',
@@ -341,6 +352,188 @@ describe('Admin - Domains API', () => {
       expect(body.path).to.equal(sbc.s3Key);
       expect(body.origin).to.equal(origin);
       expect(body.serviceName).to.equal(`${name1}-ext`);
+    });
+  });
+
+  describe('GET /domains/:id/migration-candidates', async () => {
+    it('should return 404 if the domain does not exist', async () => {
+      const user = await factory.user();
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+
+      await request(app)
+        .get('/domains/8771900/migration-candidates')
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .expect(404);
+    });
+
+    it('should list branch configurations on other sites', async () => {
+      const names = 'www.example.gov';
+      const user = await factory.user();
+      const oldSite = await factory.site();
+      const newSite = await factory.site();
+
+      const domain = await factory.domain.create({
+        siteId: oldSite.id,
+        names,
+        serviceName: `${names}-ext`,
+        state: Domain.States.Provisioned,
+      });
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      const { body } = await request(app)
+        .get(`/domains/${domain.id}/migration-candidates`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .expect(200);
+
+      expect(body.canMigrate).to.be.true;
+      expect(body.domain.id).to.equal(domain.id);
+      expect(body.candidates.map((c) => c.id)).to.deep.equal(
+        newSite.SiteBranchConfigs.map((sbc) => sbc.id),
+      );
+    });
+  });
+
+  describe('POST /domains/:id/migrate', async () => {
+    afterEach(() => sinon.restore());
+
+    it('should require an admin role', async () => {
+      const user = await factory.user();
+      const domain = await factory.domain.create();
+      const cookie = await authenticatedAdminOrSupportSession(
+        user,
+        sessionConfig,
+        'pages.support',
+      );
+
+      await request(app)
+        .post(`/domains/${domain.id}/migrate`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ targetSiteBranchConfigId: domain.siteBranchConfigId })
+        .expect(403);
+    });
+
+    it('should return 404 if the target branch config does not exist', async () => {
+      const user = await factory.user();
+      const domain = await factory.domain.create();
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+
+      await request(app)
+        .post(`/domains/${domain.id}/migrate`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ targetSiteBranchConfigId: 8771900 })
+        .expect(404);
+    });
+
+    it('should return 400 if the migration is invalid', async () => {
+      const user = await factory.user();
+      const oldSite = await factory.site();
+      const newSite = await factory.site();
+
+      const domain = await factory.domain.create({
+        siteId: oldSite.id,
+        names: 'www.example.gov',
+        state: Domain.States.Pending,
+      });
+      const targetSbc = newSite.SiteBranchConfigs[0];
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      const { body } = await request(app)
+        .post(`/domains/${domain.id}/migrate`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ targetSiteBranchConfigId: targetSbc.id })
+        .expect(400);
+
+      expect(body.message).to.equal(
+        "Only 'provisioned' domains with an external domain service can be migrated.",
+      );
+    });
+
+    it('should return 500 if the external domain service update fails', async () => {
+      sinon
+        .stub(CloudFoundryAPIClient.prototype, 'updateExternalDomain')
+        .rejects(new Error('CF is unhappy'));
+
+      const names = 'www.example.gov';
+      const user = await factory.user();
+      const oldSite = await factory.site();
+      const newSite = await factory.site();
+
+      const domain = await factory.domain.create({
+        siteId: oldSite.id,
+        names,
+        serviceName: `${names}-ext`,
+        origin: siteViewOrigin(oldSite),
+        path: '/site/old-owner/old-repo',
+        state: Domain.States.Provisioned,
+      });
+      const targetSbc = newSite.SiteBranchConfigs[0];
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      await request(app)
+        .post(`/domains/${domain.id}/migrate`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ targetSiteBranchConfigId: targetSbc.id })
+        .expect(500);
+
+      const rolledBack = await Domain.findByPk(domain.id);
+      expect(rolledBack.state).to.equal(Domain.States.Provisioned);
+      expect(rolledBack.serviceName).to.equal(`${names}-ext`);
+    });
+
+    it('should migrate the domain to the new site', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'updateExternalDomain').resolves();
+      sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
+
+      const names = 'www.example.gov';
+      const user = await factory.user();
+      const oldSite = await factory.site();
+      const newSite = await factory.site();
+
+      const domain = await factory.domain.create({
+        siteId: oldSite.id,
+        names,
+        serviceName: `${names}-ext`,
+        origin: siteViewOrigin(oldSite),
+        path: '/site/old-owner/old-repo',
+        state: Domain.States.Provisioned,
+      });
+      const targetSbc = newSite.SiteBranchConfigs[0];
+
+      const cookie = await authenticatedAdminOrSupportSession(user, sessionConfig);
+      const { body } = await request(app)
+        .post(`/domains/${domain.id}/migrate`)
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({ targetSiteBranchConfigId: targetSbc.id })
+        .expect(200);
+
+      expect(body.domain.siteBranchConfigId).to.equal(targetSbc.id);
+      expect(body.domain.state).to.equal(Domain.States.Provisioned);
+      expect(body.domain.serviceName).to.equal(`${names}-ext`);
+      expect(body.domain.origin).to.equal(siteViewOrigin(newSite));
+
+      sinon.assert.calledOnceWithExactly(
+        CloudFoundryAPIClient.prototype.updateExternalDomain,
+        {
+          name: `${names}-ext`,
+          origin: siteViewOrigin(newSite),
+          path: targetSbc.s3Key,
+        },
+      );
+
+      const deleted = await Domain.findByPk(domain.id);
+      expect(deleted).to.be.null;
     });
   });
 });

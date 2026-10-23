@@ -358,6 +358,28 @@ class CloudFoundryAPIClient {
     return this.authRequest('POST', '/v3/service_instances', body);
   }
 
+  /**
+   * Updates the parameters of an existing external domain service instance.
+   * This is the equivalent of:
+   *   cf update-service <name> -c '{ "origin": "...", "path": "..." }'
+   *
+   * @param {Object} params
+   * @param {string} params.name The CF service instance name
+   * @param {string} params.origin The new target origin of the domains
+   * @param {string} params.path The new target path of the domains
+   * @returns {Promise<Object>} The CF response
+   */
+  async updateExternalDomain({ name, origin, path }) {
+    const instance = await this.fetchServiceInstance(name);
+
+    return this.authRequest('PATCH', `/v3/service_instances/${instance.guid}`, {
+      parameters: {
+        origin,
+        path,
+      },
+    });
+  }
+
   createS3ServiceInstance(name, serviceName, spaceGuid) {
     return this.fetchS3ServicePlanGUID(serviceName).then((servicePlanGuid) => {
       const body = buildRequestBody({
