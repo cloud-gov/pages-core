@@ -1,9 +1,11 @@
 const IORedis = require('ioredis');
-
-const { Domain, Site, SiteBranchConfig } = require('../models');
+const { Op } = require('sequelize');
+const { sequelize, Domain, Site, SiteBranchConfig } = require('../models');
 const CloudFoundryAPIClient = require('../utils/cfApiClient');
 const { DomainQueue } = require('../queues');
 const config = require('../../config');
+const { siteViewOrigin } = require('../utils/site');
+const { CustomError } = require('../utils/validators');
 const SourceCodePlatformHelper = require('./SourceCodePlatformHelper');
 
 const DnsService = require('./Dns');
@@ -58,6 +60,54 @@ async function destroy(domain) {
 function canDeprovision(domain) {
   const { Provisioning, Provisioned, Failed } = States;
   return [Provisioning, Provisioned, Failed].includes(domain.state);
+}
+
+/**
+ * @param {DomainModel} domain The domain
+ * @returns {boolean}
+ */
+function canMigrate(domain) {
+  return domain.state === States.Provisioned && !!domain.serviceName;
+}
+
+/**
+ * @param {DomainModel} domain The domain to migrate
+ * @returns {Promise<SiteBranchConfigModel[]>}
+ */
+function findMigrationCandidates(domain) {
+  return SiteBranchConfig.findAll({
+    where: {
+      context: Domain.Contexts.values,
+    },
+    include: [
+      {
+        model: Site,
+        required: true,
+        where: {
+          id: {
+            [Op.ne]: domain.siteId,
+          },
+        },
+      },
+      {
+        model: Domain,
+        required: false,
+      },
+    ],
+    order: [
+      [Site, 'owner', 'ASC'],
+      [Site, 'repository', 'ASC'],
+      ['context', 'ASC'],
+    ],
+  }).then((candidates) =>
+    candidates.filter(
+      (candidate) =>
+        candidate.Domains.length === 0 ||
+        candidate.Domains.some(
+          (target) => target.state === States.Pending && target.names === domain.names,
+        ),
+    ),
+  );
 }
 
 /**
@@ -224,6 +274,194 @@ async function provision(domain, dnsResults) {
 }
 
 /**
+ * @typedef {object} MigrationResult
+ * @prop {DomainModel} source The domain that was migrated from (now deleted)
+ * @prop {DomainModel} target The domain that was migrated to (now provisioned)
+ */
+
+/**
+ *
+ * @param {DomainModel} domain The provisioned domain to migrate from.
+ * @param {SiteBranchConfigModel} targetSbc The destination branch config.
+ * @returns {Promise<MigrationResult>}
+ */
+async function migrate(domain, targetSbc) {
+  if (!canMigrate(domain)) {
+    throw new CustomError(
+      // eslint-disable-next-line max-len
+      `Only '${States.Provisioned}' domains with an external domain service can be migrated.`,
+      400,
+    );
+  }
+
+  if (!targetSbc) {
+    throw new CustomError('A site branch config to migrate to must be provided.', 400);
+  }
+
+  if (targetSbc.siteId === domain.siteId) {
+    throw new CustomError(
+      'Domains can only be migrated to a domain on a different site.',
+      400,
+    );
+  }
+
+  const { Site: targetSite } = targetSbc;
+
+  if (!targetSite) {
+    throw new CustomError(
+      'The site branch config being migrated to must be loaded with its site.',
+      400,
+    );
+  }
+
+  if (targetSbc.context === 'preview') {
+    throw new CustomError(
+      // eslint-disable-next-line max-len
+      'The domain being migrated to cannot have a site branch config with the context of "preview".',
+      400,
+    );
+  }
+
+  const origin = siteViewOrigin(targetSite);
+  const { s3Key: path } = targetSbc;
+
+  if (!path) {
+    throw new CustomError(
+      // eslint-disable-next-line max-len
+      `The site branch config ${targetSbc.id} for the domain being migrated to does not have an s3Key.`,
+      400,
+    );
+  }
+
+  const { serviceName } = domain;
+  let targetDomain = await Domain.findOne({
+    where: {
+      names: domain.names,
+      siteBranchConfigId: targetSbc.id,
+      siteId: targetSite.id,
+      state: States.Pending,
+    },
+  });
+
+  if (!targetDomain) {
+    const existingTargetDomain = await Domain.findOne({
+      where: {
+        siteBranchConfigId: targetSbc.id,
+        siteId: targetSite.id,
+      },
+    });
+
+    if (existingTargetDomain) {
+      throw new CustomError(
+        'The selected site branch configuration already has a custom domain.',
+        400,
+      );
+    }
+  }
+  const targetWasCreated = !targetDomain;
+
+  const previousTarget = targetWasCreated
+    ? null
+    : {
+        origin: targetDomain.origin,
+        path: targetDomain.path,
+        serviceName: targetDomain.serviceName,
+        state: targetDomain.state,
+      };
+
+  await sequelize.transaction(async (transaction) => {
+    if (targetWasCreated) {
+      targetDomain = await Domain.create(
+        {
+          context: targetSbc.context,
+          names: domain.names,
+          origin,
+          path,
+          serviceName,
+          siteBranchConfigId: targetSbc.id,
+          siteId: targetSite.id,
+          state: States.Provisioned,
+        },
+        { transaction },
+      );
+    } else {
+      await targetDomain.update(
+        {
+          serviceName,
+          origin,
+          path,
+          state: States.Provisioned,
+        },
+        { transaction },
+      );
+    }
+
+    await domain.update(
+      {
+        state: States.Pending,
+        serviceName: null,
+      },
+      { transaction },
+    );
+
+    await domain.destroy({ transaction });
+  });
+
+  try {
+    await cfApi().updateExternalDomain({
+      name: serviceName,
+      origin,
+      path,
+    });
+  } catch (error) {
+    await sequelize.transaction(async (transaction) => {
+      if (targetWasCreated) {
+        await targetDomain.destroy({ force: true, transaction });
+      } else {
+        await targetDomain.update(previousTarget, { transaction });
+      }
+
+      await domain.restore({ transaction });
+      await domain.update(
+        {
+          state: States.Provisioned,
+          serviceName,
+        },
+        { transaction },
+      );
+    });
+
+    if (
+      error.errors?.some(
+        (cfError) =>
+          Number(cfError.code) === 60016 ||
+          cfError.title === 'CF-AsyncServiceInstanceOperationInProgress',
+      )
+    ) {
+      throw new CustomError(
+        'Cloud Foundry is still processing the previous service update. ' +
+          'Wait for it to finish, then try migrating again. ' +
+          'This migration was not applied.',
+        400,
+      );
+    }
+
+    throw error;
+  }
+  //Trigger site rebuild
+  targetDomain.SiteBranchConfig = targetSbc;
+  await module.exports.rebuildAssociatedSite(
+    targetDomain,
+    SourceCodePlatformHelper.flows.FLOW__ADMIN_REBUILD,
+  );
+
+  return {
+    source: domain,
+    target: targetDomain,
+  };
+}
+
+/**
  * @param {number} id The domain id
  */
 async function checkDeprovisionStatus(id) {
@@ -298,10 +536,13 @@ module.exports.rebuildAssociatedSite = rebuildAssociatedSite;
 module.exports.canProvision = canProvision;
 module.exports.canDeprovision = canDeprovision;
 module.exports.canDestroy = canDestroy;
+module.exports.canMigrate = canMigrate;
 module.exports.checkDeprovisionStatus = checkDeprovisionStatus;
 module.exports.checkAcmeChallengeDnsRecord = checkAcmeChallengeDnsRecord;
 module.exports.checkDnsRecords = checkDnsRecords;
 module.exports.checkProvisionStatus = checkProvisionStatus;
 module.exports.deprovision = deprovision;
 module.exports.destroy = destroy;
+module.exports.findMigrationCandidates = findMigrationCandidates;
+module.exports.migrate = migrate;
 module.exports.provision = provision;

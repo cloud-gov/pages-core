@@ -42,6 +42,15 @@ apiRouter.post(
   AdminControllers.Domain.deprovision,
 );
 apiRouter.post('/domains/:id/provision', AdminControllers.Domain.provision);
+apiRouter.get(
+  '/domains/:id/migration-candidates',
+  AdminControllers.Domain.migrationCandidates,
+);
+apiRouter.post(
+  '/domains/:id/migrate',
+  authorize(['pages.admin']),
+  AdminControllers.Domain.migrate,
+);
 apiRouter.post('/domains', AdminControllers.Domain.create);
 apiRouter.get('/events', AdminControllers.Event.list);
 apiRouter.get('/organizations', AdminControllers.Organization.list);

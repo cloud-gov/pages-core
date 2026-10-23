@@ -8,6 +8,7 @@ const DomainService = require('../../../../api/services/Domain');
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const { DomainQueue } = require('../../../../api/queues');
 const config = require('../../../../config');
+const { siteViewOrigin } = require('../../../../api/utils/site');
 // eslint-disable-next-line max-len
 const SourceCodePlatformHelper = require('../../../../api/services/SourceCodePlatformHelper');
 
@@ -848,6 +849,295 @@ describe('Domain Service', () => {
         },
       );
       expect(domain.state).to.eq(Domain.States.Provisioning);
+    });
+  });
+
+  describe('.canMigrate()', () => {
+    it('returns true if the domain is provisioned and has a service', () => {
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioned,
+        serviceName: 'www.agency.gov-ext',
+      });
+
+      expect(DomainService.canMigrate(domain)).to.be.true;
+    });
+
+    it('returns false if the domain has no service name', () => {
+      const domain = DomainFactory.build({
+        state: Domain.States.Provisioned,
+        serviceName: null,
+      });
+
+      expect(DomainService.canMigrate(domain)).to.be.false;
+    });
+
+    [
+      Domain.States.Pending,
+      Domain.States.Provisioning,
+      Domain.States.Failed,
+      Domain.States.Deprovisioning,
+    ].forEach((state) => {
+      it(`returns false if the domain is \`${state}\``, () => {
+        const domain = DomainFactory.build({
+          state,
+          serviceName: 'www.agency.gov-ext',
+        });
+
+        expect(DomainService.canMigrate(domain)).to.be.false;
+      });
+    });
+  });
+
+  describe('.findMigrationCandidates()', () => {
+    it('finds non-preview branch configs on other sites', async () => {
+      const oldSite = await SiteFactory();
+      const newSite = await SiteFactory({ demoBranch: 'demo' });
+
+      const domain = await DomainFactory.create({
+        siteId: oldSite.id,
+        state: Domain.States.Provisioned,
+      });
+
+      const results = await DomainService.findMigrationCandidates(domain);
+      const resultIds = results.map((r) => r.id);
+      const expectedIds = newSite.SiteBranchConfigs.map((sbc) => sbc.id);
+
+      expect(resultIds).to.include.members(expectedIds);
+      expect(results.some((r) => r.Site.id === oldSite.id)).to.be.false;
+      expect(results.every((r) => r.context !== 'preview')).to.be.true;
+    });
+
+    it('excludes branch configs that already have another domain', async () => {
+      const oldSite = await SiteFactory();
+      const newSite = await SiteFactory();
+      const domain = await DomainFactory.create({
+        siteId: oldSite.id,
+        state: Domain.States.Provisioned,
+      });
+      await DomainFactory.create({
+        siteId: newSite.id,
+        names: 'www.other.gov',
+      });
+
+      const results = await DomainService.findMigrationCandidates(domain);
+      const occupiedSbcIds = newSite.SiteBranchConfigs.map((sbc) => sbc.id);
+
+      expect(results.map((r) => r.id)).to.not.include.members(occupiedSbcIds);
+    });
+  });
+
+  describe('.migrate()', () => {
+    async function createMigrationPair({
+      names = 'www.agency.gov',
+      serviceName = 'www.agency.gov-ext',
+      sourceOverrides = {},
+      createPendingTarget = false,
+    } = {}) {
+      const oldSite = await SiteFactory();
+      const newSite = await SiteFactory();
+
+      const source = await DomainFactory.create({
+        siteId: oldSite.id,
+        names,
+        serviceName,
+        origin: `${oldSite.awsBucketName}.app.cloud.gov`,
+        path: '/site/old-owner/old-repo',
+        state: Domain.States.Provisioned,
+        ...sourceOverrides,
+      });
+
+      await source.reload({
+        include: [Site, SiteBranchConfig],
+      });
+      const targetSbc = await SiteBranchConfig.findByPk(newSite.SiteBranchConfigs[0].id, {
+        include: [Site],
+      });
+      const target = createPendingTarget
+        ? await DomainFactory.create({
+            siteId: newSite.id,
+            siteBranchConfigId: targetSbc.id,
+            names,
+          })
+        : null;
+
+      return { source, target, targetSbc, oldSite, newSite };
+    }
+
+    it('throws if the domain cannot be migrated', async () => {
+      const { source, targetSbc } = await createMigrationPair({
+        sourceOverrides: {
+          state: Domain.States.Pending,
+        },
+      });
+
+      const error = await DomainService.migrate(source, targetSbc).catch((e) => e);
+
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq(
+        "Only 'provisioned' domains with an external domain service can be migrated.",
+      );
+    });
+
+    it('throws if no target domain is given', async () => {
+      const { source } = await createMigrationPair();
+
+      const error = await DomainService.migrate(source, null).catch((e) => e);
+
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq('A site branch config to migrate to must be provided.');
+    });
+
+    it('throws if the target domain is on the same site', async () => {
+      const site = await SiteFactory({
+        demoBranch: 'demo',
+      });
+      const source = await DomainFactory.create({
+        siteId: site.id,
+        names: 'www.agency.gov',
+        serviceName: 'www.agency.gov-ext',
+        state: Domain.States.Provisioned,
+      });
+      const demoSbc = site.SiteBranchConfigs.find(
+        (sbc) => sbc.context === Domain.Contexts.Demo,
+      );
+      const targetSbc = await SiteBranchConfig.findByPk(demoSbc.id, { include: [Site] });
+
+      const error = await DomainService.migrate(source, targetSbc).catch((e) => e);
+
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq(
+        'Domains can only be migrated to a domain on a different site.',
+      );
+    });
+
+    it('throws if the destination already has another domain', async () => {
+      const { source, targetSbc, newSite } = await createMigrationPair();
+      await DomainFactory.create({
+        siteId: newSite.id,
+        siteBranchConfigId: targetSbc.id,
+        names: 'www.other.gov',
+      });
+
+      const error = await DomainService.migrate(source, targetSbc).catch((e) => e);
+
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq(
+        'The selected site branch configuration already has a custom domain.',
+      );
+    });
+
+    it(`clones the domain to the destination, deletes the source domain
+        updates the service and queues a destination build`, async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'updateExternalDomain').resolves();
+      const rebuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
+
+      const { source, targetSbc, newSite } = await createMigrationPair();
+      const serviceName = source.serviceName;
+      const expectedOrigin = siteViewOrigin(newSite);
+      const expectedPath = targetSbc.s3Key;
+
+      const result = await DomainService.migrate(source, targetSbc);
+
+      expect(result.source.id).to.eq(source.id);
+      expect(result.target.names).to.eq(source.names);
+      expect(result.target.state).to.eq(Domain.States.Provisioned);
+      expect(result.target.serviceName).to.eq(serviceName);
+      expect(result.target.origin).to.eq(expectedOrigin);
+      expect(result.target.path).to.eq(expectedPath);
+
+      const deletedSource = await Domain.findByPk(source.id, { paranoid: false });
+      expect(deletedSource.deletedAt).to.not.be.null;
+      expect(deletedSource.state).to.eq(Domain.States.Pending);
+      expect(deletedSource.serviceName).to.be.null;
+
+      sinon.assert.calledOnceWithExactly(
+        CloudFoundryAPIClient.prototype.updateExternalDomain,
+        {
+          name: serviceName,
+          origin: expectedOrigin,
+          path: expectedPath,
+        },
+      );
+      sinon.assert.calledOnceWithExactly(
+        rebuildSpy,
+        result.target,
+        SourceCodePlatformHelper.flows.FLOW__ADMIN_REBUILD,
+      );
+    });
+
+    it('rolls the records back if the service update fails', async () => {
+      sinon
+        .stub(CloudFoundryAPIClient.prototype, 'updateExternalDomain')
+        .rejects(new Error('CF is unhappy'));
+
+      const { source, targetSbc } = await createMigrationPair();
+      const serviceName = source.serviceName;
+
+      const error = await DomainService.migrate(source, targetSbc).catch((e) => e);
+
+      expect(error).to.be.an('Error');
+      expect(error.message).to.eq('CF is unhappy');
+
+      const reloadedSource = await Domain.findByPk(source.id);
+      expect(reloadedSource).to.not.be.null;
+      expect(reloadedSource.state).to.eq(Domain.States.Provisioned);
+      expect(reloadedSource.serviceName).to.eq(serviceName);
+
+      const target = await Domain.findOne({
+        where: { siteBranchConfigId: targetSbc.id },
+      });
+      expect(target).to.be.null;
+    });
+
+    it('rolls back and reports a busy CF service without rebuilding', async () => {
+      const cfError = new Error('An operation for the service instance is in progress.');
+      cfError.errors = [
+        {
+          code: 60016,
+          title: 'CF-AsyncServiceInstanceOperationInProgress',
+        },
+      ];
+      sinon
+        .stub(CloudFoundryAPIClient.prototype, 'updateExternalDomain')
+        .rejects(cfError);
+      const rebuildSpy = sinon.stub(DomainService, 'rebuildAssociatedSite').resolves();
+      const { source, targetSbc } = await createMigrationPair();
+      const serviceName = source.serviceName;
+
+      const error = await DomainService.migrate(source, targetSbc).catch((e) => e);
+
+      expect(error.status).to.eq(400);
+      expect(error.message).to.include('still processing the previous service update');
+      expect(error.message).to.include('This migration was not applied');
+      const restored = await Domain.findByPk(source.id);
+      expect(restored.state).to.eq(Domain.States.Provisioned);
+      expect(restored.serviceName).to.eq(serviceName);
+      expect(
+        await Domain.findOne({
+          where: { siteBranchConfigId: targetSbc.id },
+        }),
+      ).to.be.null;
+      sinon.assert.notCalled(rebuildSpy);
+      sinon.assert.calledOnce(CloudFoundryAPIClient.prototype.updateExternalDomain);
+    });
+
+    it('does not roll back if queuing the destination build fails', async () => {
+      sinon.stub(CloudFoundryAPIClient.prototype, 'updateExternalDomain').resolves();
+      sinon
+        .stub(DomainService, 'rebuildAssociatedSite')
+        .rejects(new Error('build queue unavailable'));
+      const { source, targetSbc } = await createMigrationPair();
+      const serviceName = source.serviceName;
+
+      const error = await DomainService.migrate(source, targetSbc).catch((e) => e);
+
+      expect(error.message).to.eq('build queue unavailable');
+      expect(await Domain.findByPk(source.id)).to.be.null;
+      const target = await Domain.findOne({
+        where: { siteBranchConfigId: targetSbc.id },
+      });
+      expect(target.state).to.eq(Domain.States.Provisioned);
+      expect(target.serviceName).to.eq(serviceName);
     });
   });
 });
