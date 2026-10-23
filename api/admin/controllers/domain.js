@@ -256,11 +256,77 @@ module.exports = wrapHandlers({
 
     const canDestroy = DomainService.canDestroy(domain);
 
+    const canMigrate = DomainService.canMigrate(domain);
+
     return res.json({
       canProvision,
       canDeprovision,
       canDestroy,
+      canMigrate,
       data: dnsResults,
+    });
+  },
+
+  async migrationCandidates(req, res) {
+    const {
+      params: { id },
+    } = req;
+
+    const domain = await fetchModelById(id, Domain.scope('withSite'));
+    if (!domain) {
+      return res.notFound();
+    }
+
+    const candidates = await DomainService.findMigrationCandidates(domain);
+
+    return res.json({
+      canMigrate: DomainService.canMigrate(domain),
+      domain: domainSerializer.serialize(domain, true),
+      candidates: DomainService.canMigrate(domain)
+        ? candidates.map((sbc) => ({
+            id: sbc.id,
+            branch: sbc.branch,
+            context: sbc.context,
+            s3Key: sbc.s3Key,
+            Site: {
+              id: sbc.Site.id,
+              owner: sbc.Site.owner,
+              repository: sbc.Site.repository,
+              siteOrigin: `https://${siteViewOrigin(sbc.Site)}`,
+            },
+          }))
+        : [],
+    });
+  },
+
+  async migrate(req, res) {
+    const {
+      params: { id },
+      body: { targetSiteBranchConfigId },
+    } = req;
+
+    const domain = await fetchModelById(id, Domain.scope('withSite'));
+    if (!domain) {
+      return res.notFound();
+    }
+
+    const targetSbc = await fetchModelById(targetSiteBranchConfigId, SiteBranchConfig, {
+      include: [Site],
+    });
+    if (!targetSbc) {
+      return res.notFound();
+    }
+
+    const { source, target } = await DomainService.migrate(domain, targetSbc);
+
+    EventCreator.audit(Event.labels.ADMIN_ACTION, req.user, 'Domain Migrated', {
+      domain: domainSerializer.serialize(source, true),
+      targetDomain: domainSerializer.serialize(target, true),
+    });
+
+    return res.json({
+      dnsRecords: DomainService.buildDnsRecords(target),
+      domain: domainSerializer.serialize(target, true),
     });
   },
 

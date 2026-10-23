@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 
 const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 
@@ -272,6 +273,36 @@ describe('CloudFoundryAPIClient', () => {
       expect(result.test).to.equal(otherProps.test);
       expect(result.value).to.equal(otherProps.value);
       expect(result.example).to.deep.equal(otherProps.example);
+    });
+  });
+
+  describe('.updateExternalDomain', () => {
+    afterEach(() => sinon.restore());
+
+    it('patches the service instance parameters', async () => {
+      const name = 'www.agency.gov-ext';
+      const guid = 'service-instance-guid';
+      const origin = 'bucket.sites.pages.cloud.gov';
+      const path = '/site/owner/repo';
+
+      const apiClient = new CloudFoundryAPIClient();
+      sinon.stub(apiClient, 'fetchServiceInstance').resolves({ guid });
+      const authRequest = sinon.stub(apiClient, 'authRequest').resolves({});
+
+      await apiClient.updateExternalDomain({ name, origin, path });
+
+      sinon.assert.calledOnceWithExactly(apiClient.fetchServiceInstance, name);
+      sinon.assert.calledOnceWithExactly(
+        authRequest,
+        'PATCH',
+        `/v3/service_instances/${guid}`,
+        {
+          parameters: {
+            origin,
+            path,
+          },
+        },
+      );
     });
   });
 });

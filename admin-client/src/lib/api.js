@@ -42,7 +42,7 @@ async function _fetch(
       authLogout();
       return null;
     }
-    if (r.status === 422) {
+    if ([400, 422].includes(r.status)) {
       const json = await r.json();
       const error = new Error(json.message || r.statusText);
       error.errors = json.errors;
@@ -202,6 +202,18 @@ async function deprovisionDomain(id) {
 
 async function destroyDomain(id) {
   return post(`/domains/${id}/destroy`);
+}
+
+async function fetchDomainMigrationCandidates(id) {
+  return get(`/domains/${id}/migration-candidates`).catch(() => null);
+}
+
+async function migrateDomain(id, targetSiteBranchConfigId) {
+  return post(
+    `/domains/${id}/migrate`,
+    { targetSiteBranchConfigId },
+    { handleError: false },
+  );
 }
 
 async function fetchEvents(query = {}) {
@@ -380,6 +392,8 @@ export {
   provisionDomain,
   deprovisionDomain,
   destroyDomain,
+  fetchDomainMigrationCandidates,
+  migrateDomain,
   fetchEvents,
   createOrganization,
   fetchOrganization,

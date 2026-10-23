@@ -4,9 +4,11 @@
   import {
     fetchDomain,
     fetchDomainDnsResult,
+    fetchDomainMigrationCandidates,
     provisionDomain,
     deprovisionDomain,
     destroyDomain,
+    migrateDomain,
   } from '../../lib/api';
   import { formatDateTime } from '../../helpers/formatter';
   import {
@@ -19,10 +21,13 @@
     LabeledItem,
   } from '../../components';
   import DnsTable from './DnsTable.svelte';
+  import MigrateForm from './MigrateForm.svelte';
 
   $: id = $router.params.id;
   $: domainPromise = fetchDomain(id);
   $: dnsResultsPromise = fetchDomainDnsResult(id);
+
+  let migration = null;
 
   function refreshDnsResults() {
     dnsResultsPromise = fetchDomainDnsResult(id);
@@ -51,6 +56,31 @@
     } catch (error) {
       return notification.setError(`Unable to delete domain ${id}: ${error.message}`);
     }
+  }
+
+  async function openMigrate() {
+    const response = await fetchDomainMigrationCandidates(id);
+
+    if (!response) {
+      return notification.setError(`Unable to load migration options for domain ${id}.`);
+    }
+
+    migration = response;
+    return null;
+  }
+
+  function closeMigrate() {
+    migration = null;
+  }
+
+  async function migrate(targetSiteBranchConfigId) {
+    const response = await migrateDomain(id, targetSiteBranchConfigId);
+    migration = null;
+    notification.setSuccess(
+      `Cloud Foundry accepted the migration to domain ${response.domain.id}. The destination build was queued.`,
+    );
+    page(`/domains/${response.domain.id}`);
+    return response;
   }
 </script>
 
@@ -83,6 +113,23 @@
         <LabeledItem label="created at" value={formatDateTime(domain.createdAt)} />
         <LabeledItem label="updated at" value={formatDateTime(domain.updatedAt)} />
       </div>
+    </div>
+    <div class="display-flex flex-align-center margin-bottom-2">
+      <button
+        class="usa-button usa-button--outline usa-button--small margin-right-1"
+        disabled={domain.state !== 'provisioned' || !domain.serviceName}
+        on:click={openMigrate}>
+        Migrate to another site
+      </button>
+      {#if domain.state !== 'provisioned'}
+        <span class="usa-hint font-sans-3xs">
+          Only a provisioned domain can be migrated.
+        </span>
+      {:else if !domain.serviceName}
+        <span class="usa-hint font-sans-3xs">
+          This domain has no external domain service to migrate.
+        </span>
+      {/if}
     </div>
     <Await on={dnsResultsPromise} let:response={dnsResults}>
       <span slot="loading">
@@ -123,5 +170,13 @@
         </button>
       {/if}
     </Await>
+    {#if migration}
+      <MigrateForm
+        {domain}
+        candidates={migration.candidates}
+        closeModal={closeMigrate}
+        onMigrate={migrate}
+      />
+    {/if}
   </Await>
 </GridContainer>
