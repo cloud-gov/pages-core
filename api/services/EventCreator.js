@@ -29,6 +29,18 @@ const audit = (label, model, message, body = {}) =>
   });
 
 /**
+ * Store error message, not the stack
+ * @param {object} err
+ * @returns {string}
+ */
+function sanitizeError(err) {
+  return {
+    name: err.name,
+    code: err.code,
+  };
+}
+
+/**
  * Create an error event
  * @param {string} label The Event label
  * @param {Error} err The underlying error
@@ -36,16 +48,19 @@ const audit = (label, model, message, body = {}) =>
  *
  * @return {Promise<Event>}
  */
-const error = (label, err, body = {}) =>
-  createEvent({
+const error = (label, err, body = {}) => {
+  logger.error(`Event error [${label}]:`, err);
+
+  return createEvent({
     type: Event.types.ERROR,
     label,
     body: {
-      error: err.stack,
+      error: sanitizeError(err),
       message: err.message,
       ...body,
     },
   });
+};
 
 const requestDenyList = [
   'accessToken', // Github access token
@@ -67,7 +82,6 @@ const requestDenyList = [
  */
 const handlerError = async (request, err) => {
   const { body, method, params, path } = request;
-
   const errBody = {
     request: {
       method,
