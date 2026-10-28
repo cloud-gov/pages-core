@@ -10,7 +10,7 @@ const factory = require('../support/factory');
 const githubAPINocks = require('../support/githubAPINocks');
 const { authenticatedSession, unauthenticatedSession } = require('../support/session');
 const validateAgainstJSONSchema = require('../support/validateAgainstJSONSchema');
-const { Build } = require('../../../api/models');
+const { Build, Site } = require('../../../api/models');
 const csrfToken = require('../support/csrfToken');
 const { createSiteUserOrg } = require('../support/site-user');
 
@@ -391,6 +391,41 @@ describe('Build API', () => {
           done();
         })
         .catch(done);
+    });
+
+    it('should scope the site lookup to the authenticated user', async () => {
+      const siteId = 8675309;
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+      const forUser = sinon.spy(Site, 'forUser');
+
+      await request(app)
+        .get(`/v0/site/${siteId}/build`)
+        .set('Cookie', cookie)
+        .expect(404);
+
+      sinon.assert.calledOnce(forUser);
+      expect(forUser.firstCall.args[0].id).to.equal(user.id);
+    });
+
+    it('not disclose builds for an existing site outside the user scope', async () => {
+      const site = await factory.site();
+      const unauthorizedUser = await factory.user();
+      const cookie = await authenticatedSession(unauthorizedUser);
+
+      await factory.build({ site });
+
+      const unauthorizedResponse = await request(app)
+        .get(`/v0/site/${site.id}/build`)
+        .set('Cookie', cookie);
+
+      const nonexistentResponse = await request(app)
+        .get('/v0/site/8675309/build')
+        .set('Cookie', cookie);
+
+      expect(unauthorizedResponse.status).to.equal(404);
+      expect(nonexistentResponse.status).to.equal(404);
+      expect(unauthorizedResponse.body).to.deep.equal(nonexistentResponse.body);
     });
   });
 

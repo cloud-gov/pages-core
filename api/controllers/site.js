@@ -159,7 +159,7 @@ module.exports = wrapHandlers({
       params: { site_id: siteId },
     } = req;
 
-    const site = await Site.findByPk(siteId, {
+    const site = await Site.forUser(user).findByPk(siteId, {
       include: [Domain],
     });
 
@@ -184,7 +184,7 @@ module.exports = wrapHandlers({
       params: { site_id: siteId },
     } = req;
 
-    const site = await Site.findByPk(siteId, {
+    const site = await Site.forUser(user).findByPk(siteId, {
       include: [
         {
           model: SiteBuildTask,
@@ -225,7 +225,7 @@ module.exports = wrapHandlers({
     } = body;
 
     // check Site for authorizer's sake
-    const site = await Site.findByPk(siteId);
+    const site = await Site.forUser(user).findByPk(siteId);
 
     if (!site) {
       return res.notFound();
@@ -257,7 +257,7 @@ module.exports = wrapHandlers({
       params: { site_id: siteId },
     } = req;
 
-    const site = await Site.findByPk(siteId);
+    const site = await Site.forUser(user).findByPk(siteId);
 
     if (!site) {
       return res.notFound();

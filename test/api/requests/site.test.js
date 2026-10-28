@@ -118,6 +118,21 @@ describe('Site API', () => {
         })
         .catch(done);
     });
+
+    it('should scope the site task lookup to the authenticated user', async () => {
+      const siteId = 8675309;
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+      const forUser = sinon.spy(Site, 'forUser');
+
+      await request(app)
+        .get(`/v0/site/${siteId}/tasks`)
+        .set('Cookie', cookie)
+        .expect(404);
+
+      sinon.assert.calledOnce(forUser);
+      expect(forUser.firstCall.args[0].id).to.equal(user.id);
+    });
   });
 
   describe('GET /v0/site/:id', () => {
@@ -162,6 +177,60 @@ describe('Site API', () => {
           done();
         })
         .catch(done);
+    });
+
+    it('should not disclose an existing site outside the user scope', async () => {
+      const site = await factory.site();
+      const unauthorizedUser = await factory.user();
+      const cookie = await authenticatedSession(unauthorizedUser);
+
+      const unauthorizedResponse = await request(app)
+        .get(`/v0/site/${site.id}/domains`)
+        .set('Cookie', cookie);
+
+      const nonexistentResponse = await request(app)
+        .get('/v0/site/8675309/domains')
+        .set('Cookie', cookie);
+
+      expect(unauthorizedResponse.status).to.equal(404);
+      expect(nonexistentResponse.status).to.equal(404);
+      expect(unauthorizedResponse.body).to.deep.equal(nonexistentResponse.body);
+    });
+
+    it('not disclose existing site build tasks outside user scope', async () => {
+      const site = await factory.site();
+      const unauthorizedUser = await factory.user();
+      const cookie = await authenticatedSession(unauthorizedUser);
+
+      const unauthorizedResponse = await request(app)
+        .get(`/v0/site/${site.id}/task`)
+        .set('Cookie', cookie);
+
+      const nonexistentResponse = await request(app)
+        .get('/v0/site/8675309/task')
+        .set('Cookie', cookie);
+
+      expect(unauthorizedResponse.status).to.equal(404);
+      expect(nonexistentResponse.status).to.equal(404);
+      expect(unauthorizedResponse.body).to.deep.equal(nonexistentResponse.body);
+    });
+
+    it('should not disclose existing site tasks outside the user scope', async () => {
+      const site = await factory.site();
+      const unauthorizedUser = await factory.user();
+      const cookie = await authenticatedSession(unauthorizedUser);
+
+      const unauthorizedResponse = await request(app)
+        .get(`/v0/site/${site.id}/tasks`)
+        .set('Cookie', cookie);
+
+      const nonexistentResponse = await request(app)
+        .get('/v0/site/8675309/tasks')
+        .set('Cookie', cookie);
+
+      expect(unauthorizedResponse.status).to.equal(404);
+      expect(nonexistentResponse.status).to.equal(404);
+      expect(unauthorizedResponse.body).to.deep.equal(nonexistentResponse.body);
     });
   });
 
@@ -1088,6 +1157,57 @@ describe('Site API', () => {
 
       expect(foundSite).to.have.property('repository', 'original');
     });
+
+    it('should scope the site lookup to the authenticated user', async () => {
+      const siteId = 8675309;
+      const siteBuildTaskId = 8675309;
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+      const forUser = sinon.spy(Site, 'forUser');
+
+      await request(app)
+        .put(`/v0/site/${siteId}/task/${siteBuildTaskId}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .send({
+          metadata: {
+            rules: [],
+          },
+        })
+        .expect(404);
+
+      sinon.assert.calledOnce(forUser);
+      expect(forUser.firstCall.args[0].id).to.equal(user.id);
+    });
+
+    it('not disclose existing site outside user scope when updating task', async () => {
+      const site = await factory.site();
+      const unauthorizedUser = await factory.user();
+      const cookie = await authenticatedSession(unauthorizedUser);
+      const siteBuildTaskId = 8675309;
+
+      const requestBody = {
+        metadata: {
+          rules: [],
+        },
+      };
+
+      const unauthorizedResponse = await request(app)
+        .put(`/v0/site/${site.id}/task/${siteBuildTaskId}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .send(requestBody);
+
+      const nonexistentResponse = await request(app)
+        .put(`/v0/site/8675309/task/${siteBuildTaskId}`)
+        .set('x-csrf-token', csrfToken.getToken())
+        .set('Cookie', cookie)
+        .send(requestBody);
+
+      expect(unauthorizedResponse.status).to.equal(404);
+      expect(nonexistentResponse.status).to.equal(404);
+      expect(unauthorizedResponse.body).to.deep.equal(nonexistentResponse.body);
+    });
   });
 
   describe('GET /v0/site/:site_id/domains', () => {
@@ -1110,6 +1230,21 @@ describe('Site API', () => {
         .expect(404);
 
       validateAgainstJSONSchema('GET', '/site/{site_id}/domains', 404, response.body);
+    });
+
+    it('should scope the site domain lookup to the authenticated user', async () => {
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+
+      const forUser = sinon.spy(Site, 'forUser');
+
+      await request(app)
+        .get('/v0/site/8675309/domains')
+        .set('Cookie', cookie)
+        .expect(404);
+
+      sinon.assert.calledOnce(forUser);
+      sinon.assert.calledWith(forUser, sinon.match({ id: user.id }));
     });
 
     it('should render a list of domains associated with a site', async () => {
@@ -1183,6 +1318,19 @@ describe('Site API', () => {
       expect(response.body).to.be.a('array');
       expect(response.body).to.have.length(1);
       expect(response.body[0]).to.have.property('id', buildTask.id);
+    });
+
+    it('should scope the site build-task lookup to the authenticated user', async () => {
+      const siteId = 8675309;
+      const user = await factory.user();
+      const cookie = await authenticatedSession(user);
+      const forUser = sinon.spy(Site, 'forUser');
+
+      await request(app).get(`/v0/site/${siteId}/task`).set('Cookie', cookie).expect(404);
+
+      sinon.assert.calledOnce(forUser);
+
+      expect(forUser.firstCall.args[0].id).to.equal(user.id);
     });
   });
 });
