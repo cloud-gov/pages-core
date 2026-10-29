@@ -1,3 +1,35 @@
+## 0.28.0 (2026-10-29)
+
+### Added
+
+- Add a wait to programatically migrate a site to a new domain with minimal downtime
+- add build after migration
+- VULN-011 User-controlled Path is not validated 3071
+- Upgrade CF version
+
+### Fixed
+
+- prevent IDOR by scoping site and build lookups to authenticated user
+- formatting check
+- VULN-010: Inconsistent Admin Role Checks
+- audit fixes
+- clean up test
+- fix test
+- send a better message if there is already a migration already running
+- lint build controller
+- standardize variable ordering
+- typo in meta object
+
+### Maintenance
+
+- remove empty users filter
+- remove exposed raw stack from error message
+- remove redundant message from error
+- add error ot logger
+- add organization select to builds view
+- add search icon
+- VULN-005 Hardcoded Bull Board Session Secret 3065
+
 ## 0.27.0 (2026-09-09)
 
 ### Added
