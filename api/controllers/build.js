@@ -14,7 +14,7 @@ const decodeb64 = (str) => Buffer.from(str, 'base64').toString('utf8');
 
 module.exports = wrapHandlers({
   async find(req, res) {
-    const site = await fetchModelById(req.params.site_id, Site);
+    const site = await fetchModelById(req.params.site_id, Site.forUser(req.user));
 
     if (!site) {
       return res.notFound();
