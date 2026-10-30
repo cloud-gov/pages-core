@@ -1,6 +1,7 @@
 <script>
   import { formatDateTime } from '../helpers/formatter';
   import { repositoryInfo } from '../helpers/repository';
+  import { selectSiteLinks } from '../lib/utils';
 
   import ExternalLink from './ExternalLink.svelte';
 
@@ -13,6 +14,11 @@
     defaultBranch: 'master',
     demoViewLink:
       'https://cg-123456789.app.cloud.gov/demo/apburnes/example-node-site/',
+    domains: [],
+    siteBranchConfigs: [
+      { id: 1, context: 'demo', s3Key: '/demo/apburnes/example-node-site' },
+    ],
+    siteOrigin: 'https://cg-123456789.app.cloud.gov',
     engine: 'node.js',
     id: 5,
     organizationId: 1,
@@ -30,7 +36,6 @@
   const {
     awsBucketName,
     createdAt,
-    demoViewLink,
     engine,
     id,
     owner,
@@ -45,6 +50,12 @@
 
   const createDate = formatDateTime(createdAt);
   const updateDate = formatDateTime(updatedAt);
+
+  $: demoLink = selectSiteLinks({
+    ...site,
+    Domains: site.domains || [],
+    SiteBranchConfigs: site.siteBranchConfigs || [],
+  }).find((link) => link.context === 'demo');
 
   $: bgColor = index % 2 === 0 ? 'bg-gray-5' : 'bg-white';
 
@@ -97,7 +108,9 @@
       </div>
       <div class="tablet:grid-col-auto padding-bottom-1">
         <ExternalLink href={viewLink}>Live</ExternalLink>
-        <ExternalLink href={demoViewLink} className="padding-x-1">Demo</ExternalLink>
+        {#if demoLink}
+          <ExternalLink href={demoLink.url} className="padding-x-1">Demo</ExternalLink>
+        {/if}
         <ExternalLink
           icon={icon}
           href={href}>
