@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
@@ -20,6 +21,8 @@ const { FileStorageService } = require('../../../../api/models');
 const JSON_SCHEMA_PATH = './public/swagger/';
 
 describe('Admin File-Storage API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   beforeEach(async () => {
     sinon.stub(EventCreator, 'error').resolves();
     await factory.organization.truncate();

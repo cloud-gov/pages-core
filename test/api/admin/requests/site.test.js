@@ -12,6 +12,7 @@ const { Site, User } = require('../../../../api/models');
 const S3SiteRemover = require('../../../../api/services/S3SiteRemover');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
   it('should require admin authentication', async () => {
@@ -23,6 +24,8 @@ const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
 };
 
 describe('Admin - Site API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   afterEach(() => Promise.all([User.truncate(), Site.truncate()]));
 
   describe('GET /admin/sites', () => {

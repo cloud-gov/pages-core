@@ -15,8 +15,12 @@ const sessionConfig = require('../../../../api/admin/sessionConfig');
 const { options: uaaConfig } = require('../../../../config').passport.uaa;
 
 const app = require('../../../../app');
+const adminApp = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 
 describe('Admin authentication request', () => {
+  beforeEach(() => resetRateLimits(adminApp));
+
   after(() => Promise.all([User.truncate(), UAAIdentity.truncate()]));
 
   describe('GET /admin/login', () => {
