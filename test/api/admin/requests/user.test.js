@@ -2,6 +2,7 @@ const request = require('supertest');
 const { expect } = require('chai');
 const sinon = require('sinon');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
@@ -18,6 +19,8 @@ const { createUAAIdentity } = require('../../support/factory/uaa-identity');
 const UAAClient = require('../../../../api/utils/uaaClient');
 
 describe('Admin - Users API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   let userRole;
   let managerRole;
 

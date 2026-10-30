@@ -9,6 +9,7 @@ const config = require('../../../../config');
 const { User } = require('../../../../api/models');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 
 const routes = [
   ['get', '/me'],
@@ -21,6 +22,8 @@ const routes = [
 ];
 
 describe('Admin - API authorization', () => {
+  beforeEach(() => resetRateLimits(app));
+
   afterEach(() => User.truncate());
 
   describe('when the user is not authenticated', () => {
