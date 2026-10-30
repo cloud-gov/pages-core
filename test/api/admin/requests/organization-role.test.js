@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const request = require('supertest');
 
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 const { Organization, OrganizationRole, Role, User } = require('../../../../api/models');
 
 const csrfToken = require('../../support/csrfToken');
@@ -38,6 +39,8 @@ const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
 };
 
 describe('Organization Role Admin API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   let authenticatedRequest;
   let supportRequest;
   let currentUser;
