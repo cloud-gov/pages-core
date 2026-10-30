@@ -34,6 +34,8 @@ module.exports = wrapHandlers({
 
     const query = {
       order: ['owner', 'repository'],
+      include: [SiteBranchConfig, Domain],
+      distinct: true,
     };
 
     const serialize = (sites) => serializeMany(sites, true);
