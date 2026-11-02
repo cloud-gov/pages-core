@@ -2,6 +2,7 @@ const request = require('supertest');
 const { expect } = require('chai');
 const sinon = require('sinon');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
@@ -19,6 +20,8 @@ const CloudFoundryAPIClient = require('../../../../api/utils/cfApiClient');
 const DomainService = require('../../../../api/services/Domain');
 
 describe('Admin - Domains API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   afterEach(() =>
     Promise.all([
       User.truncate(),

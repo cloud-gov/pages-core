@@ -13,6 +13,7 @@ const config = require('../../../../config');
 const { Site, User, BuildLog } = require('../../../../api/models');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 
 const itShouldRequireAdminAuthentication = (path, schema, method = 'get') => {
   it('should require admin authentication', async () => {
@@ -40,6 +41,8 @@ const buildResponseExpectations = (response, build) => {
 const s3Mock = mockClient(S3Client);
 
 describe('Admin - Site API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   afterEach(() => Promise.all([User.truncate(), Site.truncate()]));
 
   describe('GET /admin/builds', () => {

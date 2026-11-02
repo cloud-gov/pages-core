@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../../../../api/admin');
+const { resetRateLimits } = require('../../support/rateLimits');
 const { authenticatedAdminOrSupportSession } = require('../../support/session');
 const sessionConfig = require('../../../../api/admin/sessionConfig');
 const factory = require('../../support/factory');
@@ -8,6 +9,8 @@ const config = require('../../../../config');
 const { Organization, User } = require('../../../../api/models');
 
 describe('Admin - Organizations API', () => {
+  beforeEach(() => resetRateLimits(app));
+
   afterEach(() => Promise.all([User.truncate(), Organization.truncate()]));
 
   describe('GET /admin/reports/organizations', () => {
