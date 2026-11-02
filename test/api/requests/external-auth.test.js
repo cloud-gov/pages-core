@@ -8,6 +8,8 @@ const app = require('../../../app');
 const factory = require('../support/factory');
 const EventCreator = require('../../../api/services/EventCreator');
 const { limiter } = require('../../../api/external-auth');
+const { Event } = require('../../../api/models');
+const nock = require('nock');
 
 describe('External authentication request', () => {
   let eventAuditStub;
@@ -15,14 +17,19 @@ describe('External authentication request', () => {
 
   beforeEach(async () => {
     // Reset the rate limiter store so counts don't leak between tests.
-    limiter.resetKey('::ffff:127.0.0.1');
-    limiter.resetKey('127.0.0.1');
-    limiter.resetKey('::1');
+    await Promise.all([
+      limiter.resetKey('::ffff:127.0.0.1'),
+      limiter.resetKey('127.0.0.1'),
+      limiter.resetKey('::1'),
+    ]);
     eventAuditStub = sinon.stub(EventCreator, 'audit').resolves();
     eventErrorStub = sinon.stub(EventCreator, 'error').resolves();
   });
 
-  afterEach(() => sinon.restore());
+  afterEach(() => {
+    nock.cleanAll();
+    sinon.restore();
+  });
 
   describe('GET /external/auth/github', () => {
     it('should redirect to GitHub for OAuth2 authentication', (done) => {
@@ -33,18 +40,77 @@ describe('External authentication request', () => {
     });
   });
 
-  describe('rate limiting', () => {
-    it('returns 429 after exceeding the request limit', async () => {
-      const limit = 10;
+  describe('OAuth rate limiting', () => {
+    const limit = 10;
+    const rateLimitMessage = 'Too many authentication attempts, please try again later.';
+
+    it('allows normal GitHub OAuth initiation requests', async () => {
+      const res = await request(app).get('/external/auth/github').expect(302);
+
+      expect(res.headers.location).to.match(
+        /^https:\/\/github.com\/login\/oauth\/authorize/,
+      );
+    });
+
+    it('advertises the dedicated OAuth request limit', async () => {
+      const res = await request(app).get('/external/auth/github').expect(302);
+
+      expect(Number(res.headers['ratelimit-limit'])).to.equal(limit);
+      expect(Number(res.headers['ratelimit-remaining'])).to.equal(limit - 1);
+      expect(res.headers).to.have.property('ratelimit-reset');
+    });
+
+    it('rate limits excessive GitHub OAuth initiation requests', async () => {
       for (let i = 0; i < limit; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         await request(app).get('/external/auth/github').expect(302);
       }
 
       const res = await request(app).get('/external/auth/github').expect(429);
-      expect(res.text).to.contain(
-        'Too many authentication attempts, please try again later.',
-      );
+
+      expect(res.text).to.contain(rateLimitMessage);
+    });
+
+    it('rate limits excessive GitHub OAuth callback requests', async () => {
+      for (let i = 0; i < limit; i += 1) {
+        // Each allowed callback must have a matching mocked GitHub response.
+        githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
+
+        // eslint-disable-next-line no-await-in-loop
+        await request(app)
+          .get(`/external/auth/github/callback` + `?code=auth-code-${i}&state=state-${i}`)
+          .expect(200);
+      }
+
+      const res = await request(app)
+        .get(
+          '/external/auth/github/callback' +
+            '?code=excessive-auth-code&state=excessive-state',
+        )
+        .expect(429);
+
+      expect(res.text).to.contain(rateLimitMessage);
+    });
+
+    it('logs an error when an OAuth request is rate limited', async () => {
+      for (let i = 0; i < limit; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await request(app).get('/external/auth/github').expect(302);
+      }
+
+      // Ignore normal calls made during setup requests, if any.
+      eventErrorStub.resetHistory();
+
+      await request(app).get('/external/auth/github').expect(429);
+
+      expect(eventErrorStub.calledOnce).to.equal(true);
+
+      const [label, error] = eventErrorStub.firstCall.args;
+
+      expect(label).to.equal(Event.labels.AUTHENTICATION_NETLIFY_CMS);
+      expect(error).to.be.instanceOf(Error);
+      expect(error.message).to.contain('OAuth rate limit exceeded');
+      expect(error.message).to.contain('GET /external/auth/github');
     });
   });
 
@@ -52,10 +118,10 @@ describe('External authentication request', () => {
     describe('sends script tag with error status and message', () => {
       it('return unsuccessful auth if user is not found', async () => {
         githubAPINocks.githubAuth('unauthorized-user', [{ id: 654321 }]);
+
         const res = await request(app)
           .get('/external/auth/github/callback?code=auth-code-123abc&state=state-123abc')
           .expect(200);
-
         expect(res.text.trim()).to.match(
           // eslint-disable-next-line max-len
           /^<script nonce=".*">(.|\n)*authorization:github:error:{"message":"You must be a (Federalist|Pages) user with a connected GitHub account."}(.|\n)*<\/script>$/g,
