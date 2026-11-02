@@ -29,19 +29,29 @@ const connection = new IORedis(redisConfig.url, {
   maxRetriesPerRequest: null,
 });
 
+const rateLimitMessage = 'Too many authentication attempts, please try again later.';
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 10, // 10 attempts per window
-  message: 'Too many authentication attempts, please try again later.',
+  message: rateLimitMessage,
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
     sendCommand: (...args) => connection.call(...args),
   }),
+  handler: (req, res, next, options) => {
+    EventCreator.error(
+      Event.labels.AUTHENTICATION_NETLIFY_CMS,
+      new Error(`OAuth rate limit exceeded for ${req.method} ${req.originalUrl}`),
+    );
+
+    res.status(options.statusCode).send(options.message);
+  },
 });
 
 const app = express();
-app.use(limiter);
+app.use(['/auth/github', '/auth/github/callback'], limiter);
 app.disable('x-powered-by');
 app.use(passport.initialize());
 app.get('/auth/github', passport.authenticate('github', { session: false }));
