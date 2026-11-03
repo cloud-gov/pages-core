@@ -278,6 +278,47 @@ describe('User model', () => {
   });
 
   describe('byUAAEmail', () => {
+    [
+      ['Mixed.Case@example.gov', 'mixed.case@example.gov'],
+      ['mixed.case@example.gov', 'Mixed.Case@EXAMPLE.GOV'],
+    ].forEach(([storedEmail, lookupEmail]) => {
+      it(`finds ${storedEmail} using ${lookupEmail}`, async () => {
+        const user = await createUser();
+        const identity = await createUAAIdentity({
+          userId: user.id,
+          email: storedEmail,
+        });
+
+        const foundUser = await User.byUAAEmail(lookupEmail).findOne();
+
+        expect(foundUser.id).to.eq(user.id);
+        expect(foundUser.UAAIdentity.id).to.eq(identity.id);
+        expect(foundUser.UAAIdentity.email).to.eq(storedEmail);
+      });
+    });
+
+    ['_', '%'].forEach((character) => {
+      it(`matches ${character} literally rather than as a wildcard`, async () => {
+        const [user1, user2] = await Promise.all([createUser(), createUser()]);
+        await Promise.all([
+          createUAAIdentity({
+            userId: user1.id,
+            email: `first${character}last@example.gov`,
+          }),
+          createUAAIdentity({
+            userId: user2.id,
+            email: 'firstXlast@example.gov',
+          }),
+        ]);
+
+        const users = await User.byUAAEmail(
+          `FIRST${character}LAST@EXAMPLE.GOV`,
+        ).findAll();
+
+        expect(users.map((user) => user.id)).to.have.members([user1.id]);
+      });
+    });
+
     it('filters users by uaa email and includes UAAIdentity', async () => {
       const [user1, user2] = await Promise.all([createUser(), createUser()]);
 
