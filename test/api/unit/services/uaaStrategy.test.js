@@ -35,6 +35,62 @@ describe('verifyUAAUser', () => {
   afterEach(() => sinon.restore());
   after(clean);
 
+  [
+    ['Mixed.Case@example.gov', 'mixed.case@example.gov'],
+    ['mixed.case@example.gov', 'Mixed.Case@EXAMPLE.GOV'],
+  ].forEach(([storedEmail, profileEmail]) => {
+    it(`verifies ${storedEmail} using profile email ${profileEmail}`, async () => {
+      const user = await createUser();
+      const identity = await createUAAIdentity({ userId: user.id, email: storedEmail });
+      cfUAANock.mockVerifyUser(
+        identity.uaaId,
+        uaaUser({ uaaId: identity.uaaId, groups: [{ display: 'pages.user' }] }),
+      );
+
+      const { user: verifiedUser, role } = await verifyUAAUser(
+        'access-token',
+        'refresh-token',
+        uaaProfile({ userId: identity.uaaId, email: profileEmail }),
+      );
+
+      expect(verifiedUser.id).to.eq(user.id);
+      expect(role).to.eq('pages.user');
+      await identity.reload();
+      expect(identity.email).to.eq(storedEmail);
+      expect(identity.accessToken).to.eq('access-token');
+      expect(identity.refreshToken).to.eq('refresh-token');
+    });
+  });
+
+  ['_', '%'].forEach((character) => {
+    it(`does not treat ${character} in a profile email as a wildcard`, async () => {
+      const user = await createUser();
+      const identity = await createUAAIdentity({
+        userId: user.id,
+        email: 'firstXlast@example.gov',
+      });
+      cfUAANock.mockVerifyUser(
+        identity.uaaId,
+        uaaUser({ uaaId: identity.uaaId, groups: [{ display: 'pages.user' }] }),
+      );
+
+      const { user: verifiedUser, role } = await verifyUAAUser(
+        'access-token',
+        'refresh-token',
+        uaaProfile({
+          userId: identity.uaaId,
+          email: `first${character}last@example.gov`,
+        }),
+      );
+
+      expect(verifiedUser).to.be.null;
+      expect(role).to.be.null;
+      await identity.reload();
+      expect(identity.accessToken).to.be.null;
+      expect(identity.refreshToken).to.be.null;
+    });
+  });
+
   it('should return a verified user in the specified group', async () => {
     const accessToken = 'a-token';
     const refreshToken = 'refresh-token';

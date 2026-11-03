@@ -75,6 +75,18 @@ describe('OrganizationService', () => {
   });
 
   describe('.findUserByUAAIdentity', () => {
+    it('finds an existing user regardless of email casing', async () => {
+      const targetUser = await createUserWithUAAIdentity();
+      await targetUser.UAAIdentity.update({ email: 'Mixed.Case@example.gov' });
+
+      const user = await OrganizationService.findUserByUAAIdentity(
+        'mixed.case@EXAMPLE.GOV',
+      );
+
+      expect(user.id).to.eq(targetUser.id);
+      expect(user.UAAIdentity.id).to.eq(targetUser.UAAIdentity.id);
+    });
+
     context('when no UAA Identity with the email exists', () => {
       it('returns null', async () => {
         const user = await OrganizationService.findUserByUAAIdentity('foo@bar.com');
@@ -112,6 +124,28 @@ describe('OrganizationService', () => {
     });
 
     context('when a UAA Identity with the email exists', () => {
+      it('reuses the existing account when the email casing differs', async () => {
+        const [currentUser, targetUser] = await Promise.all([
+          createUserWithUAAIdentity(),
+          createUserWithUAAIdentity(),
+        ]);
+        await targetUser.UAAIdentity.update({ email: 'Mixed.Case@example.gov' });
+        const userCount = await User.count();
+        const identityCount = await UAAIdentity.count();
+
+        const [user, invite] = await OrganizationService.findOrCreateUAAUser(
+          currentUser.UAAIdentity,
+          'mixed.case@EXAMPLE.GOV',
+        );
+
+        sinon.assert.notCalled(inviteUAAUserStub);
+        expect(user.id).to.eq(targetUser.id);
+        expect(user.UAAIdentity.id).to.eq(targetUser.UAAIdentity.id);
+        expect(invite.email).to.eq('Mixed.Case@example.gov');
+        expect(await User.count()).to.eq(userCount);
+        expect(await UAAIdentity.count()).to.eq(identityCount);
+      });
+
       it('returns the User and the UAA Identity and does not invite to UAA', async () => {
         const [currentUser, targetUser] = await Promise.all([
           createUserWithUAAIdentity(),

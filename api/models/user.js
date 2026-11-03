@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, col, fn, where } = require('sequelize');
 const { toInt } = require('../utils');
 const { encrypt, decrypt } = require('../services/Encryptor');
 const { encryption } = require('../../config');
@@ -104,9 +104,7 @@ const associate = ({
     include: [
       {
         model: UAAIdentity,
-        where: {
-          email: uaaEmail,
-        },
+        where: where(fn('lower', col('UAAIdentity.email')), uaaEmail.toLowerCase()),
         required: true,
       },
     ],

@@ -67,11 +67,10 @@ async function verifyUAAUser(accessToken, refreshToken, profile) {
   }
 
   const identity = await UAAIdentity.findOne({
-    where: {
-      email: {
-        [Sequelize.Op.iLike]: email,
-      },
-    },
+    where: Sequelize.where(
+      Sequelize.fn('lower', Sequelize.col('UAAIdentity.email')),
+      email.toLowerCase(),
+    ),
     include: User,
   });
 
