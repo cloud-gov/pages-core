@@ -429,6 +429,8 @@ describe('OrganizationService', () => {
           expect(targetUserOrgs.length).to.eq(1);
           expect(targetUserOrgs[0].id).to.eq(org.id);
           expect(uaaUserAttributes.inviteLink).to.be.undefined;
+          expect(uaaUserAttributes.org.id).to.eq(org.id);
+          expect(uaaUserAttributes.org.name).to.eq(org.name);
 
           const orgRole = await OrganizationRole.findOne({
             where: {
@@ -509,6 +511,8 @@ describe('OrganizationService', () => {
           expect(targetUserOrgs.length).to.eq(1);
           expect(targetUserOrgs[0].id).to.eq(org.id);
           expect(uaaUserAttributes.inviteLink).to.be.undefined;
+          expect(uaaUserAttributes.org.id).to.eq(org.id);
+          expect(uaaUserAttributes.org.name).to.eq(org.name);
 
           const orgRole = await OrganizationRole.findOne({
             where: {

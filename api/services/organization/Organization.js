@@ -163,7 +163,7 @@ module.exports = {
    * @param {number} roleId
    * @param {string} targetUserEmail - the email address of the user to invite
    * @param {boolean} isAdmin - called from the admin API
-   * @returns {Promise<UAAClient.UAAUserAttributes>}
+   * @returns {Promise<UAAClient.UAAUserAttributes & {org: OrgType}>}
    */
   async inviteUserToOrganization(
     currentUser,
@@ -216,8 +216,7 @@ module.exports = {
         roleId: role.id,
       },
     });
-
-    return uaaUserAttributes;
+    return { ...uaaUserAttributes, org };
   },
 
   /**

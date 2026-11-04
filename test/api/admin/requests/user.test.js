@@ -17,6 +17,8 @@ const {
 } = require('../../../../api/models');
 const { createUAAIdentity } = require('../../support/factory/uaa-identity');
 const UAAClient = require('../../../../api/utils/uaaClient');
+const OrganizationService = require('../../../../api/services/organization/Organization');
+const QueueJobs = require('../../../../api/queue-jobs');
 
 describe('Admin - Users API', () => {
   beforeEach(() => resetRateLimits(app));
@@ -56,6 +58,78 @@ describe('Admin - Users API', () => {
     await User.truncate({
       force: true,
       cascade: true,
+    });
+  });
+
+  describe('POST /admin/users/invite', () => {
+    it('requires admin authentication', async () => {
+      await request(app).post('/users/invite').expect(401);
+    });
+
+    ['cloud.gov', 'uaa', 'login.gov', 'gsa.gov'].forEach((origin) => {
+      it(`queues an invitation with the organization name for ${origin}`, async () => {
+        const { user: admin } = await factory.userWithUAAIdentity.create();
+        const targetUser = await factory.user();
+        const org = await factory.organization.create({ name: 'invitation-test-org' });
+        const email = 'invited@example.gov';
+        const link = 'https://uaa.example.com/invitations/accept?code=invite-code';
+        const attributes = { email, inviteLink: link, origin, userId: 'uaa-user-id' };
+        sinon
+          .stub(OrganizationService, 'findOrCreateUAAUser')
+          .resolves([targetUser, attributes]);
+        const sendInviteStub = sinon
+          .stub(QueueJobs.prototype, 'sendUAAInvite')
+          .resolves();
+
+        const cookie = await authenticatedAdminOrSupportSession(admin, sessionConfig);
+        const { body } = await request(app)
+          .post('/users/invite')
+          .set('Cookie', cookie)
+          .set('Origin', config.app.adminHostname)
+          .set('x-csrf-token', csrfToken.getToken())
+          .send({ uaaEmail: email, organizationId: org.id, roleId: userRole.id })
+          .expect(200);
+
+        sinon.assert.calledOnceWithExactly(sendInviteStub, email, link, origin, org.name);
+        expect(body).to.deep.equal({ invite: { email, link } });
+        expect(attributes).not.to.have.property('org');
+        const membership = await OrganizationRole.findOne({
+          where: { organizationId: org.id, userId: targetUser.id },
+        });
+        expect(membership).not.to.be.null;
+        expect(membership.roleId).to.eq(userRole.id);
+      });
+    });
+
+    it('does not queue an email for an existing account without a link', async () => {
+      const { user: admin } = await factory.userWithUAAIdentity.create();
+      const { user: targetUser, uaaIdentity } =
+        await factory.userWithUAAIdentity.create();
+      const org = await factory.organization.create();
+      const sendInviteStub = sinon.stub(QueueJobs.prototype, 'sendUAAInvite').resolves();
+      const inviteUAAUserStub = sinon.stub(OrganizationService, 'inviteUAAUser');
+
+      const cookie = await authenticatedAdminOrSupportSession(admin, sessionConfig);
+      const { body } = await request(app)
+        .post('/users/invite')
+        .set('Cookie', cookie)
+        .set('Origin', config.app.adminHostname)
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          uaaEmail: uaaIdentity.email,
+          organizationId: org.id,
+          roleId: userRole.id,
+        })
+        .expect(200);
+
+      sinon.assert.notCalled(sendInviteStub);
+      sinon.assert.notCalled(inviteUAAUserStub);
+      expect(body).to.deep.equal({ invite: { email: uaaIdentity.email } });
+      const membership = await OrganizationRole.findOne({
+        where: { organizationId: org.id, userId: targetUser.id },
+      });
+      expect(membership).not.to.be.null;
+      expect(membership.roleId).to.eq(userRole.id);
     });
   });
 
