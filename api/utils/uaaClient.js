@@ -46,11 +46,12 @@ class UAAClient {
   /**
    * @param {string} targetUserEmail - the email address of the user to add
    * @param {string} userToken - a user token with the `scim.invite` scope
-   * @returns {UAAUserAttributes} - User or invite attributes
+   * @returns {Promise<UAAUserAttributes>} - User or invite attributes
    *
    * Invites the target user to UAA and adds them to the `pages.user` UAA group
    */
   async inviteUserToUserGroup(targetUserEmail, userToken) {
+    /** @type {UAAUserAttributes} */
     let userInviteAttributes;
 
     const groupName = 'pages.user';
@@ -90,7 +91,7 @@ class UAAClient {
 
   /**
    * @param {string} targetUserEmail - the email address of the user to add
-   * @returns {UAAUserAttributes} - User or invite attributes
+   * @returns {Promise<UAAUserAttributes>} - User or invite attributes
    *
    * Used by our backend to add a user to UAA's pages.user group
    * when the invite cannot be on behalf of a user.
@@ -127,8 +128,7 @@ class UAAClient {
 
   /**
    * @param {string} groupId - a UAA group id
-   * @param {{origin: string, userId: string}} userInfo
-   * - the origin and user id of the uaa user
+   * @param {{userId: string}} userInfo - the user id of the uaa user
    * @param {string} clientToken - a client token with the `scim.write` scope
    *
    * Adds the UAA user to the specific UAA group,
@@ -160,7 +160,7 @@ class UAAClient {
    * @returns {Promise<string>} a client token
    *
    * Fetches a new client token with scopes matching the configured client `authorities`
-   * @param {{scope: string}} - the form options for the client token
+   * @param {{scope?: string}} [options] - the form options for the client token
    */
   async fetchClientToken({ scope } = {}) {
     const form = {

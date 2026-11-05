@@ -49,12 +49,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
       {errorMessage && <div className="usa-error-message">{errorMessage}</div>}
       {showFileDropZone && (
         <>
-          <AlertBanner
-            className="margin-top-1"
-            status="warning"
-            message={message}
-            alertRole={false}
-          />
+          <AlertBanner status="warning" message={message} alertRole={false} />
           <FileUpload
             onUpload={onUpload}
             onCancel={() => setShowFileDropZone(false)}
@@ -98,6 +93,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
               className="usa-button"
               onClick={() => setShowFileDropZone(true)}
             >
+              {/* @ts-expect-error */}
               <IconAddAttachment className="usa-icon" />
               Upload files
             </button>
@@ -106,6 +102,7 @@ const NewFileOrFolder = ({ onUpload, onCreateFolder }) => {
               className="usa-button usa-button--outline"
               onClick={() => setShowFolderNameField(true)}
             >
+              {/* @ts-expect-error */}
               <IconAddFolder className="usa-icon" />
               New folder
             </button>

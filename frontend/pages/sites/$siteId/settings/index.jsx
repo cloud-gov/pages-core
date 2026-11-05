@@ -15,6 +15,7 @@ import globals from '../../../../globals';
 function SiteSettings() {
   const { id } = useParams();
   const { hash } = useLocation();
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
   const navigate = useNavigate();
 

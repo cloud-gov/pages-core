@@ -34,6 +34,7 @@ function CommitSummary({ buildDetails }) {
   return (
     <div className="commit-summary">
       <h3 className="commit-branch margin-bottom-1">
+        {/* @ts-expect-error */}
         <IconBranch className="usa-icon text-bottom" /> {buildDetails?.branch}
       </h3>
       <p className="commit-details margin-top-1 margin-left-205">

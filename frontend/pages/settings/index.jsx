@@ -27,6 +27,7 @@ const onGitProviderAuthFailure = (_error) => {
 };
 
 function UserSettings() {
+  // @ts-expect-error
   const user = useSelector((state) => state.user.data);
 
   if (!user) {

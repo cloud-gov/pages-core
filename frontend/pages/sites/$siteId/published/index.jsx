@@ -11,7 +11,9 @@ import BranchesTable from './BranchesTable';
 
 function PublishedBranchesTable() {
   const { id } = useParams();
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
+  // @ts-expect-error
   const publishedBranches = useSelector((state) => state.publishedBranches);
 
   useEffect(() => {

@@ -55,4 +55,17 @@ if (environment) {
   }
 }
 
-module.exports = config;
+/**
+ * @typedef {{ [key: string]: any } & {
+ *   app: typeof import('./app'),
+ *   queues: typeof import('./queues'),
+ *   postgres: typeof import('./postgres'),
+ *   redis: typeof import('./redis') & { tls?: object },
+ *   mailer: typeof import('./mailer') & { username?: string, password?: string },
+ *   encryption: { key: string, algorithm: string },
+ *   userEnvVar: { key: string },
+ *   localSiteBuildTasks?: { id: number, type: string }[],
+ * }} Config
+ */
+
+module.exports = /** @type {Config} */ (config);

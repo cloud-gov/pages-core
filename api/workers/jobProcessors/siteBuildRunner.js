@@ -16,12 +16,14 @@ const sleepInterval = process.env.NODE_ENV === 'test' ? 0 : 1000;
  * @async
  * @method siteBuildRunner
  * @param {Object} job - The bullmq job object
+ * @param {string} job.id - The bullmq job id
  * @param {object} job.data - The job data object
  * @param {string} job.data.buildId - The buildId for the site build job
- * @param {Object} options - The options for polling.
+ * @param {Object} [options] - The options for polling.
  * @param {number} [options.totalAttempts=180] - The total number of attempts
  * @param {number} [options.sleepNumber=15000] - The milliseconds
- * @return {Promise<{Object}>} The bullmq's queue add job response
+ * to wait before the next poll
+ * @return {Promise<boolean>} true when the site build completes
  */
 async function siteBuildRunner(job, { sleepNumber = 15000, totalAttempts = 180 } = {}) {
   const logger = createJobLogger(job);

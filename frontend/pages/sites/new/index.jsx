@@ -31,10 +31,15 @@ function AddSite() {
     [],
   );
 
+  // @ts-expect-error
   const alert = useSelector((state) => state.alert);
+  // @ts-expect-error
   const organizations = useSelector((state) => state.organizations);
+  // @ts-expect-error
   const showAddNewSiteFields = useSelector((state) => state.showAddNewSiteFields);
+  // @ts-expect-error
   const { isLoading } = useSelector((state) => state.sites);
+  // @ts-expect-error
   const templates = useSelector((state) => state.FRONTEND_CONFIG.TEMPLATES);
 
   const example = getTemplateExampleUrl(templates);

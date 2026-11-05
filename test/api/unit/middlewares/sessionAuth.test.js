@@ -4,6 +4,7 @@ const moment = require('moment');
 
 const config = require('../../../../config');
 const sessionAuth = require('../../../../api/middlewares/session-auth');
+const EventCreator = require('../../../../api/services/EventCreator');
 
 describe('sessionAuth', () => {
   let mockReq;
@@ -27,6 +28,8 @@ describe('sessionAuth', () => {
       forbidden: sinon.spy(),
     };
   });
+
+  afterEach(() => sinon.restore());
 
   it('calls res.forbidden when not authenticated', (done) => {
     mockReq.session.authenticated = false;
@@ -61,5 +64,22 @@ describe('sessionAuth', () => {
     sessionAuth(mockReq, mockRes, mockNext);
     expect(mockReq.logout.calledOnce).to.equal(true);
     expect(mockReq.session.authRedirectPath).to.equal(undefined);
+  });
+
+  it('records the timed out logout as an error event with a message', () => {
+    const eventError = sinon.stub(EventCreator, 'error');
+    mockReq.logout = (callback) => callback();
+    mockRes.redirect = sinon.spy();
+    mockReq.session.authenticatedAt = moment()
+      .subtract(config.policies.authRevalidationMinutes + 5, 'minutes')
+      .toDate();
+
+    sessionAuth(mockReq, mockRes, mockNext);
+
+    expect(eventError.calledOnce).to.equal(true);
+    const [, error] = eventError.firstCall.args;
+    expect(error).to.be.an.instanceOf(Error);
+    expect(error.message).to.equal('session timed logout');
+    expect(mockRes.redirect.calledOnceWith(config.app.hostname)).to.equal(true);
   });
 });

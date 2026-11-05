@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../util/federalistApi';
 
+// @ts-expect-error
 const REFRESH_INTERVAL = parseInt(30 * 1000, 10);
 const initResultsState = {
   buildTasks: null,

@@ -20,6 +20,7 @@ async function destroySiteInfra({ site, user }) {
     throw new Error(reason);
   }
 
+  // @ts-expect-error
   const msg = results.map(JSON.stringify);
   logger.info(msg.join('\n'));
   return true;

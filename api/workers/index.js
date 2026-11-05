@@ -1,3 +1,4 @@
+// @ts-nocheck
 const path = require('path');
 const IORedis = require('ioredis');
 
@@ -167,4 +168,7 @@ async function start() {
   await jobs();
 }
 
-start().catch(logger.err);
+start().catch((error) => {
+  logger.error(`Worker process failed to start: ${error?.stack || error}`);
+  process.exit(1);
+});

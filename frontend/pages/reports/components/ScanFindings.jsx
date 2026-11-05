@@ -39,6 +39,7 @@ const ScanFindings = ({
   if (count && groupedFindings) {
     return (
       <>
+        {/* @ts-expect-error */}
         {severity[scanGroup].map(({ [groupKey]: group, label, color }, groupIndex) => (
           <React.Fragment key={group}>
             {groupedFindings[group] && groupedFindings[group]?.length > 0 && (
@@ -57,6 +58,7 @@ const ScanFindings = ({
                   {groupedFindings[group]?.map((finding, findingIndex) => (
                     <ScanFinding
                       key={finding.name || finding.help}
+                      // @ts-expect-error
                       index={findingIndex}
                       finding={finding}
                       groupColor={color}

@@ -3,6 +3,18 @@ import PropTypes from 'prop-types';
 import AlertBanner from '@shared/alertBanner';
 import LoadingIndicator from '@shared/LoadingIndicator';
 
+/**
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ * @param {Array} [props.data]
+ * @param {string} [props.dataHeader]
+ * @param {string} [props.dataMessage]
+ * @param {{ message: string }} [props.error]
+ * @param {string} [props.errorMessage]
+ * @param {boolean} props.isPending
+ * @param {boolean} props.isPlaceholderData
+ * @param {boolean} [props.showErrorIfEmpty]
+ */
 export default function QueryPage({
   children,
   data,

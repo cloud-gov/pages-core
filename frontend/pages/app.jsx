@@ -19,7 +19,9 @@ function shouldClearAlert(alert) {
 export function App({ onEnter }) {
   const location = useLocation();
   const queryClient = new QueryClient();
+  // @ts-expect-error
   const alert = useSelector((state) => state.alert);
+  // @ts-expect-error
   const notifications = useSelector((state) => state.notifications);
 
   useEffect(() => {

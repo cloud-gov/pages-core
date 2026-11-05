@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const moment = require('moment');
 const request = require('supertest');
 const app = require('../../../app');
 const factory = require('../support/factory');
@@ -87,6 +88,23 @@ describe('Build Log API', () => {
         expect(response.body.offset).to.equal(0);
         expect(response.body.output_count).to.equal('1000');
         expect(response.body.output).to.have.length(1000);
+      });
+
+      it('should return no logs for recent builds without logs', async () => {
+        const { site, user } = await createSiteUserOrg();
+        const cookie = await authenticatedSession(user);
+        const build = await factory.build({
+          user,
+          site,
+          completedAt: moment().subtract(1, 'days').toDate(),
+        });
+
+        const { body } = await request(app)
+          .get(`/v0/build/${build.id}/log`)
+          .set('Cookie', cookie)
+          .expect(200);
+
+        expect(body.output).to.deep.equal([]);
       });
 
       it('should reject non-organization user build log requests', async () => {

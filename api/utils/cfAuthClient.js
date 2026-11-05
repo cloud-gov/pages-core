@@ -2,6 +2,12 @@ const jwt = require('jsonwebtoken');
 const HttpClient = require('./httpClient');
 
 class CloudFoundryAuthClient {
+  /**
+   * @param {Object} [options]
+   * @param {string} [options.username] - Defaults to CF_API_USERNAME
+   * @param {string} [options.password] - Defaults to CF_API_PASSWORD
+   * @param {string} [options.tokenUrl] - Defaults to CLOUD_FOUNDRY_OAUTH_TOKEN_URL
+   */
   constructor({ username, password, tokenUrl } = {}) {
     this.username = username ?? process.env.CF_API_USERNAME;
     this.password = password ?? process.env.CF_API_PASSWORD;

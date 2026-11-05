@@ -21,7 +21,7 @@ describe('FileUpload Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
-    prettyBytes.mockReturnValue('4 KB');
+    jest.mocked(prettyBytes).mockReturnValue('4 KB');
   });
 
   afterEach(() => {

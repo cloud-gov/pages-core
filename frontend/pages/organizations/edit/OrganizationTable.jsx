@@ -56,6 +56,7 @@ function OrganizationTable({
                 ? timeFrom(currentMember.User.signedInAt)
                 : 'Never'}
             </td>
+            {/* @ts-expect-error */}
             <td label="Actions" data-title="Actions" className="table-actions" />
           </tr>
         )}

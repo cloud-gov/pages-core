@@ -28,6 +28,7 @@ export default function A11yScanChild({
     .map((i) => i.total)
     .reduce((a, b) => a + b, 0);
 
+  /** @type {Object[]} */
   const navGroups = [...utils.severity.a11y].map((group) => ({
     ...group,
     label: group.label,
@@ -165,6 +166,7 @@ export default function A11yScanChild({
           <div>
             <A11yPassed passes={report.passes} />
             <hr />
+            {/* @ts-expect-error */}
             <About sbtType={sbtType} siteId={siteId}>
               <GeneratedFor
                 siteId={siteId}

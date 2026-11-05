@@ -22,6 +22,14 @@ function filterEntity(res, name, field = 'name') {
   return filtered;
 }
 
+/**
+ * @param {Object} res - The CF API list response
+ * @param {string} name - The value to match
+ * @param {string} [field='name'] - The entity field to match on
+ * @param {Object} [options]
+ * @param {string} [options.errorMessage] - The error message if no entity is found
+ * @return {Object} The matching entity
+ */
 function findEntity(res, name, field = 'name', { errorMessage } = {}) {
   const errMsg = errorMessage || `Not found: Entity @${field} = ${name}`;
   const entity = res.resources.find((item) => utils.get(item, field) === name);
@@ -51,6 +59,16 @@ function objToQueryParams(obj) {
   return qs;
 }
 
+/**
+ * @param {Object} params
+ * @param {string} [params.type='managed'] - The service type
+ * @param {string} params.name - The service name
+ * @param {string} [params.spaceGuid] - The space relationship guid
+ * @param {string} [params.servicePlanGuid] - The service plan relationship guid
+ * @param {string} [params.serviceInstanceGuid] - The service instance relationship guid
+ * @param {Object} [params.parameters] - The service parameters
+ * @return {Object} The CF API request body
+ */
 function buildRequestBody({
   type = 'managed',
   name,
@@ -87,6 +105,11 @@ function buildRequestBody({
 }
 
 class CloudFoundryAPIClient {
+  /**
+   * @param {Object} [options]
+   * @param {string} [options.apiUrl] - Defaults to CLOUD_FOUNDRY_API_HOST
+   * @param {CloudFoundryAuthClient} [options.authClient]
+   */
   constructor({ apiUrl, authClient } = {}) {
     this.authClient = authClient ?? new CloudFoundryAuthClient();
     this.httpClient = new HttpClient(apiUrl ?? process.env.CLOUD_FOUNDRY_API_HOST);
@@ -142,9 +165,9 @@ class CloudFoundryAPIClient {
    * @param {Object} options - The options for polling.
    * @param {number} [options.attempt=1] - The starting attempt count.
    * @param {number} [options.totalAttempts=240] - The total number of attempts
-   * @param {number} [options.sleepNumber=15000] - The milliseconds
+   * @param {number} [options.sleepInterval=15000] - The milliseconds
    * to wait before the next attempt
-   * @return {Promise<{Object}>} An object with the state value or possible error
+   * @return {Promise<{ state: string }>} An object with the finished state
    */
   async pollTaskStatus(
     guid,
@@ -242,8 +265,13 @@ class CloudFoundryAPIClient {
    * Defaults to the pages-build-container-{env} app
    * @param {Array} [message.containerSize] - The container settings for disk and memory
    * defaults to 4GB disk and 2GB of memory
-   * @param {number} jobId - The queue job id
-   * @return {Promise<{Object}>} An object with the state value or possible error
+   * @param {string|number} jobId - The queue job id
+   * @param {Object} [options] - The options for retrying
+   * @param {number} [options.attempt=1] - The starting attempt count
+   * @param {number} [options.totalAttempts=3] - The total number of attempts
+   * @param {number} [options.sleepInterval=1000] - The milliseconds
+   * to wait before the next attempt
+   * @return {Promise<Object>} The created CF task
    */
   async startSiteBuildTask(
     message,
@@ -502,6 +530,16 @@ class CloudFoundryAPIClient {
     return this.authClient.accessToken();
   }
 
+  /**
+   * @param {string} methodName - The client method to call
+   * @param {string|Array} args - The method arguments
+   * @param {Object} [options]
+   * @param {Object} [options.res] - The previous response
+   * @param {number} [options.retries=0] - The number of retries so far
+   * @param {number} [options.totalRetries=20] - The total number of retries
+   * @param {number} [options.sleepInterval=1000] - The base milliseconds between retries
+   * @return {Promise<Object>} The last response
+   */
   async retry(
     methodName,
     args,

@@ -47,7 +47,7 @@ describe('useBuilds', () => {
 
   it('should return error', async () => {
     const siteId = 1;
-    await getSiteBuildsError(siteId, 'Something happened');
+    await getSiteBuildsError(siteId);
 
     const { result } = renderHook(() => useBuilds(siteId), {
       wrapper: createWrapper(),
@@ -88,9 +88,7 @@ describe('useBuilds', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(ref.current.scrollIntoView).toHaveBeenCalledTimes(1);
-    expect(qcSpy.calledOnceWith({ queryKey: ['builds', parseInt(siteId, 10)] })).toBe(
-      true,
-    );
+    expect(qcSpy.calledOnceWith({ queryKey: ['builds', siteId] })).toBe(true);
   });
 
   it('should mutate the builds on rebuild and not scrollIntoView', async () => {
@@ -121,8 +119,6 @@ describe('useBuilds', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(ref.current.scrollIntoView).toHaveBeenCalledTimes(0);
-    expect(qcSpy.calledOnceWith({ queryKey: ['builds', parseInt(siteId, 10)] })).toBe(
-      true,
-    );
+    expect(qcSpy.calledOnceWith({ queryKey: ['builds', siteId] })).toBe(true);
   });
 });

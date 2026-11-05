@@ -42,6 +42,7 @@ const mapSites = (organizations, siteData, user) =>
       const { organizationId } = site;
       const organization = getOrgById(organizations, organizationId);
       return (
+        // @ts-expect-error
         <SiteListItem key={site.id} organization={organization} site={site} user={user} />
       );
     });
@@ -66,9 +67,13 @@ const getSites = (organizations, sites, user) => {
 };
 
 export const Sites = () => {
+  // @ts-expect-error
   const alert = useSelector((state) => state.alert);
+  // @ts-expect-error
   const organizations = useSelector((state) => state.organizations);
+  // @ts-expect-error
   const sites = useSelector((state) => state.sites);
+  // @ts-expect-error
   const user = useSelector((state) => state.user.data);
 
   const [orgFilterValue, setOrgFilterValue] = useState('all-options');
@@ -83,11 +88,13 @@ export const Sites = () => {
       (user.hasGitlabAuth && process.env.FEATURE_WORKSHOP_INTEGRATION === 'true')) &&
     hasOrgs(organizations)
   ) {
+    // @ts-expect-error
     buttonAddSite = (
       <Link
         to="/sites/new"
         role="button"
         className="usa-button button-add-website margin-right-0"
+        // @ts-expect-error
         alt="Add a new site"
       >
         <UsaIcon name="add" /> Add site
@@ -95,6 +102,7 @@ export const Sites = () => {
     );
   }
   if (!user.hasGithubAuth) {
+    // @ts-expect-error
     buttonGitHub = (
       <GithubAuthButton
         onSuccess={onGithubAuthSuccess}
@@ -104,6 +112,7 @@ export const Sites = () => {
     );
   }
   if (!user.hasGitlabAuth && process.env.FEATURE_WORKSHOP_INTEGRATION === 'true') {
+    // @ts-expect-error
     buttonGitLab = (
       <GitLabAuthButton
         onSuccess={onGitLabAuthSuccess}
