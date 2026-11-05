@@ -22,6 +22,7 @@ export default function Zap({
   // eslint-disable-next-line max-len
   const pageTitle = `Pages | ${scanTitle} report for ${report.site['@name']} on ${report.generated} for build id ${buildId}`;
 
+  /** @type {Object[]} */
   const navGroups = [...severity.zap].map((group) => ({
     ...group,
     usePill: true,

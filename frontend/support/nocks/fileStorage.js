@@ -15,6 +15,7 @@ export async function getFileStorageFiles(
   params.append('path', path);
   if (sortKey) params.append('sortKey', sortKey);
   if (sortOrder) params.append('sortOrder', sortOrder);
+  // @ts-expect-error
   if (page) params.append('page', page);
 
   const expectedUrl = `/v0/file-storage/${fileStorageId}`;

@@ -18,6 +18,7 @@ import { cleanUrlPathSlashes } from '@util';
 
 function FileStoragePage() {
   const { id } = useParams();
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
   const fileStorageServiceId = site.fileStorageServiceId;
 
@@ -92,6 +93,7 @@ function FileStoragePage() {
     primaryHandler: () => {},
   };
   const resetModal = useCallback(() => {
+    // @ts-expect-error
     setDialogProps(INITIAL_DIALOG_PROPS);
   }, []);
 
@@ -147,6 +149,7 @@ function FileStoragePage() {
       // Alpha sort is better done in ASC, not DESC
       newSortOrder = REVERSE_SORT_ORDER;
     }
+    // @ts-expect-error
     setSearchParams({
       ...Object.fromEntries(searchParams),
       sortKey,
@@ -170,6 +173,7 @@ function FileStoragePage() {
       };
       setDialogProps({
         ...dialogProps,
+        // @ts-expect-error
         open: true,
         header: 'Are you sure?',
         message: confirmMessage,
@@ -278,6 +282,7 @@ function FileStoragePage() {
             >
               {!isFetching && fetchedPublicFiles?.length === 0 && (
                 <tr>
+                  {/* @ts-expect-error */}
                   <td colSpan="99" className="text-italic">
                     No files or folders found.
                   </td>

@@ -35,6 +35,7 @@ const logRateLimitExceeded = (limiter) => (req, res, next, options) => {
   res.status(options.statusCode).send(options.message);
 };
 
+// @ts-expect-error
 const adminRateLimit = rateLimit({
   windowMs: ADMIN_API_RATE_LIMIT_WINDOW_MS,
   max: ADMIN_API_RATE_LIMIT_MAX_REQUESTS,
@@ -44,6 +45,7 @@ const adminRateLimit = rateLimit({
   handler: logRateLimitExceeded('API'),
 });
 
+// @ts-expect-error
 const authRateLimit = rateLimit({
   windowMs: ADMIN_AUTH_RATE_LIMIT_WINDOW_MS,
   max: ADMIN_AUTH_RATE_LIMIT_MAX_FAILED_ATTEMPTS,
@@ -54,6 +56,7 @@ const authRateLimit = rateLimit({
   handler: logRateLimitExceeded('auth'),
 });
 
+// @ts-expect-error
 const adminSlowDown = slowDown({
   windowMs: ADMIN_API_SLOW_DOWN_WINDOW_MS,
   delayAfter: ADMIN_API_SLOW_DOWN_REQUESTS_BEFORE_DELAY,

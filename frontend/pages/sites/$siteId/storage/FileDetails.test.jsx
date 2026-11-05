@@ -27,7 +27,7 @@ describe('FileDetails', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    prettyBytes.mockReturnValue('1 MB');
+    jest.mocked(prettyBytes).mockReturnValue('1 MB');
   });
 
   it('renders file details correctly', () => {

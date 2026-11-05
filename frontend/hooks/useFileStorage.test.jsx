@@ -96,7 +96,7 @@ describe('useFileStorage', () => {
 
   it('should return an error when fetching public files fails', async () => {
     const errorMessage = 'Failed to fetch public files';
-    await getFileStorageFilesError({ ...props, errorMessage });
+    await getFileStorageFilesError({ ...props });
     await getFileStorageFiles({ ...props }, { times: 3 });
 
     const { result } = renderHook(() => useFileStorage(...Object.values(props)), {
@@ -134,7 +134,7 @@ describe('useFileStorage', () => {
     const fileItem = { id: 1, name: 'file1.txt' };
 
     const deleteErrorMessage = 'Failed to delete file';
-    await deletePublicItemError(props.fileStorageId, fileItem.id, deleteErrorMessage);
+    await deletePublicItemError(props.fileStorageId, fileItem.id);
     await getFileStorageFiles({ ...props }, { times: 3 });
 
     const { result } = renderHook(() => useFileStorage(...Object.values(props)), {

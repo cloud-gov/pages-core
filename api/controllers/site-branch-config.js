@@ -18,6 +18,13 @@ function generateS3Key(site, context, branch) {
   return `preview/${site.owner}/${site.repository}/${branch}`;
 }
 
+/**
+ * @param {Object} [params]
+ * @param {string} [params.branch] - The branch name
+ * @param {Object|string} [params.config={}] - The site config, as an object, JSON or YAML
+ * @param {string} [params.context] - The branch config context
+ * @returns {{ branch: string, config: Object, context: string }} The validated params
+ */
 function validate({ branch, config = {}, context } = {}) {
   const parsedConfig = parseSiteConfig(config);
 

@@ -1,17 +1,29 @@
 {
-  "include": ["frontend/**/*", "api/**/*", "test/frontend/support/data"],
+  "include": ["frontend/**/*", "api/**/*", "test/frontend/support/data", "types/**/*"],
   "compilerOptions": {
-    "baseUrl": ".",
+    "checkJs": true,
+    "noEmit": true,
+    "strict": false,
+    "target": "es2024",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["node", "jest"],
+    "skipLibCheck": true,
+    "maxNodeModuleJsDepth": 0,
     "paths": {
       "@shared/*": ["./frontend/shared/*"],
       "@actions/*": ["./frontend/actions/*"],
+      "@hooks": ["./frontend/hooks"],
       "@hooks/*": ["./frontend/hooks/*"],
+      "@util": ["./frontend/util"],
       "@util/*": ["./frontend/util/*"],
       "@selectors/*": ["./frontend/selectors/*"],
       "@pages/*": ["./frontend/pages/*"],
       "@globals": ["./frontend/globals"],
       "@propTypes": ["./frontend/propTypes"],
-      "@support": ["./frontend/support"]
+      "@support": ["./frontend/support"],
+      "@support/*": ["./frontend/support/*"]
     }
   }
 }

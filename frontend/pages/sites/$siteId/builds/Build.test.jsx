@@ -47,6 +47,7 @@ describe('<Build />', () => {
         build={{
           ...props.build,
           state: 'success',
+          // @ts-expect-error
           startedAt: 1770775800000,
           branch: 'main',
         }}
@@ -74,6 +75,7 @@ describe('<Build />', () => {
         build={{
           ...props.build,
           state: 'error',
+          // @ts-expect-error
           startedAt: 1770775800000,
           branch: 'main',
         }}

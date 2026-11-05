@@ -41,6 +41,8 @@ const mockProps = {
   onSort: jest.fn(),
   currentSortKey: 'name',
   currentSortOrder: 'asc',
+  highlightItem: null,
+  children: null,
 };
 
 describe('FileList', () => {

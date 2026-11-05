@@ -6,7 +6,6 @@ import LocationBar from './LocationBar';
 describe('LocationBar Component', () => {
   const mockOnNavigate = jest.fn();
   const storageRoot = 'https://example.gov/~assets';
-  const siteId = '123';
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -15,12 +14,7 @@ describe('LocationBar Component', () => {
   it('renders root directory correctly, in text (not link) if current directory', () => {
     render(
       /* MemoryRouter allows us to render components that use react Link  */
-      <LocationBar
-        path=""
-        siteId={siteId}
-        storageRoot={storageRoot}
-        onNavigate={mockOnNavigate}
-      />,
+      <LocationBar path="" storageRoot={storageRoot} onNavigate={mockOnNavigate} />,
     );
 
     expect(screen.getByText(`${storageRoot}/`)).toBeInTheDocument();
@@ -32,12 +26,7 @@ describe('LocationBar Component', () => {
 
   it('renders single-level folder correctly, with parent as link', () => {
     render(
-      <LocationBar
-        path="foo"
-        siteId={siteId}
-        storageRoot={storageRoot}
-        onNavigate={mockOnNavigate}
-      />,
+      <LocationBar path="foo" storageRoot={storageRoot} onNavigate={mockOnNavigate} />,
     );
 
     expect(screen.getByRole('link', { name: `${storageRoot}/` })).toBeInTheDocument();
@@ -48,7 +37,6 @@ describe('LocationBar Component', () => {
     render(
       <LocationBar
         path="foo/bar"
-        siteId={siteId}
         storageRoot={storageRoot}
         onNavigate={mockOnNavigate}
       />,
@@ -62,7 +50,6 @@ describe('LocationBar Component', () => {
     render(
       <LocationBar
         path="baz/foo/bar"
-        siteId={siteId}
         storageRoot={storageRoot}
         onNavigate={mockOnNavigate}
       />,
@@ -79,7 +66,6 @@ describe('LocationBar Component', () => {
     render(
       <LocationBar
         path="foo/bar/baz"
-        siteId={siteId}
         storageRoot={storageRoot}
         onNavigate={mockOnNavigate}
       />,
@@ -90,26 +76,14 @@ describe('LocationBar Component', () => {
   });
 
   it('does not render ../ at root level', () => {
-    render(
-      <LocationBar
-        path=""
-        siteId={siteId}
-        storageRoot={storageRoot}
-        onNavigate={mockOnNavigate}
-      />,
-    );
+    render(<LocationBar path="" storageRoot={storageRoot} onNavigate={mockOnNavigate} />);
 
     expect(screen.queryByRole('link', { name: '../' })).not.toBeInTheDocument();
   });
 
   it('clicking domain/~assets resets to root if it is a link', () => {
     render(
-      <LocationBar
-        path="foo"
-        siteId={siteId}
-        storageRoot={storageRoot}
-        onNavigate={mockOnNavigate}
-      />,
+      <LocationBar path="foo" storageRoot={storageRoot} onNavigate={mockOnNavigate} />,
     );
     fireEvent.click(screen.getByRole('link', { name: `${storageRoot}/` }));
     expect(mockOnNavigate).toHaveBeenCalledWith('/');
@@ -121,7 +95,6 @@ describe('LocationBar Component', () => {
     render(
       <LocationBar
         path={path}
-        siteId={siteId}
         storageRoot={storageRoot}
         onNavigate={mockOnNavigate}
         trailingSlash={false}
@@ -138,7 +111,6 @@ describe('LocationBar Component', () => {
     render(
       <LocationBar
         path={path}
-        siteId={siteId}
         storageRoot={storageRoot}
         onNavigate={mockOnNavigate}
         trailingSlash={false}
@@ -153,12 +125,7 @@ describe('LocationBar Component', () => {
     const fileName = 'qux.txt';
     const path = `foo/bar/bash/${fileName}`;
     render(
-      <LocationBar
-        path={path}
-        siteId={siteId}
-        storageRoot={storageRoot}
-        onNavigate={mockOnNavigate}
-      />,
+      <LocationBar path={path} storageRoot={storageRoot} onNavigate={mockOnNavigate} />,
     );
 
     const elementName = `${fileName}/`;

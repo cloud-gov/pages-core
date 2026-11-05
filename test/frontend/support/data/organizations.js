@@ -7,7 +7,7 @@ export function createFixtureOrg({
   updatedAt = Date.now().toString(),
   isActive = true,
   isSandbox = false,
-  daysUnitSandboxCleaning = null,
+  daysUntilSandboxCleaning = null,
 } = {}) {
   return {
     createdAt,
@@ -16,6 +16,6 @@ export function createFixtureOrg({
     updatedAt,
     isActive,
     isSandbox,
-    daysUnitSandboxCleaning,
+    daysUntilSandboxCleaning,
   };
 }

@@ -11,6 +11,7 @@ import FilesTable from './FilesTable';
 
 function PublishedFilesTable() {
   const { id, name } = useParams();
+  // @ts-expect-error
   const publishedFiles = useSelector((state) => state.publishedFiles);
 
   const [currentPage, setCurrentPage] = useState(0);

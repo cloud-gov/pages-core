@@ -17,7 +17,7 @@ const compat =
 
 /**
  * Helper to get the given date or `now` in UTC.
- * @param {String | Date} dateString  date to convert to UTC. Defaults to now.
+ * @param {String | Date | number} [dateString] date to convert to UTC. Defaults to now.
  * @return {Date}                     date in UTC
  */
 function getUTCDate(dateString = Date.now()) {

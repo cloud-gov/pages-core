@@ -119,6 +119,7 @@ function NewCustomDomain() {
               placeholder='ie. "site.agency.gov"'
               onChange={(event) => {
                 setDomainValues({
+                  // @ts-expect-error
                   siteBranchConfigId,
                   names: event.target.value,
                 });
@@ -139,6 +140,7 @@ function NewCustomDomain() {
               settings&apos; branch configurations for{' '}
               <Link
                 to={`/sites/${id}/settings/#site-branch-config`}
+                // @ts-expect-error
                 alt="Go to site settings' live site context branch configuration"
               >
                 Live
@@ -146,6 +148,7 @@ function NewCustomDomain() {
               or{' '}
               <Link
                 to={`/sites/${id}/settings/#demo-branch-config`}
+                // @ts-expect-error
                 alt="Go to site settings' demo context branch configuration"
               >
                 Demo
@@ -160,6 +163,7 @@ function NewCustomDomain() {
               onChange={(event) => {
                 setDomainValues({
                   names,
+                  // @ts-expect-error
                   siteBranchConfigId: event.target.value,
                 });
               }}

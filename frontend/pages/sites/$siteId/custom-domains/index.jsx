@@ -10,6 +10,7 @@ import Domains from './Domains';
 function DomainList() {
   const { id } = useParams();
   const { domains, deleteSiteDomain } = useSiteDomains(id);
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
 
   if (!site || domains.isLoading) {
@@ -29,6 +30,7 @@ function DomainList() {
           to={`/sites/${id}/custom-domains/new`}
           role="button"
           className="usa-button button-add-website margin-right-0"
+          // @ts-expect-error
           alt="Add a new site domain"
         >
           <UsaIcon name="add" /> Add new domain

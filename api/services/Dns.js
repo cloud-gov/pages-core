@@ -77,7 +77,7 @@ function buildDnsRecords(domainName) {
 
 /**
  * @param {DnsRecord} dnsRecord
- * @returns {Promise<[DnsResultState, string=]>}
+ * @returns {Promise<[DnsResultState, string?]>}
  */
 async function resolveDnsRecord(dnsRecord) {
   try {
@@ -88,10 +88,12 @@ async function resolveDnsRecord(dnsRecord) {
     });
     const values = await resolver.resolve(dnsRecord.name, dnsRecord.type);
 
+    // @ts-expect-error
     if (values.includes(dnsRecord.target)) {
       return [DnsResultState.Success];
     }
 
+    // @ts-expect-error
     const message = values.length > 0 ? `Found [${values.join(', ')}]` : 'Record not set';
 
     return [DnsResultState.Pending, message];

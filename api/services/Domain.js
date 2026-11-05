@@ -14,8 +14,31 @@ const { BuildService } = require('./build');
 const { States } = Domain;
 
 /**
- * @typedef {object} DomainModel
- * @prop {string} state
+ * @typedef {import('sequelize').Model & {
+ *   id: number,
+ *   names: string,
+ *   context: string,
+ *   origin: string | null,
+ *   path: string | null,
+ *   serviceName: string | null,
+ *   state: string,
+ *   siteId: number,
+ *   SiteBranchConfig?: { branch: string | null },
+ *   isPending(): boolean,
+ *   namesArray(): string[],
+ * }} DomainModel
+ */
+
+/**
+ * @typedef {import('sequelize').Model & {
+ *   id: number,
+ *   branch: string | null,
+ *   context: string,
+ *   s3Key: string | null,
+ *   siteId: number,
+ *   Site?: SiteModel,
+ *   Domains?: DomainModel[],
+ * }} SiteBranchConfigModel
  */
 
 /**
@@ -142,7 +165,7 @@ function buildDnsRecords(domain) {
 
 /**
  * @param {DomainModel} domain The domain
- * @returns {DnsService.DnsResult[]}
+ * @returns {Promise<DnsService.DnsResult[]>}
  */
 async function checkDnsRecords(domain) {
   const dnsResults = await Promise.all(
@@ -154,7 +177,7 @@ async function checkDnsRecords(domain) {
 
 /**
  * @param {DomainModel} domain The domain
- * @returns {DnsService.DnsResult[]}
+ * @returns {Promise<DnsService.DnsResult[]>}
  */
 function checkAcmeChallengeDnsRecord(domain) {
   return Promise.all(
@@ -186,7 +209,8 @@ function isSiteUrlManagedByDomain(site, domains, context) {
 
 /**
  * @param {DomainModel} domain
- * @param {SiteModel} site
+ * @param {{ description: string, refresh: boolean }} flow
+ * One of SourceCodePlatformHelper.flows
  */
 async function rebuildAssociatedSite(domain, flow) {
   const { branch } = domain.SiteBranchConfig;

@@ -37,6 +37,7 @@ export default function Report() {
           siteId={siteId}
           buildId={buildId}
           report={report}
+          // @ts-expect-error
           sbtType={data.type}
         />
       );

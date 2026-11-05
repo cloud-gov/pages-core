@@ -4,6 +4,18 @@ import globals from '@globals';
 
 import { IconBranch, IconGitHub, IconGitLab } from './icons';
 
+/**
+ * @param {Object} props
+ * @param {string} props.sourceCodePlatform
+ * @param {string} props.sourceCodeUrl
+ * @param {string} [props.text]
+ * @param {string} [props.textGitHub]
+ * @param {string} [props.textGitLab]
+ * @param {string} [props.branch]
+ * @param {string} [props.sha]
+ * @param {string} [props.icon]
+ * @param {boolean} [props.isButton]
+ */
 const SourceCodePlatformLink = ({
   sourceCodePlatform,
   sourceCodeUrl,

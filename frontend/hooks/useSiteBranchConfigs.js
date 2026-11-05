@@ -32,6 +32,7 @@ export const useSiteBranchConfigs = (siteId, { noPreviews = false } = {}) => {
       .catch((error) =>
         setConfigs({
           ...siteBranchConfigs,
+          // @ts-expect-error
           state: 'error',
           error: error.message,
         }),

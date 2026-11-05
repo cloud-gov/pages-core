@@ -21,6 +21,7 @@ const enhancers = [applyMiddleware];
 
 if (!['production', 'test'].includes(process.env.NODE_ENV)) {
   middlewares.push(logger);
+  // @ts-expect-error
   enhancers.unshift(composeWithDevTools);
 }
 

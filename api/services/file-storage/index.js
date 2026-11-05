@@ -63,6 +63,12 @@ async function adminGetSiteFileStorageById(id) {
   return fss;
 }
 
+/**
+ * @param {Object} [options]
+ * @param {number} [options.siteFileStorageId] - The file storage service id
+ * @param {number} [options.limit=50] - The page size
+ * @param {number} [options.page=1] - The page number
+ */
 async function adminGetSiteFileStorageUserActions({
   siteFileStorageId,
   limit = 50,

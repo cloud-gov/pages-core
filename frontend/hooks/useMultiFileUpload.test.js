@@ -17,7 +17,6 @@ describe('useMultiFileUpload Hook', () => {
     it('should add files to the queue', async () => {
       const { result } = renderHook(() =>
         useMultiFileUpload({
-          urlPath: '/upload',
           onUpload: mockOnUpload,
         }),
       );
@@ -35,7 +34,6 @@ describe('useMultiFileUpload Hook', () => {
     it('should clear all added files in the queue', async () => {
       const { result } = renderHook(() =>
         useMultiFileUpload({
-          urlPath: '/upload',
           onUpload: mockOnUpload,
         }),
       );
@@ -57,7 +55,6 @@ describe('useMultiFileUpload Hook', () => {
     it('should remove a specific file from the queue', async () => {
       const { result } = renderHook(() =>
         useMultiFileUpload({
-          urlPath: '/upload',
           onUpload: mockOnUpload,
         }),
       );
@@ -114,7 +111,6 @@ describe('useMultiFileUpload Hook', () => {
       const mockOnUpload = jest.fn(() => Promise.reject(new Error(errorMessage)));
       const { result } = renderHook(() =>
         useMultiFileUpload({
-          urlPath: '/upload',
           onUpload: mockOnUpload,
         }),
       );
@@ -140,7 +136,6 @@ describe('useMultiFileUpload Hook', () => {
       const mockOnUpload = jest.fn(() => Promise.reject());
       const { result } = renderHook(() =>
         useMultiFileUpload({
-          urlPath: '/upload',
           onUpload: mockOnUpload,
         }),
       );

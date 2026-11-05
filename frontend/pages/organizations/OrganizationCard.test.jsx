@@ -59,7 +59,7 @@ describe('OrganizationCard', () => {
         name: 'Organization Name',
         isActive: isActive,
         isSandbox: isSandbox,
-        daysUntilSandboxCleaningdays: 3,
+        daysUntilSandboxCleaning: 3,
       }),
       role: {
         id: randomUUID(),
@@ -79,7 +79,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });
@@ -93,7 +93,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(true, testProps.organization.id);
   });
@@ -107,7 +107,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });
@@ -121,7 +121,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(true, testProps.organization.id);
   });
@@ -135,7 +135,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });
@@ -149,7 +149,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });
@@ -163,7 +163,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });
@@ -177,7 +177,7 @@ describe('OrganizationCard', () => {
     const testProps = initTest(testData);
 
     testOrganizationCard(testProps.organization.name);
-    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaningdays);
+    testMessage(testData.isSandbox, testProps.organization.daysUntilSandboxCleaning);
     testOrganizationActiveStatus(testData.isActive);
     testOrganizationLink(false, testProps.organization.id);
   });

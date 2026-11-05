@@ -22,6 +22,7 @@ const CopyFileLink = ({ url }) => {
       onClick={() => handleCopy(`${url}`)}
     >
       {copySuccess ? 'Copied!' : 'Copy link'}
+      {/* @ts-expect-error */}
       <IconLink className="usa-icon" />
     </button>
   );

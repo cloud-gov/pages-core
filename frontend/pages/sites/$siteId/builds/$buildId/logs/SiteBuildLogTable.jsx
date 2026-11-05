@@ -7,6 +7,7 @@ function SiteBuildLogTable({ buildLogs, buildState }) {
     ? 'smooth'
     : 'none';
 
+  // @ts-expect-error
   const scrollToLast = useCallback((node, state) => {
     if (node && ['created', 'error', 'processing', 'queued', 'tasked'].includes(state)) {
       node.scrollTop = node.scrollHeight;
@@ -20,6 +21,7 @@ function SiteBuildLogTable({ buildLogs, buildState }) {
       ref={buildLogRef}
       className="build-log"
       style={{
+        // @ts-expect-error
         scrollBehavior: scrollType,
       }}
     >

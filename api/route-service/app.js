@@ -139,6 +139,7 @@ function passThroughProxy(req, res) {
 
 async function parseReqFormData(req, data) {
   return new Promise((resolve, reject) => {
+    // @ts-expect-error
     const busboy = Busboy({ headers: req.headers });
     const formData = new FormData();
     const bufferStream = new Readable({
@@ -156,6 +157,7 @@ async function parseReqFormData(req, data) {
       });
 
       file.on('end', () => {
+        // @ts-expect-error
         formData.append(fieldName, new Blob([Buffer.concat(chunks)]), {
           filename: filename,
           contentType: mimetype,

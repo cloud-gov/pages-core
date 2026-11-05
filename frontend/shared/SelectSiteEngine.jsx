@@ -38,9 +38,9 @@ const SelectSiteEngine = ({
   onChange,
   name,
   id,
-  className,
+  className = '',
   touched = false,
-  error,
+  error = null,
 }) => {
   return (
     <>

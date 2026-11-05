@@ -43,11 +43,11 @@ describe('storage/logs/index', () => {
     jest.clearAllMocks();
 
     // Setup default mock implementations
-    currentSite.mockReturnValue(mockSite);
-    useSelector.mockImplementation((selector) =>
-      selector({ sites: { data: [mockSite] } }),
-    );
-    useFileStorageLogs.mockReturnValue({
+    jest.mocked(currentSite).mockReturnValue(mockSite);
+    jest
+      .mocked(useSelector)
+      .mockImplementation((selector) => selector({ sites: { data: [mockSite] } }));
+    jest.mocked(useFileStorageLogs).mockReturnValue({
       data: mockLogs,
       isPending: false,
       error: null,
@@ -67,7 +67,7 @@ describe('storage/logs/index', () => {
   });
 
   it('shows loading state', () => {
-    useFileStorageLogs.mockReturnValue({
+    jest.mocked(useFileStorageLogs).mockReturnValue({
       data: [],
       isPending: true,
       error: null,
@@ -83,10 +83,12 @@ describe('storage/logs/index', () => {
       id: '123',
     };
 
-    currentSite.mockReturnValueOnce(siteWithoutFileStorage);
-    useSelector.mockImplementationOnce((selector) =>
-      selector({ sites: { data: [siteWithoutFileStorage] } }),
-    );
+    jest.mocked(currentSite).mockReturnValueOnce(siteWithoutFileStorage);
+    jest
+      .mocked(useSelector)
+      .mockImplementationOnce((selector) =>
+        selector({ sites: { data: [siteWithoutFileStorage] } }),
+      );
 
     setup();
 
@@ -97,7 +99,7 @@ describe('storage/logs/index', () => {
   });
 
   it('shows error state', () => {
-    useFileStorageLogs.mockReturnValue({
+    jest.mocked(useFileStorageLogs).mockReturnValue({
       data: [],
       isPending: false,
       error: new Error('Failed to load'),
@@ -110,7 +112,7 @@ describe('storage/logs/index', () => {
   });
 
   it('parses different action types correctly', () => {
-    useFileStorageLogs.mockReturnValue({
+    jest.mocked(useFileStorageLogs).mockReturnValue({
       data: mockLogs,
       isPending: false,
       error: null,

@@ -24,6 +24,7 @@ const FileDetails = ({
   return (
     <div className="file-details">
       <div className="file-details__header bg-base-lightest">
+        {/* @ts-expect-error */}
         <IconAttachment className="usa-icon margin-right-1" />
         <h3>File details</h3>
         <button

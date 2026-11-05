@@ -32,7 +32,7 @@ describe('validAddRepoSiteForm', () => {
 
   it('should return an empty object if just repoUrl is valid without org', () => {
     const expected = validAddRepoSiteForm(
-      { repoUrl, engine },
+      { repoUrl, engine, repoOrganizationId: null },
       {
         organizations: withoutOrgs,
       },
@@ -46,6 +46,7 @@ describe('validAddRepoSiteForm', () => {
       {
         repoUrl: null,
         repoOrganizationId,
+        engine,
       },
       {
         organizations: withOrgs,
@@ -59,6 +60,7 @@ describe('validAddRepoSiteForm', () => {
       {
         repoUrl,
         repoOrganizationId: null,
+        engine,
       },
       {
         organizations: withOrgs,
@@ -72,6 +74,7 @@ describe('validAddRepoSiteForm', () => {
       {
         repoUrl,
         repoOrganizationId: repoOrganizationId,
+        engine: null,
       },
       {
         organizations: withOrgs,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const express = require('express');
 const { createBullBoard } = require('@bull-board/api');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');

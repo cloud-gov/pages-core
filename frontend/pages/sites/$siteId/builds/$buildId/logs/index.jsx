@@ -11,6 +11,7 @@ export const REFRESH_INTERVAL = 15 * 1000;
 const BUILD_LOG_RETENTION_LIMIT = 180 * 24 * 60 * 60 * 1000; // 180 days in milliseconds
 
 function buildTooOld(build) {
+  // @ts-expect-error
   return new Date() - new Date(build?.completedAt) > BUILD_LOG_RETENTION_LIMIT;
 }
 

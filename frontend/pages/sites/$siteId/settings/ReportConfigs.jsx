@@ -94,6 +94,7 @@ function ReportConfigs({ siteId: id }) {
         onChange={(event) => updateRule(event, rule.id, prop)}
         disabled={rule.source === 'Pages'}
       >
+        {/* @ts-expect-error */}
         <option value="" default>
           — Choose a rule —{' '}
         </option>
@@ -179,11 +180,13 @@ function ReportConfigs({ siteId: id }) {
                 onClick={() => deleteRule(rule)}
               >
                 <span className="usa-sr-only">Delete</span>
+                {/* @ts-expect-error */}
                 <IconTrash className="" aria-hidden />
               </button>
             </td>
           </>
         )}
+        {/* @ts-expect-error */}
         {isPagesRule && <td colSpan="2">{pagesPlaceholder()}</td>}
       </tr>
     );

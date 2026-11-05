@@ -21,6 +21,7 @@ jest.mock('redux-form', () => ({
     return WrappedComponent;
   },
 
+  /** @param {Object} props - The props redux-form passes to a Field */
   // eslint-disable-next-line react/prop-types
   Field: ({ name, component: Component = 'input', type, ...props }) => {
     if (typeof Component === 'string') {
@@ -56,6 +57,7 @@ describe('<AddRepoSiteForm />', () => {
     invalid: false,
     valid: true,
     initialValues: {},
+    showAddNewSiteFields: false,
   };
 
   it("renders selection for site's engine", () => {

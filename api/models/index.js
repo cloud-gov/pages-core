@@ -21,6 +21,7 @@ sequelize.addHook('beforeCount', function (options) {
     options.col = this._scope.col || options.col || `"${this.options.name.singular}".id`;
   }
 
+  // @ts-expect-error
   if (options.include && options.include.length > 0) {
     options.include = null;
   }
@@ -50,10 +51,84 @@ require('./domain')(sequelize, DataTypes);
 
 Object.keys(sequelize.models)
   .map((key) => sequelize.models[key])
+  // @ts-expect-error
   .filter((model) => model.associate)
+  // @ts-expect-error
   .forEach((model) => model.associate(sequelize.models));
+
+/* eslint-disable max-len */
+/**
+ * @typedef {object} Models
+ * @property {ReturnType<typeof import('./build')>} Build
+ * @property {ReturnType<typeof import('./build-log')>} BuildLog
+ * @property {ReturnType<typeof import('./build-task-type')>} BuildTaskType
+ * @property {ReturnType<typeof import('./build-task')>} BuildTask
+ * @property {ReturnType<typeof import('./file-storage-domain')>} FileStorageDomain
+ * @property {ReturnType<typeof import('./file-storage-file')>} FileStorageFile
+ * @property {ReturnType<typeof import('./file-storage-service')>} FileStorageService
+ * @property {ReturnType<typeof import('./file-storage-user-action')>} FileStorageUserAction
+ * @property {ReturnType<typeof import('./site')>} Site
+ * @property {ReturnType<typeof import('./site-branch-config')>} SiteBranchConfig
+ * @property {ReturnType<typeof import('./site-build-task')>} SiteBuildTask
+ * @property {ReturnType<typeof import('./user')>} User
+ * @property {ReturnType<typeof import('./user-action')>} UserAction
+ * @property {ReturnType<typeof import('./action-type')>} ActionType
+ * @property {ReturnType<typeof import('./user-environment-variable')>} UserEnvironmentVariable
+ * @property {ReturnType<typeof import('./event')>} Event
+ * @property {ReturnType<typeof import('./role')>} Role
+ * @property {ReturnType<typeof import('./organization')>} Organization
+ * @property {ReturnType<typeof import('./organization-role')>} OrganizationRole
+ * @property {ReturnType<typeof import('./uaa-identity')>} UAAIdentity
+ * @property {ReturnType<typeof import('./domain')>} Domain
+ */
+/* eslint-enable max-len */
+
+const {
+  Build,
+  BuildLog,
+  BuildTaskType,
+  BuildTask,
+  FileStorageDomain,
+  FileStorageFile,
+  FileStorageService,
+  FileStorageUserAction,
+  Site,
+  SiteBranchConfig,
+  SiteBuildTask,
+  User,
+  UserAction,
+  ActionType,
+  UserEnvironmentVariable,
+  Event,
+  Role,
+  Organization,
+  OrganizationRole,
+  UAAIdentity,
+  Domain,
+} = /** @type {Models} */ (/** @type {unknown} */ (sequelize.models));
 
 module.exports = {
   sequelize,
   ...sequelize.models,
+  Build,
+  BuildLog,
+  BuildTaskType,
+  BuildTask,
+  FileStorageDomain,
+  FileStorageFile,
+  FileStorageService,
+  FileStorageUserAction,
+  Site,
+  SiteBranchConfig,
+  SiteBuildTask,
+  User,
+  UserAction,
+  ActionType,
+  UserEnvironmentVariable,
+  Event,
+  Role,
+  Organization,
+  OrganizationRole,
+  UAAIdentity,
+  Domain,
 };

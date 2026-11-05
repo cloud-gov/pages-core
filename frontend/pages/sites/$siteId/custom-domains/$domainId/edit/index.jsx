@@ -130,6 +130,7 @@ function EditCustomDomain() {
               settings&apos; branch configurations for{' '}
               <Link
                 to={`/sites/${id}/settings/#site-branch-config`}
+                // @ts-expect-error
                 alt="Go to site settings' live site context branch configuration"
               >
                 Live
@@ -137,6 +138,7 @@ function EditCustomDomain() {
               or{' '}
               <Link
                 to={`/sites/${id}/settings/#demo-branch-config`}
+                // @ts-expect-error
                 alt="Go to site settings' demo context branch configuration"
               >
                 Demo

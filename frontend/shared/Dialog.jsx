@@ -126,6 +126,7 @@ const Dialog = ({
                   {primaryButton && (
                     <li className="usa-button-group__item">
                       <button
+                        // @ts-expect-error
                         tabIndex="0"
                         type="button"
                         className="usa-button"
@@ -139,6 +140,7 @@ const Dialog = ({
                   {secondaryButton && secondaryHandler && (
                     <li className="usa-button-group__item">
                       <button
+                        // @ts-expect-error
                         tabIndex="0"
                         type="button"
                         className="usa-button usa-button--outline padding-105"
@@ -154,6 +156,7 @@ const Dialog = ({
             </div>
             {dismissable && closeHandler && (
               <button
+                // @ts-expect-error
                 tabIndex="0"
                 type="button"
                 className="usa-button--unstyled usa-modal__close"

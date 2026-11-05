@@ -38,6 +38,7 @@ const BuildLogs = {
 
   async archiveBuildLogs(site, build) {
     const key = this.buildKey(site, build);
+    // @ts-expect-error
     const { logs } = await this.fetchBuildLogs(build);
     if (!logs) {
       return;

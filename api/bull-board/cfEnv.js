@@ -8,6 +8,7 @@ const appEnv = cfenv.getAppEnv();
 
 const redisCreds = appEnv.getServiceCreds(`${PRODUCT}-${APP_ENV}-redis`);
 process.env.REDIS_URL = redisCreds.uri;
+// @ts-expect-error
 process.env.REDIS_TLS = {};
 
 const uaaCredentials = appEnv.getServiceCreds(`app-${APP_ENV}-uaa-client`);

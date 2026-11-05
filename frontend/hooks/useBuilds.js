@@ -33,6 +33,7 @@ export function useRebuild(siteId, buildId, ref) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
+    /** @param {{ buildId: number, siteId: number }} variables */
     mutationFn: ({ buildId, siteId }) => api.restartBuild(buildId, siteId),
     onSuccess: () => {
       // Scroll to build history container ref

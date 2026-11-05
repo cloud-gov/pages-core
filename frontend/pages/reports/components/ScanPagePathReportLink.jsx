@@ -21,6 +21,7 @@ const ScanPagePathAndReportLink = ({ pagePath, pageURL = false, reportLink }) =>
             target="_blank"
             aria-label="open scanned page in a new window,"
             title="open scanned page in a new window"
+            // @ts-expect-error
             href={pageURL}
             rel="noreferrer"
           >
@@ -54,6 +55,7 @@ const ScanPagePathAndReportLink = ({ pagePath, pageURL = false, reportLink }) =>
       <Link
         className="usa-link font-body-2xs text-bold text-no-wrap"
         to={reportLink}
+        // @ts-expect-error
         path="relative"
         title={`Full results for ${pagePath}`}
       >

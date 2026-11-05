@@ -75,6 +75,7 @@ export default function useFileStorage(
   }, []);
 
   const deleteMutation = useMutation({
+    /** @param {{ item: { id: number } }} variables */
     mutationFn: ({ item }) => federalist.deletePublicItem(fileStorageId, item.id),
     onSuccess: () =>
       handleSuccess(
@@ -93,6 +94,7 @@ export default function useFileStorage(
   });
 
   const uploadMutation = useMutation({
+    /** @param {{ parent?: string, file: File }} variables */
     mutationFn: ({ parent = '/', file }) =>
       federalist.uploadPublicFile(fileStorageId, parent, file),
     onSuccess: (file) => {
@@ -107,6 +109,7 @@ export default function useFileStorage(
   });
 
   const createFolderMutation = useMutation({
+    /** @param {{ parent?: string, name: string }} variables */
     mutationFn: ({ parent = '/', name }) =>
       federalist.createPublicDirectory(fileStorageId, parent, name),
     onSuccess: () =>

@@ -37,6 +37,7 @@ const LocationBar = ({ path, storageRoot, onNavigate, trailingSlash = true }) =>
             title="Public storage home"
             style={{ cursor: 'pointer' }}
           >
+            {/* @ts-expect-error */}
             <IconGlobe className="usa-icon width-3 height-3" />
           </button>
         </li>

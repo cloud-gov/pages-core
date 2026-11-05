@@ -11,6 +11,7 @@ export default function Report() {
   return (
     <>
       {onReportPage && <AlertBanner />}
+      {/* @ts-expect-error */}
       <a name="top" />
       <main className="grid-container">
         {onReportPage ? <Outlet /> : <ReportNotFound />}

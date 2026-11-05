@@ -59,6 +59,7 @@ describe('siteRoutes', () => {
         const component = route.Component;
         expect(
           typeof component === 'function' ||
+            // @ts-expect-error
             component.$$typeof === Symbol.for('react.memo'),
         ).toBe(true);
       });

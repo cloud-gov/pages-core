@@ -25,8 +25,10 @@ function siteHasBuildTasks(SiteBuildTasks = []) {
 function SiteBuildList() {
   const ref = useRef();
   const { id } = useParams();
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
   const organization = useSelector((state) =>
+    // @ts-expect-error
     getOrgById(state.organizations, site.organizationId),
   );
 
@@ -84,6 +86,7 @@ function SiteBuildList() {
             </thead>
             <tbody>
               {data.map(({ latestForBranch, ...build }) => {
+                // @ts-expect-error
                 const SiteBuild = memo(Build, [build.state]);
 
                 return (

@@ -60,6 +60,18 @@ describe('mailer', () => {
           }),
         );
       });
+
+      it(`adds a \`uaa-invite\` job to the mail queue for agency IDP
+          users without an organization name`, async () => {
+        const origin = 'agency.gov';
+
+        const job = await queue.sendUAAInvite(email, link, origin);
+
+        expect(job.name).to.eq('uaa-invite');
+        expect(job.data.to).to.deep.eq([email]);
+        expect(job.data.html).to.contain('invited to join <a');
+        expect(job.data.html).to.not.contain('undefined');
+      });
     });
 
     describe('.sendAlert()', () => {

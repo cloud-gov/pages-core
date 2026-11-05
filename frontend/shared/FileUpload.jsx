@@ -54,6 +54,7 @@ const FileUpload = ({ onUpload, onCancel = () => {}, triggerOnMount = false }) =
         id="file-input-dropzone"
         className="usa-file-input__target margin-bottom-1px"
         role="button"
+        // @ts-expect-error
         tabIndex="0"
         aria-label="File uploader"
         aria-describedby="file-input-error file-input-status"

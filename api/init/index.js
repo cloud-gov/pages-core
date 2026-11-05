@@ -63,7 +63,9 @@ function init(app) {
 
   app.use(express.static('public'));
 
+  // @ts-expect-error
   app.use(slowDown(config.rateSlowing));
+  // @ts-expect-error
   app.use(rateLimit(config.rateLimiting));
 
   maybeUseExpressLogger(app);

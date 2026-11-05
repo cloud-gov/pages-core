@@ -16,12 +16,12 @@ const { PAGES_PUBLISHER_HOST } = process.env;
  * @async
  * @method createEditorSite
  * @param {Object} job - The bullmq job object
- * * @param {object} job.data - The job data object
- * * * @param {string} job.data.siteId - The editor site id
- * * * @param {string} job.data.siteName - The editor site id
- * * * @param {string} job.data.orgName - The editor org name
- * * * @param {string} job.data.apiKey - The editor site bot api key
- * @return {Promise<{Object}>} The bullmq's queue add job response
+ * @param {object} job.data - The job data object
+ * @param {string} job.data.siteId - The editor site id
+ * @param {string} job.data.siteName - The editor site name
+ * @param {string} job.data.orgName - The editor org name
+ * @param {string} job.data.apiKey - The editor site bot api key
+ * @return {Promise<boolean>} true when the editor site is created
  */
 async function createEditorSite(job) {
   // Webhook client to send success or error request to

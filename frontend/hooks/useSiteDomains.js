@@ -36,6 +36,7 @@ export const useSiteDomains = (siteId, domainId) => {
         setDomains({
           ...domains,
           isLoading: false,
+          // @ts-expect-error
           state: 'error',
           error: error.message,
         }),
@@ -126,6 +127,7 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
         .catch((error) =>
           setDomain({
             ...domain,
+            // @ts-expect-error
             isLoading: false,
             error: error.message,
           }),
@@ -147,6 +149,10 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
     }
   }, [siteId, domainId, domains, siteBranchConfigs]);
 
+  /**
+   * Updates only the values that are passed
+   * @param {{ names?: string, siteBranchConfigId?: number }} values
+   */
   function setDomainValues({ names, siteBranchConfigId }) {
     const updated = omitByPredicate(
       {
@@ -171,6 +177,7 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
       .then((results) =>
         setDomain({
           ...domain,
+          // @ts-expect-error
           isLoading: false,
           data: results,
         }),
@@ -179,6 +186,7 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
       .catch((error) =>
         setDomain({
           ...domain,
+          // @ts-expect-error
           isLoading: false,
           error: error.message,
         }),
@@ -189,22 +197,23 @@ export const useSiteDomain = (siteIdArg, domainIdArg) => {
     const { data } = domain;
 
     if (data.state === 'pending') {
-      return api
-        .updateSiteDomain(siteId, domainId, data)
-        .then((results) => {
-          if (!results) {
-            throw new Error({
-              message: `Unable to update domain ${data.names}}`,
-            });
-          }
-        })
-        .then(() => navigate(`/sites/${siteId}/custom-domains`))
-        .catch((error) =>
-          setDomain({
-            ...domain,
-            error,
-          }),
-        );
+      return (
+        api
+          // @ts-expect-error
+          .updateSiteDomain(siteId, domainId, data)
+          .then((results) => {
+            if (!results) {
+              throw new Error(`Unable to update domain ${data.names}`);
+            }
+          })
+          .then(() => navigate(`/sites/${siteId}/custom-domains`))
+          .catch((error) =>
+            setDomain({
+              ...domain,
+              error: error.message,
+            }),
+          )
+      );
     }
 
     return window.alert(

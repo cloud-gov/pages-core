@@ -116,7 +116,7 @@ class S3Client {
       if (objects.length >= totalMaxObjects) {
         break;
       }
-      wereS3ResultsTruncated = page.isTruncated;
+      wereS3ResultsTruncated = page.IsTruncated;
     }
 
     // Truncate results before returning if there are more than our page size
