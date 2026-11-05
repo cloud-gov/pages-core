@@ -29,6 +29,7 @@ export default function Domains({ siteId, domains, handleDelete }) {
                 <div className="usa-card__container bg-base-lightest">
                   <div className="usa-card__header">
                     <ListRow>
+                      {/* @ts-expect-error */}
                       <ContextTitle context={sbc.context} branch={sbc.branch} />
                       <StateIndicator state={domain.state} />
                     </ListRow>
@@ -72,6 +73,7 @@ export default function Domains({ siteId, domains, handleDelete }) {
                         onClick={() =>
                           navigate(`/sites/${siteId}/custom-domains/${domain.id}/edit`)
                         }
+                        // @ts-expect-error
                         alt={`Edit site domain ${domain.names}`}
                         type="button"
                       >
@@ -81,6 +83,7 @@ export default function Domains({ siteId, domains, handleDelete }) {
                         disabled={actionsDisabled}
                         className="usa-button usa-button--secondary"
                         onClick={() => handleDelete(domain.id)}
+                        // @ts-expect-error
                         alt={`Delete site domain ${domain.names}`}
                         type="button"
                       >
@@ -90,6 +93,7 @@ export default function Domains({ siteId, domains, handleDelete }) {
                     {actionsDisabled && (
                       <ListRow justify="flex-end">
                         <p className="margin-bottom-0">
+                          {/* @ts-expect-error */}
                           <em htmlFor="domain-edit-delete-actions">
                             *Cannot edit or delete a {domain.state} domain.
                           </em>

@@ -167,6 +167,10 @@ jobs:
             file: src/ci/partials/lint-api.yml
             image: node24
 
+          - task: typecheck-api
+            file: src/ci/partials/typecheck-api.yml
+            image: node24
+
           - task: test-api
             privileged: true
             file: src/ci/partials/test-api.yml

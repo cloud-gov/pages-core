@@ -8,8 +8,11 @@ const { logger } = require('../../winston');
 const siteErrors = require('../responses/siteErrors');
 
 /**
- * @param {string[]} values The enum values
- * @returns
+ * @template {string} const T
+ * @param {readonly T[]} values The enum values
+ * @returns {{ [K in T as Capitalize<Lowercase<K>>]: Lowercase<K> } & {
+ *   values: Lowercase<T>[]
+ * }}
  * An object contained capitalized constants for each value and a `values` key
  * returning the list of values. All values or lowercase.
  *
@@ -26,6 +29,7 @@ const siteErrors = require('../responses/siteErrors');
 function buildEnum(values) {
   const lowerCaseValues = values.map((value) => value.toLowerCase());
 
+  /** @type {any} */
   const constants = lowerCaseValues.reduce(
     (acc, value) => ({
       ...acc,

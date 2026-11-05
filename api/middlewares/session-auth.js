@@ -16,7 +16,7 @@ module.exports = function sessionAuth(req, res, next) {
           user: req.user,
         });
       }
-      EventCreator.error(Event.labels.AUTHENTICATION, 'session timed logout', {
+      EventCreator.error(Event.labels.AUTHENTICATION, new Error('session timed logout'), {
         user: req.user,
       });
       return res.redirect(config.app.hostname);

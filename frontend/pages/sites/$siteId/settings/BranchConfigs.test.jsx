@@ -36,11 +36,12 @@ describe('<BranchConfig />', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-    global.fetch?.mockClear();
+    jest.mocked(global.fetch)?.mockClear();
   });
 
   test('prevents from creating live site config with invalid branch name', async () => {
-    global.fetch = jest.fn();
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock;
 
     const createWrapper = createTestQueryClient();
     const liveSiteBranch = 'main 1';
@@ -63,7 +64,7 @@ describe('<BranchConfig />', () => {
       'Validation error: Invalid branch name — ' +
       'branches can only contain alphanumeric characters, underscores, ' +
       'and hyphens.","status":400}';
-    global.fetch.mockResolvedValue(createMockResponse(data, 422));
+    fetchMock.mockResolvedValue(createMockResponse(data, 422));
     jest.spyOn(actions, 'httpError');
     jest.spyOn(notificationActions, 'success');
 
@@ -90,7 +91,8 @@ describe('<BranchConfig />', () => {
   });
 
   test('prevents from creating demo site config with invalid branch name', async () => {
-    global.fetch = jest.fn();
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock;
 
     const createWrapper = createTestQueryClient();
     const demoSiteBranch = 'main 1';
@@ -113,7 +115,7 @@ describe('<BranchConfig />', () => {
       'Validation error: Invalid branch name — ' +
       'branches can only contain alphanumeric characters, underscores, ' +
       'and hyphens.","status":400}';
-    global.fetch.mockResolvedValue(createMockResponse(data, 422));
+    fetchMock.mockResolvedValue(createMockResponse(data, 422));
     jest.spyOn(actions, 'httpError');
     jest.spyOn(notificationActions, 'success');
 
@@ -141,7 +143,8 @@ describe('<BranchConfig />', () => {
 
   ///
   test('prevents from updatinf live site config with invalid branch name', async () => {
-    global.fetch = jest.fn();
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock;
 
     const createWrapper = createTestQueryClient();
     const liveSiteBranch = 'main 1';
@@ -164,7 +167,7 @@ describe('<BranchConfig />', () => {
       'Validation error: Invalid branch name — ' +
       'branches can only contain alphanumeric characters, underscores, ' +
       'and hyphens.","status":400}';
-    global.fetch.mockResolvedValue(createMockResponse(data, 422));
+    fetchMock.mockResolvedValue(createMockResponse(data, 422));
     jest.spyOn(actions, 'httpError');
     jest.spyOn(notificationActions, 'success');
 
@@ -191,7 +194,8 @@ describe('<BranchConfig />', () => {
   });
 
   test('prevents from updating demo site config with invalid branch name', async () => {
-    global.fetch = jest.fn();
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock;
 
     const createWrapper = createTestQueryClient();
     const demoSiteBranch = 'main 1';
@@ -214,7 +218,7 @@ describe('<BranchConfig />', () => {
       'Validation error: Invalid branch name — ' +
       'branches can only contain alphanumeric characters, ' +
       'underscores, and hyphens.","status":400}';
-    global.fetch.mockResolvedValue(createMockResponse(data, 422));
+    fetchMock.mockResolvedValue(createMockResponse(data, 422));
     jest.spyOn(actions, 'httpError');
     jest.spyOn(notificationActions, 'success');
 

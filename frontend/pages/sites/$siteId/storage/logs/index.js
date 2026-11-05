@@ -12,6 +12,7 @@ import { currentSite } from '@selectors/site';
 
 function FileStorageLogs() {
   const { id } = useParams();
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
   const fileStorageServiceId = site.fileStorageServiceId;
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,6 +47,7 @@ function FileStorageLogs() {
       isPending={isPending}
       isPlaceholderData={false}
     >
+      {/* @ts-expect-error */}
       <div id="top" ref={scrollTo} tabIndex="-1" />
       <LogList logs={data} />
       <Pagination

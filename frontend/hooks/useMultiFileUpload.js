@@ -46,6 +46,7 @@ export const useMultiFileUpload = ({ onUpload, maxFileSizeMB = MEGABYTE_LIMIT })
     setFiles((prevFiles) => [...prevFiles, ...fileItems]);
   }, []);
 
+  // @ts-expect-error
   const clearFiles = useCallback(() => setFiles(() => []));
 
   const uploadFile = useCallback(

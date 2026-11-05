@@ -15,6 +15,7 @@ export const useBuildTasks = (id) => {
         setResults({
           isLoading: false,
           buildTasks: data,
+          // @ts-expect-error
           hasBuildTasks: data.length > 0,
         }),
       );

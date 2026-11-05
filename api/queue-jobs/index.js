@@ -26,8 +26,8 @@ class QueueJobs {
    * @async
    * @method sendAlert
    * @param {string} reason - The reason for the alert
-   * @param {string} errors: The errors associated to the alert,
-   * @return {Promise<{Object}>} The bullmq's queue add job response
+   * @param {Array} errors: The errors associated to the alert,
+   * @return {Promise<import('bullmq').Job>} The bullmq's queue add job response
    */
   async sendAlert(reason, errors) {
     await this.mailQueue.waitUntilReady();
@@ -49,7 +49,9 @@ class QueueJobs {
    * @param {string} organization.name: organizationName,
    * @param {Object[]} organization.Sites: Array of org sites
    * @param {Object[]} organization.Users: Array of org users
-   * @return {Promise<{Object}>} The bullmq's queue add job response
+   * @param {Date} organization.sandboxNextCleaningAt: The next sandbox cleaning date
+   * @param {number} organization.daysUntilSandboxCleaning: Days until the next cleaning
+   * @return {Promise<import('bullmq').Job[]>} The bullmq's queue add job responses
    */
   async sendSandboxReminder(organization) {
     const {
@@ -106,8 +108,8 @@ class QueueJobs {
    * @param {string} email - The email to send the invite to
    * @param {string} link - The invite link
    * @param {string} origin - The UAA origin of the email
-   * @param {string} orgName - The organization name the email is being invited to
-   * @return {Promise<{Object}>} The bullmq's queue add job response
+   * @param {string} [orgName] - The organization name the email is being invited to
+   * @return {Promise<import('bullmq').Job>} The bullmq's queue add job response
    */
   async sendUAAInvite(email, link, origin, orgName) {
     await this.mailQueue.waitUntilReady();
@@ -137,10 +139,10 @@ class QueueJobs {
    * @async
    * @method startBuildTask
    * @param {Object} buildTask - An instance of the model Build Taks
-   * @param {number} build.id - The build task primary key
-   * @param {Object} build.BuildTaskType - The instance's related build task type instance
-   * @param {string} build.BuildTaskType.name - The build task type instance name
-   * @return {Promise<{Object}>} The bullmq's queue add job response
+   * @param {number} buildTask.id - The build task primary key
+   * @param {Object} buildTask.BuildTaskType - The related build task type instance
+   * @param {string} buildTask.BuildTaskType.name - The build task type instance name
+   * @return {Promise<import('bullmq').Job>} The bullmq's queue add job response
    */
   async startBuildTask(buildTask, priority) {
     const {
@@ -160,12 +162,12 @@ class QueueJobs {
    * @async
    * @method startCreateEditorSiteTask
    * @param {Object} editorSite - An instance of the model Build Taks
-   * * @param {number} editorSite.userEmail - The editor site's manager email for the org
-   * * @param {Object} editorSite.orgName - The name of the org
-   * * @param {Object} editorSite.siteName - The name of the site
-   * * @param {Object} editorSite.siteName - The id of the site
-   * * @param {Object} editorSite.apiKey - The bot api key
-   * @return {Promise<{Object}>} The bullmq's queue add job response
+   * @param {string} editorSite.userEmail - The editor site's manager email for the org
+   * @param {string} editorSite.orgName - The name of the org
+   * @param {string} editorSite.siteName - The name of the site
+   * @param {string} editorSite.siteId - The id of the site
+   * @param {string} editorSite.apiKey - The bot api key
+   * @return {Promise<import('bullmq').Job>} The bullmq's queue add job response
    */
   async startCreateEditorSiteTask(editorSite) {
     const { userEmail, orgName, siteName, siteId, apiKey } = editorSite;
@@ -194,7 +196,7 @@ class QueueJobs {
    * @param {Object} build.Site - The build instance's related site
    * @param {string} build.Site.owner - The site's owner
    * @param {string} build.Site.repository - The site's repository
-   * @return {Promise<{Object}>} The bullmq's queue add job response
+   * @return {Promise<import('bullmq').Job>} The bullmq's queue add job response
    */
   async startSiteBuild(build, priority) {
     const { branch, id: buildId, Site } = build;

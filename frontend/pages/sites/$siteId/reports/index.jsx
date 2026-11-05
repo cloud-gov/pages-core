@@ -17,12 +17,15 @@ import ReportList from './ReportList';
 
 function Reports() {
   const { id } = useParams();
+  // @ts-expect-error
   const site = useSelector((state) => currentSite(state.sites, id));
   const organization = useSelector((state) =>
+    // @ts-expect-error
     getOrgById(state.organizations, site.organizationId),
   );
   const { buildTasks: scans, isLoading } = useBuildTasksForSite(id);
   const { siteBuildTasks } = useSiteBuildTasks(id);
+  // @ts-expect-error
   const [searchParams, setSearchParams] = useSearchParams(false);
   const today = startOfToday();
 

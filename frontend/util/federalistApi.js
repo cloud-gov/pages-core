@@ -135,6 +135,11 @@ export default {
     });
   },
 
+  /**
+   * @param {number|string} siteId
+   * @param {number|string} domainId
+   * @param {{ names?: string, siteBranchConfigId?: number }} [params]
+   */
   updateSiteDomain(siteId, domainId, { names, siteBranchConfigId } = {}) {
     return request(`site/${siteId}/domain/${domainId}`, {
       method: 'PUT',
@@ -375,6 +380,7 @@ export default {
     sortOrder = 'desc',
     page = 1,
   ) {
+    // @ts-expect-error
     const params = new URLSearchParams({
       path,
       sortKey,

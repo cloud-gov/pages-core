@@ -11,6 +11,7 @@ const options = config.passport.github.externalOptions;
 const onSuccess = (accessToken, _refreshToken, _profile, callback) => {
   const username = _profile.username.toLowerCase();
   const { maxAge } = config.session.cookie;
+  // @ts-expect-error
   const isExpired = (date, timeLimit) => new Date() - date > timeLimit;
 
   User.findOne({

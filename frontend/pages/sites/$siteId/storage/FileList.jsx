@@ -36,8 +36,10 @@ const FileListRow = ({
         <div className="file-name-wrap  font-mono-xs text-ls-neg-1">
           <span className="file-icon">
             {item.type === 'directory' ? (
+              // @ts-expect-error
               <IconFolder className="usa-icon" />
             ) : (
+              // @ts-expect-error
               <IconAttachment className="usa-icon" />
             )}
           </span>
@@ -137,6 +139,7 @@ const FileList = ({
             <button
               type="button"
               className="usa-button--unstyled usa-table__sort-button"
+              // @ts-expect-error
               tabIndex="0"
               onClick={() => onSort(SORT_KEY_NAME)}
               aria-label="Sort by name"
@@ -162,6 +165,7 @@ const FileList = ({
             <button
               type="button"
               className="usa-button--unstyled usa-table__sort-button"
+              // @ts-expect-error
               tabIndex="0"
               onClick={() => onSort(SORT_KEY_LAST_MODIFIED)}
               aria-label="Sort by last modified"

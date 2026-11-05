@@ -28,10 +28,14 @@ function createStubs() {
   const apiStub = stub(api, 'revokeApplicationGrant').resolves();
   const focusStub = stub().resolves();
   const closeStub = stub().returns();
-  const windowStub = stub(window, 'open').returns({
-    focus: focusStub,
-    close: closeStub,
-  });
+  const windowStub = stub(window, 'open').returns(
+    /** @type {Window} */ (
+      /** @type {unknown} */ ({
+        focus: focusStub,
+        close: closeStub,
+      })
+    ),
+  );
 
   return {
     onFailure,
@@ -58,10 +62,12 @@ describe('<GithubAuthButton/>', () => {
     window['origin'] = globals.APP_HOSTNAME;
 
     // Set screen height and width
-    window['screen'] = {
-      width: 1200,
-      height: 1000,
-    };
+    Object.defineProperty(window, 'screen', {
+      value: {
+        width: 1200,
+        height: 1000,
+      },
+    });
   });
 
   beforeEach(() => {

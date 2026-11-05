@@ -83,6 +83,7 @@ module.exports = {
     if (user) {
       return [
         user,
+        // @ts-expect-error
         {
           email: user.UAAIdentity.email,
         },
@@ -112,10 +113,9 @@ module.exports = {
 
   /**
    *
-   * @param {string} email
-   * @param {string} orgName
+   * @param {string} editorSiteName
+   * @param {string} editorOrgName
    */
-
   async setupSiteEditorOrganization(editorSiteName, editorOrgName) {
     let org;
     const orgName = `editor-${slugify(editorOrgName)}-${slugify(editorSiteName)}`;
@@ -247,7 +247,7 @@ module.exports = {
   },
 
   /**
-   * @param {OrganizationModel} organization The organization
+   * @param {import('sequelize').Model} organization The organization
    * @returns {Promise<OrgType>}
    */
   deactivateOrganization(organization) {
@@ -255,7 +255,7 @@ module.exports = {
   },
 
   /**
-   * @param {OrganizationModel} organization The organization
+   * @param {import('sequelize').Model} organization The organization
    * @returns {Promise<OrgType>}
    */
   activateOrganization(organization) {

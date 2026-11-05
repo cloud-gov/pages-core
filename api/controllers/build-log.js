@@ -108,11 +108,13 @@ module.exports = wrapHandlers({
       ? await getBuildLogsFromS3(build, build.state, offset, byteLimit)
       : await getBuildLogsFromDatabase(build, build.state, offset, lineLimit);
 
+    // @ts-expect-error
     if (buildLogs.length === 0 && offset === 0) {
       const isExpired = moment(build.completedAt).isBefore(
         moment().subtract(179, 'days'),
       );
       if (isExpired) {
+        // @ts-expect-error
         buildLogs.push({
           source: 'ALL',
           output: 'Build logs are only retained for 180 days.',

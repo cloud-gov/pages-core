@@ -11,6 +11,19 @@ function makeOptions(opts) {
   ));
 }
 
+/**
+ * @param {Object} props
+ * @param {string} [props.className]
+ * @param {string|number} props.id
+ * @param {string} [props.label]
+ * @param {boolean} [props.touched]
+ * @param {string} [props.error]
+ * @param {boolean} [props.mustChooseOption]
+ * @param {string} props.name
+ * @param {Function} props.onChange
+ * @param {Array} props.orgData
+ * @param {string|number} props.value
+ */
 const UserOrgSelect = ({
   className = '',
   id,
@@ -24,6 +37,7 @@ const UserOrgSelect = ({
   value,
 }) => (
   <div>
+    {/* @ts-expect-error */}
     <label htmlFor={id} className="usa-label text-bold">
       {label}
     </label>
@@ -31,6 +45,7 @@ const UserOrgSelect = ({
     <select
       {...{ name, id }}
       value={value}
+      // @ts-expect-error
       onChange={onChange}
       className={`usa-select ${touched && error ? 'usa-select--error' : ''} ${className}`}
     >

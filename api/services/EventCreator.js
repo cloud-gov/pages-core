@@ -31,7 +31,7 @@ const audit = (label, model, message, body = {}) =>
 /**
  * Store error message, not the stack
  * @param {object} err
- * @returns {string}
+ * @returns {{ name: string, code: string }}
  */
 function sanitizeError(err) {
   return {

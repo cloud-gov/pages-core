@@ -1,12 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  matchPath,
-  useParams,
-  useLocation,
-  useSearchParams,
-  Outlet,
-} from 'react-router-dom';
+import { matchPath, useParams, useLocation, Outlet } from 'react-router-dom';
 
 import { currentSite } from '@selectors/site';
 import { getOrgById } from '@selectors/organization';
@@ -34,9 +28,11 @@ function getPageTitle(location, buildId = null) {
 export function SiteContainer() {
   const { id, buildId } = useParams();
   const location = useLocation();
-  const params = useSearchParams();
+  // @ts-expect-error
   const sites = useSelector((state) => state.sites);
+  // @ts-expect-error
   const organizations = useSelector((state) => state.organizations);
+  // @ts-expect-error
   const alert = useSelector((state) => state.alert);
 
   if (sites.isLoading || !sites.data) {
@@ -101,9 +97,6 @@ export function SiteContainer() {
           sourceCodePlatform={site.sourceCodePlatform}
           sourceCodeUrl={site.sourceCodeUrl}
           title={pageTitle}
-          siteId={site.id}
-          branch={params.branch || site.defaultBranch}
-          fileName={params.fileName}
         />
         <Outlet />
       </div>

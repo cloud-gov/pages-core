@@ -32,6 +32,7 @@ export default function ReportList({
           <a
             href="#list"
             role="button"
+            // @ts-expect-error
             tabIndex="0"
             className="usa-link"
             onClick={clearParams}
@@ -135,6 +136,7 @@ export default function ReportList({
             <a
               href="#list"
               role="button"
+              // @ts-expect-error
               tabIndex="0"
               className="usa-link"
               onClick={clearParams}

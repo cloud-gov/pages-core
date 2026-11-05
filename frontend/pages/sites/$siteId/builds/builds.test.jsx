@@ -9,7 +9,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import actions from '@actions/alertActions';
 
-global.fetch = jest.fn();
+const fetchMock = jest.fn();
+global.fetch = fetchMock;
 
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
@@ -31,6 +32,8 @@ const createWrapper = (siteId = '123') => {
         }),
         subscribe: jest.fn(),
         dispatch: jest.fn(),
+        replaceReducer: jest.fn(),
+        [Symbol.observable]: jest.fn(),
       }}
     >
       <QueryClientProvider client={queryClient}>
@@ -50,7 +53,7 @@ const createWrapper = (siteId = '123') => {
 
 describe('<Build />', () => {
   test('renders build list and displays error for invalid build rebuild', async () => {
-    useSelector.mockImplementation((selector) =>
+    jest.mocked(useSelector).mockImplementation((selector) =>
       selector({
         sites: {
           data: [{ id: 123, name: 'Test Site', organizationId: 'org-1' }],
@@ -74,7 +77,7 @@ describe('<Build />', () => {
 
     expect(screen.getByText('invalid branch name')).toBeInTheDocument();
 
-    global.fetch.mockResolvedValue({
+    fetchMock.mockResolvedValue({
       ok: false,
       status: 422,
       statusText: '',

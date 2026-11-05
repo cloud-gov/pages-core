@@ -75,6 +75,7 @@ const ScanFinding = ({
         groupLabel={groupLabel}
         groupColor={groupColor}
         count={count}
+        // @ts-expect-error
         references={references}
         sbtType={sbtType}
         anchor={anchor}
@@ -94,6 +95,7 @@ const ScanFinding = ({
         <FindingDescription
           description={description}
           sbtType={sbtType}
+          // @ts-expect-error
           siteId={siteId}
           moreInfo={hasMoreInfo}
         />
@@ -306,7 +308,12 @@ const FindingLocations = ({ locations = [], anchor, sbtType }) => (
             >
               {/* TODO: Review this one */}
               {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
-              <a id={locationAnchor} href={`#${locationAnchor}`} label="anchor" />
+              <a
+                id={locationAnchor}
+                href={`#${locationAnchor}`}
+                // @ts-expect-error
+                label="anchor"
+              />
               {url && (
                 <h4 className="font-body-md text-normal margin-bottom-0">
                   <FindingLocationURL url={url} />

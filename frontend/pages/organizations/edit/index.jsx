@@ -89,6 +89,7 @@ function OrganizationEdit() {
         federalistApi.fetchOrganization(id),
         federalistApi.fetchRoles(),
       ]);
+      // @ts-expect-error
       dispatch({
         type: 'init',
         payload: {
@@ -155,11 +156,13 @@ function OrganizationEdit() {
           roleOptions={roleOptions}
           onSubmit={(data) => federalistApi.inviteToOrganization(org.id, data)}
           onSubmitSuccess={({ member, invite: { email, link } }, reduxDispatch) => {
+            // @ts-expect-error
             dispatch({
               type: 'addMember',
               payload: member,
             });
             if (link) {
+              // @ts-expect-error
               dispatch({
                 type: 'invitationSent',
                 payload: {

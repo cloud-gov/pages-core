@@ -13,7 +13,7 @@ function OrganizationCard({ organization, role }) {
         <div className="usa-card__body">
           {organization.isSandbox && (
             <p>
-              <em>{sandboxMsg(organization.daysUntilSandboxCleaningdays)}</em>
+              <em>{sandboxMsg(organization.daysUntilSandboxCleaning)}</em>
             </p>
           )}
         </div>

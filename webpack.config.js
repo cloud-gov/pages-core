@@ -50,6 +50,7 @@ const svgoConfig = {
   ],
 };
 
+/** @type {import('webpack').WebpackPluginInstance[]} */
 const plugins = [
   // Make sure this is the first plugin!!!
   new MiniCssExtractPlugin({
