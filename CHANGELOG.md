@@ -1,3 +1,13 @@
+## 0.28.1 (2026-11-13)
+
+### Fixed
+
+- Logs outputting session code
+
+### Maintenance
+
+- Create standard lint, format, type check config and tasks for all nodejs projects 2977
+
 ## 0.28.0 (2026-11-04)
 
 ### Added
