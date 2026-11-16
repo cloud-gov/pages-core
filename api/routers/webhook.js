@@ -27,7 +27,7 @@ function verifySignature(req, res, next) {
     signWebhookRequest(payload, headers);
   } catch (err) {
     res.badRequest();
-    next(err);
+    return next(err);
   }
   next();
 }
@@ -53,7 +53,7 @@ function verifySiteRequest(expectedKeys) {
       if (!hasKeys) throw new Error('Invalid request payload');
     } catch (err) {
       res.badRequest();
-      next(err);
+      return next(err);
     }
 
     next();
@@ -65,7 +65,7 @@ function verifyToken(req, res, next) {
     verifyGitLabToken(req.headers);
   } catch (err) {
     res.badRequest();
-    next(err);
+    return next(err);
   }
   next();
 }
