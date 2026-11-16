@@ -17,6 +17,7 @@ const { createSiteUserOrg } = require('../support/site-user');
 const utils = require('../../../api/utils');
 // eslint-disable-next-line max-len
 const SourceCodePlatformHelper = require('../../../api/services/SourceCodePlatformHelper');
+const OrganizationService = require('../../../api/services/organization');
 
 const { Organization, Role, Site } = require('../../../api/models');
 const SiteDestroyer = require('../../../api/services/SiteDestroyer');
@@ -714,28 +715,34 @@ describe('Site API', () => {
 
       nock.cleanAll();
 
-      githubAPINocks.repo({
+      // Site creation validates the repository, then checks the webhook user's
+      // permissions when selecting an admin token. Both calls must be mocked.
+      const repoNock = githubAPINocks.repo({
         accessToken: 'fake-access-token',
         owner: siteOwner,
         repo: siteRepository,
         response: [
           200,
           {
-            permissions: {
-              admin: true,
-              push: false,
-            },
+            default_branch: 'main',
+            permissions: { admin: true, push: false },
           },
         ],
       });
+      const permissionsNock = githubAPINocks.repo({
+        accessToken: 'fake-access-token',
+        owner: siteOwner,
+        repo: siteRepository,
+        response: [200, { permissions: { admin: true, push: false } }],
+      });
 
-      sinon.stub(Site.prototype, 'getOrgUsers').resolves([
+      sinon.stub(OrganizationService, 'getOrganizationUsers').resolves([
         {
           githubAccessToken: 'fake-access-token',
           signedInAt: new Date(),
         },
       ]);
-      githubAPINocks.webhook({
+      const webhookNock = githubAPINocks.webhook({
         owner: siteOwner,
         repo: siteRepository,
         response: [
@@ -776,6 +783,9 @@ describe('Site API', () => {
             .expect(400),
         )
         .then((response) => {
+          expect(repoNock.isDone()).to.be.true;
+          expect(permissionsNock.isDone()).to.be.true;
+          expect(webhookNock.isDone()).to.be.true;
           validateAgainstJSONSchema('POST', '/site', 400, response.body);
           expect(response.body.message).to.equal(
             'You do not have admin access to this repository',
