@@ -1,12 +1,33 @@
 const GitHub = require('./GitHub');
+const { CustomError } = require('../utils/validators');
+
+const requireAdminToken = async (site, users, getAccessTokenWithAdminPermissions) => {
+  const token = await getAccessTokenWithAdminPermissions(site, users);
+  if (!token) {
+    throw new CustomError(
+      'No valid GitHub token with repository-admin permissions is available. ' +
+        'A repository administrator in the site organization must reconnect GitHub.',
+      403,
+    );
+  }
+  return token;
+};
 
 const createSiteWebhook = async (site, users, getAccessTokenWithAdminPermissions) => {
-  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, users);
+  const githubAccessToken = await requireAdminToken(
+    site,
+    users,
+    getAccessTokenWithAdminPermissions,
+  );
   return GitHub.setWebhook(site, githubAccessToken);
 };
 
 const listSiteWebhooks = async (site, users, getAccessTokenWithAdminPermissions) => {
-  const githubAccessToken = await getAccessTokenWithAdminPermissions(site, users);
+  const githubAccessToken = await requireAdminToken(
+    site,
+    users,
+    getAccessTokenWithAdminPermissions,
+  );
   return GitHub.listSiteWebhooks(site, githubAccessToken);
 };
 
