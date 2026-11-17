@@ -8,7 +8,7 @@ module.exports = (error = {}, { res }) => {
     finalError = {
       status: error,
     };
-  } else if (error.code === 'EBADCSRFTOKEN') {
+  } else if (error.name !== 'HttpError' && error.code === 'EBADCSRFTOKEN') {
     finalError = {
       status: 403,
       message: 'Invalid CSRF token',

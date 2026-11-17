@@ -31,12 +31,12 @@ const audit = (label, model, message, body = {}) =>
 /**
  * Store error message, not the stack
  * @param {object} err
- * @returns {{ name: string, code: string }}
+ * @returns {{ name: string, code: string | number }}
  */
 function sanitizeError(err) {
   return {
     name: err.name,
-    code: err.code,
+    code: err.name === 'HttpError' ? err.status : err.code,
   };
 }
 
