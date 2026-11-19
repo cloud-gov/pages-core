@@ -59,7 +59,7 @@
       </LabeledItem>
       {#if organizationId}
         <LabeledItem label="organization id">
-          <span class="usa-tag bg-indigo">{organizationId}</span>
+          <a class="usa-tag bg-indigo" href="/organizations/{organizationId}">{organizationId}</a>
         </LabeledItem>
       {/if}
       <div class="display-flex flex-row flex-justify-end margin-y-05">
