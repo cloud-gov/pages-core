@@ -16,3 +16,6 @@ queues_site_builds_concurrency: 3
 route-service-instances: 2
 uaa_host: https://uaa.fr-stage.cloud.gov
 uaa_login_host: https://login.fr-stage.cloud.gov
+cf_api_host: https://api.fr-stage.cloud.gov
+cf_oauth_token_url: https://login.fr-stage.cloud.gov/oauth/token
+cf_domain_with_cdn_plan_guid: a727e4ef-7db0-404a-b3f8-92202cfdc5d5
