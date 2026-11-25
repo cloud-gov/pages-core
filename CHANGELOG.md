@@ -1,3 +1,18 @@
+## 0.28.1 (2026-11-23)
+
+### Fixed
+
+- Avoid deprecated Octokit error.code access
+- lint fix
+- reject webhook operations when no GitHub admin token is available
+- Stop webhook validation middleware immediately after a validation failure by returning next(err)
+- Logs outputting session code
+
+### Maintenance
+
+- add link tag to org id in site metadata
+- Create standard lint, format, type check config and tasks for all nodejs projects 2977
+
 ## 0.28.0 (2026-11-04)
 
 ### Added
